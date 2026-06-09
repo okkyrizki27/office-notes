@@ -1,0 +1,33 @@
+status_code;status_name;status_mo_sap;wo_status;is_wo_overdue;check_taskpersonalized;taskpersonalized_status
+INA;Open;CRTD-INIT;Open;0;1;
+INA;Open;CRTD-INIT;Open;0;1;Close
+INA;Open;CRTD-INIT;Open;0;1;Cancelled
+INB;Assigned;REL-APPV;Open;0;1;Complete
+INB;Assigned;REL-APPV;Open;0;1;In Progress
+INB;Assigned;REL-APPV;Open;0;1;Open
+INB;Assigned;REL-APPV;Open;0;1;Pending
+INB;Assigned;REL-APPV;In Progress;0;1;Complete
+INB;Assigned;REL-APPV;In Progress;0;1;In Progress
+INB;Assigned;REL-APPV;In Progress;0;1;Open
+INB;Assigned;REL-APPV;In Progress;0;1;Pending
+INB;Assigned;REL-APPV;Pending;0;1;Complete
+INB;Assigned;REL-APPV;Pending;0;1;In Progress
+INB;Assigned;REL-APPV;Pending;0;1;Open
+INB;Assigned;REL-APPV;Pending;0;1;Pending
+INE;Completed;TECO-COMP;Complete;;0;
+INF;Overdue Open;REL-APPV;Open;1;1;
+INF;Overdue Open;REL-APPV;Open;1;1;Close
+INF;Overdue Open;REL-APPV;Open;1;1;Cancelled
+ING;Overdue Assigned;REL-APPV;Open;1;1;Complete
+ING;Overdue Assigned;REL-APPV;Open;1;1;In Progress
+ING;Overdue Assigned;REL-APPV;Open;1;1;Open
+ING;Overdue Assigned;REL-APPV;Open;1;1;Pending
+ING;Overdue Assigned;REL-APPV;In Progress;1;1;Complete
+ING;Overdue Assigned;REL-APPV;In Progress;1;1;In Progress
+ING;Overdue Assigned;REL-APPV;In Progress;1;1;Open
+ING;Overdue Assigned;REL-APPV;In Progress;1;1;Pending
+ING;Overdue Assigned;REL-APPV;Pending;1;1;Complete
+ING;Overdue Assigned;REL-APPV;Pending;1;1;In Progress
+ING;Overdue Assigned;REL-APPV;Pending;1;1;Open
+ING;Overdue Assigned;REL-APPV;Pending;1;1;Pending
+INI;Closed;CLSD-COMP;Close;;0;

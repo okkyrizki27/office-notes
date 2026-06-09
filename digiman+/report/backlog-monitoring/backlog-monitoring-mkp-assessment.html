@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Assessment – Backlog Monitoring Implementation for MKP</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 10.5pt;
+    color: #1a1a1a;
+    background: #fff;
+    padding: 32px 40px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .doc-header { border-bottom: 3px solid #0078d4; padding-bottom: 16px; margin-bottom: 24px; }
+  .doc-title { font-size: 18pt; font-weight: 700; color: #0078d4; }
+  .doc-subtitle { font-size: 10pt; color: #555; margin-top: 3px; }
+  .meta-table { margin-top: 12px; border-collapse: collapse; width: 100%; font-size: 10pt; }
+  .meta-table td { padding: 3px 8px 3px 0; color: #444; vertical-align: top; }
+  .meta-table td:first-child { font-weight: 600; color: #222; width: 150px; }
+
+  /* Section headings */
+  h2 {
+    font-size: 11.5pt; font-weight: 700; color: #fff;
+    background: #0078d4; padding: 7px 12px;
+    margin: 26px 0 10px; border-radius: 3px;
+  }
+  h3 {
+    font-size: 10.5pt; font-weight: 700; color: #0078d4;
+    border-left: 4px solid #0078d4; padding-left: 10px;
+    margin: 18px 0 8px;
+  }
+  h4 { font-size: 10pt; font-weight: 700; color: #333; margin: 14px 0 6px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 10pt; margin: 8px 0 14px; }
+  th { background: #0078d4; color: #fff; padding: 7px 10px; text-align: left; font-weight: 600; }
+  td { padding: 6px 10px; border-bottom: 1px solid #e0e0e0; vertical-align: top; line-height: 1.5; }
+  tr:nth-child(even) td { background: #f5f9ff; }
+
+  /* Badge colours */
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 9pt; font-weight: 700; white-space: nowrap;
+  }
+  .red    { background: #ffcccc; color: #c62828; }
+  .orange { background: #ffe0b2; color: #e65100; }
+  .yellow { background: #fff9c4; color: #f57f17; }
+  .green  { background: #e8f5e9; color: #2e7d32; }
+  .blue   { background: #e3f2fd; color: #1565c0; }
+  .gray   { background: #f0f0f0; color: #555; }
+
+  /* Callout boxes */
+  .callout {
+    padding: 9px 14px; margin: 8px 0 12px;
+    border-left: 4px solid; border-radius: 0 4px 4px 0;
+    font-size: 10pt; line-height: 1.6;
+  }
+  .callout-info  { background: #e3f2fd; border-color: #1565c0; }
+  .callout-warn  { background: #fff8e1; border-color: #f9a825; }
+  .callout-risk  { background: #ffebee; border-color: #c62828; }
+  .callout-ok    { background: #e8f5e9; border-color: #2e7d32; }
+
+  /* Code block */
+  pre {
+    background: #1e1e1e; color: #d4d4d4;
+    padding: 12px 16px; border-radius: 4px;
+    font-family: Consolas, monospace; font-size: 9pt;
+    margin: 8px 0 14px; overflow-x: auto; line-height: 1.6;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .kw  { color: #569cd6; }  /* keyword */
+  .cm  { color: #6a9955; }  /* comment */
+  .str { color: #ce9178; }  /* string */
+  .fn  { color: #dcdcaa; }  /* function */
+
+  code {
+    background: #f0f0f0; padding: 1px 5px; border-radius: 3px;
+    font-family: Consolas, monospace; font-size: 9.5pt; color: #c7254e;
+  }
+
+  /* Lists */
+  ol, ul { padding-left: 20px; }
+  ol li, ul li { margin: 4px 0; line-height: 1.6; }
+
+  /* Step flow */
+  .steps { counter-reset: step; padding-left: 0; list-style: none; }
+  .steps li {
+    counter-increment: step;
+    padding: 8px 12px 8px 48px;
+    position: relative; margin: 4px 0;
+    background: #f8fbff; border-left: 3px solid #0078d4;
+    border-radius: 0 4px 4px 0;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    background: #0078d4; color: #fff;
+    width: 22px; height: 22px; border-radius: 50%;
+    font-size: 9pt; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  b { color: #111; }
+  em { font-style: italic; color: #555; }
+  .muted { color: #888; font-size: 9pt; }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 40px; padding-top: 10px;
+    border-top: 1px solid #ddd;
+    font-size: 9pt; color: #888; text-align: center;
+  }
+
+  @media print {
+    body { padding: 20px 28px; }
+    h2, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    pre { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="doc-header">
+  <div class="doc-title">Backlog Monitoring — MKP Implementation Assessment</div>
+  <div class="doc-subtitle">Gap Analysis & Recommendations: BUMA ID → MKP</div>
+  <table class="meta-table">
+    <tr><td>Document</td><td>Technical Assessment Report</td></tr>
+    <tr><td>Scope</td><td>SP <code>usp_iams_backlog_monitoring</code> — Multi-tenant Readiness</td></tr>
+    <tr><td>Current Tenant</td><td>BUMA ID</td></tr>
+    <tr><td>Target Tenant</td><td>MKP</td></tr>
+    <tr><td>Date</td><td>05 Juni 2026</td></tr>
+    <tr><td>Prepared by</td><td>Okky Rizki R</td></tr>
+  </table>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<h2>Executive Summary</h2>
+<div class="callout callout-warn">
+  Logic Backlog Monitoring yang ada saat ini <b>sepenuhnya hardcode untuk BUMA ID</b> dan <b>tidak dapat langsung dijalankan untuk MKP</b> tanpa perubahan. Terdapat <b>6 blocking issue</b> yang harus diselesaikan sebelum go-live, serta sejumlah konfigurasi yang perlu dieksternalisasi agar sistem dapat mendukung multi-tenant secara berkelanjutan.
+</div>
+<p>Arsitektur saat ini: <b>API mentrigger save ke semua DB (ADM, d-inspect, d-execute, d-order) secara bersamaan</b>. Masing-masing client (BUMA ID dan MKP) memiliki DB terpisah. Perubahan SP harus mempertimbangkan bahwa satu SP akan digunakan untuk dua tenant dengan konfigurasi berbeda.</p>
+
+
+<!-- SECTION 1: HARDCODE INVENTORY -->
+<h2>1. Inventory Hardcode di SP Saat Ini</h2>
+
+<h3>1.1 ADLS2 Paths — 14 Path Semua Hardcode <code>/buma/</code></h3>
+<pre><span class="cm">-- Semua path di bawah ini mengandung '/buma/' yang perlu diganti per tenant</span>
+<span class="str">'assetmanagement/buma/digiman_dexecute/mobacklog/'</span>
+<span class="str">'assetmanagement/buma/digiman_dorder/lookup/'</span>
+<span class="str">'assetmanagement/buma/digiman_dplan/digitalplanning/'</span>
+<span class="str">'assetmanagement/buma/digiman_dplan/dpcolumn/'</span>
+<span class="str">'assetmanagement/buma/digiman_dplan/dpvalue/'</span>
+<span class="str">'assetmanagement/buma/iams_maintenance_execution/workorder/'</span>
+<span class="str">'assetmanagement/buma/iams_maintenance_execution/task/'</span>
+<span class="str">'assetmanagement/buma/iams_maintenance_execution/taskpersonalized/'</span>
+<span class="str">'assetmanagement/buma/iams_maintenance_execution/taskpersonalizedfinding/'</span>
+<span class="str">'assetmanagement/buma/iams_maintenance_order/mechanicorderlist/'</span>
+<span class="str">'assetmanagement/buma/iams_maintenance_order/...'</span>  <span class="cm">-- (dan 4 path lainnya)</span>
+<span class="str">'assetmanagement/buma/shared_tenant/sectiontype/'</span>
+<span class="str">'assetmanagement/buma/shared_tenant/site/'</span>
+<span class="str">'assetmanagement/buma/mapping/config_mapping_mol_status.csv'</span>
+<span class="str">'assetmanagement/buma/reports/digiman/dim_equipment_mobacklog/*.parquet'</span>
+<span class="str">'assetmanagement/buma/reports/digiman/dim_date/*.parquet'</span></pre>
+
+<h3>1.2 Business Logic Filter — Hardcode</h3>
+<pre><span class="cm">-- Filter MO (di query mobacklog)</span>
+<span class="kw">WHERE</span> mocreatedby = <span class="str">'DATACOM'</span>            <span class="cm">-- source MO dari SAP</span>
+  <span class="kw">AND</span> replacementstatuslvl1 = <span class="str">'BEX'</span>     <span class="cm">-- activity type</span>
+  <span class="kw">AND</span> motype = <span class="str">'MT01'</span>                   <span class="cm">-- tipe MO</span>
+
+<span class="cm">-- Tenant filter (di sectiontype & site)</span>
+<span class="kw">WHERE</span> tenantcode = <span class="str">'BUMAID'</span>
+
+<span class="cm">-- Status MO mapping (SAP user status codes)</span>
+<span class="kw">WHEN</span> lower(user_status) = <span class="str">'comp'</span>  → Closed
+<span class="kw">WHEN</span> lower(user_status) <span class="kw">IN</span> (<span class="str">'init','wapv','inpv','nrev'</span>) → Waiting Approval
+<span class="kw">WHEN</span> lower(user_status) = <span class="str">'appv'</span>  → (kondisional)
+
+<span class="cm">-- Priority group filter</span>
+<span class="kw">WHERE</span> [group] = <span class="str">'Inspection'</span></pre>
+
+<h3>1.3 Dimension Tables — Tidak Tersedia di MKP</h3>
+<table>
+  <tr><th>Table</th><th>Source</th><th>Status MKP</th><th>Impact jika Missing</th></tr>
+  <tr>
+    <td><code>dim_equipment</code></td>
+    <td>Parquet di datamart BUMA ID</td>
+    <td><span class="badge red">Tidak Ada</span></td>
+    <td>INNER JOIN → output <b>0 rows</b></td>
+  </tr>
+  <tr>
+    <td><code>dim_date</code></td>
+    <td>Parquet di datamart BUMA ID</td>
+    <td><span class="badge red">Tidak Ada</span></td>
+    <td><code>week_id</code> semua NULL</td>
+  </tr>
+  <tr>
+    <td><code>lookup</code> MOL_LAST_STATUS</td>
+    <td>digiman_dorder/lookup</td>
+    <td><span class="badge red">Tidak Ada</span></td>
+    <td>Risk SP error / <code>status_desc</code> NULL</td>
+  </tr>
+</table>
+
+<h3>1.4 Config Files — BUMA ID Specific</h3>
+<table>
+  <tr><th>File</th><th>Konten (BUMA ID)</th><th>Risk di MKP</th></tr>
+  <tr><td><code>config_mapping_mol_status.csv</code></td><td>Status mapping MOL ke business status</td><td>MKP mungkin punya status berbeda</td></tr>
+  <tr><td><code>config_image.csv</code></td><td>OB LOADER, OB HAULER, COAL HAULER, dll</td><td>Section MKP berbeda</td></tr>
+  <tr><td><code>aging_category.csv</code></td><td>1–14, 15–45, &gt;45 hari</td><td>Threshold MKP mungkin berbeda</td></tr>
+</table>
+
+
+<!-- SECTION 2: GAP ANALYSIS -->
+<h2>2. Gap Analysis per Kategori</h2>
+
+<h3>Kategori A — BLOCKING (Harus diselesaikan sebelum go-live)</h3>
+<table>
+  <tr><th>#</th><th>Item</th><th>Masalah</th><th>Solusi</th></tr>
+  <tr>
+    <td><b>A1</b></td>
+    <td>ADLS2 path <code>/buma/</code></td>
+    <td>Path tidak exist di MKP container → semua query error</td>
+    <td>Parameterize: <code>@tenantPath</code></td>
+  </tr>
+  <tr>
+    <td><b>A2</b></td>
+    <td><code>dim_equipment</code> parquet</td>
+    <td>INNER JOIN → output 0 rows, dashboard kosong</td>
+    <td>Buat dim_equipment untuk MKP dari source DB MKP</td>
+  </tr>
+  <tr>
+    <td><b>A3</b></td>
+    <td><code>dim_date</code> parquet</td>
+    <td><code>week_id</code> semua NULL</td>
+    <td>Share parquet (data tidak tenant-specific) atau run <code>sp_dim_date</code></td>
+  </tr>
+  <tr>
+    <td><b>A4</b></td>
+    <td><code>tenantcode = 'BUMAID'</code></td>
+    <td>Filter salah, data sectiontype & site kosong</td>
+    <td>Parameterize: <code>@tenantCode</code></td>
+  </tr>
+  <tr>
+    <td><b>A5</b></td>
+    <td><code>createdby = 'DATACOM'</code></td>
+    <td>MKP mungkin bukan DATACOM → mobacklog kosong</td>
+    <td>Config per tenant atau parameterize</td>
+  </tr>
+  <tr>
+    <td><b>A6</b></td>
+    <td><code>replacementstatuslvl1 = 'BEX'</code></td>
+    <td>MKP mungkin punya activity type berbeda</td>
+    <td>Config per tenant atau parameterize</td>
+  </tr>
+</table>
+
+<h3>Kategori B — SHOULD CHANGE (Data tidak akurat jika dibiarkan)</h3>
+<table>
+  <tr><th>#</th><th>Item</th><th>Masalah</th><th>Solusi</th></tr>
+  <tr>
+    <td><b>B1</b></td>
+    <td><code>motype = 'MT01'</code></td>
+    <td>Tipe MO MKP belum dikonfirmasi</td>
+    <td>Config per tenant</td>
+  </tr>
+  <tr>
+    <td><b>B2</b></td>
+    <td>SAP user status codes</td>
+    <td>MKP mungkin pakai kode berbeda di SAP</td>
+    <td>Config mapping status per tenant</td>
+  </tr>
+  <tr>
+    <td><b>B3</b></td>
+    <td><code>[group] = 'Inspection'</code></td>
+    <td>Priority group MKP belum dikonfirmasi</td>
+    <td>Config per tenant</td>
+  </tr>
+  <tr>
+    <td><b>B4</b></td>
+    <td>Section type exclusion</td>
+    <td><code>OTHERS, LIGHTING TOWER</code> mungkin bukan exclusion list MKP</td>
+    <td>Config per tenant</td>
+  </tr>
+  <tr>
+    <td><b>B5</b></td>
+    <td><code>config_image.csv</code></td>
+    <td>Section name MKP berbeda dari BUMA ID</td>
+    <td>Buat file config terpisah per tenant</td>
+  </tr>
+  <tr>
+    <td><b>B6</b></td>
+    <td><code>config_mapping_mol_status.csv</code></td>
+    <td>MOL status MKP belum dikonfirmasi</td>
+    <td>Buat file config terpisah per tenant</td>
+  </tr>
+  <tr>
+    <td><b>B7</b></td>
+    <td><code>lookup</code> MOL_LAST_STATUS</td>
+    <td>Tidak ada di MKP — risk SP error silent</td>
+    <td>Wrap query dalam TRY/CATCH (quick win)</td>
+  </tr>
+</table>
+
+<h3>Kategori C — NICE TO HAVE (Improvement Arsitektur)</h3>
+<table>
+  <tr><th>#</th><th>Item</th><th>Rekomendasi</th></tr>
+  <tr><td><b>C1</b></td><td>Aging range threshold</td><td>Buat config table per tenant (saat ini hardcode di SP)</td></tr>
+  <tr><td><b>C2</b></td><td>UTC offset</td><td>Sudah dynamic dari site table ✓ — tidak perlu diubah</td></tr>
+  <tr><td><b>C3</b></td><td><code>SELECT TOP 1</code> di validasi</td><td>Hanya validasi record pertama jika batch — perlu review jika batch dipakai</td></tr>
+  <tr><td><b>C4</b></td><td>SP on-demand per bulan</td><td>Pertimbangkan scheduling otomatis jika volume meningkat</td></tr>
+</table>
+
+
+<!-- SECTION 3: ARCHITECTURE RECOMMENDATION -->
+<h2>3. Rekomendasi Arsitektur</h2>
+
+<h3>Opsi 1 — SP Parameter (Jangka Pendek) <span class="badge green">Recommended</span></h3>
+<p>Tambahkan parameter ke SP untuk menggantikan hardcode tenant-specific:</p>
+<pre><span class="kw">CREATE PROCEDURE</span> [dbo].[usp_iams_backlog_monitoring]
+(
+    @yearmonth        <span class="fn">VARCHAR</span>(6),
+    @tenantCode       <span class="fn">VARCHAR</span>(20) = <span class="str">'BUMAID'</span>,   <span class="cm">-- NEW</span>
+    @tenantPath       <span class="fn">VARCHAR</span>(100) = <span class="str">'buma'</span>,    <span class="cm">-- NEW: ADLS2 path segment</span>
+    @moCreatedBy      <span class="fn">VARCHAR</span>(50) = <span class="str">'DATACOM'</span>, <span class="cm">-- NEW</span>
+    @moType           <span class="fn">VARCHAR</span>(20) = <span class="str">'MT01'</span>,    <span class="cm">-- NEW</span>
+    @activityType     <span class="fn">VARCHAR</span>(20) = <span class="str">'BEX'</span>,     <span class="cm">-- NEW</span>
+    @priorityGroup    <span class="fn">VARCHAR</span>(50) = <span class="str">'Inspection'</span> <span class="cm">-- NEW</span>
+)</pre>
+<p>Semua hardcode di-replace dengan parameter:</p>
+<pre><span class="cm">-- Sebelum</span>
+<span class="str">'assetmanagement/buma/digiman_dexecute/mobacklog/'</span>
+<span class="kw">WHERE</span> tenantcode = <span class="str">'BUMAID'</span>
+
+<span class="cm">-- Sesudah</span>
+<span class="str">'assetmanagement/'</span> + @tenantPath + <span class="str">'/digiman_dexecute/mobacklog/'</span>
+<span class="kw">WHERE</span> tenantcode = @tenantCode</pre>
+<div class="callout callout-ok"><b>Pro:</b> Cepat diimplementasi, minimal perubahan, backward compatible (default value = BUMA ID).<br><b>Con:</b> Makin banyak parameter jika konfigurasi bertambah.</div>
+
+<h3>Opsi 2 — Tenant Config Table (Jangka Panjang) <span class="badge blue">Scalable</span></h3>
+<p>Buat tabel konfigurasi yang dibaca SP saat runtime:</p>
+<pre><span class="kw">CREATE TABLE</span> dbo.backlog_monitoring_config (
+    tenant_code           <span class="fn">VARCHAR</span>(20)   <span class="kw">PRIMARY KEY</span>,
+    tenant_path           <span class="fn">VARCHAR</span>(100),   <span class="cm">-- ADLS2 path segment</span>
+    mo_created_by         <span class="fn">VARCHAR</span>(50),    <span class="cm">-- filter createdby di mobacklog</span>
+    mo_type               <span class="fn">VARCHAR</span>(20),    <span class="cm">-- filter motype</span>
+    activity_type         <span class="fn">VARCHAR</span>(20),    <span class="cm">-- filter replacementstatuslvl1</span>
+    priority_group        <span class="fn">VARCHAR</span>(50),    <span class="cm">-- filter [group] di priority</span>
+    section_type_exclude  <span class="fn">VARCHAR</span>(500),   <span class="cm">-- comma-separated exclusion list</span>
+    aging_tier1_days      <span class="fn">INT</span>,            <span class="cm">-- batas aging tier 1 (default 14)</span>
+    aging_tier2_days      <span class="fn">INT</span>,            <span class="cm">-- batas aging tier 2 (default 45)</span>
+    is_active             <span class="fn">BIT</span>
+)
+
+<span class="cm">-- BUMA ID (existing)</span>
+<span class="kw">INSERT INTO</span> backlog_monitoring_config <span class="kw">VALUES</span>
+(<span class="str">'BUMAID'</span>, <span class="str">'buma'</span>, <span class="str">'DATACOM'</span>, <span class="str">'MT01'</span>, <span class="str">'BEX'</span>, <span class="str">'Inspection'</span>, <span class="str">'OTHERS,LIGHTING TOWER'</span>, 14, 45, 1)
+
+<span class="cm">-- MKP (setelah dikonfirmasi)</span>
+<span class="kw">INSERT INTO</span> backlog_monitoring_config <span class="kw">VALUES</span>
+(<span class="str">'MKP'</span>, <span class="str">'mkp'</span>, <span class="str">'???'</span>, <span class="str">'???'</span>, <span class="str">'???'</span>, <span class="str">'???'</span>, <span class="str">'???'</span>, 14, 45, 1)</pre>
+<div class="callout callout-ok"><b>Pro:</b> Scalable — tenant baru cukup tambah 1 row, tidak perlu ubah SP.<br><b>Con:</b> Effort lebih besar, perlu migration data, SP lebih kompleks.</div>
+
+
+<!-- SECTION 4: RISK & MITIGATION -->
+<h2>4. Risk &amp; Mitigasi</h2>
+<table>
+  <tr><th>Risk</th><th>Prob.</th><th>Impact</th><th>Mitigasi</th></tr>
+  <tr>
+    <td><code>dim_equipment</code> MKP tidak tersedia → output kosong</td>
+    <td><span class="badge red">Tinggi</span></td>
+    <td><span class="badge red">Kritis</span></td>
+    <td>Buat SP/view <code>dim_equipment</code> untuk MKP sebelum go-live. Test dengan <code>SELECT COUNT(*)</code> dari source.</td>
+  </tr>
+  <tr>
+    <td>Filter <code>createdby=DATACOM</code> salah di MKP → mobacklog kosong</td>
+    <td><span class="badge red">Tinggi</span></td>
+    <td><span class="badge red">Kritis</span></td>
+    <td>Konfirmasi dengan tim MKP. Run: <code>SELECT DISTINCT createdby FROM mobacklog</code></td>
+  </tr>
+  <tr>
+    <td><code>replacementstatuslvl1=BEX</code> tidak match di MKP</td>
+    <td><span class="badge orange">Sedang</span></td>
+    <td><span class="badge red">Tinggi</span></td>
+    <td>Run: <code>SELECT DISTINCT replacementstatuslvl1 FROM mobacklog</code> di MKP.</td>
+  </tr>
+  <tr>
+    <td>SAP user status codes berbeda → status MO salah semua</td>
+    <td><span class="badge orange">Sedang</span></td>
+    <td><span class="badge red">Tinggi</span></td>
+    <td>Validasi dengan BPO MKP: apakah menggunakan kode SAP yang sama (<code>comp</code>, <code>appv</code>, dll).</td>
+  </tr>
+  <tr>
+    <td><code>lookup MOL_LAST_STATUS</code> tidak ada → SP error silent</td>
+    <td><span class="badge red">Tinggi</span></td>
+    <td><span class="badge orange">Sedang</span></td>
+    <td>Quick win: wrap query <code>#lookup</code> dalam TRY/CATCH. Sudah ada pattern di query <code>#mobacklog</code>.</td>
+  </tr>
+  <tr>
+    <td>Section type exclusion berbeda → dim_equipment filter salah</td>
+    <td><span class="badge orange">Sedang</span></td>
+    <td><span class="badge orange">Sedang</span></td>
+    <td>Konfirmasi daftar section type MKP dengan BPO. Update config exclusion list.</td>
+  </tr>
+  <tr>
+    <td>Config files (image, aging) tidak di-update → UI tidak sesuai MKP</td>
+    <td><span class="badge yellow">Rendah</span></td>
+    <td><span class="badge yellow">Rendah</span></td>
+    <td>Buat file config baru per tenant di ADLS2 sebelum go-live.</td>
+  </tr>
+  <tr>
+    <td><code>dim_date</code> tidak tersedia → <code>week_id</code> NULL</td>
+    <td><span class="badge red">Tinggi</span></td>
+    <td><span class="badge yellow">Rendah</span></td>
+    <td><code>dim_date</code> tidak tenant-specific — share parquet yang sama atau run <code>sp_dim_date</code>.</td>
+  </tr>
+</table>
+
+
+<!-- SECTION 5: QUICK WINS -->
+<h2>5. Quick Wins (Bisa Dilakukan Sekarang)</h2>
+<table>
+  <tr><th>#</th><th>Action</th><th>Effort</th><th>Impact</th></tr>
+  <tr>
+    <td>1</td>
+    <td>Wrap <code>#lookup</code> query dalam TRY/CATCH</td>
+    <td><span class="badge green">5 menit</span></td>
+    <td>Hilangkan risk SP error di MKP</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>Run query validasi berikut di MKP DB</td>
+    <td><span class="badge green">30 menit</span></td>
+    <td>Konfirmasi semua nilai filter yang benar</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Cek apakah <code>dim_date</code> parquet bisa di-share antar tenant</td>
+    <td><span class="badge green">1 jam</span></td>
+    <td>Resolve 1 dari 3 blocking dim tables</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Tambahkan parameter <code>@tenantCode</code> &amp; <code>@tenantPath</code> ke SP</td>
+    <td><span class="badge yellow">2–3 jam</span></td>
+    <td>SP bisa dijalankan untuk MKP dengan path yang benar</td>
+  </tr>
+</table>
+
+<h4>Query Validasi untuk Dijalankan di MKP:</h4>
+<pre><span class="cm">-- 1. Cek nilai filter MO</span>
+<span class="kw">SELECT DISTINCT</span> createdby, replacementstatuslvl1, motype
+<span class="kw">FROM</span> mobacklog
+
+<span class="cm">-- 2. Cek SAP user status codes</span>
+<span class="kw">SELECT DISTINCT</span> user_status <span class="kw">FROM</span> mechanicorderlist
+
+<span class="cm">-- 3. Cek priority group</span>
+<span class="kw">SELECT DISTINCT</span> [group] <span class="kw">FROM</span> priority
+
+<span class="cm">-- 4. Cek section type yang ada di MKP</span>
+<span class="kw">SELECT DISTINCT</span> sectiontypecode, sectiontypename <span class="kw">FROM</span> sectiontype
+<span class="kw">WHERE</span> tenantcode = <span class="str">'MKP'</span>  <span class="cm">-- ganti dengan tenant code MKP yang benar</span></pre>
+
+
+<!-- SECTION 6: IMPLEMENTATION ROADMAP -->
+<h2>6. Implementation Roadmap</h2>
+<ol class="steps">
+  <li><b>Assessment &amp; Konfirmasi</b> — Jalankan query validasi di MKP. Konfirmasi nilai filter (createdby, motype, activity type, SAP status codes, section types) dengan BPO MKP.</li>
+  <li><b>Resolve Blockers</b> — Buat <code>dim_equipment</code> untuk MKP. Handle atau share <code>dim_date</code>. Wrap <code>lookup</code> dalam TRY/CATCH.</li>
+  <li><b>Refactor SP</b> — Tambah parameter tenant ke SP. Replace semua 14 hardcode ADLS2 path. Externalize filter values.</li>
+  <li><b>Buat Config Files MKP</b> — <code>config_image.csv</code>, <code>aging_category.csv</code>, <code>config_mapping_mol_status.csv</code> untuk MKP di ADLS2.</li>
+  <li><b>Testing</b> — Run SP untuk MKP <code>@yearmonth</code> bulan berjalan. Validasi output vs data di aplikasi Digiman+ MKP. Sign-off BPO MKP.</li>
+  <li><b>Go-live &amp; Monitoring</b> — Deploy ke production. Monitor jumlah record output antar tenant setiap run.</li>
+</ol>
+
+<div class="callout callout-info" style="margin-top:16px">
+  <b>Estimasi effort total:</b> ~3–5 hari engineering (tergantung kecepatan konfirmasi data dari BPO MKP dan ketersediaan dim_equipment).
+</div>
+
+
+<!-- FOOTER -->
+<div class="doc-footer">
+  Backlog Monitoring — MKP Implementation Assessment &nbsp;|&nbsp; Prepared by Okky Rizki R &nbsp;|&nbsp; 05 Juni 2026 &nbsp;|&nbsp; Confidential — Internal Use Only
+</div>
+
+</body>
+</html>

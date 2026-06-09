@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>MOM – CBM Integration with EHMS</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    color: #1a1a1a;
+    background: #fff;
+    padding: 32px 40px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .doc-header {
+    border-bottom: 3px solid #0078d4;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+  .doc-title {
+    font-size: 20pt;
+    font-weight: 700;
+    color: #0078d4;
+    letter-spacing: 0.3px;
+  }
+  .doc-subtitle {
+    font-size: 10pt;
+    color: #555;
+    margin-top: 4px;
+  }
+  .meta-table {
+    margin-top: 12px;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 10pt;
+  }
+  .meta-table td { padding: 3px 8px 3px 0; color: #444; }
+  .meta-table td:first-child { font-weight: 600; color: #222; width: 140px; }
+
+  /* Section heading */
+  h2 {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #fff;
+    background: #0078d4;
+    padding: 6px 12px;
+    margin: 24px 0 10px;
+    border-radius: 3px;
+    letter-spacing: 0.2px;
+  }
+  h3 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #0078d4;
+    border-left: 4px solid #0078d4;
+    padding-left: 10px;
+    margin: 18px 0 8px;
+  }
+
+  /* Session divider */
+  .session-divider {
+    border: none;
+    border-top: 2px dashed #0078d4;
+    margin: 28px 0 6px;
+  }
+  .session-label {
+    font-size: 9pt;
+    color: #0078d4;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  /* Lists */
+  ol, ul { padding-left: 20px; }
+  ol li, ul li {
+    margin: 5px 0;
+    line-height: 1.6;
+  }
+  ol li::marker { font-weight: 600; color: #0078d4; }
+
+  /* Flow list */
+  .flow-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  .flow-list li {
+    padding: 5px 10px 5px 34px;
+    position: relative;
+    border-left: 2px solid #cce4f7;
+    margin: 2px 0;
+    background: #f8fbff;
+    border-radius: 0 3px 3px 0;
+  }
+  .flow-list li::before {
+    content: "→";
+    position: absolute;
+    left: 10px;
+    color: #0078d4;
+    font-weight: 700;
+  }
+
+  /* Callout boxes */
+  .callout {
+    background: #f0f7ff;
+    border-left: 4px solid #0078d4;
+    padding: 8px 12px;
+    margin: 8px 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 10.5pt;
+  }
+  .callout-future {
+    background: #fff8e1;
+    border-left: 4px solid #f9a825;
+  }
+  .callout-next {
+    background: #e8f5e9;
+    border-left: 4px solid #388e3c;
+  }
+  .callout-warn {
+    background: #fff3e0;
+    border-left: 4px solid #e65100;
+  }
+
+  /* CBM types table */
+  .cbm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10.5pt;
+    margin: 8px 0;
+  }
+  .cbm-table th {
+    background: #0078d4;
+    color: #fff;
+    padding: 7px 12px;
+    text-align: left;
+    font-weight: 600;
+  }
+  .cbm-table td {
+    padding: 6px 12px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .cbm-table tr:nth-child(even) td { background: #f5f9ff; }
+
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: Consolas, monospace;
+    font-size: 10pt;
+    color: #c7254e;
+  }
+
+  b { color: #111; }
+  em { color: #555; font-style: italic; }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 40px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+    font-size: 9pt;
+    color: #888;
+    text-align: center;
+  }
+
+  @media print {
+    body { padding: 20px 28px; }
+    h2 { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cbm-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────────────────────────── -->
+<div class="doc-header">
+  <div class="doc-title">Minutes of Meeting</div>
+  <div class="doc-subtitle">CBM Integration — Digiman+ &amp; EHMS</div>
+  <table class="meta-table">
+    <tr><td>Project</td><td>Digiman+ × EHMS CBM Integration</td></tr>
+    <tr><td>Session 1</td><td>25 Mei 2026</td></tr>
+    <tr><td>Session 2</td><td>03 Juni 2026</td></tr>
+    <tr><td>Prepared by</td><td>Okky Rizki R</td></tr>
+    <tr><td>Distribusi</td><td>Tim Digiman+ &amp; Tim EHMS</td></tr>
+  </table>
+</div>
+
+<!-- ── SESSION 1 ──────────────────────────────────────────────────────────── -->
+<div class="session-label">Session 1 &mdash; 25 Mei 2026</div>
+
+<h2>1. Integration Points</h2>
+<ol>
+  <li><b>Integration via Topic:</b> Digiman+ publish data ke topic (Btech), EHMS consume topic.</li>
+  <li>EHMS consume semua topic meskipun data master belum available di EHMS.</li>
+  <li>Jika ada equipment pindah site, EHMS perlu assess cara menampilkan data history CBM di dashboard.</li>
+</ol>
+
+<h2>2. Expected Flow — MO Service</h2>
+<ul class="flow-list">
+  <li>MO Service sync to Digiman+ : status <b>Release</b></li>
+  <li>Planner buat Planning di Digiplan, mapping MO Service terhadap planning tersebut</li>
+  <li>Eksekusi &rarr; proses input CBM</li>
+  <li>Execution finish</li>
+  <li>Publish data CBM ke topic <em>(MO Service belum tentu sudah TECO)</em></li>
+  <li>EHMS consume topic &rarr; taruh ke table staging</li>
+  <li>EHMS mengolah data dari staging <em>(assess lebih lanjut)</em></li>
+</ul>
+
+<h2>3. Notes &amp; Constraints</h2>
+<ol start="1">
+  <li>Di Digiman+ backlog execution baru activity type: <b>BEX</b>, belum ada EHM dan ACT. <em>Future enhancement.</em></li>
+  <li><b>TECO Date</b> tidak dikirim dari Digiman+.</li>
+  <li><b>SMU</b> di Digiman+ belum ada validasi range perubahan setiap service-nya.</li>
+  <li>Format date: <b>ISO string</b>.</li>
+  <li>Mapping CBM Threshold dari transaksi Digiman+ akan ada di dalam Topic bersamaan value dan rating untuk transaksi tersebut.</li>
+  <li>
+    Data master CBM Threshold EHMS sync dari Digiman+ <em>(perlu assess lebih lanjut)</em>.<br>
+    <br>Sumber input data CBM:
+    <ul>
+      <li>Service Sheet (PSCS) : Digiman+</li>
+      <li>Uploader</li>
+      <li>EHM via uploader</li>
+      <li>ACT via uploader</li>
+      <li>Revise data CBM</li>
+      <li>Pengecekan under carriage</li>
+    </ul>
+  </li>
+  <li>Value dan rating data transaksi dari Digiman+ tidak perlu dikompare lagi di master data CBM Threshold EHMS. Jika memungkinkan, tampilkan reference master data threshold yang digunakan saat transaksi terjadi <em>(perlu assess lebih lanjut)</em>.</li>
+</ol>
+
+<!-- ── SESSION 2 ──────────────────────────────────────────────────────────── -->
+<hr class="session-divider">
+<div class="session-label">Session 2 &mdash; 03 Juni 2026</div>
+
+<h2>4. Component &amp; Equipment Mapping</h2>
+<ol>
+  <li>Mapping Equipment to Component di EHMS diambil dari SAP. Di Digiman+ dimaintain sendiri. Perlu disepakati dengan BPO <b>flow setup mapping component</b> jika suatu saat ada model baru.</li>
+  <li>Digiman+ dapat mempertimbangkan membuat <b>API untuk integrasi data component mapping</b> <em>(future)</em>.</li>
+  <li>Monitoring CBM sampai level <b>Component</b> — tidak perlu sampai level sub component. Namun Digiman+ tetap mengirim data inputan user (CBM) sampai level sub component jika ada, beserta task key.</li>
+</ol>
+
+<h2>5. Data &amp; Integration Scope</h2>
+<div class="callout callout-future">🔮 <b>Future Journey</b></div>
+<ol start="4">
+  <li><b>Data master integration</b> — future journey.</li>
+  <li><b>Bank task integration</b> — future journey.</li>
+  <li><b>Follow up action integration / intervention</b> — future journey.</li>
+</ol>
+
+<h2>6. Mapping &amp; Validation Rules</h2>
+<ol start="7">
+  <li><b>Area</b> diisi dengan Sub Component dari Digiman+ jika ada.</li>
+  <li>Mapping component to area <b>jangan divalidasi saat integrasi</b> — EHMS akan memproses dari table staging.</li>
+  <li><b>CBM Parameter:</b> Digiman+ copy dari EHMS untuk BUMA ID.</li>
+</ol>
+
+<h2>7. Task Key &amp; Description</h2>
+<ol start="10">
+  <li><b>Task Key EHMS</b> masuk ke field <code>external_code</code> di Digiman+.</li>
+  <li>Digiman+ kirim data transaksi ke EHMS — task key diambil dari <code>external_code</code> jika ada.</li>
+  <li><b>Task Description</b> untuk initial Digiman+ disamakan dengan EHMS.</li>
+</ol>
+
+<h2>8. CBM Task Types</h2>
+<p style="margin-bottom:8px">3 tipe task CBM di EHMS saat ini:</p>
+<table class="cbm-table">
+  <tr>
+    <th>Tipe</th>
+    <th>Format / Nilai</th>
+    <th>Keterangan</th>
+  </tr>
+  <tr>
+    <td><b>Manual Rating</b></td>
+    <td>A, B, C, X</td>
+    <td>Rating kondisi komponen</td>
+  </tr>
+  <tr>
+    <td><b>Measurement</b></td>
+    <td>Decimal (2 digit)</td>
+    <td>Nilai pengukuran numerik</td>
+  </tr>
+  <tr>
+    <td><b>Physical Condition</b></td>
+    <td>Good, Damage, Missing</td>
+    <td>Kondisi fisik komponen</td>
+  </tr>
+</table>
+
+<h2>9. Data Fields yang Dikirim Digiman+ ke EHMS</h2>
+<ol start="14">
+  <li><b>UOM</b> tetap dikirim dari Digiman+.</li>
+  <li><b>IsSampleTaken:</b> <code>1</code> jika data diisi oleh user, <code>0</code> selain itu.</li>
+  <li><b>Rating</b> dikirim beserta <b>threshold</b> yang digunakan saat transaksi.</li>
+</ol>
+
+<h2>10. Next Discussion</h2>
+<div class="callout callout-next">
+  📋 <b>Agenda berikutnya:</b> Bentuk / struktur data <b>JSON</b> yang akan dikirim Digiman+ ke EHMS.<br>
+  <em>Status: Menunggu development Digiman+.</em>
+</div>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────────────── -->
+<div class="doc-footer">
+  MOM CBM Integration — Digiman+ &times; EHMS &nbsp;|&nbsp; Prepared by Okky Rizki R &nbsp;|&nbsp; Confidential — Internal Use Only
+</div>
+
+</body>
+</html>

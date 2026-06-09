@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Backlog Monitoring - Business Process & Configuration Analysis</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; line-height: 1.6; }
+  h1 { font-size: 20px; border-bottom: 2px solid #333; padding-bottom: 8px; }
+  h2 { font-size: 16px; margin-top: 28px; border-left: 4px solid #0078d4; padding-left: 10px; color: #0078d4; }
+  h3 { font-size: 14px; margin-top: 18px; color: #444; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 12px; }
+  th { background: #0078d4; color: white; padding: 7px 10px; text-align: left; }
+  td { padding: 6px 10px; border: 1px solid #ccc; }
+  tr:nth-child(even) { background: #f5f8fc; }
+  code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: Consolas, monospace; }
+  .note { background: #fff8e1; border-left: 4px solid #f9a825; padding: 10px 14px; margin: 12px 0; font-size: 12px; }
+  .meta { color: #888; font-size: 12px; margin-bottom: 20px; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 3px 0; }
+  @media print { body { margin: 20px; } }
+</style>
+</head>
+<body>
+
+<h1>Backlog Monitoring — Business Process &amp; Configuration Analysis</h1>
+<p class="meta">Generated: 26 Mei 2026 &nbsp;|&nbsp; Author: Okky Rizki R &nbsp;|&nbsp; Scope: BUMA ID</p>
+
+<h2>1. Overview</h2>
+<p>
+Backlog Monitoring adalah sistem pelaporan <strong>Maintenance Order (MO) yang belum selesai (backlog)</strong> di Digiman+ untuk tenant <strong>BUMA ID</strong>.
+SP utamanya adalah <code>usp_iams_backlog_monitoring</code> yang dijalankan per bulan dengan parameter <code>@yearmonth</code> format <code>YYYYMM</code>.
+</p>
+<ul>
+  <li>Filter MO: <code>createdby = DATACOM</code>, <code>replacementstatuslvl1 = BEX</code>, <code>motype = MT01</code></li>
+  <li>Filter final: hanya MO yang memiliki <code>priority is not null</code> (sudah punya EMOL dengan data priority)</li>
+  <li>Data di-adjust timezone berdasarkan UTC offset masing-masing site</li>
+</ul>
+
+<h2>2. Data Sources (ADLS2 via OPENROWSET)</h2>
+<table>
+  <tr><th>Source Group</th><th>Table</th><th>Keterangan</th></tr>
+  <tr><td>digiman_dexecute</td><td>mobacklog</td><td>MO backlog dari SAP. Filter: createdby=DATACOM, replacementstatuslvl1=BEX, motype=MT01</td></tr>
+  <tr><td>digiman_dorder</td><td>lookup</td><td>Master status MOL (MOL_LAST_STATUS) — <strong>tidak ada di MKP</strong></td></tr>
+  <tr><td>digiman_dplan</td><td>digitalplanning, dpcolumn, dpvalue</td><td>Cek apakah MO sudah masuk planning (status SUBMIT/INPROGRESS)</td></tr>
+  <tr><td>iams_maintenance_execution</td><td>workorder, task, taskpersonalized, taskpersonalizedfinding</td><td>Data inspeksi/eksekusi, join ke MO number</td></tr>
+  <tr><td>iams_maintenance_order</td><td>mechanicorderlist, mechanicorderdetail, mechanicordersummary, mechanicordermaterial, poolingmoitem, sapmosyncorder, checkpartorder</td><td>Data EMOL, part order, SAP sync</td></tr>
+  <tr><td>iams_services_asset</td><td>asset, assetmodel, component, subcomponent, actionremedy, priority</td><td>Master data equipment &amp; komponen</td></tr>
+  <tr><td>iams_workflow</td><td>workflowtransaction</td><td>Status approval workflow</td></tr>
+  <tr><td>shared_tenant</td><td>sectiontype, site</td><td>Master site &amp; section, filter tenantcode=BUMAID</td></tr>
+  <tr><td>shared_user</td><td>user</td><td>Master data user (code, fullname)</td></tr>
+  <tr><td>datamart (parquet)</td><td>dim_equipment_mobacklog, dim_date</td><td>Dimension equipment &amp; tanggal — <strong>tidak ada di MKP</strong></td></tr>
+  <tr><td>config (csv)</td><td>config_mapping_mol_status.csv</td><td>Mapping status MOL ke business status</td></tr>
+</table>
+
+<h2>3. Business Logic Utama</h2>
+
+<h3>3.1 Status MO</h3>
+<p>Ditentukan dari <code>user_status</code> (SAP) dan kondisi lainnya:</p>
+<table>
+  <tr><th>User Status</th><th>Kondisi Tambahan</th><th>Status MO</th></tr>
+  <tr><td><code>COMP</code></td><td>—</td><td><strong>Closed</strong></td></tr>
+  <tr><td><code>INIT, WAPV, INPV, NREV</code></td><td>—</td><td><strong>Waiting Approval</strong></td></tr>
+  <tr><td><code>APPV</code></td><td>Ada di Digital Planning</td><td><strong>Waiting Execution</strong></td></tr>
+  <tr><td><code>APPV</code></td><td>Tidak di DP, ada SAP MO, GR/GI full atau partial</td><td><strong>Waiting Planning</strong></td></tr>
+  <tr><td><code>APPV</code></td><td>Tidak di DP, ada SAP MO, GR/GI kosong</td><td><strong>Waiting Part</strong></td></tr>
+  <tr><td><code>APPV</code></td><td>Tidak di DP, tidak ada SAP MO</td><td><strong>Waiting Planning</strong></td></tr>
+  <tr><td colspan="2">Override: <code>Waiting Part</code> + <code>No Material</code></td><td><strong>→ Waiting Planning</strong></td></tr>
+</table>
+<p><strong>Priority rank</strong> saat ada duplicate MO number:</p>
+<p>Closed (1) → Waiting Approval (2) → Waiting Execution (3) → Waiting Planning (4) → Waiting Part (5)</p>
+
+<h3>3.2 Status Part</h3>
+<p>Diisi berdasarkan kombinasi GR/GI status dari <code>checkpartorder</code>. Hanya relevan untuk status Closed, Waiting Execution, Waiting Planning, Waiting Part. Nilai: <em>Completed: GR Full/GI Full/GI Partial</em>, <em>Not Completed</em>, atau <code>null</code>.</p>
+
+<h3>3.3 Aging Days &amp; Aging Range</h3>
+<ul>
+  <li><strong>Aging Days</strong> = selisih hari dari <code>mocreateddate</code> hingga sekarang (adjusted UTC offset per site), atau hingga <code>motecodate</code> jika sudah Closed.</li>
+  <li><strong>Aging Range</strong> (dari config CSV):</li>
+</ul>
+<table>
+  <tr><th>Range</th><th>Keterangan</th></tr>
+  <tr><td>1–14 hari</td><td>New/Recent</td></tr>
+  <tr><td>15–45 hari</td><td>Medium</td></tr>
+  <tr><td>&gt;45 hari</td><td>Critical</td></tr>
+</table>
+
+<h3>3.4 Status Digital Planning</h3>
+<p><code>Yes</code> / <code>No</code> — apakah MO number ditemukan di Digital Planning yang aktif (status SUBMIT/INPROGRESS) pada bulan tersebut.</p>
+
+<h3>3.5 MO Category</h3>
+<p><code>Material</code> jika <code>plancost &gt; 0</code>, <code>No Material</code> jika <code>plancost</code> adalah 0 atau null.</p>
+
+<h2>4. Dimension Tables</h2>
+
+<h3>vw_dim_equipment (app_wicope)</h3>
+<ul>
+  <li>Source: DB Digiman+ (<code>app_wicope</code>)</li>
+  <li>Join: equipment → equipmentmodel → sectiontype → unitstatus (ambil status terbaru per equipment)</li>
+  <li>Filter: <code>status_unit = 'INPR'</code>, section type bukan <code>OTHERS</code> atau <code>LIGHTING TOWER</code></li>
+  <li>Output: equipment, model_unit, section_type_code_name, status_unit</li>
+</ul>
+
+<h3>vw_dim_site (app_opex)</h3>
+<ul>
+  <li>Source: <code>app_opex.dbo.vw_mcc_sap_mssite</code></li>
+  <li>Mapping site_id → site_code untuk 22 site BUMA (LAT, BIN, ADR, IPR, dll.)</li>
+  <li>Beberapa site di-hardcode via UNION ALL (BSF, RO, INFRA, ADR CP, dll.)</li>
+</ul>
+
+<h3>sp_dim_date</h3>
+<ul>
+  <li>Generate kalender dari <strong>2019-01-01</strong> s/d <strong>2035-12-31</strong></li>
+  <li>Week menggunakan custom logic: week start <strong>Sabtu</strong> (<code>DATEFIRST 5/6</code>)</li>
+  <li>Output: date_id, week_id, month_id, quarter_id, semester_id, week_reset_desc, dll.</li>
+</ul>
+
+<h2>5. Configuration Files</h2>
+
+<h3>backlog_monitoring_config_image.csv</h3>
+<p>Mapping section ke URL gambar equipment untuk tampilan dashboard:</p>
+<table>
+  <tr><th>Section</th><th>Image</th></tr>
+  <tr><td>OB LOADER</td><td>BIG DIGGER.png</td></tr>
+  <tr><td>OB HAULER</td><td>OB HAULER.png</td></tr>
+  <tr><td>SUPPORT GEAR EQUIPMENT</td><td>DOZZER.png</td></tr>
+  <tr><td>COAL HAULER</td><td>COAL HAULER.png</td></tr>
+  <tr><td>ALL</td><td>BUMA.png</td></tr>
+</table>
+
+<h3>backlog_monitoring_aging_category.csv</h3>
+<table>
+  <tr><th>ID</th><th>Aging Category</th></tr>
+  <tr><td>1</td><td>1–14 hari</td></tr>
+  <tr><td>2</td><td>15–45 hari</td></tr>
+  <tr><td>3</td><td>&gt;45 hari</td></tr>
+</table>
+
+<h2>6. Catatan Penting / Known Issues</h2>
+<div class="note">
+  <strong>1. dim_equipment &amp; dim_date tidak tersedia di MKP</strong><br>
+  Kedua table ini diambil dari datamart parquet (bukan curated). Ada komentar eksplisit <code>GA ADA DI MKP</code> di stored procedure.
+</div>
+<div class="note">
+  <strong>2. Lookup MOL status tidak tersedia di MKP</strong><br>
+  Table <code>#lookup</code> dari <code>digiman_dorder/lookup/</code> juga tidak ada di MKP.
+</div>
+<div class="note">
+  <strong>3. SP berjalan per bulan (on-demand)</strong><br>
+  Tidak ada materialized view — SP ini menggunakan temp table dan harus dijalankan manual dengan parameter <code>@yearmonth</code>.
+</div>
+<div class="note">
+  <strong>4. Filter MO ketat</strong><br>
+  Hanya MO dengan <code>createdby = DATACOM</code> (dari SAP), <code>replacementstatuslvl1 = BEX</code>, dan <code>motype = MT01</code> yang masuk ke backlog.
+</div>
+<div class="note">
+  <strong>5. Priority null di-exclude dari output final</strong><br>
+  MO tanpa EMOL atau tanpa data priority tidak akan muncul di hasil akhir (<code>where [priority] is not null</code>).
+</div>
+
+</body>
+</html>
