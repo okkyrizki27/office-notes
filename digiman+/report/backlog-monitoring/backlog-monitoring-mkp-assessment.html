@@ -486,9 +486,54 @@
 </div>
 
 
+<!-- SECTION 7: FINDINGS FROM DEEP ANALYSIS -->
+<h2>7. Temuan dari Analisis Mendalam (09 Juni 2026)</h2>
+
+<h3>7.1 Join ke <code>#lookup</code> Redundant — Bisa Dihapus Sepenuhnya</h3>
+
+<p>Berdasarkan perbandingan data aktual antara tabel <code>digiman_dorder/lookup</code> (filter <code>lookupcategory = 'MOL_LAST_STATUS'</code>) dengan <code>config_mapping_mol_status.csv</code>, ditemukan bahwa kedua sumber data tersebut mengandung informasi yang identik:</p>
+
+<table>
+  <tr><th>lookupcode (lookup table)</th><th>lookupname (lookup table)</th><th>status (CSV)</th><th>status_desc (CSV)</th><th>Identik?</th></tr>
+  <tr><td>MLOP</td><td>Open Defect Finding need MOR/MOL</td><td>MLOP</td><td>Open Defect Finding need MOR/MOL</td><td><span class="badge green">Ya</span></td></tr>
+  <tr><td>MLSU</td><td>MOL Submitted</td><td>MLSU</td><td>MOL Submitted</td><td><span class="badge green">Ya</span></td></tr>
+  <tr><td>MLCO</td><td>MOL Complete Approved by Supervisor</td><td>MLCO</td><td>MOL Complete Approved by Supervisor</td><td><span class="badge green">Ya</span></td></tr>
+  <tr><td>MLDL</td><td>Delete MOL Pooling &amp; Validation</td><td>MLDL</td><td>Delete MOL Pooling &amp; Validation</td><td><span class="badge green">Ya</span></td></tr>
+  <tr><td>MLOK</td><td>Create MO to SAP</td><td>MLOK</td><td>Create MO to SAP</td><td><span class="badge green">Ya</span></td></tr>
+</table>
+
+<p>Selain itu, hasil join (<code>l.lookupname as status_desc</code>) <b>tidak digunakan di manapun</b> dalam final SELECT maupun dalam logic <code>correct_status</code>. Logic <code>correct_status</code> hanya menggunakan kolom dari CSV (<code>mmls.require_mono</code>, <code>mmls.is_active</code>, <code>mmls.workflow_transaction_status</code>, <code>mmls.mol_status</code>).</p>
+
+<div class="callout callout-ok">
+  <b>Kesimpulan:</b> Join ke <code>#lookup</code> murni redundant. Seluruh blok fetch <code>#lookup</code> dan join-nya dapat dihapus dari SP tanpa mengubah output apapun. Ini juga sekaligus <b>menghilangkan risk SP error di MKP</b> karena tabel <code>lookup</code> tidak tersedia di MKP (item B7 & Risk table di atas).
+</div>
+
+<h4>Perubahan yang Direkomendasikan:</h4>
+<pre><span class="cm">-- HAPUS: fetch #lookup (tidak diperlukan)</span>
+<span class="cm">-- drop table if exists #lookup</span>
+<span class="cm">-- create table #lookup (...)</span>
+<span class="cm">-- insert into #lookup exec(@query_lookup)</span>
+
+<span class="cm">-- HAPUS: join ke #lookup di dalam maintenance_order_transformation</span>
+<span class="cm">-- Sebelum (subquery mmls):</span>
+<span class="kw">left join</span>
+(
+    <span class="kw">select</span> mms.*, l.lookupname <span class="kw">as</span> status_desc <span class="kw">from</span> #mapping_mol_status mms
+    <span class="kw">left join</span> #lookup l <span class="kw">on</span> mms.[status] = l.lookupcode
+) mmls
+<span class="kw">on</span> mol.[status] = mmls.mol_status
+
+<span class="cm">-- Sesudah (langsung pakai CSV tanpa join lookup):</span>
+<span class="kw">left join</span> #mapping_mol_status mmls
+<span class="kw">on</span> mol.[status] = mmls.mol_status</pre>
+
+<div class="callout callout-info">
+  <b>Update item B7 &amp; Quick Win #1:</b> Rekomendasi sebelumnya adalah wrap dalam TRY/CATCH. Dengan temuan ini, rekomendasi diperbarui menjadi <b>hapus join sepenuhnya</b> — lebih bersih dan tidak meninggalkan dead code.
+</div>
+
 <!-- FOOTER -->
 <div class="doc-footer">
-  Backlog Monitoring — MKP Implementation Assessment &nbsp;|&nbsp; Prepared by Okky Rizki R &nbsp;|&nbsp; 05 Juni 2026 &nbsp;|&nbsp; Confidential — Internal Use Only
+  Backlog Monitoring — MKP Implementation Assessment &nbsp;|&nbsp; Prepared by Okky Rizki R &nbsp;|&nbsp; 05 Juni 2026 &nbsp;|&nbsp; Updated 09 Juni 2026 &nbsp;|&nbsp; Confidential — Internal Use Only
 </div>
 
 </body>

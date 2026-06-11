@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Delayed Ticket Report 20260610</title>
+<style>
+  @page { size: A4 landscape; margin: 14mm; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #1a1a1a; padding: 0; margin: 0; }
+  h1 { font-size: 18pt; color: #c0392b; border-bottom: 3px solid #c0392b; padding-bottom: 8px; margin-bottom: 6px; }
+  h2 { font-size: 13pt; color: #fff; background: #c0392b; padding: 6px 12px; border-radius: 3px; margin: 22px 0 10px; }
+  h3 { font-size: 11.5pt; color: #c0392b; border-left: 4px solid #c0392b; padding-left: 10px; margin: 18px 0 8px; }
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9pt; margin: 8px 0 14px; }
+  th { background: #c0392b; color: #fff; padding: 6px 8px; text-align: left; font-weight: 600; word-wrap: break-word; }
+  td { padding: 5px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+  tr:nth-child(even) td { background: #fdf2f0; }
+  code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9pt; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 16px 0; }
+  a { color: #c0392b; text-decoration: none; }
+  p { margin: 4px 0; line-height: 1.6; }
+  b { color: #111; }
+  .footer { margin-top: 30px; font-size: 9pt; color: #888; text-align: center; border-top: 1px solid #ddd; padding-top: 8px; }
+  @media print { h2, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+<h1>Delayed Ticket Report</h1>
+<p><b>Generated:</b> 10 June 2026  |  <b>Project:</b> IAMS30  |  <b>Board:</b> IAMS 3.0</p>
+<br>
+<p>Report ini membandingkan waktu ticket berstatus <b>In Progress</b> saat ini dengan rata-rata historis waktu pengerjaan <b>To Do → DEV DONE</b> (5 sprint terakhir per tim) untuk Story Point yang sama. Ticket dianggap <b>delayed</b> jika sudah In Progress lebih lama dari rata-rata tersebut.</p>
+<br>
+<hr>
+<br>
+<h2>Baseline Rata-rata (To Do -> DEV DONE)</h2>
+<br>
+<table>
+<tr><th>Story Point</th><th>MKP Team (hari)</th><th>BUMA ID Team (hari)</th></tr>
+<tr><td>1</td><td>2.34</td><td>1.76</td></tr>
+<tr><td>2</td><td>4.26</td><td>2.42</td></tr>
+<tr><td>3</td><td>7.12</td><td>6.17</td></tr>
+<tr><td>5</td><td>8.63</td><td>8.87</td></tr>
+<tr><td>8</td><td>23.76</td><td>27.78</td></tr>
+</table>
+<br>
+<hr>
+<br>
+<h2>Migration Digiplan - S6 — MKP Team</h2>
+<br>
+<p>Total ticket In Progress: <b>0</b>  |  Delayed: <b>0</b>  |  On Track: <b>0</b>  |  No Baseline (SP di luar 1/2/3/5/8): <b>0</b></p>
+<br>
+<p>Tidak ada ticket yang delayed di sprint ini.</p>
+<br>
+<hr>
+<br>
+<h2>4.0.1 - Improve and Fix — BUMA ID Team</h2>
+<br>
+<p>Total ticket In Progress: <b>8</b>  |  Delayed: <b>1</b>  |  On Track: <b>7</b>  |  No Baseline (SP di luar 1/2/3/5/8): <b>0</b></p>
+<br>
+<h3>🔴 Delayed Tickets</h3>
+<br>
+<table>
+<tr><th>Key</th><th>Summary</th><th>Assignee</th><th>SP</th><th>Started</th><th>Elapsed (hari)</th><th>Baseline (hari)</th><th>Delay (hari)</th><th>Priority</th></tr>
+<tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4003">IAMS30-4003</a></td><td>[WEB] Enhance Handle Konsistensi Data User - Remove Headers, Use Token...</td><td>dimas.wahyu</td><td>3</td><td>2026-05-29</td><td>11.4</td><td>6.2</td><td>5.2</td><td>Medium</td></tr>
+</table>
+<br>
+<h3>🟢 On Track Tickets</h3>
+<br>
+<table>
+<tr><th>Key</th><th>Summary</th><th>Assignee</th><th>SP</th><th>Started</th><th>Elapsed (hari)</th><th>Baseline (hari)</th><th>Priority</th></tr>
+<tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4037">IAMS30-4037</a></td><td>[BE MOBILE] Investigation API POST - Listing Validation</td><td>Dian Heryana</td><td>2</td><td>2026-06-08</td><td>1.6</td><td>2.4</td><td>Medium</td></tr>
+<tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4021">IAMS30-4021</a></td><td>[Mobile] Inspection - Cannot Preview after delete Evidences</td><td>dimas.wahyu</td><td>2</td><td>2026-06-08</td><td>1.5</td><td>2.4</td><td>Medium</td></tr>
+<tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4001">IAMS30-4001</a></td><td>[BE] Include Mandatory Field Name in API Error Response for Grafana Tr...</td><td>Dian Heryana</td><td>3</td><td>2026-06-09</td><td>0.5</td><td>6.2</td><td>Medium</td></tr>
+<tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4028">IAMS30-4028</a></td><td>[MOBILE] Image Compression — Iterative Compression to Meet Backend Siz...</td><td>nurrahman hadi</td><td>3</td><td>2026-06-09</td><td>0.4</td><td>6.2</td><td>Medium</td></tr>
+<tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4020">IAMS30-4020</a></td><td>[MOBILE] View History Detail — Dynamic Form Submission</td><td>nurrahman hadi</td><td>3</td><td>2026-06-10</td><td>-0.2</td><td>6.2</td><td>Medium</td></tr>
+<tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4042">IAMS30-4042</a></td><td>[BE] API Create & Delete SectionUserEquipmentMapping</td><td>Riki Ahmad Fadilah</td><td>3</td><td>2026-06-10</td><td>-0.2</td><td>6.2</td><td>Medium</td></tr>
+<tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4045">IAMS30-4045</a></td><td>[BE] Update Get Asset API: Add SectionTypeCode Filter Criteria</td><td>Dian Heryana</td><td>2</td><td>2026-06-10</td><td>-0.2</td><td>2.4</td><td>Medium</td></tr>
+</table>
+<br>
+<hr>
+<br>
+<p><b>Total ticket delayed (semua sprint aktif): 1</b></p>
+<br>
+<hr>
+<p><em>Auto-generated by delayed_ticket_report.py — 10 June 2026</em></p>
+</body>
+</html>

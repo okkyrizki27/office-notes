@@ -1,5 +1,9 @@
 # Outstanding Task
 
+- [ ] `P1` Check to Hamsyah about Opportunity - priority untuk BUMA ID Team:
+  - Print PDF yg inspection monitoring web (show all from all inspector)
+  - Benerin filter di inspection monitoring web
+  - Print PDF activity history (Form)
 - [~] `P1` Assess how to show data intervention that archived in the ADLS2 for BUMA AU *(In Progress by Herianto)*
 - [ ] `P1` Equipment area mapping, BPO BUMA ID request include release di Jun 2026
 - [ ] `P1` Translate data konfigurasi MKP dari tim technical sebelum dikirim ke MKP
