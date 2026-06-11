@@ -7,13 +7,16 @@
 
 ## Attendees
 
+**BTECH:**
 - Alimudin Sodding
-- Sunardi
 - Okky RR
 - Faisal P
 - Indro AN
 - Robert
 - Laila
+
+**BUMA:**
+- Sunardi
 - Anas
 
 ## Discussion
@@ -34,16 +37,16 @@
 
 7. PSCS memiliki alur: **Submit** oleh Mechanic, kemudian **approve** oleh Supervisor, Planner, dan Superintendent.
 8. Approval PSCS baru dapat dilakukan setelah EMOL dibuat (created).
-9. Flow process akan dibuat sesuai hasil diskusi.
-10. Pembuatan EMOL dapat dilakukan oleh Inspector atau assigned user.
+9. Pembuatan EMOL dapat dilakukan oleh Inspector atau assigned user.
 
 ### Reference & Scope
 
-11. Template untuk bank task dan panduan tipe task akan dibagikan oleh BTECH.
-12. Fokus pengembangan form saat ini pada unit **Hauler** dan **Loader**.
+10. Fokus pengembangan form saat ini pada unit **Hauler** dan **Loader**.
 
 ## Action Items
 
 | # | Task | Detail |
 |---|------|--------|
-| 13 | Buatkan progress timeline | User meminta dibuatkan progress timeline, dengan fokus PSCS sampai integrasi dengan EHMS, serta opsi tambahan untuk inspection form. |
+| 11 | Buat Flow Process | BTECH membuat Flow Process sesuai hasil diskusi pada meeting ini. |
+| 12 | Share template bank task | BTECH membagikan template untuk bank task dan panduan tipe task. |
+| 13 | Buatkan progress timeline | BPO request dibuatkan progress timeline, dengan fokus PSCS sampai integrasi dengan EHMS, serta opsi tambahan untuk inspection form. |

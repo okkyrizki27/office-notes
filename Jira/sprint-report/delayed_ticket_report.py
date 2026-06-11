@@ -1,5 +1,5 @@
 """
-Delayed Ticket Report
+Delayed and Reopen Ticket Report
 Run: python delayed_ticket_report.py
 Output: delayed_ticket_report_YYYYMMDD.md / .html / .pdf
 
@@ -137,8 +137,12 @@ def build_baseline(sprint_map):
     return baseline
 
 # ── IN PROGRESS TICKETS: time since entered progress ─────────────────────────
-def time_in_progress_hours(issue):
-    """Hours since the ticket first left To Do/Backlog into progress/done."""
+def count_reopens(issue):
+    """Number of times the ticket was moved back to 'Re-open' status."""
+    return sum(1 for _, _, to_s in status_transitions(issue) if to_s == "Re-open")
+
+def time_in_progress_hours(issue, sprint_start=None):
+    """Hours since the ticket entered progress, capped to sprint start (whichever is more recent)."""
     start_time = None
     for created, from_s, to_s in status_transitions(issue):
         if start_time is None and from_s in TODO_STATUSES and (
@@ -148,6 +152,8 @@ def time_in_progress_hours(issue):
     if start_time is None:
         # Tidak pernah pindah dari To Do/Backlog -> pakai created date
         start_time = issue["fields"]["created"]
+    if sprint_start is not None and parse_dt(sprint_start) > parse_dt(start_time):
+        start_time = sprint_start
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     delta = now - parse_dt(start_time)
     return delta.total_seconds() / 3600, start_time
@@ -198,7 +204,7 @@ for sprint_obj in active_sprints:
         if f["status"]["name"] != "In Progress":
             continue
         sp_val = sp(f)
-        elapsed_h, start_time = time_in_progress_hours(issue)
+        elapsed_h, start_time = time_in_progress_hours(issue, sprint_obj.get("startDate"))
         baseline_h = baseline.get(sp_val) if sp_val in TARGET_SP else None
         if baseline_h is None:
             status_flag = "no-baseline"
@@ -217,16 +223,32 @@ for sprint_obj in active_sprints:
             "priority": (f.get("priority") or {}).get("name", "-"),
             "sp": sp_val,
             "started": start_time[:10],
+            "sprint_start": sprint_obj.get("startDate", "")[:10],
             "elapsed_days": elapsed_h / 24,
             "baseline_days": (baseline_h / 24) if baseline_h is not None else None,
             "delay_days": delay_days,
             "status_flag": status_flag,
         })
 
+    reopen_rows = []
+    for issue in issues:
+        f = issue["fields"]
+        reopen_count = count_reopens(issue)
+        if reopen_count > 0:
+            reopen_rows.append({
+                "key": issue["key"],
+                "summary": f["summary"][:70] + ("..." if len(f["summary"]) > 70 else ""),
+                "status": f["status"]["name"],
+                "assignee": (f.get("assignee") or {}).get("displayName", "Unassigned"),
+                "priority": (f.get("priority") or {}).get("name", "-"),
+                "reopen_count": reopen_count,
+            })
+
     delayed_by_sprint.append({
         "sprint": sprint_obj,
         "team": team_name,
         "rows": rows,
+        "reopen_rows": reopen_rows,
     })
 
 # ── BUILD MARKDOWN ────────────────────────────────────────────────────────────
@@ -234,7 +256,7 @@ today   = datetime.now().strftime("%d %B %Y")
 today_f = datetime.now().strftime("%Y%m%d")
 lines = []
 
-lines.append("# Delayed Ticket Report")
+lines.append("# Delayed and Reopen Ticket Report")
 lines.append(f"**Generated:** {today}  |  **Project:** {PROJECT}  |  **Board:** IAMS 3.0\n")
 lines.append("Report ini membandingkan waktu ticket berstatus **In Progress** saat ini "
               "dengan rata-rata historis waktu pengerjaan **To Do → DEV DONE** "
@@ -272,12 +294,12 @@ for d in delayed_by_sprint:
 
     if delayed_rows:
         lines.append("### 🔴 Delayed Tickets\n")
-        lines.append("| Key | Summary | Assignee | SP | Started | Elapsed (hari) | Baseline (hari) | Delay (hari) | Priority |")
-        lines.append("|-----|---------|----------|----|---------|-----------------|-------------------|---------------|----------|")
+        lines.append("| Key | Summary | Assignee | SP | Started | Sprint Start | Elapsed (hari) | Baseline (hari) | Delay (hari) | Priority |")
+        lines.append("|-----|---------|----------|----|---------|--------------|-----------------|-------------------|---------------|----------|")
         for r in sorted(delayed_rows, key=lambda x: -x["delay_days"]):
             lines.append(
                 f"| [{r['key']}]({BASE_URL}/browse/{r['key']}) | {r['summary']} | {r['assignee']} | "
-                f"{r['sp']:.0f} | {r['started']} | {r['elapsed_days']:.1f} | "
+                f"{r['sp']:.0f} | {r['started']} | {r['sprint_start']} | {r['elapsed_days']:.1f} | "
                 f"{r['baseline_days']:.1f} | {r['delay_days']:.1f} | {r['priority']} |"
             )
         lines.append("")
@@ -308,6 +330,20 @@ for d in delayed_by_sprint:
             )
         lines.append("")
 
+    reopen_rows = d["reopen_rows"]
+    if reopen_rows:
+        lines.append("### 🔁 Reopened Tickets\n")
+        lines.append("| Key | Summary | Status | Assignee | Reopen Count | Priority |")
+        lines.append("|-----|---------|--------|----------|--------------|----------|")
+        for r in sorted(reopen_rows, key=lambda x: -x["reopen_count"]):
+            lines.append(
+                f"| [{r['key']}]({BASE_URL}/browse/{r['key']}) | {r['summary']} | {r['status']} | "
+                f"{r['assignee']} | {r['reopen_count']} | {r['priority']} |"
+            )
+        lines.append("")
+    else:
+        lines.append("Tidak ada ticket yang pernah reopen di sprint ini.\n")
+
     lines.append("---\n")
 
 lines.append(f"**Total ticket delayed (semua sprint aktif): {total_delayed}**\n")
@@ -318,10 +354,10 @@ md_content = "\n".join(lines)
 
 # ── SAVE ──────────────────────────────────────────────────────────────────────
 out_dir  = os.path.dirname(os.path.abspath(__file__))
-pdf_dir  = os.path.join(out_dir, "pdf")
 html_dir = os.path.join(out_dir, "html")
 md_dir   = os.path.join(out_dir, "md")
-for d_ in (pdf_dir, html_dir, md_dir):
+pdf_dir  = os.path.join(out_dir, "pdf")
+for d_ in (html_dir, md_dir, pdf_dir):
     os.makedirs(d_, exist_ok=True)
 
 md_file = os.path.join(md_dir, f"delayed_ticket_report_{today_f}.md")
@@ -388,16 +424,17 @@ html_content = f"""<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Delayed Ticket Report {today_f}</title>
+<title>Delayed and Reopen Ticket Report {today_f}</title>
 <style>
   @page {{ size: A4 landscape; margin: 14mm; }}
   body {{ font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #1a1a1a; padding: 0; margin: 0; }}
   h1 {{ font-size: 18pt; color: #c0392b; border-bottom: 3px solid #c0392b; padding-bottom: 8px; margin-bottom: 6px; }}
-  h2 {{ font-size: 13pt; color: #fff; background: #c0392b; padding: 6px 12px; border-radius: 3px; margin: 22px 0 10px; }}
-  h3 {{ font-size: 11.5pt; color: #c0392b; border-left: 4px solid #c0392b; padding-left: 10px; margin: 18px 0 8px; }}
+  h2 {{ font-size: 13pt; color: #fff; background: #c0392b; padding: 6px 12px; border-radius: 3px; margin: 22px 0 10px; page-break-after: avoid; break-after: avoid; }}
+  h3 {{ font-size: 11.5pt; color: #c0392b; border-left: 4px solid #c0392b; padding-left: 10px; margin: 18px 0 8px; page-break-after: avoid; break-after: avoid; }}
   table {{ width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9pt; margin: 8px 0 14px; }}
   th {{ background: #c0392b; color: #fff; padding: 6px 8px; text-align: left; font-weight: 600; word-wrap: break-word; }}
   td {{ padding: 5px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }}
+  tr {{ page-break-inside: avoid; break-inside: avoid; }}
   tr:nth-child(even) td {{ background: #fdf2f0; }}
   code {{ background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9pt; }}
   hr {{ border: none; border-top: 1px solid #ddd; margin: 16px 0; }}
