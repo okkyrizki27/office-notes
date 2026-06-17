@@ -115,7 +115,7 @@
     <tr><td>Tenant Asal</td><td>BUMA ID</td></tr>
     <tr><td>Tenant Target</td><td>MKP</td></tr>
     <tr><td>Prepared by</td><td>Okky Rizki R</td></tr>
-    <tr><td>Terakhir diupdate</td><td>09 Juni 2026</td></tr>
+    <tr><td>Terakhir diupdate</td><td>10 Juni 2026</td></tr>
   </table>
 </div>
 
@@ -198,6 +198,7 @@ insert into #lookup exec(@query_lookup)</span></pre>
 
 <pre><span class="cm">-- Query generate dim_date untuk pipeline MKP</span>
 <span class="cm">-- @offset = -(@first_day_of_week - 1)</span>
+<span class="cm">-- @first_date_of_date_generation = tanggal awal generate dim_date (parameter, default '2020-01-01')</span>
 <span class="kw">select</span>
     d.date_id,
     <span class="fn">cast</span>(<span class="fn">year</span>(<span class="fn">dateadd</span>(day, @offset, d.date_id)) <span class="kw">as</span> <span class="fn">varchar</span>)
@@ -206,7 +207,7 @@ insert into #lookup exec(@query_lookup)</span></pre>
     <span class="fn">cast</span>(<span class="fn">year</span>(d.date_id) <span class="kw">as</span> <span class="fn">varchar</span>)
         + <span class="fn">right</span>(<span class="str">'0'</span> + <span class="fn">cast</span>(<span class="fn">month</span>(d.date_id) <span class="kw">as</span> <span class="fn">varchar</span>), 2) <span class="kw">as</span> month_id
 <span class="kw">from</span> (
-    <span class="kw">select cast</span>(<span class="fn">dateadd</span>(day, n, <span class="str">'2020-01-01'</span>) <span class="kw">as</span> date) <span class="kw">as</span> date_id
+    <span class="kw">select cast</span>(<span class="fn">dateadd</span>(day, n, @first_date_of_date_generation) <span class="kw">as</span> date) <span class="kw">as</span> date_id
     <span class="kw">from</span> (
         <span class="kw">select top</span> 3650 <span class="fn">row_number</span>() <span class="kw">over</span> (<span class="kw">order by</span> (<span class="kw">select null</span>)) - 1 <span class="kw">as</span> n
         <span class="kw">from</span> sys.objects s1 <span class="kw">cross join</span> sys.objects s2
@@ -214,27 +215,36 @@ insert into #lookup exec(@query_lookup)</span></pre>
 ) d</pre>
 
 <div class="callout callout-warn">
-  <b>Prerequisite:</b> Konfirmasi konvensi hari pertama minggu ke tim MKP sebelum pipeline dijalankan, agar <code>week_id</code> yang dihasilkan konsisten dengan kalender yang dipakai di dashboard mereka.
+  <b>Prerequisite:</b> Konfirmasi 2 hal ke tim MKP sebelum pipeline dijalankan:
+  <ul>
+    <li>Konvensi hari pertama minggu (<code>@first_day_of_week</code>), agar <code>week_id</code> yang dihasilkan konsisten dengan kalender yang dipakai di dashboard mereka.</li>
+    <li>Tanggal awal generate <code>dim_date</code> (<code>@first_date_of_date_generation</code>) — sebelumnya hardcode <code>'2020-01-01'</code>, sekarang dijadikan parameter.</li>
+  </ul>
 </div>
 
 
 <!-- KEPUTUSAN 3 -->
-<h2>Keputusan 3 — <code>dim_equipment</code>: Buat Pipeline Generate Parquet untuk MKP</h2>
+<h2 id="keputusan3">Keputusan 3 — <code>dim_equipment</code>: Buat Pipeline Generate Parquet untuk MKP (Desain Universal)</h2>
 
 <div class="callout callout-ok">
-  <b>Tanggal:</b> 09 Jun 2026<br>
+  <b>Tanggal:</b> 09 Jun 2026, direvisi 10 Jun 2026<br>
   <b>Keputusan:</b> SP tidak diubah — tetap baca <code>dim_equipment</code> parquet dari datamart seperti BUMA ID. Karena MKP tidak punya <code>dim_equipment</code> di datamart, dibuat <b>pipeline baru</b> yang generate <code>dim_equipment</code> parquet ke datamart MKP dengan menjoin tabel-tabel yang sudah ada di curated layer.
 </div>
 
+<div class="callout callout-info">
+  <b>Revisi 10 Jun 2026 — Desain Universal:</b> <code>dim_equipment</code> harus berisi <b>SEMUA equipment</b> tanpa filter kategori. Tujuannya agar <code>dim_equipment</code> bisa direuse oleh dashboard lain (tidak hanya Backlog Monitoring). Filter spesifik per-dashboard dipindahkan ke config mapping <code>equipment_category</code> ↔ dashboard (lihat <a href="#keputusan6">Keputusan 6</a>), bukan baked-in di <code>dim_equipment</code> atau di SP.
+</div>
+
 <h4>Kolom yang Diperlukan</h4>
-<p>SP butuh <code>equipment</code> dan <code>status_unit</code>. PBI filter butuh semua 5 kolom:</p>
+<p>SP butuh <code>equipment</code> dan <code>status_unit</code>. PBI filter butuh 6 kolom (termasuk <code>equipment_category</code> baru):</p>
 <table>
   <tr><th>Kolom</th><th>Sumber</th><th>Catatan</th></tr>
   <tr><td><code>site_id</code></td><td><code>iams_services_asset/asset.sitecode</code></td><td>Kolom sudah ada di tabel asset, belum di-select di SP</td></tr>
   <tr><td><code>equipment</code></td><td><code>iams_services_asset/asset.assetnumber</code></td><td>Sudah ada di SP</td></tr>
   <tr><td><code>model_unit</code></td><td><code>iams_services_asset/assetmodel.name</code></td><td>Join via <code>asset.assetmodelcode</code></td></tr>
-  <tr><td><code>section_type_code_name</code></td><td><code>iams_services_asset/subcomponent.name</code></td><td>Join via <code>asset.sectiontypecode</code></td></tr>
-  <tr><td><code>status_unit</code></td><td><code>iams_services_asset/assetstatus</code></td><td>Ambil status terbaru per asset (ROW_NUMBER)</td></tr>
+  <tr><td><code>section_type_code_name</code></td><td><code>iams_services_asset/sectiontype.name</code></td><td>Join via <code>asset.sectiontypecode</code> — <span class="badge orange">perlu direvisi/dicek ulang</span>, sebelumnya diasumsikan dari tabel <code>subcomponent</code></td></tr>
+  <tr><td><code>status_unit</code></td><td><code>iams_services_asset/assetstatus</code></td><td>Ambil status terbaru per asset (ROW_NUMBER), <b>LEFT JOIN</b></td></tr>
+  <tr><td><code>equipment_category</code></td><td><code>iams_services_asset/asset.AssetCategoryCode</code></td><td><span class="badge orange">Baru</span> — dipakai bersama config mapping <code>equipment_category</code> ↔ dashboard di Keputusan 6</td></tr>
 </table>
 
 <h4>Prerequisite — Sync <code>AssetStatus</code> ke Datamart</h4>
@@ -257,7 +267,7 @@ insert into #lookup exec(@query_lookup)</span></pre>
 <span class="kw">where</span> rn = 1</pre>
 
 <div class="callout callout-warn">
-  <b>Catatan:</b> Di SP, <code>dim_equipment</code> dipakai sebagai INNER JOIN — hanya MO dari equipment yang ada di <code>dim_equipment</code> yang masuk ke output laporan. Pastikan pipeline generate <code>dim_equipment</code> MKP mencakup semua equipment yang relevan agar tidak ada MO yang tereksklusi secara tidak sengaja.
+  <b>Catatan:</b> Khusus join ke <code>AssetStatus</code> (untuk ambil <code>status_unit</code>) harus <b>LEFT JOIN</b>, supaya equipment yang belum punya record status tidak ter-exclude dari <code>dim_equipment</code> — <code>status_unit</code> hanya informasi tambahan, bukan filter. Join lainnya (model, section type, dst) ikuti pola yang sudah ada di SP saat ini. Pastikan pipeline generate <code>dim_equipment</code> MKP mencakup <b>semua</b> equipment yang ada (universal — lihat callout di atas), dan filter per-dashboard dilakukan lewat config mapping di Keputusan 6, bukan lewat INNER JOIN di SP.
 </div>
 
 
@@ -284,10 +294,19 @@ insert into #lookup exec(@query_lookup)</span></pre>
   <tr><th>Filter</th><th>Lokasi di SP</th><th>Default (BUMA ID)</th><th>Action</th></tr>
   <tr><td><code>tenantcode</code></td><td>sectiontype, site</td><td>BUMAID</td><td>Jadi <code>@tenantCode</code></td></tr>
   <tr><td><code>mocreatedby</code></td><td>mobacklog WHERE</td><td>DATACOM</td><td>Jadi <code>@moCreatedBy</code> — kemungkinan dihapus dari filter setelah konfirmasi MKP</td></tr>
-  <tr><td><code>replacementstatuslvl1</code></td><td>mobacklog WHERE</td><td>BEX</td><td>Jadi <code>@replacementStatusLvl1</code></td></tr>
+  <tr><td><code>replacementstatuslvl1</code></td><td>mobacklog WHERE</td><td>BEX</td><td>Jadi <code>@replacementStatusLvl1</code> — ini adalah <b>PM Activity Type</b> di SAP, <span class="badge orange">perlu konfirmasi nilai untuk MKP</span></td></tr>
   <tr><td><code>motype</code></td><td>mobacklog WHERE</td><td>MT01</td><td>Jadi <code>@moType</code></td></tr>
   <tr><td><code>[group] = 'Inspection'</code></td><td>priority WHERE</td><td>Inspection</td><td><span class="badge green">Tidak diubah</span> — master data Digiman+, sama untuk semua client</td></tr>
 </table>
+
+<div class="callout callout-warn">
+  <b>Open Item (10 Jun 2026):</b>
+  <ul>
+    <li><code>@moCreatedBy</code> dan <code>@moType</code> mengasumsikan single value (mis. <code>'DATACOM'</code>, <code>'MT01'</code>). Di MKP kemungkinan ada <b>lebih dari satu value</b> untuk masing-masing filter ini — perlu desain parameter yang support multi-value (misal comma-separated string yang di-split, atau table-valued parameter). Teknis belum diputuskan.</li>
+    <li>Perlu konfirmasi ke MKP: apakah mereka oke <b>semua data backlog</b> diambil tanpa filter <code>created_by</code>, atau hanya subset tertentu — terkait volume data dan sensitivitas data.</li>
+    <li><code>@replacementStatusLvl1</code> adalah <b>PM Activity Type</b> di SAP. BUMA ID memakai <code>'BEX'</code>; di MKP kemungkinan <code>'BKG'</code> saja, atau bisa jadi ada activity type lain yang juga relevan (multi-value, sama seperti <code>@moCreatedBy</code> dan <code>@moType</code>) — perlu konfirmasi ke tim MKP.</li>
+  </ul>
+</div>
 
 
 <!-- KEPUTUSAN 5 -->
@@ -296,6 +315,10 @@ insert into #lookup exec(@query_lookup)</span></pre>
 <div class="callout callout-ok">
   <b>Tanggal:</b> 09 Jun 2026<br>
   <b>Keputusan:</b> SAP user status codes di MKP dipastikan berbeda dari BUMA ID. Pendekatan yang dipilih adalah <b>config mapping file</b> — mengikuti pola <code>config_mapping_mol_status.csv</code> yang sudah ada. SP membaca mapping dari file CSV sehingga tidak perlu ubah logic CASE WHEN saat ada client baru.
+</div>
+
+<div class="callout callout-info">
+  <b>Revisi 10 Jun 2026:</b> Standar MO SAP <b>tidak punya step approval default</b> — workflow approval (<i>Waiting Approval</i>) adalah konfigurasi tambahan khusus BUMA ID. Step status MKP perlu dikonfirmasi satu per satu ke tim MKP (apa yang dianggap <i>Closed</i>, <i>In Progress</i>, <i>Waiting Approval</i>, dst — bisa jadi sebagian step ini tidak ada di MKP).
 </div>
 
 <h4>Kondisi Saat Ini (BUMA ID — Hardcode di SP)</h4>
@@ -327,15 +350,17 @@ nrev       ; waiting_approval</pre>
 <span class="kw">GROUP BY</span> [status]
 <span class="kw">ORDER BY</span> jumlah <span class="kw">DESC</span></pre>
   Setelah nilai dikonfirmasi, isi <code>config_mapping_sap_user_status.csv</code> untuk MKP dan update logic SP untuk membaca dari config file.
+  <br><br>
+  <b>Catatan penamaan (10 Jun 2026):</b> Apapun hasil konfirmasi step status MKP, nilai <code>status_category</code> di config tetap harus diselaraskan ke penamaan existing yang sudah dipakai (mis. <i>in progress</i> → <code>INPR</code>) — standardisasi penuh dilakukan di Digiman+ melalui <code>config_mapping_sap_user_status.csv</code>.
 </div>
 
 
 <!-- KEPUTUSAN 6 -->
-<h2>Keputusan 6 — Config Files untuk MKP</h2>
+<h2 id="keputusan6">Keputusan 6 — Config Files untuk MKP</h2>
 
 <div class="callout callout-ok">
-  <b>Tanggal:</b> 09 Jun 2026<br>
-  <b>Keputusan:</b> Ada 4 config file yang perlu dipersiapkan untuk MKP. Satu bisa di-copy as-is, tiga sisanya perlu dibuat baru setelah konfirmasi dengan tim MKP.
+  <b>Tanggal:</b> 09 Jun 2026, direvisi 10 Jun 2026<br>
+  <b>Keputusan:</b> Ada 5 config file yang perlu dipersiapkan untuk MKP. Satu bisa di-copy as-is, empat sisanya perlu dibuat baru setelah konfirmasi dengan tim MKP.
 </div>
 
 <table>
@@ -355,16 +380,41 @@ nrev       ; waiting_approval</pre>
   <tr>
     <td><code>config_image.csv</code></td>
     <td>PBI</td>
-    <td>Buat baru — section names dan URL gambar disesuaikan dengan MKP</td>
-    <td><span class="badge orange">Tunggu section names &amp; URL gambar MKP</span></td>
+    <td>Buat baru — section names disesuaikan dengan MKP, gambar disimpan sebagai base64 (chunked) bukan URL statis</td>
+    <td><span class="badge orange">Tunggu section names &amp; gambar dari MKP</span></td>
   </tr>
   <tr>
     <td><code>aging_category.csv</code></td>
     <td>PBI + SP</td>
-    <td>Buat baru — struktur CSV diperluas dengan kolom threshold, SP diganti dari CASE WHEN ke range join</td>
+    <td>Buat baru — struktur CSV diperluas dengan kolom threshold &amp; priority, SP diganti dari CASE WHEN ke range join</td>
     <td><span class="badge orange">Tunggu konfirmasi threshold MKP</span></td>
   </tr>
+  <tr>
+    <td><code>config_mapping_equipment_category_dashboard.csv</code></td>
+    <td>PBI</td>
+    <td><span class="badge orange">Baru</span> — mapping <code>equipment_category</code> ↔ dashboard, bentuk baris per dashboard. Lihat <a href="#keputusan3">Keputusan 3</a></td>
+    <td><span class="badge orange">Desain awal, belum final</span></td>
+  </tr>
 </table>
+
+<h4>Config Baru — <code>config_mapping_equipment_category_dashboard.csv</code></h4>
+<p>Dipakai untuk filter per-dashboard di sisi PBI tanpa mengubah <code>dim_equipment</code> atau SP. Tidak perlu sampai level equipment — cukup level <code>equipment_category</code>. Setiap kombinasi kategori + dashboard yang ingin ditampilkan jadi satu baris (1 kategori bisa muncul di banyak dashboard):</p>
+<table>
+  <tr><th>equipment_category</th><th>dashboard</th></tr>
+  <tr><td>AC</td><td>Backlog Monitoring</td></tr>
+  <tr><td>AC</td><td>EMS</td></tr>
+  <tr><td>OB</td><td>Backlog Monitoring</td></tr>
+</table>
+<p>PBI filter dashboard tertentu cukup join <code>dim_equipment.equipment_category</code> ke config ini lalu filter <code>dashboard = '...'</code> — tidak perlu logic filter terpisah per dashboard di SP/datamart.</p>
+
+<h4>Config Image — Mekanisme Base64 + Chunking</h4>
+<p>Gambar section/unit disimpan sebagai <b>base64</b> di config table (URL statis tidak diizinkan lagi). Karena base64 bisa melebihi limit ukuran kolom/storage, gambar dipecah jadi beberapa baris dengan kolom <code>sequence</code> dan di-assemble ulang saat dibaca:</p>
+<table>
+  <tr><th>section</th><th>sequence</th><th>base64_chunk</th></tr>
+  <tr><td>OB</td><td>1</td><td><code>iVBORw0KGgoAAAANS...</code></td></tr>
+  <tr><td>OB</td><td>2</td><td><code>UhEUgAAAyAAAAMg...</code></td></tr>
+</table>
+<p>Akan dibuat program konversi gambar → base64 (chunked). Untuk MKP: minta gambar sesuai section/unit mereka, lalu dikonversi via program tersebut.</p>
 
 <h4>Perubahan Struktur <code>aging_category.csv</code></h4>
 <p>Kolom <code>min_days</code> dan <code>max_days</code> ditambahkan agar threshold bisa dikonfigurasi per tenant tanpa ubah SP. <code>max_days</code> dikosongkan (NULL) untuk bucket terakhir, artinya tidak ada batas atas.</p>
@@ -379,11 +429,15 @@ nrev       ; waiting_approval</pre>
 
 <p><b>Sesudah:</b></p>
 <table>
-  <tr><th>id</th><th>aging_category</th><th>min_days</th><th>max_days</th></tr>
-  <tr><td>1</td><td>1-14</td><td>0</td><td>14</td></tr>
-  <tr><td>2</td><td>15-45</td><td>15</td><td>45</td></tr>
-  <tr><td>3</td><td>&gt;45</td><td>46</td><td><i>null</i></td></tr>
+  <tr><th>id</th><th>aging_category</th><th>min_days</th><th>max_days</th><th>priority</th></tr>
+  <tr><td>1</td><td>1-14</td><td>0</td><td>14</td><td>P1</td></tr>
+  <tr><td>2</td><td>15-45</td><td>15</td><td>45</td><td>P2</td></tr>
+  <tr><td>3</td><td>&gt;45</td><td>46</td><td><i>null</i></td><td>P3</td></tr>
 </table>
+
+<div class="callout callout-warn">
+  <b>Revisi 10 Jun 2026:</b> Aging range awalnya diasumsikan berbanding lurus langsung dengan priority (P1/P2/P3) dari tabel priority master — ternyata tidak, tabel priority punya range sendiri yang independen. Untuk sekarang, kolom <code>priority</code> ditambahkan eksplisit di <code>aging_category.csv</code> (P1 untuk 1-14, P2 untuk 15-45, P3 untuk &gt;45) agar tidak ada asumsi proporsional. Long term: pertimbangkan ambil <code>aging_category</code> &amp; <code>priority</code> langsung dari tabel priority master (diasumsikan universal antar tenant) begitu tabel itu tersedia di datamart.
+</div>
 
 <h4>Perubahan di SP — CASE WHEN diganti Range Join</h4>
 <div class="diff-block">
@@ -400,20 +454,22 @@ end as aging_range</span></pre>
 (
     [aging_category] <span class="fn">varchar</span>(20),
     [min_days]       <span class="fn">int</span>,
-    [max_days]       <span class="fn">int</span>  <span class="cm">-- null = tidak ada batas atas</span>
+    [max_days]       <span class="fn">int</span>,  <span class="cm">-- null = tidak ada batas atas</span>
+    [priority]       <span class="fn">varchar</span>(10)
 )
 <span class="cm">-- load dari: assetmanagement/{tenantPath}/mapping/aging_category.csv</span>
 
 <span class="cm">-- lalu di CTE, ganti CASE WHEN dengan:</span>
 <span class="kw">left join</span> #aging_category ac
 <span class="kw">on</span> aging_days >= ac.min_days
-<span class="kw">and</span> (ac.max_days <span class="kw">is null or</span> aging_days <= ac.max_days)</pre>
+<span class="kw">and</span> (ac.max_days <span class="kw">is null or</span> aging_days <= ac.max_days)
+<span class="cm">-- select tambahan: ac.aging_category, ac.priority</span></pre>
 </div>
 
 
 <!-- FOOTER -->
 <div class="doc-footer">
-  Backlog Monitoring — MKP Implementation Guide &nbsp;|&nbsp; Prepared by Okky Rizki R &nbsp;|&nbsp; 09 Juni 2026 &nbsp;|&nbsp; Confidential — Internal Use Only
+  Backlog Monitoring — MKP Implementation Guide &nbsp;|&nbsp; Prepared by Okky Rizki R &nbsp;|&nbsp; 10 Juni 2026 &nbsp;|&nbsp; Confidential — Internal Use Only
 </div>
 
 </body>
