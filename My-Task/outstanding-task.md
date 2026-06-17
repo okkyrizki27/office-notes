@@ -1,11 +1,11 @@
 # Outstanding Task
 
 - [ ] `P1` Email to BUMA AU Regarding issue intervention blank and archiving strategy follow up action
-- [ ] `P1` Translate data konfigurasi MKP dari tim technical sebelum dikirim ke MKP
-- [ ] `P1` [IAMS30-4081](https://bukittechnology.atlassian.net/browse/IAMS30-4081) Fix performa work card list — root cause bukan ANR, tapi FE render semua work card sekaligus; solusi: lazy render / virtualized list saat scroll
+- [ ] `P1` Plan to execute data config
+- [ ] `P1` Analyse the Digiman Transaction Report logic
 - [ ] `P1` Assess ticket untuk filter add subtask : MO SAP
-- [ ] `P1` Create ticket for backlog monitoring report for MKP
 - [ ] `P1` Assessment via Nexus *(Due Date: 03 Jun 2026)*
+- [ ] `P1` How to show second and third approval in the Digiman Transaction Dashboard
 - [ ] `P1` Create Timeline Service Sheet for BUMA ID
 - [ ] `P1` Create template untuk isi bank task dan lain-lain
 - [ ] `P2` Add new field EDD after user select Priority when ordering parts
@@ -50,3 +50,6 @@
 - [x] `P1` Assess how to show data intervention that archived in the ADLS2 for BUMA AU *(Done: 11 Jun 2026)*
 - [x] `P1` Equipment area mapping, BPO BUMA ID request include release di Jun 2026 *(Cancelled: 11 Jun 2026)*
 - [x] `P1` Check logic backlog monitoring dashboard for MKP *(Done: 11 Jun 2026)*
+- [x] `P1` [IAMS30-4081](https://bukittechnology.atlassian.net/browse/IAMS30-4081) Fix performa work card list — root cause bukan ANR, tapi FE render semua work card sekaligus; solusi: lazy render / virtualized list saat scroll *(Done: 12 Jun 2026)*
+- [x] `P1` Create ticket for backlog monitoring report for MKP — Epic [IAMS30-4211](https://bukittechnology.atlassian.net/browse/IAMS30-4211) + 9 child tickets ([IAMS30-4212](https://bukittechnology.atlassian.net/browse/IAMS30-4212)–[4220](https://bukittechnology.atlassian.net/browse/IAMS30-4220)) dan [IAMS30-4221](https://bukittechnology.atlassian.net/browse/IAMS30-4221) untuk PBI *(Done: 15 Jun 2026)*
+- [x] `P1` Translate data konfigurasi MKP dari tim technical sebelum dikirim ke MKP *(Done: 17 Jun 2026)*
