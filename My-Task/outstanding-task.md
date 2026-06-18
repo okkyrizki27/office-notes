@@ -9,10 +9,9 @@
 - [ ] `P1` Create Timeline Service Sheet for BUMA ID
 - [ ] `P1` Create template untuk isi bank task dan lain-lain
 - [ ] `P2` Add new field EDD after user select Priority when ordering parts
-- [ ] `P2` Persiapan data untuk implementasi Inspection and Order site IPR, effort 1 sprint
 - [~] `P2` Compare data master dan transaksi EHMS dengan data master Digiman+ *(menunggu diskusi dengan Soraya di hari Kamis, 21 Mei 2026)*
 - [ ] `P2` Confirmation to MKP perlakuan terhadap order yang gagal karena over budget — reject or pending, once budget release sync again to SAP
-- [ ] `P2` Create process flow of Digiman+ Form
+- [ ] `P2` Create process flow of Digiman+ Form request Uda Sunardi
 - [ ] `P3` Monitoring scheduler saat ini masih satu account admin bisa atur all tenant, perlu dibuat rule admin per tenant
 
 ---
@@ -53,3 +52,5 @@
 - [x] `P1` [IAMS30-4081](https://bukittechnology.atlassian.net/browse/IAMS30-4081) Fix performa work card list — root cause bukan ANR, tapi FE render semua work card sekaligus; solusi: lazy render / virtualized list saat scroll *(Done: 12 Jun 2026)*
 - [x] `P1` Create ticket for backlog monitoring report for MKP — Epic [IAMS30-4211](https://bukittechnology.atlassian.net/browse/IAMS30-4211) + 9 child tickets ([IAMS30-4212](https://bukittechnology.atlassian.net/browse/IAMS30-4212)–[4220](https://bukittechnology.atlassian.net/browse/IAMS30-4220)) dan [IAMS30-4221](https://bukittechnology.atlassian.net/browse/IAMS30-4221) untuk PBI *(Done: 15 Jun 2026)*
 - [x] `P1` Translate data konfigurasi MKP dari tim technical sebelum dikirim ke MKP *(Done: 17 Jun 2026)*
+- [x] `P1` Email ke BUMA AU ada tidak API untuk data visionlink dibanding web scrapper *(Done: 18 Jun 2026)*
+- [x] `P2` Persiapan data untuk implementasi Inspection and Order site IPR, effort 1 sprint *(Done: 18 Jun 2026)*
