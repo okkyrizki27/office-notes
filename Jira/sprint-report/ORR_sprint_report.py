@@ -140,6 +140,16 @@ def compute_dev_done_range(issue):
             end_time = created
     return start_time, end_time
 
+def business_days_count(start_date, end_date):
+    """Count business days (excluding weekends and Indonesian holidays) from start_date up to (not including) end_date."""
+    count = 0
+    current = start_date
+    while current < end_date:
+        if current.weekday() < 5 and current not in ID_HOLIDAYS:
+            count += 1
+        current += timedelta(days=1)
+    return count
+
 def business_hours_between(start, end):
     """Hours between two datetimes, excluding weekends and Indonesian national holidays."""
     if end <= start:
@@ -364,6 +374,17 @@ for sprint_obj in active_sprints:
             "priority": (f.get("priority") or {}).get("name", "-"),
         })
 
+    sprint_start_dt = parse_dt(sprint_obj["startDate"]).date() if sprint_obj.get("startDate") else None
+    sprint_end_dt   = parse_dt(sprint_obj["endDate"]).date()   if sprint_obj.get("endDate")   else None
+    today_date = datetime.now().date()
+    if sprint_start_dt and sprint_end_dt:
+        total_sprint_days   = business_days_count(sprint_start_dt, sprint_end_dt + timedelta(days=1))
+        elapsed_sprint_days = business_days_count(sprint_start_dt, min(today_date, sprint_end_dt) + timedelta(days=1))
+        sprint_day_pct      = (elapsed_sprint_days / total_sprint_days * 100) if total_sprint_days else 0
+    else:
+        total_sprint_days = elapsed_sprint_days = None
+        sprint_day_pct = 0
+
     status_counts = {"done": [0, 0.0], "progress": [0, 0.0], "todo": [0, 0.0]}
     for issue in issues:
         f = issue["fields"]
@@ -393,6 +414,9 @@ for sprint_obj in active_sprints:
         "todo_sp": status_counts["todo"][1],
         "done_pct_tickets": (status_counts["done"][0] / total_tickets * 100) if total_tickets else 0,
         "done_pct_sp": (status_counts["done"][1] / total_sp * 100) if total_sp else 0,
+        "total_sprint_days": total_sprint_days,
+        "elapsed_sprint_days": elapsed_sprint_days,
+        "sprint_day_pct": sprint_day_pct,
     }
 
     delayed_by_sprint.append({
@@ -572,7 +596,9 @@ for d in delayed_by_sprint:
     lines.append(f"| Done / QA Passed | {prog['done_tickets']} ({prog['done_pct_tickets']:.0f}%) | {prog['done_sp']:.0f} SP ({prog['done_pct_sp']:.0f}%) |")
     lines.append(f"| In Progress / Dev Done / QA Test | {prog['progress_tickets']} | {prog['progress_sp']:.0f} SP |")
     lines.append(f"| To Do | {prog['todo_tickets']} | {prog['todo_sp']:.0f} SP |")
-    lines.append(f"| **Progress** | {progress_bar(prog['done_pct_tickets'])} | {progress_bar(prog['done_pct_sp'])} |")
+    lines.append(f"| **Progress (Tickets / SP)** | {progress_bar(prog['done_pct_tickets'])} | {progress_bar(prog['done_pct_sp'])} |")
+    if prog["total_sprint_days"] is not None:
+        lines.append(f"| **Sprint Day Progress** | {prog['elapsed_sprint_days']} / {prog['total_sprint_days']} hari kerja | {progress_bar(prog['sprint_day_pct'])} |")
     lines.append("")
 
     todo_rows = d["todo_rows"]

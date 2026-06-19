@@ -1,6 +1,5 @@
 # Outstanding Task
 
-- [ ] `P1` Email to BUMA AU Regarding issue intervention blank and archiving strategy follow up action
 - [ ] `P1` Plan to execute data config
 - [ ] `P1` Analyse the Digiman Transaction Report logic
 - [ ] `P1` Assess ticket untuk filter add subtask : MO SAP
@@ -8,10 +7,10 @@
 - [ ] `P1` How to show second and third approval in the Digiman Transaction Dashboard
 - [ ] `P1` Create Timeline Service Sheet for BUMA ID
 - [ ] `P1` Create template untuk isi bank task dan lain-lain
-- [ ] `P2` Add new field EDD after user select Priority when ordering parts
+- [ ] `P1` Create process flow of Digiman+ Form request Uda Sunardi
+- [ ] `P2` Follow up to Ko Herianto terkait view untuk details of Intervention
 - [~] `P2` Compare data master dan transaksi EHMS dengan data master Digiman+ *(menunggu diskusi dengan Soraya di hari Kamis, 21 Mei 2026)*
 - [ ] `P2` Confirmation to MKP perlakuan terhadap order yang gagal karena over budget — reject or pending, once budget release sync again to SAP
-- [ ] `P2` Create process flow of Digiman+ Form request Uda Sunardi
 - [ ] `P3` Monitoring scheduler saat ini masih satu account admin bisa atur all tenant, perlu dibuat rule admin per tenant
 
 ---
@@ -54,3 +53,5 @@
 - [x] `P1` Translate data konfigurasi MKP dari tim technical sebelum dikirim ke MKP *(Done: 17 Jun 2026)*
 - [x] `P1` Email ke BUMA AU ada tidak API untuk data visionlink dibanding web scrapper *(Done: 18 Jun 2026)*
 - [x] `P2` Persiapan data untuk implementasi Inspection and Order site IPR, effort 1 sprint *(Done: 18 Jun 2026)*
+- [x] `P1` Email to BUMA AU Regarding issue intervention blank and archiving strategy follow up action *(Done: 19 Jun 2026)*
+- [x] `P2` Add new field EDD after user select Priority when ordering parts *(Done: 19 Jun 2026)*
