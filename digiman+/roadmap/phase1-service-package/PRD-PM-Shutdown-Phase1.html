@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRD — PM Shutdown Phase 1 | Digiman+</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --success: #16a34a;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-400: #94a3b8;
+    --gray-600: #475569;
+    --gray-800: #1e293b;
+    --tech-bg: #0f172a;
+    --tech-accent: #38bdf8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--gray-800);
+    background: #fff;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary) 0%, #0f2744 60%, #1a3a5c 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 80px;
+    page-break-after: always;
+  }
+  .cover-badge {
+    background: rgba(255,255,255,0.15);
+    color: #93c5fd;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 28px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .cover h1 {
+    font-size: 48px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    max-width: 700px;
+  }
+  .cover h1 span { color: #60a5fa; }
+  .cover-sub {
+    font-size: 20px;
+    color: #93c5fd;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    margin-top: 48px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 32px;
+  }
+  .cover-meta-item label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #60a5fa;
+    margin-bottom: 4px;
+  }
+  .cover-meta-item span {
+    color: #fff;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  .cover-divider {
+    width: 60px;
+    height: 4px;
+    background: #3b82f6;
+    border-radius: 2px;
+    margin-bottom: 32px;
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 960px; margin: 0 auto; padding: 60px 48px; }
+
+  /* ── TOC ── */
+  .toc-page {
+    padding: 60px 48px;
+    max-width: 960px;
+    margin: 0 auto;
+    page-break-after: always;
+  }
+  .toc-title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .toc-heading { font-size: 32px; font-weight: 700; color: var(--primary); margin-bottom: 40px; }
+  .toc-section { margin-bottom: 4px; }
+  .toc-section a {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    color: var(--gray-800);
+    text-decoration: none;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 14px;
+  }
+  .toc-section a:hover { color: var(--accent); }
+  .toc-num {
+    min-width: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 13px;
+  }
+  .toc-dots { flex: 1; border-bottom: 2px dotted var(--gray-200); margin: 0 8px; height: 1px; align-self: center; }
+  .toc-tech { background: var(--gray-50); border-left: 3px solid var(--tech-accent); padding: 16px 20px; border-radius: 4px; margin-top: 24px; }
+  .toc-tech .toc-tech-label { font-size: 10px; font-weight: 700; color: var(--tech-accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+  /* ── SECTION HEADERS ── */
+  .section-header {
+    background: linear-gradient(90deg, var(--primary) 0%, #1e4976 100%);
+    color: #fff;
+    padding: 40px 48px;
+    margin-bottom: 40px;
+    page-break-before: always;
+  }
+  .section-header .section-num {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #93c5fd;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .section-header h2 { font-size: 32px; font-weight: 700; }
+  .section-header p { color: #93c5fd; margin-top: 8px; font-size: 15px; }
+
+  .section-header.tech {
+    background: linear-gradient(90deg, var(--tech-bg) 0%, #1e293b 100%);
+    border-top: 3px solid var(--tech-accent);
+  }
+  .section-header.tech .section-num { color: var(--tech-accent); }
+  .section-header.tech p { color: #94a3b8; }
+
+  /* ── TYPOGRAPHY ── */
+  h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gray-200);
+  }
+  h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin: 24px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h4::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  p { margin-bottom: 14px; color: var(--gray-600); }
+  ul, ol { margin: 10px 0 16px 24px; }
+  li { margin-bottom: 6px; color: var(--gray-600); }
+  strong { color: var(--gray-800); }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    display: flex;
+    gap: 12px;
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; }
+  .callout-info { background: var(--accent-light); border-left: 4px solid var(--accent); }
+  .callout-info .callout-icon::before { content: 'ℹ'; color: var(--accent); }
+  .callout-warning { background: #fffbeb; border-left: 4px solid var(--warning); }
+  .callout-warning .callout-icon::before { content: '⚠'; color: var(--warning); }
+  .callout-decision { background: #f0fdf4; border-left: 4px solid var(--success); }
+  .callout-decision .callout-icon::before { content: '✓'; color: var(--success); font-weight: 700; }
+  .callout-tech { background: #0f172a; border-left: 4px solid var(--tech-accent); color: #e2e8f0; }
+  .callout-tech .callout-icon::before { content: '⚙'; color: var(--tech-accent); }
+  .callout-tech p { color: #94a3b8; }
+  .callout p { margin: 0; }
+
+  /* ── TABLES ── */
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--gray-200); color: var(--gray-600); }
+  tr:nth-child(even) td { background: var(--gray-50); }
+  tr:hover td { background: var(--accent-light); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-mandatory { background: #fee2e2; color: #dc2626; }
+  .badge-optional { background: #dbeafe; color: #1d4ed8; }
+  .badge-new { background: #dcfce7; color: #15803d; }
+  .badge-existing { background: var(--gray-100); color: var(--gray-600); }
+  .badge-deferred { background: #fef9c3; color: #854d0e; }
+  .badge-open { background: #fef3c7; color: #92400e; }
+  .badge-resolved { background: #dcfce7; color: #166534; }
+
+  /* ── CARDS ── */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin: 24px 0; }
+  .card {
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 20px;
+    background: var(--gray-50);
+  }
+  .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card h5 { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--gray-600); margin: 0; }
+
+  /* ── ACTOR ROLES ── */
+  .actor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 24px 0; }
+  .actor-card {
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 2px solid transparent;
+  }
+  .actor-card.planner { background: #eff6ff; border-color: #3b82f6; }
+  .actor-card.supervisor { background: #f0fdf4; border-color: #22c55e; }
+  .actor-card.mechanic { background: #fff7ed; border-color: #f97316; }
+  .actor-card.admin { background: #fdf4ff; border-color: #a855f7; }
+  .actor-icon { font-size: 32px; margin-bottom: 8px; }
+  .actor-card h5 { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .actor-card .actor-platform { font-size: 11px; color: var(--gray-400); margin-bottom: 8px; }
+  .actor-card p { font-size: 12px; color: var(--gray-600); margin: 0; }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table th:first-child { background: var(--gray-600); }
+  .compare-table .pro { color: var(--success); font-weight: 600; }
+  .compare-table .con { color: var(--danger); }
+  .recommend-row td { background: #f0fdf4 !important; font-weight: 600; }
+
+  /* ── CODE/MONO ── */
+  code {
+    background: var(--gray-100);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    color: #be185d;
+  }
+  pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    margin: 16px 0;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  /* ── DIAGRAMS ── */
+  .diagram-wrap {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 32px;
+    margin: 24px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .diagram-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    align-self: flex-start;
+  }
+  .mermaid { width: 100%; }
+
+  /* ── STATUS FLOW ── */
+  .status-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .status-node {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status-arrow {
+    color: var(--gray-400);
+    font-size: 18px;
+    margin: 0 8px;
+  }
+  .status-open { background: var(--gray-100); color: var(--gray-600); }
+  .status-progress { background: #dbeafe; color: #1d4ed8; }
+  .status-complete { background: #dcfce7; color: #166534; }
+  .status-approved { background: #fdf4ff; color: #7e22ce; }
+
+  /* ── DECISION SUMMARY ── */
+  .decision-row td:first-child { font-weight: 600; color: var(--gray-800); }
+  .decision-row td:last-child { color: var(--gray-600); }
+
+  /* ── SCENARIO TABLE ── */
+  .scenario-header { background: #1e293b; color: #93c5fd; font-size: 11px; letter-spacing: 0.5px; }
+  .scenario-bold { font-weight: 700; color: var(--primary); }
+
+  /* ── OPEN ITEMS ── */
+  .open-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .open-item:last-child { border-bottom: none; }
+  .open-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  .open-dot.unresolved { background: var(--warning); }
+  .open-dot.resolved { background: var(--success); }
+  .open-dot.deferred { background: var(--gray-400); }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--gray-200); margin: 40px 0; }
+
+  /* ── TECH SECTION OVERRIDES ── */
+  .tech-section h3 { color: var(--tech-accent); border-bottom-color: #1e293b; }
+  .tech-section h4::before { background: var(--tech-accent); }
+  .tech-section p { color: #94a3b8; }
+  .tech-section li { color: #94a3b8; }
+  .tech-section th { background: #1e293b; }
+  .tech-section td { color: #94a3b8; }
+  .tech-section tr:nth-child(even) td { background: #0f172a; }
+
+  /* ── STEP FLOW DIAGRAMS ── */
+  .sf-wrap { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 28px 32px; margin: 24px 0; }
+  .sf-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  .sf { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .sf-node { border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 500; text-align: center; min-width: 300px; max-width: 480px; line-height: 1.4; }
+  .sf-start  { background: #1a3a5c; color: #fff; border-radius: 24px; }
+  .sf-end    { background: #16a34a; color: #fff; border-radius: 24px; }
+  .sf-step   { background: #fff; border: 2px solid #1a3a5c; color: #1a3a5c; }
+  .sf-dec    { background: #dbeafe; border: 2px solid #2563eb; color: #1e3a5f; transform: none; font-style: italic; }
+  .sf-warn   { background: #fef3c7; border: 2px solid #d97706; color: #92400e; }
+  .sf-action { background: #f0fdf4; border: 2px solid #16a34a; color: #166534; }
+  .sf-arrow  { color: #94a3b8; font-size: 22px; line-height: 1; margin: 2px 0; }
+  .sf-branches { display: flex; gap: 20px; justify-content: center; align-items: flex-start; margin: 4px 0; width: 100%; }
+  .sf-branch { display: flex; flex-direction: column; align-items: center; gap: 0; flex: 1; max-width: 260px; }
+  .sf-bl     { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 10px; margin-bottom: 4px; }
+  .sf-bl.yes { background: #dcfce7; color: #166534; }
+  .sf-bl.no  { background: #fee2e2; color: #991b1b; }
+  .sf-bl.ya  { background: #dcfce7; color: #166534; }
+  .sf-bl.tdk { background: #fee2e2; color: #991b1b; }
+  .sf-line   { border-top: 2px solid var(--gray-200); width: 100%; margin: 10px 0; }
+  /* Architecture box diagram */
+  .arch-wrap { background: #0f172a; border-radius: 10px; padding: 28px; margin: 24px 0; }
+  .arch-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #38bdf8; margin-bottom: 20px; }
+  .arch-grid { display: grid; grid-template-columns: auto 1fr; gap: 12px 20px; align-items: center; }
+  .arch-box { padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; }
+  .arch-mobile { background: #1a3a5c; color: #fff; }
+  .arch-main   { background: #2563eb; color: #fff; }
+  .arch-svc    { background: #1e293b; color: #93c5fd; border: 1px solid #334155; }
+  .arch-db     { background: #134e4a; color: #6ee7b7; border: 1px solid #0d9488; border-radius: 4px; }
+  .arch-arrow  { color: #64748b; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+  .arch-arrow span { background: #1e293b; color: #94a3b8; font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+  /* Workcard diagram */
+  .wc-wrap { border: 2px solid #1a3a5c; border-radius: 10px; overflow: hidden; margin: 24px 0; max-width: 600px; }
+  .wc-title { background: #1a3a5c; color: #fff; padding: 12px 20px; font-weight: 700; font-size: 14px; }
+  .wc-tabs  { display: flex; border-bottom: 2px solid #e2e8f0; }
+  .wc-tab   { padding: 10px 24px; font-size: 13px; font-weight: 600; cursor: default; border-right: 1px solid #e2e8f0; }
+  .wc-tab.existing { background: #f1f5f9; color: #64748b; }
+  .wc-tab.new-tab  { background: #dbeafe; color: #1d4ed8; }
+  .wc-body  { display: flex; }
+  .wc-col   { flex: 1; padding: 16px; border-right: 1px solid #e2e8f0; }
+  .wc-col:last-child { border-right: none; }
+  .wc-col h6 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 10px; }
+  .wc-item  { font-size: 12px; color: #475569; padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
+  .wc-item:last-child { border-bottom: none; }
+  .wc-status { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin: 3px 4px 3px 0; }
+  .st-empty    { background: #f1f5f9; color: #64748b; }
+  .st-progress { background: #dbeafe; color: #1d4ed8; }
+  .st-complete { background: #dcfce7; color: #166534; }
+
+  /* ── PRINT ── */
+  @media print {
+    .cover { min-height: 297mm; }
+    .section-header { page-break-before: always; }
+    .diagram-wrap { page-break-inside: avoid; }
+    table { page-break-inside: avoid; }
+    h3 { page-break-after: avoid; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     COVER PAGE
+══════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">Product Requirements Document</div>
+  <div class="cover-divider"></div>
+  <h1>PM Shutdown<br><span>Service Bundle &</span><br><span>Form Execution</span></h1>
+  <div class="cover-sub">Phase 1 — Digiman+</div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <label>Produk</label>
+      <span>Digiman+</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Fase</label>
+      <span>Phase 1</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Tanggal</label>
+      <span>22 Juni 2026</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Status</label>
+      <span>Draft — Review Internal</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TABLE OF CONTENTS
+══════════════════════════════════════ -->
+<div class="toc-page">
+  <div class="toc-title">Daftar Isi</div>
+  <div class="toc-heading">Isi Dokumen</div>
+
+  <div class="toc-section"><a href="#s1"><span class="toc-num">1</span> Ringkasan Eksekutif<span class="toc-dots"></span></a></div>
+  <div class="toc-section"><a href="#s2"><span class="toc-num">2</span> Latar Belakang &amp; Gap Saat Ini<span class="toc-dots"></span></a></div>
+  <div class="toc-section"><a href="#s3"><span class="toc-num">3</span> Aktor &amp; Peran<span class="toc-dots"></span></a></div>
+  <div class="toc-section"><a href="#s4"><span class="toc-num">4</span> Fitur 1: Service Bundle Planning<span class="toc-dots"></span></a></div>
+  <div class="toc-section"><a href="#s5"><span class="toc-num">5</span> Fitur 2: PM Shutdown Workcard — Tab Form<span class="toc-dots"></span></a></div>
+  <div class="toc-section"><a href="#s6"><span class="toc-num">6</span> Fitur 3: Multi-Mechanic Form Execution<span class="toc-dots"></span></a></div>
+  <div class="toc-section"><a href="#s7"><span class="toc-num">7</span> Fitur 4: Identitas &amp; Autentikasi Mechanic<span class="toc-dots"></span></a></div>
+  <div class="toc-section"><a href="#s8"><span class="toc-num">8</span> Fitur 5: Mechanic Activity Tracking<span class="toc-dots"></span></a></div>
+  <div class="toc-section"><a href="#s9"><span class="toc-num">9</span> Ringkasan Keputusan Bisnis<span class="toc-dots"></span></a></div>
+  <div class="toc-section"><a href="#s10"><span class="toc-num">10</span> Open Items<span class="toc-dots"></span></a></div>
+
+  <div class="toc-tech">
+    <div class="toc-tech-label">⚙ Bagian Technical — Dapat dilewati oleh Business User</div>
+    <div class="toc-section"><a href="#t1"><span class="toc-num">T1</span> Perubahan Data Model<span class="toc-dots"></span></a></div>
+    <div class="toc-section"><a href="#t2"><span class="toc-num">T2</span> Arsitektur &amp; Evolusi API<span class="toc-dots"></span></a></div>
+    <div class="toc-section"><a href="#t3"><span class="toc-num">T3</span> Mekanisme Sync &amp; Offline-First<span class="toc-dots"></span></a></div>
+    <div class="toc-section"><a href="#t4"><span class="toc-num">T4</span> Conflict Resolution<span class="toc-dots"></span></a></div>
+    <div class="toc-section"><a href="#t5"><span class="toc-num">T5</span> Activity Tracking — Detail Teknis<span class="toc-dots"></span></a></div>
+    <div class="toc-section"><a href="#t6"><span class="toc-num">T6</span> Breaking Changes &amp; Migrasi<span class="toc-dots"></span></a></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 1 — RINGKASAN EKSEKUTIF
+══════════════════════════════════════ -->
+<div id="s1" class="section-header">
+  <div class="section-num">Bagian 1</div>
+  <h2>Ringkasan Eksekutif</h2>
+  <p>Gambaran singkat tujuan dan cakupan Phase 1</p>
+</div>
+<div class="container">
+  <p>Dokumen ini mendefinisikan kebutuhan produk untuk pengembangan fitur <strong>PM Shutdown</strong> di Digiman+ — khususnya terkait <strong>Service Bundle</strong>, <strong>Multi-Mechanic Form Execution</strong>, dan <strong>Mechanic Activity Tracking</strong> pada Phase 1.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h5>Service Bundle</h5>
+      <p>Planner dapat menyusun bundle form yang harus diisi saat eksekusi scheduled service.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👥</div>
+      <h5>Multi-Mechanic</h5>
+      <p>Beberapa mechanic dapat mengisi satu form secara bersamaan dengan dukungan offline-first.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⏱</div>
+      <h5>Activity Tracking</h5>
+      <p>Aktivitas mechanic (masuk/keluar form) direkam per shift untuk kebutuhan reporting.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📴</div>
+      <h5>Offline-First</h5>
+      <p>Seluruh alur — mengisi form, submit, hingga Finish Execution — dapat dilakukan tanpa koneksi internet.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon"></div>
+    <p>Bagian 1–10 ditujukan untuk <strong>business user</strong>. Bagian T1–T6 adalah spesifikasi teknis yang dapat dilewati oleh pembaca non-teknis.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 2 — LATAR BELAKANG
+══════════════════════════════════════ -->
+<div id="s2" class="section-header">
+  <div class="section-num">Bagian 2</div>
+  <h2>Latar Belakang &amp; Gap Saat Ini</h2>
+  <p>Kondisi PM Shutdown saat ini dan permasalahan yang ingin diselesaikan</p>
+</div>
+<div class="container">
+  <h3>Kondisi Saat Ini</h3>
+  <p>PM Shutdown saat ini hanya menghandle <strong>backlog execution</strong> — yaitu temuan hasil inspeksi yang dimasukkan ke dalam scheduled service untuk perbaikan. Tidak ada dokumentasi terstruktur tentang pekerjaan yang dilakukan selama service berlangsung.</p>
+
+  <div class="callout callout-warning">
+    <div class="callout-icon"></div>
+    <p>Tab Form di workcard PM Shutdown mobile <strong>sudah ada dalam aplikasi namun masih tersembunyi (hidden)</strong> dan belum diimplementasi. Phase 1 ini akan mengaktifkan dan mengisi tab tersebut.</p>
+  </div>
+
+  <h3>Gap yang Ditemukan</h3>
+  <p>Di industri heavy equipment mining, scheduled service berbasis periodical service hour: <strong>250 hrs, 500 hrs, 1000 hrs, 2000 hrs</strong>. Dalam kondisi aktual di lapangan sebelum digitalisasi, setiap service memiliki <strong>bundle form</strong> yang harus diisi — namun ini belum terakomodasi di Digiman+.</p>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Aspek</th><th>Kondisi Saat Ini</th><th>Target Phase 1</th></tr>
+      <tr><td>Jenis pekerjaan yang dicatat</td><td>Backlog execution saja</td><td>Backlog + Service form bundle</td></tr>
+      <tr><td>Dokumentasi service</td><td>Tidak ada</td><td>Service sheet + form tambahan sesuai kebutuhan</td></tr>
+      <tr><td>Pengisian form</td><td>Satu user, satu form</td><td>Banyak mechanic, satu form, offline-first</td></tr>
+      <tr><td>Tracking aktivitas mechanic</td><td>Tidak ada</td><td>Rekaman masuk/keluar form per shift</td></tr>
+      <tr><td>Tab Form di workcard</td><td>Hidden, belum implementasi</td><td>Aktif, menampilkan bundle form</td></tr>
+    </table>
+  </div>
+
+  <h3>Konteks Arsitektur Digiman+</h3>
+  <p>Digiman+ memiliki arsitektur mendekati microservice. Fitur-fitur yang relevan dengan Phase 1 ini:</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Fitur</th><th>Service</th><th>Platform</th><th>Status</th></tr>
+      <tr><td>Digiplan (scheduled service planning)</td><td><code>dplan</code></td><td>Web</td><td><span class="badge badge-existing">Existing</span></td></tr>
+      <tr><td>PM Shutdown (eksekusi service)</td><td><code>maintenance-execution</code></td><td>Mobile</td><td><span class="badge badge-existing">Existing</span></td></tr>
+      <tr><td>Form Builder</td><td><code>maintenance-strategy</code></td><td>Web</td><td><span class="badge badge-existing">Existing</span></td></tr>
+      <tr><td>Form Submission</td><td><code>maintenance-execution</code></td><td>Mobile</td><td><span class="badge badge-existing">Existing</span></td></tr>
+      <tr><td>Service Bundle (baru)</td><td><code>maintenance-execution</code></td><td>Web + Mobile</td><td><span class="badge badge-new">Baru</span></td></tr>
+    </table>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon"></div>
+    <p><strong>Catatan arsitektur:</strong> PM Shutdown saat ini adalah pure proxy ke <code>dplan</code> — tidak punya data sendiri. Phase 1 mengubah ini secara signifikan: <code>maintenance-execution</code> akan menjadi aggregator yang punya data form bundle sendiri.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 3 — AKTOR
+══════════════════════════════════════ -->
+<div id="s3" class="section-header">
+  <div class="section-num">Bagian 3</div>
+  <h2>Aktor &amp; Peran</h2>
+  <p>Siapa saja yang terlibat dalam fitur Phase 1</p>
+</div>
+<div class="container">
+  <div class="actor-grid">
+    <div class="actor-card planner">
+      <div class="actor-icon">🗓️</div>
+      <h5>Planner</h5>
+      <div class="actor-platform">Platform: Web (Digiplan)</div>
+      <p>Membuat scheduled service plan dan menyusun bundle form yang harus diisi saat eksekusi.</p>
+    </div>
+    <div class="actor-card supervisor">
+      <div class="actor-icon">👷</div>
+      <h5>Supervisor / Foreman</h5>
+      <div class="actor-platform">Platform: Mobile</div>
+      <p>Mengawasi eksekusi service. Melakukan Finish Execution untuk menandai WorkOrder selesai.</p>
+    </div>
+    <div class="actor-card mechanic">
+      <div class="actor-icon">🔧</div>
+      <h5>Mechanic</h5>
+      <div class="actor-platform">Platform: Mobile</div>
+      <p>Mengisi form service di lapangan. Dapat bekerja secara offline. Aktivitasnya direkam per shift.</p>
+    </div>
+    <div class="actor-card admin">
+      <div class="actor-icon">⚙️</div>
+      <h5>Form Builder Engineer / Admin HO</h5>
+      <div class="actor-platform">Platform: Web</div>
+      <p>Membuat dan mengelola template form di Form Builder, termasuk mapping ke model equipment dan service hour.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 4 — SERVICE BUNDLE PLANNING
+══════════════════════════════════════ -->
+<div id="s4" class="section-header">
+  <div class="section-num">Bagian 4</div>
+  <h2>Fitur 1: Service Bundle Planning</h2>
+  <p>Planner menyusun bundle form untuk sebuah scheduled service — dilakukan di web (Digiplan)</p>
+</div>
+<div class="container">
+  <h3>Konsep Service Bundle</h3>
+  <p>Untuk setiap service execution, ada kumpulan form (<strong>bundle</strong>) yang harus diisi oleh mechanic di lapangan. Bundle ini terdiri dari form mandatory dan optional, ditentukan oleh Planner.</p>
+
+  <h4>Jenis Form dalam Bundle</h4>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Jenis Form</th><th>Contoh</th><th>Status Default</th><th>Siapa yang Tentukan</th></tr>
+      <tr><td>Service Sheet</td><td>Checklist komponen, pengukuran</td><td><span class="badge badge-mandatory">Mandatory</span></td><td>Sistem (suggestion), Planner bisa ubah</td></tr>
+      <tr><td>Form Pengelasan</td><td>Welding work form</td><td><span class="badge badge-optional">Optional</span></td><td>Planner</td></tr>
+      <tr><td>Form Tyre R&amp;I</td><td>Pelepasan &amp; pemasangan tyre</td><td><span class="badge badge-optional">Optional</span></td><td>Planner</td></tr>
+      <tr><td>Return to Operation (RTO)</td><td>Form serah terima unit</td><td><span class="badge badge-optional">Optional</span></td><td>Planner</td></tr>
+      <tr><td>Form lainnya</td><td>Sesuai kebutuhan service</td><td><span class="badge badge-optional">Optional</span></td><td>Planner</td></tr>
+    </table>
+  </div>
+
+  <div class="callout callout-decision">
+    <div class="callout-icon"></div>
+    <p><strong>Keputusan desain:</strong> Service sheet di-suggest otomatis oleh sistem berdasarkan Equipment Model × Service Hour, dengan status default Mandatory. Namun <strong>authority penuh ada di Planner</strong> — sistem hanya memberi suggestion, Planner dapat mengubah mandatory/optional untuk semua form.</p>
+  </div>
+
+  <h3>Peran Planner dalam Menyusun Bundle</h3>
+  <p>Planner adalah <strong>pemilik scope pekerjaan</strong>. Planner mengetahui: unit apa yang di-service, interval berapa (250/500/1000/2000 hrs), pekerjaan apa yang akan dilakukan, dan durasi service. Dari informasi ini, Planner menentukan komposisi bundle form.</p>
+
+  <h4>Filter Form Suggestion oleh Sistem</h4>
+  <p>Sistem menampilkan suggestion form berdasarkan dua kriteria sekaligus:</p>
+  <ul>
+    <li>Form yang di-mapping ke <strong>model equipment</strong> unit yang di-service</li>
+    <li>Form yang di-mapping ke <strong>model equipment + service hour</strong> yang bersangkutan</li>
+  </ul>
+  <p>Planner juga dapat melakukan <strong>pencarian manual</strong> untuk menemukan form yang tidak muncul dalam suggestion.</p>
+
+  <h3>Alur: Planner Menyusun Bundle</h3>
+  <div class="diagram-wrap">
+    <div class="diagram-label">Diagram 4.1 — Alur Service Bundle Planning (Planner)</div>
+    <div class="mermaid">
+flowchart TD
+    A([Planner buka Scheduled Service Plan]) --> B[Pilih unit & interval service\n250/500/1000/2000 hrs]
+    B --> C{Service sheet tersedia\ndi Form Builder?}
+    C -->|Ya| D[Sistem auto-select Service Sheet\nIsMandatory = true]
+    C -->|Tidak| E[Tidak ada blocker\nLanjut tanpa service sheet]
+    D --> F[Sistem tampilkan suggestion form\nberdasarkan model & model+service hour]
+    E --> F
+    F --> G[Planner review, tambah / cari form lain]
+    G --> H[Planner set tiap form: Mandatory atau Optional]
+    H --> I[⚠ Sistem tampilkan WARNING\nForm tidak bisa di-unassign setelah disimpan]
+    I --> J{Planner konfirmasi Save?}
+    J -->|Tidak| G
+    J -->|Ya| K[Sistem buat Task per form - SQL\n+ copy template JSON - Cosmos]
+    K --> L([✓ Bundle siap untuk eksekusi di lapangan])
+    </div>
+  </div>
+
+  <h3>Aturan Penting: Bundle Tidak Bisa Diubah Setelah Disimpan</h3>
+  <div class="callout callout-warning">
+    <div class="callout-icon"></div>
+    <p>Untuk MVP Phase 1: <strong>form yang sudah di-assign ke bundle tidak bisa dihapus</strong> setelah Planner menyimpan. Sistem akan menampilkan peringatan (warning) sebelum Planner mengkonfirmasi penyimpanan. Planner masih bisa <em>menambah</em> form setelah save pertama, tapi tidak bisa menghapus.</p>
+  </div>
+
+  <h4>Aturan jika Service Sheet Tidak Tersedia</h4>
+  <p>Jika service sheet untuk kombinasi model equipment × service hour belum dibuat di Form Builder, <strong>tidak ada blocker</strong> — Planner tetap dapat menyimpan bundle dan eksekusi tetap dapat berjalan sampai selesai. Prinsip: konsistensi di seluruh alur.</p>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 5 — WORKCARD TAB FORM
+══════════════════════════════════════ -->
+<div id="s5" class="section-header">
+  <div class="section-num">Bagian 5</div>
+  <h2>Fitur 2: PM Shutdown Workcard — Tab Form</h2>
+  <p>Perubahan pada workcard PM Shutdown di mobile — mengaktifkan Tab Form</p>
+</div>
+<div class="container">
+  <h3>Struktur Workcard (Setelah Phase 1)</h3>
+  <div style="margin:24px 0;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#2563eb;margin-bottom:12px;">Diagram 5.1 — Struktur Workcard PM Shutdown</div>
+    <div class="wc-wrap">
+      <div class="wc-title">📱 Workcard PM Shutdown</div>
+      <div class="wc-tabs">
+        <div class="wc-tab existing">📋 Tab: Backlog <span class="badge badge-existing" style="margin-left:6px;">Existing</span></div>
+        <div class="wc-tab new-tab">📝 Tab: Form <span class="badge badge-new" style="margin-left:6px;">New</span></div>
+      </div>
+      <div class="wc-body">
+        <div class="wc-col">
+          <h6>Backlog Execution</h6>
+          <div class="wc-item">Temuan inspeksi dari Digiplan</div>
+          <div class="wc-item">Dikerjakan oleh Supervisor / Foreman</div>
+          <div class="wc-item" style="color:#94a3b8;font-style:italic;">Tidak ada perubahan di Phase 1</div>
+        </div>
+        <div class="wc-col">
+          <h6>Bundle Forms</h6>
+          <div class="wc-item">📄 Nama form</div>
+          <div class="wc-item"><span class="badge badge-mandatory">Mandatory</span> <span class="badge badge-optional">Optional</span></div>
+          <div class="wc-item">Status pengisian:</div>
+          <div class="wc-item">
+            <span class="wc-status st-empty">Belum Diisi</span>
+            <span class="wc-status st-progress">In Progress</span>
+            <span class="wc-status st-complete">Complete ✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4>Informasi yang Ditampilkan per Form dalam List</h4>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Informasi</th><th>Keterangan</th></tr>
+      <tr><td>Nama form</td><td>Nama form sesuai yang dikonfigurasi di Form Builder</td></tr>
+      <tr><td>Mandatory / Optional</td><td>Status yang ditentukan Planner saat menyusun bundle</td></tr>
+      <tr><td>Status pengisian</td><td>Belum diisi / Sedang diisi (In Progress) / Selesai (Complete)</td></tr>
+    </table>
+  </div>
+
+  <h3>Validasi Finish Execution</h3>
+  <p>Sebelum Supervisor/Foreman dapat melakukan <strong>Finish Execution</strong> untuk menandai WorkOrder selesai, sistem memvalidasi dua hal:</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Validasi</th><th>Sebelum Phase 1</th><th>Setelah Phase 1</th></tr>
+      <tr><td>Backlog execution selesai</td><td>✅ Ada</td><td>✅ Tetap ada</td></tr>
+      <tr><td>Semua mandatory form status Complete</td><td>❌ Tidak ada</td><td>✅ Ditambahkan</td></tr>
+    </table>
+  </div>
+  <p>Optional form <strong>tidak memblokir</strong> Finish Execution — hanya mandatory form yang menjadi syarat.</p>
+
+  <div class="callout callout-decision">
+    <div class="callout-icon"></div>
+    <p><strong>Finish Execution bisa dilakukan offline</strong> — selama data di device lokal menunjukkan semua mandatory form sudah Complete dan backlog execution selesai. Prinsip offline-first berlaku penuh untuk semua aksi termasuk Finish Execution.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 6 — MULTI-MECHANIC FORM EXECUTION
+══════════════════════════════════════ -->
+<div id="s6" class="section-header">
+  <div class="section-num">Bagian 6</div>
+  <h2>Fitur 3: Multi-Mechanic Form Execution</h2>
+  <p>Satu form dapat diisi oleh beberapa mechanic sekaligus dengan dukungan offline-first penuh</p>
+</div>
+<div class="container">
+  <h3>Prinsip Dasar</h3>
+  <ul>
+    <li>Satu form dalam bundle dapat diisi oleh <strong>beberapa mechanic sekaligus</strong></li>
+    <li>Semua mechanic menggunakan mode <strong>offline-first</strong> — tidak perlu koneksi internet saat mengisi</li>
+    <li>Pembagian kerja antar mechanic dilakukan secara <strong>operasional</strong> (oleh Supervisor, Foreman, atau mechanic sendiri) — sistem tidak mengatur siapa mengisi bagian mana</li>
+    <li>Submission bersifat <strong>per form</strong>, bukan per bundle</li>
+  </ul>
+
+  <h3>Alur Lengkap: Dari Buka Form hingga Finish Execution</h3>
+  <div class="diagram-wrap">
+    <div class="diagram-label">Diagram 6.1 — Alur Form Execution (Multi-Mechanic)</div>
+    <div class="mermaid">
+flowchart TD
+    A([Mechanic buka form di workcard]) --> B[Baca safety precautions]
+    B --> C[Klik Mulai\nSistem buat TaskPersonalizedLog record]
+    C --> D[Mechanic isi field-field form\nData tersimpan lokal otomatis - auto-save]
+    D --> E{Ada koneksi internet?}
+    E -->|Ya| F[Auto-sync: upload dirty fields\n+ download update dari rekan]
+    E -->|Tidak| G[Tetap isi form offline\nSemua tersimpan lokal]
+    F --> H{Semua mandatory\nfields terisi?}
+    G --> H
+    H -->|Belum| D
+    H -->|Ya| I[Review form via Summary]
+    I --> J[Klik Submit]
+    J --> K[Form status: Complete\nMasuk approval workflow]
+    K --> L{Semua mandatory form\ndalam bundle Complete?}
+    L -->|Belum| M[Mechanic lain lanjut\nisi form masing-masing]
+    L -->|Ya| N[Supervisor/Foreman\nklik Finish Execution]
+    N --> O([✓ WorkOrder Complete])
+    </div>
+  </div>
+
+  <h3>Visibility Antar Mechanic</h3>
+  <p>Mechanic dapat saling melihat progress pengisian hingga level <strong>field per field</strong> — bukan hanya per tab. Mechanic B dapat melihat field mana saja yang sudah diisi oleh Mechanic A beserta identitasnya.</p>
+
+  <div class="callout callout-info">
+    <div class="callout-icon"></div>
+    <p><strong>Mekanisme visibilitas:</strong> Auto-sync aktif saat ada koneksi — debounce <strong>3 detik</strong> setelah input (upload + download) dan background timer <strong>30 detik</strong> (download saja). Near real-time tanpa persistent connection. Saat offline, update terlihat hanya setelah sync.</p>
+  </div>
+
+  <h3>Aturan Submit</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Aspek</th><th>Aturan</th></tr>
+      <tr><td>Siapa yang submit</td><td>Satu mechanic sebagai perwakilan per form</td></tr>
+      <tr><td>Pre-condition</td><td>Semua mandatory fields terisi di device submitter</td></tr>
+      <tr><td>Submit offline</td><td>✅ Bisa — di-queue, dikirim ke server saat ada koneksi</td></tr>
+      <tr><td>Review sebelum submit</td><td>Tersedia fitur Summary untuk review form sebelum submit</td></tr>
+      <tr><td>Duplicate submission</td><td>First submit wins by timestamp — submit kedua ditolak</td></tr>
+    </table>
+  </div>
+
+  <h3>Penanganan Konflik Antar Mechanic</h3>
+  <p>Karena beberapa mechanic bisa mengisi form yang sama secara offline, ada kemungkinan dua mechanic mengisi field yang sama. Aturannya:</p>
+  <div class="callout callout-decision">
+    <div class="callout-icon"></div>
+    <p><strong>First Write Wins:</strong> Field yang diisi lebih awal (berdasarkan timestamp perangkat saat input) yang dipertahankan. Jika ada field yang tidak tersimpan karena sudah diisi lebih awal oleh mechanic lain, sync tetap dianggap <strong>berhasil</strong> dan mechanic mendapat notifikasi yang jelas tentang field mana yang tidak tersimpan.</p>
+  </div>
+
+  <h3>Edge Cases Penting</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Situasi</th><th>Penanganan</th></tr>
+      <tr><td>Auto-save &amp; crash perangkat</td><td>Sudah diimplementasi — data tersimpan lokal otomatis</td></tr>
+      <tr><td>WorkOrder dibatalkan saat form diisi</td><td>Tidak bisa terjadi — jika plan sudah start eksekusi, Planner tidak bisa cancel</td></tr>
+      <tr><td>Mechanic sakit/pergi, data belum sync — form content</td><td>Jika sync terjadi setelah form sudah Complete, data <strong>ditolak</strong></td></tr>
+      <tr><td>Mechanic sakit/pergi, data belum sync — activity records</td><td>Tetap <strong>diterima</strong> selama StartDate &lt; waktu submit (activity adalah historical log)</td></tr>
+      <tr><td>Form reopen setelah submit</td><td>Deferred ke Phase berikutnya</td></tr>
+      <tr><td>DueDate WorkOrder terlewati</td><td>Hanya informasi, tidak ada enforcement sistem</td></tr>
+      <tr><td>Modifikasi bundle dari lapangan</td><td>Deferred ke Phase berikutnya</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 7 — MECHANIC IDENTITY
+══════════════════════════════════════ -->
+<div id="s7" class="section-header">
+  <div class="section-num">Bagian 7</div>
+  <h2>Fitur 4: Identitas &amp; Autentikasi Mechanic</h2>
+  <p>Mechanic diidentifikasi menggunakan akun individual — email / UPN</p>
+</div>
+<div class="container">
+  <h3>Keputusan</h3>
+  <div class="callout callout-decision">
+    <div class="callout-icon"></div>
+    <p><strong>Mechanic menggunakan akun individual</strong> — login dengan email / UPN masing-masing. Shared user tidak dipilih.</p>
+  </div>
+
+  <h3>Dasar Keputusan</h3>
+  <p>Semua mechanic sudah terdaftar sebagai karyawan di tabel <code>UserEmploymentProfile</code>. Kolom <code>UserCode</code> (email) bersifat <strong>not null</strong> untuk semua mechanic — fondasi akun individual sudah tersedia, tinggal provisioning.</p>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Kolom</th><th>Keterangan</th><th>Catatan</th></tr>
+      <tr><td><code>UserCode</code></td><td>Email / UPN karyawan</td><td><strong>Not null</strong> — digunakan sebagai mechanic identity</td></tr>
+      <tr><td><code>EmployeeId</code></td><td>ID unik karyawan</td><td>Unique identifier</td></tr>
+      <tr><td><code>SiteId</code></td><td>Site lokasi kerja</td><td>Filter per site</td></tr>
+    </table>
+  </div>
+
+  <h3>Implikasi</h3>
+  <ul>
+    <li>Mechanic login langsung dengan email/UPN — tidak perlu pilih nama dari daftar</li>
+    <li>Identity di form field (<code>updated_by</code>) dan activity log (<code>TaskPersonalizedLog</code>) menggunakan <code>UserCode</code></li>
+    <li>Audit trail solid — setiap aksi tercatat atas nama mechanic yang sebenarnya</li>
+    <li>Tidak perlu konfigurasi mapping tambahan</li>
+  </ul>
+
+  <h3>Open Items</h3>
+  <div class="open-item">
+    <div class="open-dot unresolved"></div>
+    <div>Bagaimana proses provisioning akun mechanic — bulk import atau per request?</div>
+  </div>
+  <div class="open-item">
+    <div class="open-dot unresolved"></div>
+    <div>Dashboard monitoring dan compliance report untuk tracking aktivitas mechanic</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 8 — MECHANIC ACTIVITY TRACKING
+══════════════════════════════════════ -->
+<div id="s8" class="section-header">
+  <div class="section-num">Bagian 8</div>
+  <h2>Fitur 5: Mechanic Activity Tracking</h2>
+  <p>Pencatatan aktivitas masuk/keluar form per mechanic per shift untuk kebutuhan reporting</p>
+</div>
+<div class="container">
+  <h3>Konsep</h3>
+  <p>Setiap kali mechanic masuk dan keluar dari form, aktivitasnya direkam. Satu mechanic bisa punya beberapa sesi dalam satu form jika bekerja di shift berbeda atau hari berbeda.</p>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Aksi</th><th>Keterangan</th></tr>
+      <tr><td><strong>Mulai (Start)</strong></td><td>Mechanic memulai pengerjaan form — klik tombol "Mulai" setelah membaca safety precautions</td></tr>
+      <tr><td><strong>Selesai (Finish/Close)</strong></td><td>Mechanic keluar dari form sementara — bisa kembali lagi nanti</td></tr>
+      <tr><td><strong>Submit</strong></td><td>Form selesai secara final — tidak bisa kembali mengisi</td></tr>
+    </table>
+  </div>
+
+  <h3>Alur Pencatatan Aktivitas</h3>
+  <div class="diagram-wrap">
+    <div class="diagram-label">Diagram 8.1 — Alur Mechanic Activity Tracking</div>
+    <div class="mermaid">
+flowchart TD
+    A([Mechanic buka form]) --> B[Baca safety precautions\nKlik Mulai]
+    B --> C{Ada open session\ndi shift yang sama?}
+    C -->|Ya| D[Tidak buat record baru\nLangsung masuk form]
+    C -->|Tidak| E{Ada open session\ndi shift berbeda?}
+    E -->|Ya| F[Auto-close sesi lama\nEndDate = shift end time]
+    F --> G[Buat TaskPersonalizedLog record baru]
+    E -->|Tidak| G
+    D --> H[Mechanic mengisi form]
+    G --> H
+    H --> I{Klik Selesai/Close?}
+    I -->|Ya| J[EndDate = waktu klik aktual]
+    J --> K([✓ Sesi tercatat lengkap])
+    I -->|Tidak| L{Form disubmit?}
+    L -->|Ya| M[Auto-close\nEndDate = min-shift end, submit time]
+    M --> N([✓ Sesi tercatat])
+    L -->|Tidak| O[Buka lagi shift berbeda?\nKembali ke cek session]
+    O --> C
+    </div>
+  </div>
+
+  <h3>Aturan Shift</h3>
+  <p>Sistem menggunakan konfigurasi shift per site untuk menentukan waktu berakhir setiap sesi. Contoh konfigurasi Site 2009:</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Nama Shift</th><th>Mulai</th><th>Berakhir</th></tr>
+      <tr><td>Day Shift</td><td>06:00</td><td>18:00</td></tr>
+      <tr><td>Night Shift</td><td>18:00</td><td>06:00 (hari berikutnya)</td></tr>
+    </table>
+  </div>
+
+  <h3>Auto-Close Waktu Selesai (EndDate)</h3>
+  <p>Jika mechanic tidak klik tombol Selesai/Close, sistem otomatis mengisi waktu selesai berdasarkan dua trigger:</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Trigger</th><th>Nilai EndDate</th></tr>
+      <tr><td>Mechanic klik Mulai di sesi baru (shift berbeda)</td><td>Waktu akhir shift dari sesi sebelumnya</td></tr>
+      <tr><td>Form disubmit</td><td>min(waktu akhir shift, waktu submit)</td></tr>
+    </table>
+  </div>
+
+  <h3>Skenario Simulasi Data</h3>
+  <p>Berikut contoh data yang dihasilkan untuk berbagai situasi:</p>
+
+  <h4>Skenario 1: Normal — Mechanic klik Mulai dan Selesai dengan benar</h4>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th></tr>
+      <tr><td>mech_A</td><td>08:00</td><td>10:30</td><td>Day Shift</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 2: Mechanic lupa Selesai, buka lagi di shift berikutnya (auto-close)</h4>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th><th>Keterangan</th></tr>
+      <tr><td>mech_A</td><td>2026-06-22 08:00</td><td><strong>2026-06-22 18:00</strong></td><td>Day Shift</td><td>Auto-close — shift end time</td></tr>
+      <tr><td>mech_A</td><td>2026-06-23 07:00</td><td>—</td><td>Day Shift</td><td>Sesi baru</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 3: Multi-mechanic, form disubmit jam 11:00 (min rule)</h4>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th><th>Keterangan</th></tr>
+      <tr><td>mech_A</td><td>08:00</td><td>10:00</td><td>Day Shift</td><td>Klik Selesai manual</td></tr>
+      <tr><td>mech_B</td><td>08:30</td><td><strong>11:00</strong></td><td>Day Shift</td><td>Auto-close saat submit — min(18:00, 11:00)</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 4: Night Shift melewati tengah malam, auto-close via Submit jam 05:00</h4>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th><th>Keterangan</th></tr>
+      <tr><td>mech_A</td><td>2026-06-22 20:00</td><td><strong>2026-06-23 05:00</strong></td><td>Night Shift</td><td>Auto-close — min(06:00, 05:00) = 05:00</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 5: Multi-mechanic, multiple sesi, Night Shift</h4>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th><th>Keterangan</th></tr>
+      <tr><td>mech_A</td><td>2026-06-22 08:00</td><td>2026-06-22 10:00</td><td>Day Shift</td><td>Klik Selesai manual</td></tr>
+      <tr><td>mech_B</td><td>2026-06-22 08:30</td><td><strong>2026-06-22 18:00</strong></td><td>Day Shift</td><td>Auto-close saat B mulai Night Shift</td></tr>
+      <tr><td>mech_A</td><td>2026-06-22 19:00</td><td><strong>2026-06-23 02:00</strong></td><td>Night Shift</td><td>Auto-close saat submit jam 02:00</td></tr>
+      <tr><td>mech_B</td><td>2026-06-22 21:00</td><td><strong>2026-06-23 02:00</strong></td><td>Night Shift</td><td>Auto-close saat submit jam 02:00</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 6: Start dan Finish di shift berbeda — mechanic klik Selesai sendiri</h4>
+  <p style="font-size:13px;color:#64748b;">Mechanic mulai di Day Shift, lupa klik Selesai, lalu klik Selesai sendiri saat sudah masuk Night Shift. FinishedAt = waktu aktual klik (bukan shift end time), karena ini adalah tindakan eksplisit mechanic.</p>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th><th>Keterangan</th></tr>
+      <tr><td>mech_A</td><td>2026-06-22 16:00</td><td><strong>2026-06-22 19:00</strong></td><td>Day Shift</td><td>Klik Selesai di Night Shift — FinishedAt = waktu aktual klik, bukan shift end time</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 7: Mechanic klik Mulai berkali-kali di shift yang sama (deduplication)</h4>
+  <p style="font-size:13px;color:#64748b;">Sistem tidak membuat record baru jika sudah ada sesi terbuka di shift yang sama. Mechanic langsung masuk ke form.</p>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Waktu</th><th>Aksi</th><th>Hasil</th></tr>
+      <tr><td>08:00</td><td>mech_A klik Mulai</td><td>Record dibuat (Day Shift, open)</td></tr>
+      <tr><td>09:30</td><td>mech_A klik Mulai lagi (shift sama)</td><td>SKIP — tidak buat record baru</td></tr>
+      <tr><td>11:00</td><td>mech_A klik Mulai lagi (shift sama)</td><td>SKIP — tidak buat record baru</td></tr>
+    </table>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th></tr>
+      <tr><td>mech_A</td><td>08:00</td><td>null (belum selesai)</td><td>Day Shift</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 8: Mulai di hari berbeda — TaskPersonalizedLog baru dibuat tiap sesi</h4>
+  <p style="font-size:13px;color:#64748b;"><code>TaskPersonalized</code> sudah ada sebelumnya (dibuat via Assign to / Assign to Me). Klik Mulai hanya membuat <code>TaskPersonalizedLog</code> per sesi.</p>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Waktu</th><th>Aksi</th><th>Record yang Dibuat</th></tr>
+      <tr><td>08:00 (hari ke-1)</td><td>mech_A klik Mulai</td><td>TaskPersonalizedLog #1 (StartDate=08:00, ShiftName=Day Shift)</td></tr>
+      <tr><td>08:30 (hari ke-2)</td><td>mech_A klik Mulai lagi (hari berbeda)</td><td>Auto-close #1 (EndDate=18:00) + TaskPersonalizedLog #2 baru</td></tr>
+    </table>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th></tr>
+      <tr><td>mech_A</td><td>2026-06-22 08:00</td><td><strong>2026-06-22 18:00</strong></td><td>Day Shift (auto-close)</td></tr>
+      <tr><td>mech_A</td><td>2026-06-23 08:30</td><td>null</td><td>Day Shift</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 9: Mechanic klik Selesai lalu Mulai lagi di shift yang sama</h4>
+  <p style="font-size:13px;color:#64748b;">Setelah klik Selesai, sesi sebelumnya tertutup. Klik Mulai lagi di shift yang sama akan membuat record baru (sesi lama sudah FinishedAt bukan null).</p>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th><th>Keterangan</th></tr>
+      <tr><td>mech_A</td><td>2026-06-22 08:00</td><td>2026-06-22 10:00</td><td>Day Shift</td><td>Klik Selesai manual (pergi makan siang)</td></tr>
+      <tr><td>mech_A</td><td>2026-06-22 13:00</td><td>2026-06-22 15:00</td><td>Day Shift</td><td>Klik Mulai lagi — record baru karena sesi sebelumnya sudah closed</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 10: Mechanic lanjut kerja ke Night Shift, klik Mulai di shift baru (auto-close via Mulai)</h4>
+  <p style="font-size:13px;color:#64748b;">Mechanic mulai di Day Shift, tidak klik Selesai, lanjut bekerja hingga Night Shift dan klik Mulai lagi. Sistem auto-close sesi Day Shift dengan shift end time-nya.</p>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th><th>Keterangan</th></tr>
+      <tr><td>mech_A</td><td>2026-06-22 16:00</td><td><strong>2026-06-22 18:00</strong></td><td>Day Shift</td><td>Auto-close saat klik Mulai di Night Shift — FinishedAt = Day Shift end</td></tr>
+      <tr><td>mech_A</td><td>2026-06-22 19:00</td><td>2026-06-22 22:00</td><td>Night Shift</td><td>Klik Selesai manual</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 11: Submit setelah shift end — lupa Selesai, submit di shift berikutnya (shift end menang)</h4>
+  <p style="font-size:13px;color:#64748b;">Mechanic selesai bekerja di Day Shift tapi lupa klik Selesai. Form disubmit saat sudah masuk Night Shift. FinishedAt = min(shift end Day Shift, submit time) = shift end Day Shift.</p>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th><th>Keterangan</th></tr>
+      <tr><td>mech_A</td><td>2026-06-22 08:00</td><td><strong>2026-06-22 18:00</strong></td><td>Day Shift</td><td>Auto-close saat submit (19:00 Night Shift) — min(18:00, 19:00) = 18:00</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 12: Night Shift happy path — Start dan Finish dalam Night Shift</h4>
+  <p style="font-size:13px;color:#64748b;">Dua variasi: Finish sebelum tengah malam, dan Finish setelah tengah malam (masih dalam Night Shift yang sama).</p>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Variasi</th><th>Mulai</th><th>Selesai</th><th>Shift</th><th>Keterangan</th></tr>
+      <tr><td>Case A: Finish sebelum tengah malam</td><td>2026-06-22 20:00</td><td>2026-06-22 23:00</td><td>Night Shift</td><td>Tanggal sama</td></tr>
+      <tr><td>Case B: Finish setelah tengah malam</td><td>2026-06-22 20:00</td><td><strong>2026-06-23 03:00</strong></td><td>Night Shift</td><td>Tanggal berbeda — masih dalam Night Shift yang sama</td></tr>
+    </table>
+  </div>
+
+  <h4>Skenario 13: Start hari ke-1, lupa Selesai, submit di hari ke-2 shift berbeda</h4>
+  <p style="font-size:13px;color:#64748b;">Mechanic mulai di Day Shift hari ke-1, lupa klik Selesai, form baru disubmit di hari ke-2 oleh mechanic lain. FinishedAt mengacu pada shift end dari StartedAt — bukan dari waktu submit.</p>
+  <div class="table-wrap">
+    <table>
+      <tr class="scenario-header"><th>Mechanic</th><th>Mulai</th><th>Selesai</th><th>Shift</th><th>Keterangan</th></tr>
+      <tr><td>mech_A</td><td>2026-06-22 08:00</td><td><strong>2026-06-22 18:00</strong></td><td>Day Shift</td><td>Submit oleh mechanic lain di 2026-06-23 19:00 — min(2026-06-22 18:00, 2026-06-23 19:00) = 2026-06-22 18:00</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 9 — RINGKASAN KEPUTUSAN
+══════════════════════════════════════ -->
+<div id="s9" class="section-header">
+  <div class="section-num">Bagian 9</div>
+  <h2>Ringkasan Keputusan Bisnis</h2>
+  <p>Semua keputusan desain yang telah ditetapkan dalam Phase 1</p>
+</div>
+<div class="container">
+  <div class="table-wrap">
+    <table class="decision-row">
+      <tr><th>Area</th><th>Keputusan</th><th>Alasan</th></tr>
+      <tr class="decision-row"><td>Bundle — Unassign</td><td>Form tidak bisa dihapus dari bundle setelah save (MVP)</td><td>Mencegah data yang sudah diisi di lapangan menjadi orphan</td></tr>
+      <tr class="decision-row"><td>Bundle — Warning</td><td>Sistem tampilkan peringatan sebelum Planner simpan bundle</td><td>Planner harus sadar bahwa assignment tidak bisa diubah</td></tr>
+      <tr class="decision-row"><td>Bundle — Service sheet tidak ada</td><td>Tidak ada blocker — eksekusi tetap bisa berjalan</td><td>Konsistensi di seluruh alur</td></tr>
+      <tr class="decision-row"><td>Bundle — Authority IsMandatory</td><td>Planner punya authority penuh, sistem hanya default suggestion</td><td>Planner yang tahu scope pekerjaan</td></tr>
+      <tr class="decision-row"><td>Conflict — Locking</td><td>Optimistic locking — tidak ada lock saat field dibuka</td><td>Lebih cocok untuk offline-first dibanding pessimistic</td></tr>
+      <tr class="decision-row"><td>Conflict — Resolution</td><td>First Write Wins berdasarkan device timestamp</td><td>Yang mengisi pertama kali dianggap lebih akurat</td></tr>
+      <tr class="decision-row"><td>Conflict — UX</td><td>Silent discard + proper message (sync tetap dianggap berhasil)</td><td>Tidak membingungkan mechanic di lapangan</td></tr>
+      <tr class="decision-row"><td>Submit — Offline</td><td>Submit bisa dilakukan offline, di-queue</td><td>Offline-first berlaku penuh</td></tr>
+      <tr class="decision-row"><td>Submit — Validation</td><td>Validasi mandatory fields dilakukan client-side</td><td>Agar submit bisa offline</td></tr>
+      <tr class="decision-row"><td>Submit — Scope</td><td>Submit per form, bukan per bundle</td><td>Setiap form independen</td></tr>
+      <tr class="decision-row"><td>Finish Execution</td><td>Blocking — semua mandatory form harus Complete</td><td>Compliance dan data integrity</td></tr>
+      <tr class="decision-row"><td>Finish Execution — Offline</td><td>Bisa offline jika data lokal memenuhi syarat</td><td>Konsisten dengan prinsip offline-first</td></tr>
+      <tr class="decision-row"><td>Mechanic Identity</td><td>Akun individual per mechanic — login dengan email / UPN. Shared user tidak dipilih.</td><td>Audit trail solid, UserCode sudah not null di UserEmploymentProfile, tidak perlu konfigurasi mapping tambahan</td></tr>
+      <tr class="decision-row"><td>Supervisor Override</td><td>Tidak ada supervisor override untuk pengisian form</td><td>Data quality — hanya mechanic yang tahu nilai pengukuran aktual</td></tr>
+      <tr class="decision-row"><td>Koordinasi lapangan</td><td>Sistem tidak mengatur device mana atau mechanic mana yang mengisi bagian mana</td><td>Koordinasi adalah tanggung jawab operasional Supervisor/Foreman/mechanic, bukan sistem</td></tr>
+      <tr class="decision-row"><td>Device clock risk</td><td>Risiko ketidakakuratan timestamp device diterima sebagai known limitation</td><td>Di lapangan tambang, kemungkinan dua mechanic mengisi field sama di momen identik sangat kecil</td></tr>
+      <tr class="decision-row"><td>Activity — Deduplication</td><td>Max 1 open session per mechanic per shift per form</td><td>Menghindari duplikasi data yang tidak bermakna</td></tr>
+      <tr class="decision-row"><td>Activity — Auto-close</td><td>EndDate = min(shift end time, submit time)</td><td>Lebih akurat untuk reporting — tidak menampilkan mechanic bekerja melewati waktu submit</td></tr>
+      <tr class="decision-row"><td>Activity — Post-submit</td><td>Activity records diterima meski form sudah Complete, selama StartDate &lt; submit time</td><td>Activity adalah historical log, tidak mempengaruhi form content</td></tr>
+      <tr class="decision-row"><td>Shift data</td><td>One-time seed dari Tenant DB untuk MVP</td><td>Shift schedule jarang berubah</td></tr>
+      <tr class="decision-row"><td>Status — Task</td><td>Open → In Progress → Complete → Approved</td><td>Mencerminkan siklus hidup pengerjaan form</td></tr>
+      <tr class="decision-row"><td>Status — WorkOrder</td><td>Open → In Progress → Complete</td><td>Mencerminkan siklus hidup service execution</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 10 — OPEN ITEMS
+══════════════════════════════════════ -->
+<div id="s10" class="section-header">
+  <div class="section-num">Bagian 10</div>
+  <h2>Open Items &amp; Deferred</h2>
+  <p>Item yang masih perlu keputusan atau ditunda ke phase berikutnya</p>
+</div>
+<div class="container">
+  <h3>Menunggu Keputusan / Konfirmasi</h3>
+  <div class="open-item"><div class="open-dot resolved"></div><div><strong>Mechanic identity:</strong> Menggunakan akun individual — email / UPN. Shared user tidak dipilih.</div></div>
+  <div class="open-item"><div class="open-dot unresolved"></div><div><strong>Bundle config di dplan:</strong> Konfirmasi apakah ada data bundle config yang perlu disimpan di dplan DB, atau cukup di maintenance-execution</div></div>
+  <div class="open-item"><div class="open-dot unresolved"></div><div><strong>Provisioning mechanic:</strong> Bagaimana proses provisioning akun mechanic — bulk import atau per request?</div></div>
+  <div class="open-item"><div class="open-dot unresolved"></div><div><strong>UX — Conflict message:</strong> Format dan placement notifikasi saat field mechanic kalah conflict</div></div>
+  <div class="open-item"><div class="open-dot unresolved"></div><div><strong>UX — Progress indicator:</strong> Indikator berapa mandatory fields sudah terisi di device</div></div>
+  <div class="open-item"><div class="open-dot unresolved"></div><div><strong>UX — Planner bundle composition:</strong> Desain UI untuk Planner menyusun bundle di Digiplan (web)</div></div>
+  <div class="open-item"><div class="open-dot unresolved"></div><div><strong>UX — Tab Form workcard:</strong> Desain UI Tab Form di workcard mobile (list form, status indicator)</div></div>
+  <div class="open-item"><div class="open-dot unresolved"></div><div><strong>Activity reporting:</strong> Durasi kalkulasi di DB atau di aplikasi? Dashboard monitoring dan compliance report</div></div>
+  <div class="open-item"><div class="open-dot unresolved"></div><div><strong>Flow detail submit offline:</strong> Detail implementasi alur submit offline → di-queue → sync ke server → server final validation</div></div>
+  <div class="open-item"><div class="open-dot unresolved"></div><div><strong>SiteShift sync:</strong> Mekanisme update data shift setelah MVP jika schedule berubah</div></div>
+
+  <hr class="divider">
+
+  <h3>Deferred ke Phase Berikutnya</h3>
+  <div class="open-item"><div class="open-dot deferred"></div><div><strong>Form reopen setelah submit:</strong> Kemampuan membuka kembali form yang sudah disubmit untuk koreksi</div></div>
+  <div class="open-item"><div class="open-dot deferred"></div><div><strong>Modifikasi bundle dari lapangan:</strong> Supervisor/Mechanic menambah form ke bundle saat eksekusi berlangsung</div></div>
+  <div class="open-item"><div class="open-dot deferred"></div><div><strong>Form Behavior detail:</strong> Field validation (range nilai), attachment/foto sebagai evidence</div></div>
+  <div class="open-item"><div class="open-dot deferred"></div><div><strong>Approval reject flow:</strong> Penanganan jika form yang sudah disubmit ditolak oleh approver</div></div>
+
+  <hr class="divider">
+
+  <h3>Sudah Diselesaikan</h3>
+  <div class="open-item"><div class="open-dot resolved"></div><div>Enforcement mandatory form saat eksekusi → blocking (Finish Execution)</div></div>
+  <div class="open-item"><div class="open-dot resolved"></div><div>Auto-sync trigger → debounce 3 detik + background timer 30 detik</div></div>
+  <div class="open-item"><div class="open-dot resolved"></div><div>Penanganan SiteShift tidak ditemukan → gunakan default site dari konfigurasi</div></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ════════ TECHNICAL SECTION ════════
+══════════════════════════════════════════════════════════ -->
+
+<div style="background:#0f172a; color:#38bdf8; padding: 48px; text-align:center; page-break-before: always;">
+  <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:0.6;margin-bottom:12px;">Bagian Technical</div>
+  <div style="font-size:36px;font-weight:700;color:#fff;margin-bottom:8px;">Spesifikasi Teknis</div>
+  <div style="color:#64748b;font-size:15px;">Bagian ini ditujukan untuk tim development. Business user dapat melewati bagian ini.</div>
+</div>
+
+<!-- T1 — DATA MODEL -->
+<div id="t1" class="section-header tech">
+  <div class="section-num">T1</div>
+  <h2>Perubahan Data Model</h2>
+  <p>Schema changes yang diperlukan di database maintenance-execution</p>
+</div>
+<div class="container tech-section">
+  <h3>Ringkasan Perubahan Tabel</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Tabel</th><th>Perubahan</th></tr>
+      <tr><td><code>WorkOrder</code></td><td>Tambah status flow (dokumentasi, bukan schema change)</td></tr>
+      <tr><td><code>Task</code></td><td>Tambah kolom <code>MachineSMUValue</code>, <code>MachineSMUAddress</code> (dipindah dari TaskPersonalized)</td></tr>
+      <tr><td><code>TaskPersonalized</code></td><td>Hapus <code>MachineSMUValue</code> &amp; <code>MachineSMUAddress</code>; tambah <code>StartedAt</code>; support N records per Task</td></tr>
+      <tr><td><code>FormSubmission</code></td><td>Tambah kolom <code>IsMandatory</code> (Boolean)</td></tr>
+      <tr><td><code>TaskPersonalizedLog</code></td><td>Tambah kolom <code>ShiftName</code> — digunakan sebagai activity log masuk/keluar form (tabel sudah ada, tidak perlu dibuat baru)</td></tr>
+      <tr><td><code>SiteShift</code></td><td><span class="badge badge-new">Tabel Baru</span> — konfigurasi shift per site (seed one-time)</td></tr>
+    </table>
+  </div>
+
+  <h3>Status Flow</h3>
+  <h4>WorkOrder</h4>
+  <div class="status-flow">
+    <span class="status-node status-open">Open</span>
+    <span class="status-arrow">→</span>
+    <span class="status-node status-progress">In Progress</span>
+    <span class="status-arrow">→</span>
+    <span class="status-node status-complete">Complete</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Status</th><th>Trigger</th></tr>
+      <tr><td><code>Open</code></td><td>WorkOrder dibuat saat sync dari dplan</td></tr>
+      <tr><td><code>In Progress</code></td><td>Mechanic pertama klik "Mulai" pada form apapun dalam bundle</td></tr>
+      <tr><td><code>Complete</code></td><td>Finish Execution dilakukan</td></tr>
+    </table>
+  </div>
+
+  <h4>Task (1 Task = 1 Form)</h4>
+  <div class="status-flow">
+    <span class="status-node status-open">Open</span>
+    <span class="status-arrow">→</span>
+    <span class="status-node status-progress">In Progress</span>
+    <span class="status-arrow">→</span>
+    <span class="status-node status-complete">Complete</span>
+    <span class="status-arrow">→</span>
+    <span class="status-node status-approved">Approved</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Status</th><th>Trigger</th></tr>
+      <tr><td><code>Open</code></td><td>Task dibuat saat Planner save bundle</td></tr>
+      <tr><td><code>In Progress</code></td><td>Saat sync: TaskPersonalized pertama masuk → gunakan StartedAt terkecil</td></tr>
+      <tr><td><code>Complete</code></td><td>Satu mechanic submit form</td></tr>
+      <tr><td><code>Approved</code></td><td>Setelah approval workflow selesai</td></tr>
+    </table>
+  </div>
+
+  <div class="callout callout-tech">
+    <div class="callout-icon"></div>
+    <p>FormSubmission tidak memiliki kolom Status. Status form execution direpresentasikan oleh <code>Task.Status</code>. Finish Execution gate: semua Task di WorkOrder dimana <code>FormSubmission.IsMandatory = true</code> harus memiliki <code>Task.Status = Complete</code>.</p>
+  </div>
+
+  <h3>TaskPersonalized — Perubahan Signifikan</h3>
+  <h4>1 Task = N TaskPersonalized</h4>
+  <p>Setiap mechanic yang mengerjakan form memiliki record TaskPersonalized sendiri. Dibuat melalui fitur <strong>Assign to / Assign to Me</strong> yang sudah ada di Digiman+ — bukan saat klik "Mulai".</p>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Kolom Dihapus</th><th>Alasan</th></tr>
+      <tr><td><code>MachineSMUValue</code></td><td>Dipindah ke Task — 1 nilai per service execution, bukan per mechanic</td></tr>
+      <tr><td><code>MachineSMUAddress</code></td><td>Dipindah ke Task</td></tr>
+    </table>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Kolom Baru</th><th>Tipe</th><th>Keterangan</th></tr>
+      <tr><td><code>StartedAt</code></td><td>DateTime</td><td>Device timestamp saat mechanic klik "Mulai"</td></tr>
+    </table>
+  </div>
+
+  <h4>Atomic Action "Mulai" Button</h4>
+  <p><code>TaskPersonalized</code> <strong>tidak dibuat saat klik Mulai</strong> — sudah dibuat sebelumnya melalui fitur <strong>Assign to / Assign to Me</strong> yang sudah ada di Digiman+. Klik "Mulai" hanya membuat atau menutup record <code>TaskPersonalizedLog</code>:</p>
+  <pre><code>-- TaskPersonalizedLog (setiap Mulai di shift baru):
+IF ada open session di shift berbeda:
+  UPDATE TaskPersonalizedLog SET EndDate = shift_end_time
+  WHERE TaskPersonalizedId = ? AND EndDate IS NULL
+
+IF tidak ada open session di shift yang sama:
+  INSERT TaskPersonalizedLog (TaskPersonalizedId, StartDate, ShiftName)
+
+-- Jika sudah ada open session di shift yang sama → tidak ada operasi, langsung masuk form
+
+-- Semua operasi di-queue dalam satu batch sync</code></pre>
+
+  <h3>TaskPersonalizedLog — Tambah Kolom ShiftName</h3>
+  <p>Tidak perlu tabel baru. Activity log menggunakan tabel <code>TaskPersonalizedLog</code> yang sudah ada, dengan penambahan satu kolom:</p>
+  <pre><code>-- ALTER TABLE yang diperlukan:
+ALTER TABLE TaskPersonalizedLog ADD ShiftName NVARCHAR(50) NULL
+
+-- Struktur relevan TaskPersonalizedLog:
+TaskPersonalizedLog {
+  Id                 : GUID (PK)
+  TaskPersonalizedId : GUID (FK → TaskPersonalized)  -- berisi TaskId + UserCode
+  StartDate          : DateTime      -- device clock saat klik Mulai
+  EndDate            : DateTime?     -- null jika belum selesai
+  ShiftName          : string        -- [BARU] nama shift saat StartDate
+  IsActive           : bool
+  CreatedAt          : DateTime
+  ModifiedAt         : DateTime
+  -- + kolom LastSynced* existing
+}
+
+-- Untuk reporting, join ke TaskPersonalized:
+SELECT tpl.*, tp.TaskId, tp.UserCode
+FROM TaskPersonalizedLog tpl
+JOIN TaskPersonalized tp ON tp.Id = tpl.TaskPersonalizedId</code></pre>
+
+  <p><strong>Deduplication rules:</strong></p>
+  <ul>
+    <li><code>TaskPersonalized</code>: upsert by <code>TaskId + UserCode</code> — 1 record per mechanic per task, selamanya</li>
+    <li><code>TaskPersonalizedLog</code>: max 1 open session (EndDate = null) per <code>TaskPersonalizedId + ShiftName</code></li>
+  </ul>
+
+  <h3>Tabel Baru: SiteShift</h3>
+  <pre><code>SiteShift {
+  Id         : int (PK)
+  TenantCode : string
+  SiteCode   : string
+  Name       : string     -- "Day Shift", "Night Shift"
+  StartShift : Time       -- 06:00
+  EndShift   : Time       -- 18:00 (explicit, tidak di-derive runtime)
+  IsActive   : bool
+}
+
+-- Logic next-day detection:
+-- if EndShift < StartShift → crosses midnight → FinishedAt.date = StartedAt.date + 1
+-- if EndShift > StartShift → same day → FinishedAt.date = StartedAt.date</code></pre>
+</div>
+
+<!-- T2 — ARSITEKTUR & API -->
+<div id="t2" class="section-header tech">
+  <div class="section-num">T2</div>
+  <h2>Arsitektur &amp; Evolusi API</h2>
+  <p>Perubahan pada service maintenance-execution dan cross-service dependencies baru</p>
+</div>
+<div class="container tech-section">
+  <h3>Evolusi maintenance-execution API</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th></th><th>Sebelum Phase 1</th><th>Setelah Phase 1</th></tr>
+      <tr><td><strong>Peran</strong></td><td>Pure proxy ke dplan</td><td>Aggregator — punya data sendiri</td></tr>
+      <tr><td><strong>Data source</strong></td><td>dplan saja</td><td>dplan + maintenance-execution DB (Task, FormSubmission, Cosmos snapshot)</td></tr>
+      <tr><td><strong>Logic</strong></td><td>Tidak ada</td><td>Bundle management, form execution, activity tracking</td></tr>
+    </table>
+  </div>
+
+  <h3>Cross-Service Dependencies Baru</h3>
+  <div class="diagram-wrap">
+    <div class="diagram-label">Diagram T2.1 — Service Dependencies</div>
+    <div class="mermaid">
+graph LR
+    Mobile([Mobile App]) --> ME[maintenance-execution]
+    ME -->|Proxy existing| DP[dplan]
+    ME -->|Copy template saat Planner save| MS[maintenance-strategy]
+    ME -->|Read shift config| SS[(SiteShift\nlocal cache)]
+    ME -->|Read/Write| MESQL[(maintenance-execution\nSQL DB)]
+    ME -->|Read/Write| MECOSMOS[(maintenance-execution\nCosmos DB)]
+    MS -->|Source template| MSCOSMOS[(maintenance-strategy\nCosmos DB)]
+
+    style Mobile fill:#1a3a5c,color:#fff
+    style ME fill:#2563eb,color:#fff
+    </div>
+  </div>
+
+  <h3>Finish Execution Gate — Dua Sumber Data</h3>
+  <pre><code>-- Validasi Finish Execution:
+-- 1. Backlog execution → query dplan (existing, tidak berubah)
+-- 2. Mandatory forms Complete:
+SELECT COUNT(*) FROM Task t
+JOIN FormSubmission fs ON t.Id = fs.TaskId
+WHERE t.WorkOrderId = @workOrderId
+  AND fs.IsMandatory = true
+  AND t.Status != 'Complete'
+-- Result = 0 → boleh Finish Execution</code></pre>
+</div>
+
+<!-- T3 — SYNC & OFFLINE -->
+<div id="t3" class="section-header tech">
+  <div class="section-num">T3</div>
+  <h2>Mekanisme Sync &amp; Offline-First</h2>
+  <p>Bagaimana data disinkronisasi antara device dan server</p>
+</div>
+<div class="container tech-section">
+  <h3>Snapshot Form Template</h3>
+  <p>Saat Planner save bundle, full template JSON di-copy dari <code>maintenance-strategy</code> Cosmos ke <code>maintenance-execution</code> Cosmos. Ini memungkinkan mechanic mengakses template form secara offline tanpa fetch real-time.</p>
+  <pre><code>Planner save bundle:
+  1. INSERT Task (per form) → SQL
+  2. INSERT FormSubmission (FormId, Version, IsMandatory) → SQL
+  3. COPY template JSON dari maintenance-strategy Cosmos
+     ke maintenance-execution Cosmos
+     linked by FormSubmissionId</code></pre>
+
+  <h3>Per-Field Sync dengan Batching</h3>
+  <pre><code>-- Client tracks dirty fields offline
+dirtyFields = [
+  { tabId, fieldId, value, timestamp, updated_by },
+  ...
+]
+
+-- Satu batch request saat ada koneksi:
+POST /api/form-submissions/{formId}/sync
+Body: { requestId: uuid, fields: dirtyFields }
+
+-- Server response:
+{
+  accepted: [fieldId, ...],
+  rejected: [{ fieldId, reason: "already_written_by_other" }, ...]
+}</code></pre>
+
+  <h3>Auto-Sync Triggers</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Trigger</th><th>Aksi</th><th>Interval</th></tr>
+      <tr><td>After input (debounce)</td><td>Upload dirty fields + download latest</td><td>3 detik setelah input terakhir</td></tr>
+      <tr><td>Background timer</td><td>Download latest saja (tanpa upload jika tidak ada dirty fields)</td><td>Setiap 30 detik</td></tr>
+    </table>
+  </div>
+
+  <h3>Retry Mechanism</h3>
+  <p>Digiman+ sudah memiliki retry mechanism. Ditambahkan prinsip <strong>idempotent batch</strong>:</p>
+  <ul>
+    <li>Setiap sync batch diberi unique <code>requestId</code></li>
+    <li>Jika partial failure → retry batch yang sama</li>
+    <li>Server menggunakan <code>fieldId + timestamp</code> sebagai idempotency key</li>
+    <li>Jika dua mechanic memiliki timestamp identik pada field yang sama: <strong>sync pertama yang tiba diproses</strong>, sync berikutnya dianggap berhasil (no-op)</li>
+  </ul>
+
+  <h3>Offline Behavior Semua Aksi</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Aksi</th><th>Bisa Offline?</th><th>Mekanisme</th></tr>
+      <tr><td>Isi form (field input)</td><td>✅ Ya</td><td>Simpan lokal, sync saat koneksi ada</td></tr>
+      <tr><td>Klik Mulai</td><td>✅ Ya</td><td>Buat record lokal, queue untuk sync</td></tr>
+      <tr><td>Submit form</td><td>✅ Ya</td><td>Queue, dikirim saat koneksi ada</td></tr>
+      <tr><td>Finish Execution</td><td>✅ Ya (jika data lokal memenuhi syarat)</td><td>Queue, dikirim saat koneksi ada</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- T4 — CONFLICT RESOLUTION -->
+<div id="t4" class="section-header tech">
+  <div class="section-num">T4</div>
+  <h2>Conflict Resolution</h2>
+  <p>Bagaimana konflik data ditangani saat beberapa mechanic mengisi form yang sama secara offline</p>
+</div>
+<div class="container tech-section">
+  <h3>Strategi: Optimistic Locking + First Write Wins</h3>
+  <p>Tidak ada lock saat field dibuka. Conflict dideteksi saat sync berdasarkan <strong>device timestamp saat input</strong>.</p>
+
+  <pre><code>-- Per-field data structure di Cosmos:
+field: {
+  value     : any,
+  timestamp : DateTime,   -- device clock saat input (known limitation: bisa tidak akurat)
+  updated_by: string      -- UserCode mechanic
+}
+
+-- Conflict resolution:
+IF existing_field.timestamp < incoming_field.timestamp:
+  DISCARD incoming_field (existing wins)
+  REPORT field sebagai "tidak tersimpan" ke client
+ELSE IF existing_field.timestamp == incoming_field.timestamp:
+  DISCARD incoming_field (no-op, dianggap berhasil)
+ELSE:
+  UPDATE field dengan incoming value</code></pre>
+
+  <h3>Known Limitation: Device Clock</h3>
+  <div class="callout callout-tech">
+    <div class="callout-icon"></div>
+    <p>Timestamp menggunakan device clock — bisa tidak akurat jika perangkat tidak tersinkronisasi. Ini adalah <strong>acceptable risk</strong> yang sudah didokumentasikan. Di lapangan tambang, kemungkinan dua mechanic mengisi field yang sama di momen yang benar-benar identik sangat kecil.</p>
+  </div>
+
+  <h3>Behavior Berbeda: Form Content vs Activity Records</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Jenis Data</th><th>Jika Sync Setelah Form Complete</th><th>Alasan</th></tr>
+      <tr><td>Form content (field values)</td><td>❌ Ditolak</td><td>Form sudah final, tidak boleh diubah</td></tr>
+      <tr><td>Activity records (TaskPersonalizedLog)</td><td>✅ Diterima (jika StartDate &lt; submit time)</td><td>Historical log, tidak mempengaruhi form content</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- T5 — ACTIVITY TRACKING DETAIL -->
+<div id="t5" class="section-header tech">
+  <div class="section-num">T5</div>
+  <h2>Activity Tracking — Detail Teknis</h2>
+  <p>Implementasi auto-close mechanism dan shift detection</p>
+</div>
+<div class="container tech-section">
+  <h3>Auto-Close Mechanism — Client-Side</h3>
+  <p>Auto-close adalah mekanisme baru yang dibangun di client. Server hanya menerima dan menyimpan data — tidak ada deteksi auto-close di server side.</p>
+
+  <pre><code>-- Saat mechanic klik Mulai:
+function handleStartClick(taskPersonalizedId, deviceTimestamp, siteCode):
+  currentShift = getShift(deviceTimestamp, siteCode)
+
+  // 1. Cek deduplication: open session di shift yang sama
+  openSameShift = TaskPersonalizedLog.find(
+    taskPersonalizedId, currentShift.Name, EndDate = null
+  )
+  if openSameShift exists: return  // tidak buat record baru, langsung masuk form
+
+  // 2. Auto-close open session dari shift berbeda
+  openOtherShift = TaskPersonalizedLog.find(taskPersonalizedId, EndDate = null)
+  if openOtherShift exists:
+    prevShift = getShift(openOtherShift.StartDate, siteCode)
+    openOtherShift.EndDate = calculateShiftEnd(openOtherShift.StartDate, prevShift)
+    queue UPDATE openOtherShift
+
+  // 3. Buat sesi baru
+  queue INSERT TaskPersonalizedLog (taskPersonalizedId, StartDate=deviceTimestamp, ShiftName=currentShift.Name)
+
+-- calculateShiftEnd:
+function calculateShiftEnd(startDate, shift):
+  if shift.EndShift < shift.StartShift:  // crosses midnight
+    return datetime(startDate.date + 1 day, shift.EndShift)
+  else:
+    return datetime(startDate.date, shift.EndShift)
+
+-- Auto-close via Submit:
+function handleFormSubmit(taskId, submitTime, siteCode):
+  openSessions = TaskPersonalizedLog.findAll(taskId, EndDate = null)
+  for session in openSessions:
+    shift = getShift(session.StartDate, siteCode)
+    shiftEnd = calculateShiftEnd(session.StartDate, shift)
+    session.EndDate = min(shiftEnd, submitTime)
+    queue UPDATE session</code></pre>
+
+  <h3>Shift Detection dari Timestamp</h3>
+  <pre><code>-- Logika penentuan shift:
+function getShift(timestamp, siteCode):
+  time = timestamp.time
+  shifts = SiteShift.where(SiteCode = siteCode, IsActive = true)
+  for shift in shifts:
+    if shift.EndShift > shift.StartShift:  // same day
+      if shift.StartShift <= time < shift.EndShift: return shift
+    else:  // crosses midnight
+      if time >= shift.StartShift OR time < shift.EndShift: return shift
+
+-- Contoh untuk site 2009:
+-- 06:00–17:59 → Day Shift (EndShift 18:00 > StartShift 06:00)
+-- 18:00–05:59 → Night Shift (EndShift 06:00 < StartShift 18:00)</code></pre>
+</div>
+
+<!-- T6 — BREAKING CHANGES -->
+<div id="t6" class="section-header tech">
+  <div class="section-num">T6</div>
+  <h2>Breaking Changes &amp; Migrasi</h2>
+  <p>Perubahan yang membutuhkan migration script dan review kode existing</p>
+</div>
+<div class="container tech-section">
+  <div class="table-wrap">
+    <table>
+      <tr><th>Perubahan</th><th>Impact</th><th>Action yang Diperlukan</th></tr>
+      <tr>
+        <td><code>MachineSMUValue</code> &amp; <code>MachineSMUAddress</code> dipindah dari <code>TaskPersonalized</code> → <code>Task</code></td>
+        <td>Data existing di TaskPersonalized perlu dimigrate</td>
+        <td>Migration script: copy data ke Task, lalu hapus kolom dari TaskPersonalized</td>
+      </tr>
+      <tr>
+        <td><code>TaskPersonalized</code>: 1 Task bisa N records</td>
+        <td>Logic yang mengasumsikan 1 Task = 1 TaskPersonalized perlu direview</td>
+        <td>Audit semua query dan business logic yang menggunakan TaskPersonalized</td>
+      </tr>
+      <tr>
+        <td><code>FormSubmission</code>: tambah kolom <code>IsMandatory</code></td>
+        <td>Kolom baru — default value perlu ditentukan untuk data existing</td>
+        <td>ALTER TABLE + backfill: existing records set IsMandatory = false</td>
+      </tr>
+      <tr>
+        <td><code>Task.Status</code>: tambah nilai <code>Complete</code> dan <code>Approved</code></td>
+        <td>Status enum perlu diupdate</td>
+        <td>Update enum di kode dan DB; pastikan existing flow tidak terganggu</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="callout callout-tech">
+    <div class="callout-icon"></div>
+    <p><strong>Catatan:</strong> <code>StartedAt</code> di TaskPersonalized menggunakan device clock — bisa berbeda dari <code>CreatedAt</code> (server timestamp saat sync) karena offline gap. Kedua kolom punya peran berbeda dan keduanya diperlukan.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="background:#0f172a; color:#475569; padding:32px 48px; text-align:center; font-size:12px; margin-top:40px;">
+  <div style="color:#94a3b8;margin-bottom:8px;">PRD — PM Shutdown Phase 1 | Digiman+</div>
+  <div>Dokumen ini bersifat internal. Versi: Draft | 22 Juni 2026</div>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#dbeafe',
+      primaryTextColor: '#1e293b',
+      primaryBorderColor: '#2563eb',
+      lineColor: '#64748b',
+      secondaryColor: '#f1f5f9',
+      tertiaryColor: '#eff6ff',
+      background: '#ffffff',
+      mainBkg: '#dbeafe',
+      nodeBorder: '#2563eb',
+      clusterBkg: '#f1f5f9',
+      titleColor: '#1e293b',
+      edgeLabelBackground: '#ffffff',
+      nodeTextColor: '#1e293b',
+      fontFamily: 'Segoe UI, Arial, sans-serif',
+      fontSize: '13px',
+    },
+    flowchart: {
+      curve: 'basis',
+      padding: 20,
+      htmlLabels: true,
+    }
+  });
+</script>
+</body>
+</html>

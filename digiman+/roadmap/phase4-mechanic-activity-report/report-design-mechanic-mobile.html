@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanic Activity Report — Mobile</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f0f2f0;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+    min-height: 100vh;
+  }
+  .phone { width: 390px; background: #f0f2f0; min-height: 100vh; }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: #2d6a4f;
+    color: #fff;
+    padding: 16px 20px 20px;
+    border-radius: 0 0 20px 20px;
+    margin-bottom: 14px;
+  }
+  .topbar-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .back-btn {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer;
+  }
+  .topbar-title { font-size: 16px; font-weight: 600; }
+  .topbar-badge {
+    margin-left: auto;
+    background: #f59e0b;
+    color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .mechanic-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+  .mechanic-meta { font-size: 12px; color: #b7e4c7; display: flex; flex-wrap: wrap; gap: 6px; }
+  .mechanic-meta span::after { content: '•'; margin-left: 6px; opacity: 0.5; }
+  .mechanic-meta span:last-child::after { content: ''; }
+  .period-row {
+    margin-top: 14px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex; align-items: center;
+  }
+  .period-icon { font-size: 16px; margin-right: 10px; }
+  .period-label { font-size: 10px; color: #b7e4c7; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .period-value { font-size: 14px; font-weight: 700; color: #fff; }
+  .period-change {
+    margin-left: auto;
+    font-size: 11px; color: #b7e4c7;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 4px 10px; border-radius: 6px; cursor: pointer;
+  }
+
+  /* ── SUMMARY ── */
+  .summary-section { padding: 0 16px 4px; }
+  .section-title {
+    font-size: 11px; font-weight: 700; color: #64748b;
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .summary-cards { display: flex; gap: 8px; margin-bottom: 8px; }
+  .summary-card {
+    flex: 1; background: #fff;
+    border-radius: 12px; padding: 12px 10px;
+    text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .summary-card.total { background: #2d6a4f; }
+  .s-label { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .summary-card.total .s-label { color: #b7e4c7; }
+  .s-hours { font-size: 20px; font-weight: 800; color: #2d6a4f; line-height: 1; }
+  .summary-card.total .s-hours { color: #fff; }
+  .summary-card.nonmaint .s-hours { color: #7c3aed; }
+  .s-unit { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+  .summary-card.total .s-unit { color: #b7e4c7; }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex; gap: 10px;
+    padding: 6px 16px 12px; flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #64748b; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .ld-work { background: #2d6a4f; }
+  .ld-off  { background: #94a3b8; }
+  .ld-warn { background: #f59e0b; }
+  .ld-manual { background: #d97706; }
+
+  /* ── DAY LIST ── */
+  .day-list { padding: 0 16px; }
+  .section-header-row { display: flex; align-items: center; margin-bottom: 10px; }
+  .sh-title { font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; }
+  .add-btn {
+    margin-left: auto;
+    background: #d8f3dc; color: #1b4332;
+    font-size: 12px; font-weight: 600;
+    padding: 6px 12px; border-radius: 8px;
+    cursor: pointer; border: none;
+  }
+
+  /* ── DAY ROW ── */
+  .day-row {
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .day-row.work-day { border-left: 4px solid #2d6a4f; }
+  .day-row.off-day  { border-left: 4px solid #e2e8f0; }
+  .day-row.warn-day { border-left: 4px solid #f59e0b; }
+
+  .day-header { display: flex; align-items: center; padding: 10px 14px; gap: 10px; }
+  .day-num { font-size: 18px; font-weight: 800; color: #1e293b; min-width: 30px; line-height: 1; }
+  .day-row.off-day .day-num  { color: #94a3b8; }
+  .day-row.warn-day .day-num { color: #f59e0b; }
+  .day-info { flex: 1; }
+  .day-name { font-size: 12px; font-weight: 600; color: #475569; }
+  .day-row.off-day .day-name { color: #94a3b8; }
+  .day-schedule { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+  .day-tag { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .tag-day   { background: #d8f3dc; color: #1b4332; }
+  .tag-night { background: #e0f2fe; color: #0369a1; }
+  .tag-off   { background: #f1f5f9; color: #94a3b8; }
+  .tag-warn  { background: #fef3c7; color: #92400e; }
+
+  .day-divider { height: 1px; background: #f1f5f9; margin: 0 14px; }
+
+  /* Activities */
+  .day-activities { padding: 8px 14px 12px; }
+  .act-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f8fafc;
+  }
+  .act-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .act-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .dot-system { background: #2d6a4f; }
+  .dot-manual { background: #d97706; }
+  .act-content { flex: 1; }
+  .act-name-text { font-size: 13px; font-weight: 600; color: #1e293b; }
+  .act-unit-text { font-size: 11px; color: #64748b; margin-top: 1px; }
+  .act-time-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+  .act-time-badge {
+    font-size: 11px; font-weight: 600; color: #475569;
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .act-dur { font-size: 11px; font-weight: 700; color: #2d6a4f; }
+  .act-cat-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; }
+  .cat-m  { background: #d8f3dc; color: #1b4332; }
+  .cat-nm { background: #ede9fe; color: #6d28d9; }
+
+  /* No activity */
+  .no-activity {
+    padding: 10px 14px 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .no-activity-text { font-size: 12px; color: #92400e; }
+  .no-activity-add { margin-left: auto; font-size: 11px; font-weight: 600; color: #2d6a4f; cursor: pointer; }
+
+  /* More days indicator */
+  .more-days {
+    text-align: center; padding: 10px 0 4px;
+    color: #94a3b8; font-size: 12px;
+  }
+
+  /* ── SUBMIT ── */
+  .submit-section { padding: 8px 16px 32px; }
+  .submit-note {
+    background: #fffbeb; border: 1px solid #fde68a;
+    border-radius: 10px; padding: 12px 14px;
+    font-size: 12px; color: #92400e;
+    margin-bottom: 14px; line-height: 1.6;
+  }
+  .incomplete-count {
+    display: inline-block; background: #f59e0b;
+    color: #fff; font-size: 11px; font-weight: 700;
+    padding: 1px 7px; border-radius: 10px; margin-right: 2px;
+  }
+  .submit-btn {
+    width: 100%; background: #2d6a4f; color: #fff;
+    border: none; border-radius: 12px;
+    padding: 16px; font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-nav">
+      <div class="back-btn">←</div>
+      <div class="topbar-title">Activity Report</div>
+      <div class="topbar-badge">DRAFT</div>
+    </div>
+    <div class="mechanic-name">Agus Priyanto</div>
+    <div class="mechanic-meta">
+      <span>10028706</span><span>Mechanic</span><span>ADT</span><span>OB Hauler</span>
+    </div>
+    <div class="period-row">
+      <div class="period-icon">📅</div>
+      <div class="period-text">
+        <div class="period-label">Periode</div>
+        <div class="period-value">22 Jun – 22 Jul 2026</div>
+      </div>
+      <div class="period-change">Ganti ›</div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-section">
+    <div class="section-title">Ringkasan</div>
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="s-label">Maintenance</div>
+        <div class="s-hours">142</div>
+        <div class="s-unit">jam</div>
+      </div>
+      <div class="summary-card nonmaint">
+        <div class="s-label">Non Maint.</div>
+        <div class="s-hours">16</div>
+        <div class="s-unit">jam</div>
+      </div>
+      <div class="summary-card total">
+        <div class="s-label">Total</div>
+        <div class="s-hours">158</div>
+        <div class="s-unit">jam</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot ld-work"></div>Work Shift</div>
+    <div class="legend-item"><div class="legend-dot ld-off"></div>Off</div>
+    <div class="legend-item"><div class="legend-dot ld-warn"></div>Belum ada aktivitas</div>
+    <div class="legend-item"><div class="legend-dot ld-manual"></div>Manual</div>
+  </div>
+
+  <!-- DAY LIST -->
+  <div class="day-list">
+    <div class="section-header-row">
+      <div class="sh-title">Detail per Hari</div>
+      <button class="add-btn">＋ Tambah Manual</button>
+    </div>
+
+    <!-- 22 Jun — Day Shift, ada aktivitas -->
+    <div class="day-row work-day">
+      <div class="day-header">
+        <div class="day-num">22</div>
+        <div class="day-info">
+          <div class="day-name">Minggu, 22 Jun</div>
+          <div class="day-schedule">Jadwal: Day Shift</div>
+        </div>
+        <div class="day-tag tag-day">Day Shift</div>
+      </div>
+      <div class="day-divider"></div>
+      <div class="day-activities">
+        <div class="act-item">
+          <div class="act-dot dot-system"></div>
+          <div class="act-content">
+            <div class="act-name-text">Service Sheet 500hrs</div>
+            <div class="act-unit-text">HDKM78002</div>
+            <div class="act-time-row">
+              <span class="act-time-badge">08:00 – 11:30</span>
+              <span class="act-dur">3.5 jam</span>
+              <span class="act-cat-badge cat-m">Maintenance</span>
+            </div>
+          </div>
+        </div>
+        <div class="act-item">
+          <div class="act-dot dot-system"></div>
+          <div class="act-content">
+            <div class="act-name-text">Welding Form</div>
+            <div class="act-unit-text">HDKM78002</div>
+            <div class="act-time-row">
+              <span class="act-time-badge">13:00 – 15:00</span>
+              <span class="act-dur">2 jam</span>
+              <span class="act-cat-badge cat-m">Maintenance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 23 Jun — Night Shift, ada aktivitas + manual -->
+    <div class="day-row work-day">
+      <div class="day-header">
+        <div class="day-num">23</div>
+        <div class="day-info">
+          <div class="day-name">Senin, 23 Jun</div>
+          <div class="day-schedule">Jadwal: Night Shift</div>
+        </div>
+        <div class="day-tag tag-night">Night Shift</div>
+      </div>
+      <div class="day-divider"></div>
+      <div class="day-activities">
+        <div class="act-item">
+          <div class="act-dot dot-manual"></div>
+          <div class="act-content">
+            <div class="act-name-text">Safety Briefing</div>
+            <div class="act-unit-text" style="color:#94a3b8;font-style:italic;">Tidak ada unit</div>
+            <div class="act-time-row">
+              <span class="act-time-badge">18:00 – 19:00</span>
+              <span class="act-dur">1 jam</span>
+              <span class="act-cat-badge cat-nm">Non Maint.</span>
+            </div>
+          </div>
+        </div>
+        <div class="act-item">
+          <div class="act-dot dot-system"></div>
+          <div class="act-content">
+            <div class="act-name-text">Backlog Execution</div>
+            <div class="act-unit-text">HDCT890002</div>
+            <div class="act-time-row">
+              <span class="act-time-badge">19:00 – 23:00</span>
+              <span class="act-dur">4 jam</span>
+              <span class="act-cat-badge cat-m">Maintenance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 24 Jun — Off -->
+    <div class="day-row off-day">
+      <div class="day-header">
+        <div class="day-num">24</div>
+        <div class="day-info">
+          <div class="day-name">Selasa, 24 Jun</div>
+          <div class="day-schedule">Jadwal: Off</div>
+        </div>
+        <div class="day-tag tag-off">Off</div>
+      </div>
+    </div>
+
+    <!-- 25 Jun — Off -->
+    <div class="day-row off-day">
+      <div class="day-header">
+        <div class="day-num">25</div>
+        <div class="day-info">
+          <div class="day-name">Rabu, 25 Jun</div>
+          <div class="day-schedule">Jadwal: Off</div>
+        </div>
+        <div class="day-tag tag-off">Off</div>
+      </div>
+    </div>
+
+    <!-- 26 Jun — Day Shift, BELUM ada aktivitas -->
+    <div class="day-row warn-day">
+      <div class="day-header">
+        <div class="day-num">26</div>
+        <div class="day-info">
+          <div class="day-name">Kamis, 26 Jun</div>
+          <div class="day-schedule">Jadwal: Day Shift</div>
+        </div>
+        <div class="day-tag tag-warn">⚠ Kosong</div>
+      </div>
+      <div class="day-divider"></div>
+      <div class="no-activity">
+        <div class="no-activity-text">⚠️ Belum ada aktivitas tercatat</div>
+        <div class="no-activity-add">＋ Tambah</div>
+      </div>
+    </div>
+
+    <!-- 27 Jun — Day Shift, ada aktivitas -->
+    <div class="day-row work-day">
+      <div class="day-header">
+        <div class="day-num">27</div>
+        <div class="day-info">
+          <div class="day-name">Jumat, 27 Jun</div>
+          <div class="day-schedule">Jadwal: Day Shift</div>
+        </div>
+        <div class="day-tag tag-day">Day Shift</div>
+      </div>
+      <div class="day-divider"></div>
+      <div class="day-activities">
+        <div class="act-item">
+          <div class="act-dot dot-system"></div>
+          <div class="act-content">
+            <div class="act-name-text">Service Sheet 1000hrs</div>
+            <div class="act-unit-text">HDKM78003</div>
+            <div class="act-time-row">
+              <span class="act-time-badge">07:30 – 12:00</span>
+              <span class="act-dur">4.5 jam</span>
+              <span class="act-cat-badge cat-m">Maintenance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 28–29 Jun — Off -->
+    <div class="day-row off-day">
+      <div class="day-header">
+        <div class="day-num">28</div>
+        <div class="day-info">
+          <div class="day-name">Sabtu, 28 Jun</div>
+          <div class="day-schedule">Jadwal: Off</div>
+        </div>
+        <div class="day-tag tag-off">Off</div>
+      </div>
+    </div>
+    <div class="day-row off-day">
+      <div class="day-header">
+        <div class="day-num">29</div>
+        <div class="day-info">
+          <div class="day-name">Minggu, 29 Jun</div>
+          <div class="day-schedule">Jadwal: Off</div>
+        </div>
+        <div class="day-tag tag-off">Off</div>
+      </div>
+    </div>
+
+    <!-- 30 Jun — Night Shift, ada aktivitas -->
+    <div class="day-row work-day">
+      <div class="day-header">
+        <div class="day-num">30</div>
+        <div class="day-info">
+          <div class="day-name">Senin, 30 Jun</div>
+          <div class="day-schedule">Jadwal: Night Shift</div>
+        </div>
+        <div class="day-tag tag-night">Night Shift</div>
+      </div>
+      <div class="day-divider"></div>
+      <div class="day-activities">
+        <div class="act-item">
+          <div class="act-dot dot-system"></div>
+          <div class="act-content">
+            <div class="act-name-text">Service Sheet 250hrs</div>
+            <div class="act-unit-text">HDKM78003</div>
+            <div class="act-time-row">
+              <span class="act-time-badge">20:00 – 00:30</span>
+              <span class="act-dur">4.5 jam</span>
+              <span class="act-cat-badge cat-m">Maintenance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="more-days">··· dan 22 hari lainnya hingga 22 Juli 2026 ···</div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="submit-section">
+    <div class="submit-note">
+      <span class="incomplete-count">1</span> hari kerja belum ada aktivitas (26 Jun). Pastikan sudah diisi atau kosongkan jika memang tidak ada pekerjaan hari itu.
+    </div>
+    <button class="submit-btn">Submit ke Supervisor</button>
+  </div>
+
+</div>
+</body>
+</html>

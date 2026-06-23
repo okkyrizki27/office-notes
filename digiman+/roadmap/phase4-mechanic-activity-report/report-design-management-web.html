@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanic Productivity Report — Management</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f0f4f0;
+    color: #1e293b;
+    font-size: 14px;
+  }
+
+  /* ── TOPNAV ── */
+  .topnav {
+    background: #2d6a4f;
+    color: #fff;
+    padding: 0 32px;
+    height: 56px;
+    display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .topnav-logo { font-size: 16px; font-weight: 800; }
+  .topnav-logo span { color: #b7e4c7; }
+  .topnav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+  .topnav-section { font-size: 13px; color: #b7e4c7; font-weight: 500; }
+  .topnav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .topnav-user { font-size: 13px; color: #b7e4c7; display: flex; align-items: center; gap: 8px; }
+  .topnav-avatar {
+    width: 30px; height: 30px;
+    background: rgba(255,255,255,0.2); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+
+  /* ── PAGE ── */
+  .page { max-width: 1200px; margin: 0 auto; padding: 28px 32px 60px; }
+
+  /* ── PAGE HEADER ── */
+  .page-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+  .page-title-group { flex: 1; }
+  .page-title { font-size: 22px; font-weight: 800; color: #1e293b; margin-bottom: 2px; }
+  .page-subtitle { font-size: 13px; color: #64748b; }
+  .site-badge {
+    background: #2d6a4f; color: #fff;
+    font-size: 13px; font-weight: 700;
+    padding: 6px 16px; border-radius: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 20px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .filter-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+  .filter-select {
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 8px; padding: 6px 12px;
+    font-size: 13px; color: #1e293b; font-family: inherit;
+    cursor: pointer; outline: none;
+  }
+  .filter-select:focus { border-color: #2d6a4f; }
+  .filter-sep { width: 1px; height: 20px; background: #e2e8f0; }
+  .filter-active-period {
+    display: flex; align-items: center; gap: 6px;
+    background: #d8f3dc; color: #1b4332;
+    font-size: 12px; font-weight: 600;
+    padding: 5px 12px; border-radius: 8px;
+  }
+
+  /* ── SUMMARY STRIP ── */
+  .summary-strip {
+    display: flex; gap: 12px; margin-bottom: 24px;
+  }
+  .ss-card {
+    flex: 1; background: #fff;
+    border-radius: 12px; padding: 16px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border-left: 4px solid transparent;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .ss-card.total    { border-left-color: #2d6a4f; }
+  .ss-card.maint    { border-left-color: #1b4332; }
+  .ss-card.nonmaint { border-left-color: #7c3aed; }
+  .ss-card.util     { border-left-color: #f59e0b; }
+  .ss-card.active   { border-left-color: #0369a1; }
+  .ss-icon { font-size: 22px; }
+  .ss-text { }
+  .ss-val { font-size: 22px; font-weight: 800; color: #1e293b; line-height: 1; }
+  .ss-card.total    .ss-val { color: #2d6a4f; }
+  .ss-card.util     .ss-val { color: #f59e0b; }
+  .ss-card.nonmaint .ss-val { color: #7c3aed; }
+  .ss-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-size: 11px; font-weight: 700; color: #64748b;
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  /* ── SECTION CARDS GRID ── */
+  .section-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 28px; }
+
+  .sec-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+  }
+  .sec-card:hover { box-shadow: 0 4px 16px rgba(45,106,79,0.15); }
+
+  .sec-card-header {
+    padding: 16px 20px 14px;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .sec-name { font-size: 16px; font-weight: 800; color: #1e293b; margin-bottom: 3px; }
+  .sec-meta { font-size: 12px; color: #94a3b8; }
+  .sec-util-badge {
+    font-size: 13px; font-weight: 800;
+    padding: 4px 12px; border-radius: 20px;
+  }
+  .util-high { background: #d8f3dc; color: #1b4332; }
+  .util-med  { background: #fef3c7; color: #92400e; }
+  .util-low  { background: #fee2e2; color: #dc2626; }
+
+  /* Utilization bar */
+  .sec-util-bar-wrap { padding: 0 20px 12px; }
+  .util-bar-track {
+    background: #f1f5f9; border-radius: 4px; height: 6px; overflow: hidden;
+  }
+  .util-bar-fill { height: 100%; border-radius: 4px; }
+  .fill-high { background: #2d6a4f; }
+  .fill-med  { background: #f59e0b; }
+  .fill-low  { background: #ef4444; }
+
+  /* Section stats grid */
+  .sec-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid #f1f5f9;
+  }
+  .sec-stat {
+    padding: 12px 16px;
+    border-right: 1px solid #f1f5f9;
+    text-align: center;
+  }
+  .sec-stat:last-child { border-right: none; }
+  .sec-stat-val { font-size: 18px; font-weight: 800; color: #1e293b; }
+  .sec-stat-val.green  { color: #2d6a4f; }
+  .sec-stat-val.purple { color: #7c3aed; }
+  .sec-stat-val.gray   { color: #64748b; }
+  .sec-stat-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  /* Level breakdown inside card */
+  .sec-levels {
+    padding: 10px 20px 14px;
+    display: flex; gap: 8px; flex-wrap: wrap;
+    border-top: 1px solid #f8fafc;
+  }
+  .level-chip {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 8px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .lc-mechanic  { background: #d8f3dc; color: #1b4332; }
+  .lc-foreman   { background: #dbeafe; color: #1d4ed8; }
+  .lc-supervisor{ background: #fdf4ff; color: #7e22ce; }
+
+  .sec-card-footer {
+    padding: 10px 20px;
+    background: #f8faf8;
+    display: flex; align-items: center;
+    font-size: 12px; color: #2d6a4f; font-weight: 600;
+    border-top: 1px solid #f1f5f9;
+  }
+  .sec-card-footer:hover { color: #1b4332; }
+  .sec-card-footer .arrow { margin-left: auto; }
+
+  /* ── INDIVIDUAL TABLE ── */
+  .table-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+  .table-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .tch-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+  .tch-count {
+    background: #f1f5f9; color: #64748b;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+  }
+  .tch-filter { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+  .tch-search {
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 8px; padding: 6px 12px;
+    font-size: 12px; color: #1e293b; font-family: inherit;
+    outline: none; width: 180px;
+  }
+  .tch-search:focus { border-color: #2d6a4f; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #f8fafc; }
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px; font-weight: 700; color: #64748b;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+  }
+  th.sortable { cursor: pointer; }
+  th.sortable:hover { color: #2d6a4f; }
+  .sort-arrow { color: #2d6a4f; margin-left: 2px; }
+  td { padding: 12px 14px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8faf8; cursor: pointer; }
+
+  .td-name { font-weight: 700; color: #1e293b; }
+  .td-eid  { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+  .level-tag {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 6px;
+  }
+  .lt-mechanic  { background: #d8f3dc; color: #1b4332; }
+  .lt-foreman   { background: #dbeafe; color: #1d4ed8; }
+  .lt-supervisor{ background: #fdf4ff; color: #7e22ce; }
+
+  .util-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .up-high { background: #d8f3dc; color: #1b4332; }
+  .up-med  { background: #fef3c7; color: #92400e; }
+  .up-low  { background: #fee2e2; color: #dc2626; }
+
+  .mini-bar { display: flex; align-items: center; gap: 6px; }
+  .mb-track { width: 80px; height: 5px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+  .mb-fill  { height: 100%; border-radius: 3px; }
+  .mb-high { background: #2d6a4f; }
+  .mb-med  { background: #f59e0b; }
+  .mb-low  { background: #ef4444; }
+
+  .status-chip {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 6px;
+  }
+  .sc-submitted { background: #fef3c7; color: #92400e; }
+  .sc-approved  { background: #d8f3dc; color: #1b4332; }
+  .sc-draft     { background: #f1f5f9; color: #94a3b8; }
+
+  .view-btn {
+    font-size: 11px; font-weight: 600; color: #2d6a4f;
+    background: none; border: none; cursor: pointer;
+    padding: 4px 8px; border-radius: 6px;
+  }
+  .view-btn:hover { background: #d8f3dc; }
+
+  .table-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #f1f5f9;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: #94a3b8;
+  }
+  .page-btn {
+    padding: 4px 10px; border: 1px solid #e2e8f0;
+    background: #fff; border-radius: 6px;
+    font-size: 12px; cursor: pointer; color: #475569;
+  }
+  .page-btn.active { background: #2d6a4f; color: #fff; border-color: #2d6a4f; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="topnav-logo">Digiman<span>+</span></div>
+  <div class="topnav-sep"></div>
+  <div class="topnav-section">Mechanic Productivity Report</div>
+  <div class="topnav-right">
+    <div class="topnav-user">
+      <div class="topnav-avatar">BW</div>
+      Budi Santoso · Site Manager ADT
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-title-group">
+      <div class="page-title">Mechanic Productivity</div>
+      <div class="page-subtitle">Ringkasan produktivitas per section dan individu</div>
+    </div>
+    <div class="site-badge">📍 Site ADT</div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-label">Periode</div>
+    <div class="filter-active-period">📅 22 Jun – 22 Jul 2026</div>
+    <div class="filter-sep"></div>
+    <div class="filter-label">Section</div>
+    <select class="filter-select">
+      <option>Semua Section</option>
+      <option>OB Hauler</option>
+      <option>OB Loader</option>
+      <option>SGE</option>
+      <option>Coal Transport</option>
+    </select>
+    <div class="filter-sep"></div>
+    <div class="filter-label">Level</div>
+    <select class="filter-select">
+      <option>Semua Level</option>
+      <option>Mechanic</option>
+      <option>Foreman</option>
+      <option>Supervisor</option>
+    </select>
+    <div class="filter-sep"></div>
+    <div class="filter-label">Status Report</div>
+    <select class="filter-select">
+      <option>Semua Status</option>
+      <option>Approved</option>
+      <option>Submitted</option>
+      <option>Draft</option>
+    </select>
+  </div>
+
+  <!-- SUMMARY STRIP -->
+  <div class="summary-strip">
+    <div class="ss-card active">
+      <div class="ss-icon">👥</div>
+      <div class="ss-text">
+        <div class="ss-val">127</div>
+        <div class="ss-label">Total Personel</div>
+      </div>
+    </div>
+    <div class="ss-card total">
+      <div class="ss-icon">⏱</div>
+      <div class="ss-text">
+        <div class="ss-val">18,240</div>
+        <div class="ss-label">Total Jam</div>
+      </div>
+    </div>
+    <div class="ss-card maint">
+      <div class="ss-icon">🔧</div>
+      <div class="ss-text">
+        <div class="ss-val">15,820</div>
+        <div class="ss-label">Jam Maintenance</div>
+      </div>
+    </div>
+    <div class="ss-card nonmaint">
+      <div class="ss-icon">📋</div>
+      <div class="ss-text">
+        <div class="ss-val">2,420</div>
+        <div class="ss-label">Jam Non Maintenance</div>
+      </div>
+    </div>
+    <div class="ss-card util">
+      <div class="ss-icon">📊</div>
+      <div class="ss-text">
+        <div class="ss-val">76%</div>
+        <div class="ss-label">Avg Utilization</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION CARDS -->
+  <div class="section-title">Per Section</div>
+  <div class="section-cards">
+
+    <!-- OB Hauler -->
+    <div class="sec-card">
+      <div class="sec-card-header">
+        <div>
+          <div class="sec-name">OB Hauler</div>
+          <div class="sec-meta">42 personel &nbsp;·&nbsp; 38 report submitted</div>
+        </div>
+        <div class="sec-util-badge util-high">82%</div>
+      </div>
+      <div class="sec-util-bar-wrap">
+        <div class="util-bar-track">
+          <div class="util-bar-fill fill-high" style="width:82%"></div>
+        </div>
+      </div>
+      <div class="sec-stats">
+        <div class="sec-stat">
+          <div class="sec-stat-val green">5,824</div>
+          <div class="sec-stat-label">Jam Maint.</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val purple">720</div>
+          <div class="sec-stat-label">Jam Non M.</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val gray">6,544</div>
+          <div class="sec-stat-label">Total Jam</div>
+        </div>
+      </div>
+      <div class="sec-levels">
+        <span class="level-chip lc-mechanic">Mechanic · 35</span>
+        <span class="level-chip lc-foreman">Foreman · 5</span>
+        <span class="level-chip lc-supervisor">Supervisor · 2</span>
+      </div>
+      <div class="sec-card-footer">
+        Lihat detail personel <span class="arrow">›</span>
+      </div>
+    </div>
+
+    <!-- OB Loader -->
+    <div class="sec-card">
+      <div class="sec-card-header">
+        <div>
+          <div class="sec-name">OB Loader</div>
+          <div class="sec-meta">35 personel &nbsp;·&nbsp; 30 report submitted</div>
+        </div>
+        <div class="sec-util-badge util-med">71%</div>
+      </div>
+      <div class="sec-util-bar-wrap">
+        <div class="util-bar-track">
+          <div class="util-bar-fill fill-med" style="width:71%"></div>
+        </div>
+      </div>
+      <div class="sec-stats">
+        <div class="sec-stat">
+          <div class="sec-stat-val green">4,210</div>
+          <div class="sec-stat-label">Jam Maint.</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val purple">680</div>
+          <div class="sec-stat-label">Jam Non M.</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val gray">4,890</div>
+          <div class="sec-stat-label">Total Jam</div>
+        </div>
+      </div>
+      <div class="sec-levels">
+        <span class="level-chip lc-mechanic">Mechanic · 28</span>
+        <span class="level-chip lc-foreman">Foreman · 5</span>
+        <span class="level-chip lc-supervisor">Supervisor · 2</span>
+      </div>
+      <div class="sec-card-footer">
+        Lihat detail personel <span class="arrow">›</span>
+      </div>
+    </div>
+
+    <!-- SGE -->
+    <div class="sec-card">
+      <div class="sec-card-header">
+        <div>
+          <div class="sec-name">SGE</div>
+          <div class="sec-meta">28 personel &nbsp;·&nbsp; 26 report submitted</div>
+        </div>
+        <div class="sec-util-badge util-high">79%</div>
+      </div>
+      <div class="sec-util-bar-wrap">
+        <div class="util-bar-track">
+          <div class="util-bar-fill fill-high" style="width:79%"></div>
+        </div>
+      </div>
+      <div class="sec-stats">
+        <div class="sec-stat">
+          <div class="sec-stat-val green">3,480</div>
+          <div class="sec-stat-label">Jam Maint.</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val purple">560</div>
+          <div class="sec-stat-label">Jam Non M.</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val gray">4,040</div>
+          <div class="sec-stat-label">Total Jam</div>
+        </div>
+      </div>
+      <div class="sec-levels">
+        <span class="level-chip lc-mechanic">Mechanic · 22</span>
+        <span class="level-chip lc-foreman">Foreman · 4</span>
+        <span class="level-chip lc-supervisor">Supervisor · 2</span>
+      </div>
+      <div class="sec-card-footer">
+        Lihat detail personel <span class="arrow">›</span>
+      </div>
+    </div>
+
+    <!-- Coal Transport -->
+    <div class="sec-card">
+      <div class="sec-card-header">
+        <div>
+          <div class="sec-name">Coal Transport</div>
+          <div class="sec-meta">22 personel &nbsp;·&nbsp; 18 report submitted</div>
+        </div>
+        <div class="sec-util-badge util-low">63%</div>
+      </div>
+      <div class="sec-util-bar-wrap">
+        <div class="util-bar-track">
+          <div class="util-bar-fill fill-low" style="width:63%"></div>
+        </div>
+      </div>
+      <div class="sec-stats">
+        <div class="sec-stat">
+          <div class="sec-stat-val green">2,306</div>
+          <div class="sec-stat-label">Jam Maint.</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val purple">460</div>
+          <div class="sec-stat-label">Jam Non M.</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val gray">2,766</div>
+          <div class="sec-stat-label">Total Jam</div>
+        </div>
+      </div>
+      <div class="sec-levels">
+        <span class="level-chip lc-mechanic">Mechanic · 17</span>
+        <span class="level-chip lc-foreman">Foreman · 3</span>
+        <span class="level-chip lc-supervisor">Supervisor · 2</span>
+      </div>
+      <div class="sec-card-footer">
+        Lihat detail personel <span class="arrow">›</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INDIVIDUAL TABLE -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="tch-title">Semua Personel</div>
+      <div class="tch-count">127 orang</div>
+      <div class="tch-filter">
+        <input class="tch-search" type="text" placeholder="🔍 Cari nama / ID...">
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Level</th>
+          <th>Section</th>
+          <th class="sortable">Utilization <span class="sort-arrow">↓</span></th>
+          <th class="sortable">Jam Maint.</th>
+          <th>Jam Non M.</th>
+          <th>Total Jam</th>
+          <th>Status Report</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="td-name">Agus Priyanto</div>
+            <div class="td-eid">10028706</div>
+          </td>
+          <td><span class="level-tag lt-mechanic">Mechanic</span></td>
+          <td>OB Hauler</td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-high" style="width:86%"></div></div>
+              <span class="util-pill up-high">86%</span>
+            </div>
+          </td>
+          <td style="font-weight:700;color:#2d6a4f;">142 jam</td>
+          <td style="color:#7c3aed;">16 jam</td>
+          <td style="font-weight:600;">158 jam</td>
+          <td><span class="status-chip sc-submitted">Submitted</span></td>
+          <td><button class="view-btn">Lihat ›</button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Deni Kurniawan</div>
+            <div class="td-eid">10031240</div>
+          </td>
+          <td><span class="level-tag lt-foreman">Foreman</span></td>
+          <td>OB Hauler</td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-high" style="width:80%"></div></div>
+              <span class="util-pill up-high">80%</span>
+            </div>
+          </td>
+          <td style="font-weight:700;color:#2d6a4f;">148 jam</td>
+          <td style="color:#7c3aed;">22 jam</td>
+          <td style="font-weight:600;">170 jam</td>
+          <td><span class="status-chip sc-approved">Approved</span></td>
+          <td><button class="view-btn">Lihat ›</button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Hendra Saputra</div>
+            <div class="td-eid">10029114</div>
+          </td>
+          <td><span class="level-tag lt-mechanic">Mechanic</span></td>
+          <td>OB Loader</td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-med" style="width:68%"></div></div>
+              <span class="util-pill up-med">68%</span>
+            </div>
+          </td>
+          <td style="font-weight:700;color:#2d6a4f;">118 jam</td>
+          <td style="color:#7c3aed;">28 jam</td>
+          <td style="font-weight:600;">146 jam</td>
+          <td><span class="status-chip sc-approved">Approved</span></td>
+          <td><button class="view-btn">Lihat ›</button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Roni Sanjaya</div>
+            <div class="td-eid">10027803</div>
+          </td>
+          <td><span class="level-tag lt-mechanic">Mechanic</span></td>
+          <td>Coal Transport</td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-low" style="width:54%"></div></div>
+              <span class="util-pill up-low">54%</span>
+            </div>
+          </td>
+          <td style="font-weight:700;color:#2d6a4f;">96 jam</td>
+          <td style="color:#7c3aed;">34 jam</td>
+          <td style="font-weight:600;">130 jam</td>
+          <td><span class="status-chip sc-draft">Draft</span></td>
+          <td><button class="view-btn">Lihat ›</button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Wahyu Purnomo</div>
+            <div class="td-eid">10030556</div>
+          </td>
+          <td><span class="level-tag lt-supervisor">Supervisor</span></td>
+          <td>SGE</td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-high" style="width:78%"></div></div>
+              <span class="util-pill up-high">78%</span>
+            </div>
+          </td>
+          <td style="font-weight:700;color:#2d6a4f;">138 jam</td>
+          <td style="color:#7c3aed;">18 jam</td>
+          <td style="font-weight:600;">156 jam</td>
+          <td><span class="status-chip sc-submitted">Submitted</span></td>
+          <td><button class="view-btn">Lihat ›</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="table-footer">
+      Menampilkan 5 dari 127 personel &nbsp;
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">›</button>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

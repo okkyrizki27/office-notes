@@ -129,8 +129,10 @@ def business_days_count(start_date, end_date):
         current += timedelta(days=1)
     return count
 
-def compute_status_segments(issue, target_status):
-    """Sum business hours spent in target_status across all occurrences."""
+def compute_status_segments(issue, target_status, sprint_start_dt=None):
+    """Sum business hours spent in target_status across all occurrences.
+    If sprint_start_dt given, enter_time is capped to sprint start
+    when the ticket entered the status before the sprint began."""
     transitions = status_transitions(issue)
     total_hours = 0.0
     enter_time  = None
@@ -138,11 +140,20 @@ def compute_status_segments(issue, target_status):
         if to_s == target_status:
             enter_time = created
         elif from_s == target_status and enter_time is not None:
-            total_hours += business_hours_between(parse_dt(enter_time), parse_dt(created))
+            start = parse_dt(enter_time)
+            if sprint_start_dt and start.date() < sprint_start_dt:
+                start = datetime.combine(sprint_start_dt, datetime.min.time())
+            end = parse_dt(created)
+            if end > start:
+                total_hours += business_hours_between(start, end)
             enter_time = None
     if enter_time is not None:
+        start = parse_dt(enter_time)
+        if sprint_start_dt and start.date() < sprint_start_dt:
+            start = datetime.combine(sprint_start_dt, datetime.min.time())
         now = datetime.now(timezone.utc).replace(tzinfo=None)
-        total_hours += business_hours_between(parse_dt(enter_time), now)
+        if now > start:
+            total_hours += business_hours_between(start, now)
     return total_hours
 
 def compute_dev_done_range(issue):
@@ -204,22 +215,34 @@ def fetch_sprint_issues(sprint_id):
 
 # ── BASELINE ──────────────────────────────────────────────────────────────────
 def build_dev_qa_baseline(sprints):
-    issues_by_key = {}
+    # Map issue key → (issue, sprint_start_dt) attributed to the sprint where DEV DONE occurred
+    issues_with_sprint = {}
     for s in sprints:
+        s_start_dt = parse_dt(s["startDate"]).date() if s.get("startDate") else None
+        s_end_dt   = parse_dt(s["endDate"]).date()   if s.get("endDate")   else None
         for issue in fetch_sprint_issues(s["id"]):
-            issues_by_key[issue["key"]] = issue
+            key = issue["key"]
+            if key in issues_with_sprint:
+                continue  # already attributed to an earlier sprint
+            _, dev_done_time = compute_dev_done_range(issue)
+            if dev_done_time and s_start_dt and s_end_dt:
+                done_date = parse_dt(dev_done_time).date()
+                if s_start_dt <= done_date <= s_end_dt:
+                    issues_with_sprint[key] = (issue, s_start_dt)
+            elif key not in issues_with_sprint:
+                issues_with_sprint[key] = (issue, s_start_dt)
 
     dev_data = {v: [] for v in TARGET_SP}
     qa_data  = {v: [] for v in TARGET_SP}
-    for issue in issues_by_key.values():
+    for issue, sprint_start_dt in issues_with_sprint.values():
         sp_val = sp(issue["fields"])
         if sp_val not in TARGET_SP:
             continue
         _, end_time = compute_dev_done_range(issue)
         if end_time is None:
             continue
-        dev_h = compute_status_segments(issue, IN_PROGRESS_STATUS)
-        qa_h  = compute_status_segments(issue, QA_TEST_STATUS)
+        dev_h = compute_status_segments(issue, IN_PROGRESS_STATUS, sprint_start_dt)
+        qa_h  = compute_status_segments(issue, QA_TEST_STATUS, sprint_start_dt)
         if dev_h > 0: dev_data[sp_val].append(dev_h)
         if qa_h  > 0: qa_data[sp_val].append(qa_h)
 
@@ -413,7 +436,7 @@ def generate_html(team_name, sprint_obj, issues, dev_bl, qa_bl, velocity_history
         priority = (f.get("priority") or {}).get("name", "-")
         summary  = safe(f.get("summary", ""), 65)
 
-        dev_h  = compute_status_segments(issue, IN_PROGRESS_STATUS)
+        dev_h  = compute_status_segments(issue, IN_PROGRESS_STATUS, sprint_start_dt)
         dev_b  = dev_bl.get(sp_val) if sp_val in TARGET_SP else None
         if dev_b and dev_h > dev_b:
             dev_delayed.append({"key": issue["key"], "summary": summary,
@@ -421,7 +444,7 @@ def generate_html(team_name, sprint_obj, issues, dev_bl, qa_bl, velocity_history
                                  "actual_days": dev_h/24, "baseline_days": dev_b/24,
                                  "delay_days": (dev_h-dev_b)/24})
 
-        qa_h = compute_status_segments(issue, QA_TEST_STATUS)
+        qa_h = compute_status_segments(issue, QA_TEST_STATUS, sprint_start_dt)
         qa_b  = qa_bl.get(sp_val) if sp_val in TARGET_SP else None
         if qa_b and qa_h > qa_b:
             qa_delayed.append({"key": issue["key"], "summary": summary,

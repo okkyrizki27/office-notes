@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanic Activity Report — Approver Web</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f0f4f0;
+    color: #1e293b;
+    font-size: 14px;
+  }
+
+  /* ── TOPNAV ── */
+  .topnav {
+    background: #2d6a4f;
+    color: #fff;
+    padding: 0 32px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .topnav-logo { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; }
+  .topnav-logo span { color: #b7e4c7; }
+  .topnav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+  .topnav-section { font-size: 13px; color: #b7e4c7; font-weight: 500; }
+  .topnav-user { margin-left: auto; font-size: 13px; color: #b7e4c7; display: flex; align-items: center; gap: 8px; }
+  .topnav-avatar {
+    width: 30px; height: 30px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 1100px; margin: 0 auto; padding: 28px 32px 60px; }
+
+  /* Breadcrumb */
+  .breadcrumb { font-size: 12px; color: #94a3b8; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: #2d6a4f; text-decoration: none; font-weight: 500; }
+  .breadcrumb .sep { color: #cbd5e1; }
+
+  /* ── REPORT HEADER CARD ── */
+  .report-header-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .mechanic-avatar-big {
+    width: 56px; height: 56px;
+    background: #d8f3dc;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #2d6a4f;
+    flex-shrink: 0;
+  }
+  .mechanic-details { flex: 1; }
+  .mechanic-name-big { font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
+  .mechanic-meta-row { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 6px; }
+  .meta-chip {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; color: #64748b;
+  }
+  .meta-chip .mc-icon { font-size: 13px; }
+  .meta-chip strong { color: #1e293b; }
+  .status-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .status-badge {
+    font-size: 12px; font-weight: 700;
+    padding: 5px 14px; border-radius: 20px;
+  }
+  .status-submitted { background: #fef3c7; color: #92400e; }
+  .status-approved  { background: #d8f3dc; color: #1b4332; }
+  .period-badge {
+    font-size: 13px; font-weight: 600;
+    color: #2d6a4f;
+    background: #d8f3dc;
+    padding: 5px 14px; border-radius: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .submitted-info { font-size: 11px; color: #94a3b8; text-align: right; }
+
+  /* ── SUMMARY CARDS ── */
+  .summary-row { display: flex; gap: 12px; margin-bottom: 20px; }
+  .sum-card {
+    flex: 1; background: #fff;
+    border-radius: 12px; padding: 18px 20px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    border-top: 4px solid transparent;
+  }
+  .sum-card.total    { border-top-color: #2d6a4f; }
+  .sum-card.maint    { border-top-color: #1b4332; }
+  .sum-card.nonmaint { border-top-color: #7c3aed; }
+  .sum-card.days     { border-top-color: #64748b; }
+  .sum-val { font-size: 28px; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: 4px; }
+  .sum-card.total    .sum-val { color: #2d6a4f; }
+  .sum-card.nonmaint .sum-val { color: #7c3aed; }
+  .sum-unit { font-size: 12px; color: #94a3b8; }
+  .sum-label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 6px; }
+
+  /* ── MAIN CONTENT ── */
+  .content-grid { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
+
+  /* ── ACTIVITY TABLE ── */
+  .activity-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+  .activity-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .ach-title { font-size: 13px; font-weight: 700; color: #1e293b; }
+  .ach-count {
+    background: #f1f5f9; color: #64748b;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+  }
+  .filter-tabs { margin-left: auto; display: flex; gap: 4px; }
+  .filter-tab {
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 6px;
+    cursor: pointer; border: none; background: transparent; color: #94a3b8;
+  }
+  .filter-tab.active { background: #d8f3dc; color: #1b4332; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #f8fafc; }
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px; font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+  }
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f8fafc;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8faf8; }
+
+  .td-date { font-weight: 600; color: #1e293b; white-space: nowrap; }
+  .td-date .td-day { font-size: 11px; color: #94a3b8; font-weight: 400; }
+  .shift-badge {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: 6px; white-space: nowrap;
+  }
+  .sb-day   { background: #d8f3dc; color: #1b4332; }
+  .sb-night { background: #e0f2fe; color: #0369a1; }
+  .sb-off   { background: #f1f5f9; color: #94a3b8; }
+
+  .td-unit {
+    font-size: 12px; font-weight: 600;
+    color: #2d6a4f;
+    background: #d8f3dc;
+    padding: 2px 8px; border-radius: 6px;
+    display: inline-block; white-space: nowrap;
+  }
+  .td-unit.no-unit { color: #94a3b8; background: #f1f5f9; font-weight: 400; font-style: italic; }
+
+  .cat-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+  .cat-m  { background: #d8f3dc; color: #1b4332; }
+  .cat-nm { background: #ede9fe; color: #6d28d9; }
+
+  .src-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; }
+  .src-sys-dot { background: #2d6a4f; }
+  .src-man-dot { background: #d97706; }
+
+  .td-dur { font-weight: 700; color: #2d6a4f; white-space: nowrap; }
+
+  /* Off row */
+  .tr-off td { color: #94a3b8; }
+  .tr-warn td:first-child { color: #f59e0b; }
+
+  /* Warn row */
+  .warn-indicator { color: #f59e0b; font-size: 13px; }
+
+  /* ── APPROVAL PANEL ── */
+  .approval-panel { display: flex; flex-direction: column; gap: 12px; }
+
+  .ap-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .ap-title { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 14px; }
+
+  .ap-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; }
+  .ap-info-row .ai-label { color: #94a3b8; }
+  .ap-info-row .ai-val { font-weight: 600; color: #1e293b; }
+
+  .ap-divider { height: 1px; background: #f1f5f9; margin: 12px 0; }
+
+  .comment-label { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px; }
+  .comment-box {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #475569;
+    resize: none;
+    font-family: inherit;
+    background: #f8fafc;
+    line-height: 1.5;
+  }
+  .comment-box:focus { outline: none; border-color: #2d6a4f; background: #fff; }
+
+  .approve-btn {
+    width: 100%;
+    background: #2d6a4f; color: #fff;
+    border: none; border-radius: 10px;
+    padding: 13px; font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 12px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .reject-btn {
+    width: 100%;
+    background: #fff; color: #dc2626;
+    border: 1.5px solid #fecaca;
+    border-radius: 10px;
+    padding: 11px; font-size: 13px; font-weight: 600;
+    cursor: pointer; margin-top: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+
+  /* checklist summary for approver */
+  .check-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 12px; color: #475569;
+    margin-bottom: 8px;
+  }
+  .check-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .check-warn { color: #f59e0b; }
+  .check-ok   { color: #2d6a4f; }
+
+  /* Pagination */
+  .table-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #f1f5f9;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: #94a3b8;
+  }
+  .page-btn {
+    padding: 4px 10px; border: 1px solid #e2e8f0;
+    background: #fff; border-radius: 6px;
+    font-size: 12px; cursor: pointer; color: #475569;
+  }
+  .page-btn.active { background: #2d6a4f; color: #fff; border-color: #2d6a4f; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="topnav-logo">Digiman<span>+</span></div>
+  <div class="topnav-sep"></div>
+  <div class="topnav-section">Activity Report — Approval</div>
+  <div class="topnav-user">
+    <div class="topnav-avatar">RS</div>
+    Rudi Supervisor · ADT
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="#">Activity Reports</a>
+    <span class="sep">›</span>
+    <span>Agus Priyanto — Juni 2026</span>
+  </div>
+
+  <!-- REPORT HEADER -->
+  <div class="report-header-card">
+    <div class="mechanic-avatar-big">AP</div>
+    <div class="mechanic-details">
+      <div class="mechanic-name-big">Agus Priyanto</div>
+      <div class="mechanic-meta-row">
+        <div class="meta-chip"><span class="mc-icon">🪪</span> <strong>10028706</strong></div>
+        <div class="meta-chip"><span class="mc-icon">⚙️</span> Mechanic</div>
+        <div class="meta-chip"><span class="mc-icon">📍</span> ADT</div>
+        <div class="meta-chip"><span class="mc-icon">🏗</span> OB Hauler</div>
+      </div>
+    </div>
+    <div class="status-area">
+      <div class="status-badge status-submitted">⏳ Menunggu Approval</div>
+      <div class="period-badge">📅 22 Jun – 22 Jul 2026</div>
+      <div class="submitted-info">Disubmit: 22 Jul 2026, 08:14</div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-row">
+    <div class="sum-card total">
+      <div class="sum-val">158</div>
+      <div class="sum-unit">jam</div>
+      <div class="sum-label">Total Jam</div>
+    </div>
+    <div class="sum-card maint">
+      <div class="sum-val">142</div>
+      <div class="sum-unit">jam</div>
+      <div class="sum-label">Maintenance</div>
+    </div>
+    <div class="sum-card nonmaint">
+      <div class="sum-val">16</div>
+      <div class="sum-unit">jam</div>
+      <div class="sum-label">Non Maintenance</div>
+    </div>
+    <div class="sum-card days">
+      <div class="sum-val">21</div>
+      <div class="sum-unit">dari 30 hari</div>
+      <div class="sum-label">Hari Aktif</div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT GRID -->
+  <div class="content-grid">
+
+    <!-- ACTIVITY TABLE -->
+    <div class="activity-card">
+      <div class="activity-card-header">
+        <div class="ach-title">Detail Aktivitas</div>
+        <div class="ach-count">30 hari</div>
+        <div class="filter-tabs">
+          <button class="filter-tab active">Semua</button>
+          <button class="filter-tab">Work</button>
+          <button class="filter-tab">Off</button>
+          <button class="filter-tab">⚠ Kosong</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Shift</th>
+            <th>Unit</th>
+            <th>Aktivitas</th>
+            <th>Kategori</th>
+            <th>Waktu</th>
+            <th>Durasi</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 22 Jun — Work, ada aktivitas -->
+          <tr>
+            <td class="td-date">
+              22 Jun
+              <div class="td-day">Minggu</div>
+            </td>
+            <td><span class="shift-badge sb-day">Day</span></td>
+            <td><span class="td-unit">HDKM78002</span></td>
+            <td>Service Sheet 500hrs</td>
+            <td><span class="cat-badge cat-m">Maintenance</span></td>
+            <td style="white-space:nowrap;color:#475569;">08:00 – 11:30</td>
+            <td class="td-dur">3.5 jam</td>
+            <td style="font-size:12px;color:#16a34a;"><span class="src-dot src-sys-dot"></span>system</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td><span class="td-unit">HDKM78002</span></td>
+            <td>Welding Form</td>
+            <td><span class="cat-badge cat-m">Maintenance</span></td>
+            <td style="white-space:nowrap;color:#475569;">13:00 – 15:00</td>
+            <td class="td-dur">2 jam</td>
+            <td style="font-size:12px;color:#16a34a;"><span class="src-dot src-sys-dot"></span>system</td>
+          </tr>
+
+          <!-- 23 Jun — Night Shift -->
+          <tr>
+            <td class="td-date">
+              23 Jun
+              <div class="td-day">Senin</div>
+            </td>
+            <td><span class="shift-badge sb-night">Night</span></td>
+            <td><span class="td-unit no-unit">–</span></td>
+            <td>Safety Briefing</td>
+            <td><span class="cat-badge cat-nm">Non Maint.</span></td>
+            <td style="white-space:nowrap;color:#475569;">18:00 – 19:00</td>
+            <td class="td-dur">1 jam</td>
+            <td style="font-size:12px;color:#d97706;"><span class="src-dot src-man-dot"></span>manual</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td><span class="td-unit">HDCT890002</span></td>
+            <td>Backlog Execution</td>
+            <td><span class="cat-badge cat-m">Maintenance</span></td>
+            <td style="white-space:nowrap;color:#475569;">19:00 – 23:00</td>
+            <td class="td-dur">4 jam</td>
+            <td style="font-size:12px;color:#16a34a;"><span class="src-dot src-sys-dot"></span>system</td>
+          </tr>
+
+          <!-- 24 Jun — Off -->
+          <tr class="tr-off">
+            <td class="td-date">
+              24 Jun
+              <div class="td-day">Selasa</div>
+            </td>
+            <td><span class="shift-badge sb-off">Off</span></td>
+            <td colspan="5" style="color:#cbd5e1;font-style:italic;font-size:12px;">—</td>
+          </tr>
+
+          <!-- 25 Jun — Off -->
+          <tr class="tr-off">
+            <td class="td-date">
+              25 Jun
+              <div class="td-day">Rabu</div>
+            </td>
+            <td><span class="shift-badge sb-off">Off</span></td>
+            <td colspan="5" style="color:#cbd5e1;font-style:italic;font-size:12px;">—</td>
+          </tr>
+
+          <!-- 26 Jun — Kosong (warning) -->
+          <tr class="tr-warn" style="background:#fffbeb;">
+            <td class="td-date" style="color:#f59e0b;">
+              26 Jun
+              <div class="td-day" style="color:#f59e0b;">Kamis</div>
+            </td>
+            <td><span class="shift-badge sb-day">Day</span></td>
+            <td colspan="5" style="color:#92400e;font-size:12px;">
+              <span class="warn-indicator">⚠</span> Tidak ada aktivitas tercatat di hari kerja ini
+            </td>
+          </tr>
+
+          <!-- 27 Jun — Work -->
+          <tr>
+            <td class="td-date">
+              27 Jun
+              <div class="td-day">Jumat</div>
+            </td>
+            <td><span class="shift-badge sb-day">Day</span></td>
+            <td><span class="td-unit">HDKM78003</span></td>
+            <td>Service Sheet 1000hrs</td>
+            <td><span class="cat-badge cat-m">Maintenance</span></td>
+            <td style="white-space:nowrap;color:#475569;">07:30 – 12:00</td>
+            <td class="td-dur">4.5 jam</td>
+            <td style="font-size:12px;color:#16a34a;"><span class="src-dot src-sys-dot"></span>system</td>
+          </tr>
+
+          <!-- 28-29 Jun — Off -->
+          <tr class="tr-off">
+            <td class="td-date">
+              28 Jun
+              <div class="td-day">Sabtu</div>
+            </td>
+            <td><span class="shift-badge sb-off">Off</span></td>
+            <td colspan="5" style="color:#cbd5e1;font-style:italic;font-size:12px;">—</td>
+          </tr>
+          <tr class="tr-off">
+            <td class="td-date">
+              29 Jun
+              <div class="td-day">Minggu</div>
+            </td>
+            <td><span class="shift-badge sb-off">Off</span></td>
+            <td colspan="5" style="color:#cbd5e1;font-style:italic;font-size:12px;">—</td>
+          </tr>
+
+          <!-- 30 Jun — Night -->
+          <tr>
+            <td class="td-date">
+              30 Jun
+              <div class="td-day">Senin</div>
+            </td>
+            <td><span class="shift-badge sb-night">Night</span></td>
+            <td><span class="td-unit">HDKM78003</span></td>
+            <td>Service Sheet 250hrs</td>
+            <td><span class="cat-badge cat-m">Maintenance</span></td>
+            <td style="white-space:nowrap;color:#475569;">20:00 – 00:30</td>
+            <td class="td-dur">4.5 jam</td>
+            <td style="font-size:12px;color:#16a34a;"><span class="src-dot src-sys-dot"></span>system</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <div class="table-footer">
+        Menampilkan 9 dari 30 hari &nbsp;
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">›</button>
+      </div>
+    </div>
+
+    <!-- APPROVAL PANEL -->
+    <div class="approval-panel">
+
+      <!-- Checklist summary -->
+      <div class="ap-card">
+        <div class="ap-title">Ringkasan untuk Approver</div>
+        <div class="check-item">
+          <span class="check-icon check-ok">✅</span>
+          <span>21 hari kerja tercatat dengan aktivitas</span>
+        </div>
+        <div class="check-item">
+          <span class="check-icon check-warn">⚠️</span>
+          <span><strong>1 hari kerja</strong> tidak ada aktivitas (26 Jun)</span>
+        </div>
+        <div class="check-item">
+          <span class="check-icon check-ok">✅</span>
+          <span>9 hari Off sesuai jadwal</span>
+        </div>
+        <div class="check-item">
+          <span class="check-icon check-ok">✅</span>
+          <span>Total 158 jam tercatat</span>
+        </div>
+        <div class="check-item" style="margin-top:4px;">
+          <span class="check-icon" style="font-size:13px;">📝</span>
+          <span style="color:#94a3b8;">3 baris input manual oleh mechanic</span>
+        </div>
+      </div>
+
+      <!-- Approval action -->
+      <div class="ap-card">
+        <div class="ap-title">Keputusan Approval</div>
+
+        <div class="ap-info-row">
+          <span class="ai-label">Mechanic</span>
+          <span class="ai-val">Agus Priyanto</span>
+        </div>
+        <div class="ap-info-row">
+          <span class="ai-label">Periode</span>
+          <span class="ai-val">22 Jun – 22 Jul 2026</span>
+        </div>
+        <div class="ap-info-row">
+          <span class="ai-label">Disubmit</span>
+          <span class="ai-val">22 Jul 2026, 08:14</span>
+        </div>
+
+        <div class="ap-divider"></div>
+
+        <div class="comment-label">Catatan (opsional)</div>
+        <textarea class="comment-box" rows="3" placeholder="Tulis catatan untuk mechanic..."></textarea>
+
+        <button class="approve-btn">✓ &nbsp;Approve Report</button>
+        <button class="reject-btn">✕ &nbsp;Kembalikan ke Mechanic</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

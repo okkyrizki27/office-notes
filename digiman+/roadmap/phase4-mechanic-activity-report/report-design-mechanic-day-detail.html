@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanic Activity Report — Day Detail</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f0f2f0;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+    min-height: 100vh;
+  }
+  .phone { width: 390px; background: #f0f2f0; min-height: 100vh; }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: #2d6a4f;
+    color: #fff;
+    padding: 16px 20px 24px;
+    border-radius: 0 0 24px 24px;
+    margin-bottom: 16px;
+  }
+  .topbar-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .back-btn {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer;
+  }
+  .topbar-title { font-size: 14px; font-weight: 600; color: #b7e4c7; }
+
+  /* Day navigation */
+  .day-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-arrow {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer;
+    border: none; color: #fff;
+  }
+  .nav-arrow:disabled { opacity: 0.3; cursor: default; }
+  .day-center { text-align: center; }
+  .day-big { font-size: 36px; font-weight: 800; color: #fff; line-height: 1; }
+  .day-month { font-size: 14px; color: #b7e4c7; margin-top: 2px; }
+  .day-full { font-size: 12px; color: #b7e4c7; margin-top: 2px; }
+
+  /* Schedule badge */
+  .schedule-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 14px;
+    gap: 8px;
+  }
+  .schedule-badge {
+    font-size: 12px; font-weight: 700;
+    padding: 5px 16px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .schedule-badge.day-shift { background: rgba(255,255,255,0.2); }
+  .schedule-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #b7e4c7; }
+
+  /* Progress indicator */
+  .day-progress {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .dp-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+  }
+  .dp-dot.active { background: #fff; width: 18px; border-radius: 3px; }
+  .dp-dot.done { background: #b7e4c7; }
+  .dp-label { font-size: 10px; color: #b7e4c7; margin-left: 4px; }
+
+  /* ── SUMMARY STRIP ── */
+  .day-summary {
+    background: #fff;
+    margin: 0 16px 14px;
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .ds-item {
+    flex: 1;
+    text-align: center;
+    border-right: 1px solid #f1f5f9;
+  }
+  .ds-item:last-child { border-right: none; }
+  .ds-val { font-size: 18px; font-weight: 800; color: #2d6a4f; }
+  .ds-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  /* ── ACTIVITIES ── */
+  .activities-section { padding: 0 16px; }
+  .section-header-row { display: flex; align-items: center; margin-bottom: 10px; }
+  .sh-title { font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; }
+  .add-btn {
+    margin-left: auto;
+    background: #d8f3dc; color: #1b4332;
+    font-size: 12px; font-weight: 600;
+    padding: 6px 12px; border-radius: 8px;
+    cursor: pointer; border: none;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* Activity card */
+  .act-card {
+    background: #fff;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .act-card.system-card { border-left: 4px solid #2d6a4f; }
+  .act-card.manual-card { border-left: 4px solid #d97706; }
+
+  .act-card-header {
+    padding: 14px 16px 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .act-title-group { flex: 1; }
+  .act-form-name { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 3px; }
+  .act-unit-name {
+    font-size: 12px; font-weight: 600;
+    color: #2d6a4f;
+    background: #d8f3dc;
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .act-unit-name.no-unit { color: #94a3b8; background: #f1f5f9; font-style: italic; font-weight: 400; }
+  .act-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .badge-cat {
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 8px;
+  }
+  .cat-m  { background: #d8f3dc; color: #1b4332; }
+  .cat-nm { background: #ede9fe; color: #6d28d9; }
+  .badge-src {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 6px;
+  }
+  .src-sys { background: #f0fdf4; color: #16a34a; }
+  .src-man { background: #fef3c7; color: #d97706; }
+
+  .act-card-divider { height: 1px; background: #f8fafc; margin: 0 16px; }
+
+  .act-card-time {
+    padding: 10px 16px 14px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .time-block {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    text-align: center;
+  }
+  .time-block .t-label { font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+  .time-block .t-val { font-size: 14px; font-weight: 700; color: #1e293b; }
+  .time-arrow { font-size: 16px; color: #94a3b8; }
+  .dur-block {
+    margin-left: auto;
+    background: #2d6a4f;
+    color: #fff;
+    border-radius: 8px;
+    padding: 6px 14px;
+    text-align: center;
+  }
+  .dur-block .t-label { font-size: 9px; font-weight: 600; color: #b7e4c7; text-transform: uppercase; letter-spacing: 0.5px; }
+  .dur-block .t-val { font-size: 14px; font-weight: 700; color: #fff; }
+
+  /* Edit button for manual */
+  .act-card-footer {
+    padding: 0 16px 12px;
+    display: flex; gap: 8px;
+  }
+  .btn-edit {
+    flex: 1;
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    color: #475569; font-size: 12px; font-weight: 600;
+    padding: 8px; border-radius: 8px; cursor: pointer;
+    text-align: center;
+  }
+  .btn-delete {
+    background: #fee2e2; border: 1px solid #fecaca;
+    color: #dc2626; font-size: 12px; font-weight: 600;
+    padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    background: #fff;
+    border-radius: 14px;
+    padding: 32px 20px;
+    text-align: center;
+    border: 2px dashed #e2e8f0;
+    margin-bottom: 10px;
+  }
+  .empty-icon { font-size: 32px; margin-bottom: 10px; }
+  .empty-title { font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 4px; }
+  .empty-sub { font-size: 12px; color: #94a3b8; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: sticky;
+    bottom: 0;
+    padding: 12px 16px 24px;
+    background: #f0f2f0;
+  }
+  .nav-row { display: flex; gap: 8px; }
+  .btn-prev {
+    background: #fff; border: 1px solid #e2e8f0;
+    color: #475569; font-size: 13px; font-weight: 600;
+    padding: 14px 20px; border-radius: 12px;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-next {
+    flex: 1;
+    background: #2d6a4f; color: #fff;
+    border: none; border-radius: 12px;
+    padding: 14px; font-size: 13px; font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-next.last-day {
+    background: #1b4332;
+  }
+  .day-counter {
+    text-align: center;
+    font-size: 11px; color: #94a3b8;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-nav">
+      <div class="back-btn">←</div>
+      <div class="topbar-title">22 Jun – 22 Jul 2026 &nbsp;·&nbsp; Agus Priyanto</div>
+    </div>
+
+    <!-- Day navigation -->
+    <div class="day-nav">
+      <button class="nav-arrow">‹</button>
+      <div class="day-center">
+        <div class="day-big">22</div>
+        <div class="day-month">Juni 2026</div>
+        <div class="day-full">Minggu</div>
+      </div>
+      <button class="nav-arrow">›</button>
+    </div>
+
+    <div class="schedule-row">
+      <div class="schedule-badge day-shift">
+        <div class="dot"></div>
+        Day Shift
+      </div>
+    </div>
+
+    <!-- Progress dots -->
+    <div class="day-progress">
+      <div class="dp-dot done"></div>
+      <div class="dp-dot active"></div>
+      <div class="dp-dot"></div>
+      <div class="dp-dot"></div>
+      <div class="dp-dot"></div>
+      <div class="dp-dot"></div>
+      <div class="dp-dot"></div>
+      <span class="dp-label">Hari 1 dari 30</span>
+    </div>
+  </div>
+
+  <!-- DAY SUMMARY STRIP -->
+  <div class="day-summary">
+    <div class="ds-item">
+      <div class="ds-val">5.5</div>
+      <div class="ds-label">Total Jam</div>
+    </div>
+    <div class="ds-item">
+      <div class="ds-val">2</div>
+      <div class="ds-label">Aktivitas</div>
+    </div>
+    <div class="ds-item">
+      <div class="ds-val" style="color:#1b4332;">5.5</div>
+      <div class="ds-label">Maintenance</div>
+    </div>
+    <div class="ds-item">
+      <div class="ds-val" style="color:#7c3aed;">0</div>
+      <div class="ds-label">Non Maint.</div>
+    </div>
+  </div>
+
+  <!-- ACTIVITIES -->
+  <div class="activities-section">
+    <div class="section-header-row">
+      <div class="sh-title">Aktivitas</div>
+      <button class="add-btn">＋ Tambah Manual</button>
+    </div>
+
+    <!-- Activity 1 — System -->
+    <div class="act-card system-card">
+      <div class="act-card-header">
+        <div class="act-title-group">
+          <div class="act-form-name">Service Sheet 500hrs</div>
+          <div class="act-unit-name">HDKM78002</div>
+        </div>
+        <div class="act-badges">
+          <span class="badge-cat cat-m">Maintenance</span>
+          <span class="badge-src src-sys">● system</span>
+        </div>
+      </div>
+      <div class="act-card-divider"></div>
+      <div class="act-card-time">
+        <div class="time-block">
+          <div class="t-label">Mulai</div>
+          <div class="t-val">08:00</div>
+        </div>
+        <div class="time-arrow">→</div>
+        <div class="time-block">
+          <div class="t-label">Selesai</div>
+          <div class="t-val">11:30</div>
+        </div>
+        <div class="dur-block">
+          <div class="t-label">Durasi</div>
+          <div class="t-val">3.5 jam</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity 2 — System -->
+    <div class="act-card system-card">
+      <div class="act-card-header">
+        <div class="act-title-group">
+          <div class="act-form-name">Welding Form</div>
+          <div class="act-unit-name">HDKM78002</div>
+        </div>
+        <div class="act-badges">
+          <span class="badge-cat cat-m">Maintenance</span>
+          <span class="badge-src src-sys">● system</span>
+        </div>
+      </div>
+      <div class="act-card-divider"></div>
+      <div class="act-card-time">
+        <div class="time-block">
+          <div class="t-label">Mulai</div>
+          <div class="t-val">13:00</div>
+        </div>
+        <div class="time-arrow">→</div>
+        <div class="time-block">
+          <div class="t-label">Selesai</div>
+          <div class="t-val">15:00</div>
+        </div>
+        <div class="dur-block">
+          <div class="t-label">Durasi</div>
+          <div class="t-val">2 jam</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity 3 — Manual (contoh ada manual) -->
+    <div class="act-card manual-card">
+      <div class="act-card-header">
+        <div class="act-title-group">
+          <div class="act-form-name">Standby — menunggu parts</div>
+          <div class="act-unit-name">HDCT890002</div>
+        </div>
+        <div class="act-badges">
+          <span class="badge-cat cat-nm">Non Maint.</span>
+          <span class="badge-src src-man">✎ manual</span>
+        </div>
+      </div>
+      <div class="act-card-divider"></div>
+      <div class="act-card-time">
+        <div class="time-block">
+          <div class="t-label">Mulai</div>
+          <div class="t-val">15:30</div>
+        </div>
+        <div class="time-arrow">→</div>
+        <div class="time-block">
+          <div class="t-label">Selesai</div>
+          <div class="t-val">17:00</div>
+        </div>
+        <div class="dur-block">
+          <div class="t-label">Durasi</div>
+          <div class="t-val">1.5 jam</div>
+        </div>
+      </div>
+      <div class="act-card-footer">
+        <div class="btn-edit">✎ Edit</div>
+        <div class="btn-delete">🗑</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="day-counter">Hari 1 dari 30 &nbsp;·&nbsp; <span style="color:#2d6a4f;font-weight:600;">28 hari lagi</span></div>
+    <div class="nav-row">
+      <button class="btn-prev" disabled>‹ Prev</button>
+      <button class="btn-next">Hari Berikutnya &nbsp;›</button>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
