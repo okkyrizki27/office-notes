@@ -8,7 +8,7 @@ Dokumen ini merangkum diskusi tentang proses eksekusi form di PM Shutdown — me
 
 ## Konteks
 
-Satu form dalam bundle dapat diisi oleh **beberapa mechanic sekaligus**, semua menggunakan mode **offline-first**. Pembagian kerja antar mechanic dilakukan secara operasional (oleh Supervisor, Foreman, atau mechanic sendiri) — tidak di-enforce oleh sistem.
+Satu form dalam package dapat diisi oleh **beberapa mechanic sekaligus**, semua menggunakan mode **offline-first**. Pembagian kerja antar mechanic dilakukan secara operasional (oleh Supervisor, Foreman, atau mechanic sendiri) — tidak di-enforce oleh sistem.
 
 ---
 
@@ -64,7 +64,7 @@ Implementasi client-side lebih kompleks (track dirty fields per field, bukan per
 - Sync dianggap **berhasil** (bukan error/gagal)
 - Tampilkan **proper message** untuk field yang tidak tersimpan
 
-Contoh: *"Sync berhasil. 2 field tidak tersimpan karena sudah diisi lebih awal oleh Mechanic A."*
+Contoh: *"Sync successful. 2 fields were not saved as they were already filled earlier by Mechanic A."*
 
 ### Sistem Tidak Tracking Device
 Sistem tidak perlu tahu device mana saja yang sedang mengerjakan form yang sama. Koordinasi sepenuhnya tanggung jawab operasional mechanic dan supervisor.
@@ -110,7 +110,7 @@ Mechanic perwakilan dapat mereview form sebelum submit melalui **fitur summary**
 
 ## Submit per Form & Finish Execution
 
-Submission bersifat **per form**, bukan per bundle. Setiap form dalam bundle disubmit secara independen oleh mechanic masing-masing.
+Submission bersifat **per form**, bukan per package. Setiap form dalam package disubmit secara independen oleh mechanic masing-masing.
 
 **Finish Execution** adalah gate di level WorkOrder — dilakukan oleh Supervisor/Foreman (atau Mechanic jika diberi permission):
 
@@ -149,9 +149,12 @@ Digiman+ sudah memiliki retry mechanism yang dipertahankan. Ditambah prinsip **i
 
 | Aspek | Keputusan |
 |-------|-----------|
-| Siapa yang bisa buka/isi/submit form | Semua user dengan akses PM Shutdown workcard |
+| Siapa yang bisa **membuka** form (view) | Semua user dengan akses PM Shutdown workcard |
+| Siapa yang bisa **mengisi** form | Mechanic yang sudah assign diri (Assign to Me) dan sudah tap Start |
 | Finish Execution | Supervisor/Foreman — Mechanic bisa jika diberi permission |
 | DueDate WorkOrder | Informasi saja, tidak ada enforcement sistem |
+
+> **Start button behavior:** Form card selalu bisa dibuka untuk dilihat. Tombol "Start" hanya muncul jika mechanic sudah ter-assign ke form tersebut. Tanpa tap Start, form terbuka dalam mode read-only dan tidak bisa diisi.
 
 ---
 

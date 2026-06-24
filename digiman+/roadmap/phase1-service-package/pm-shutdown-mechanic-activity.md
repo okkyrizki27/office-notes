@@ -27,8 +27,8 @@ Tidak perlu tabel baru. Activity log disimpan di tabel `TaskPersonalizedLog` yan
 TaskPersonalizedLog  (existing)
   ├── Id
   ├── TaskPersonalizedId  ← FK ke TaskPersonalized (yang sudah berisi TaskId + UserCode)
-  ├── StartDate           ← device timestamp saat klik "Start/Mulai"
-  ├── EndDate             ← device timestamp saat klik "Finish/Close", nullable
+  ├── StartDate           ← device timestamp saat tap "Start"
+  ├── EndDate             ← device timestamp saat tap "Finish", nullable
   ├── ShiftName           ← [KOLOM BARU] shift saat StartDate
   ├── UserFullName        ← [KOLOM BARU] nama lengkap mechanic saat sesi dibuat (snapshot dari UserEmploymentProfile)
   ├── SiteCode            ← [KOLOM BARU] kode site mechanic saat sesi dibuat (snapshot dari UserEmploymentProfile)
@@ -50,13 +50,13 @@ TaskPersonalizedLog  (existing)
 
 ---
 
-## Trigger "Start/Mulai"
+## Trigger "Start"
 
 > **Catatan deduplication — dua tabel, dua aturan berbeda:**
 > - `TaskPersonalized` → upsert by `TaskId + UserCode` — **1 record per mechanic per task, selamanya**. Tidak bergantung shift.
 > - `TaskPersonalizedLog` → deduplication by `TaskPersonalizedId + ShiftName` — **max 1 open session per mechanic per shift**. Mechanic bisa punya multiple record jika beda shift.
 
-> **Catatan:** `TaskPersonalized` **tidak dibuat saat klik Mulai**. Digiman+ sudah punya fitur **Assign to / Assign to Me** untuk Task — `TaskPersonalized` dibuat melalui fitur tersebut sebelum mechanic membuka form. Yang dibuat saat klik Mulai hanya `TaskPersonalizedLog`.
+> **Catatan:** `TaskPersonalized` **tidak dibuat saat tap Start**. Digiman+ sudah punya fitur **Assign to / Assign to Me** untuk Task — `TaskPersonalized` dibuat melalui fitur tersebut sebelum mechanic membuka form. What gets created on "Start" tap is only `TaskPersonalizedLog`.
 
 ### Klik pertama (first time mechanic buka form di shift ini)
 1. `TaskPersonalized` → sudah ada (dibuat via Assign to / Assign to Me)
@@ -75,11 +75,11 @@ TaskPersonalizedLog  (existing)
 
 ## Auto-Close FinishedAt
 
-Jika mechanic tidak klik "Finish/Close", ada dua trigger auto-close:
+Jika mechanic tidak tap "Finish", ada dua trigger auto-close:
 
 | Trigger | Behavior |
 |---------|----------|
-| Mechanic klik "Start" sesi baru (shift berbeda) | Close sesi sebelumnya → `EndDate = shift end time` pada tanggal StartDate sesi tersebut |
+| Mechanic tap "Start" sesi baru (shift berbeda) | Close sesi sebelumnya → `EndDate = shift end time` pada tanggal StartDate sesi tersebut |
 | Form disubmit | Close semua sesi yang masih open → `EndDate = min(shift end time, submit time)` |
 
 Submit adalah **safety net** — menangkap sesi terakhir yang tidak di-close via trigger pertama.
@@ -130,7 +130,7 @@ if EndShift > StartShift → same day → FinishedAt date = StartedAt date
 - Record dibuat lokal saat offline, di-queue untuk sync
 
 ### Auto-Close Mechanism — Client-Side
-Auto-close adalah mekanisme baru yang dibangun di client. Saat mechanic klik "Start" sesi baru, client secara lokal:
+Auto-close adalah mekanisme baru yang dibangun di client. Saat mechanic tap "Start" sesi baru, client secara lokal:
 1. Hitung `EndDate` sesi sebelumnya = shift end time berdasarkan `StartDate` sesi tersebut
 2. Queue dua operasi sekaligus: **update** Session lama (set EndDate) + **create** Session baru
 3. Kedua operasi dikirim ke server dalam satu batch saat sync
@@ -151,10 +151,10 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 
 ---
 
-### Skenario 1: Single mechanic, klik Finish dengan benar
+### Skenario 1: Single mechanic, tap Finish dengan benar
 ```
 08:00  Mechanic A klik Start  → TaskFormActivity (mech_A, 08:00, null, Day Shift)
-10:30  Mechanic A klik Finish → TaskFormActivity (mech_A, 08:00, 10:30, Day Shift)
+10:30  Mechanic A tap Finish → TaskFormActivity (mech_A, 08:00, 10:30, Day Shift)
 ```
 | Id | TaskId | UserCode | StartedAt | FinishedAt | ShiftName |
 |----|--------|----------|-----------|------------|-----------|
@@ -178,7 +178,7 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 ```
 [2026-06-22]
 08:00  Mechanic A klik Start → record 1 dibuat (Day Shift)
-       (lupa klik Finish)
+       (lupa tap Finish)
 
 [2026-06-23]
 07:00  Mechanic A klik Start (Day Shift) →
@@ -197,7 +197,7 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 ```
 [2026-06-22]
 20:00  Mechanic A klik Start → record dibuat (Night Shift)
-       (lupa klik Finish)
+       (lupa tap Finish)
 
 [2026-06-23]
 05:00  Form disubmit (submit time = 05:00) →
@@ -217,8 +217,8 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 [2026-06-22]
 08:00  Mechanic A klik Start → record A1 (Day Shift)
 08:30  Mechanic B klik Start → record B1 (Day Shift)
-10:00  Mechanic A klik Finish → record A1 FinishedAt = 10:00
-       (Mechanic B tidak klik Finish)
+10:00  Mechanic A tap Finish → record A1 FinishedAt = 10:00
+       (Mechanic B tidak tap Finish)
 11:00  Mechanic B submit form (submit time = 11:00) →
        → handleFormSubmit: record B1 masih open
        → shift end Day Shift = 18:00
@@ -233,18 +233,21 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 
 ---
 
-### Skenario 6: First time Start — TaskPersonalized + TaskFormActivity dibuat bersamaan
+### Skenario 6: First time Start — TaskPersonalized sudah ada via Assign to Me
 ```
-[Mechanic A belum pernah buka form T001]
-08:00  Mechanic A klik Start →
+[Sebelumnya] Mechanic A tap "Assign to Me" di Tab Form →
        → TaskPersonalized dibuat (mech_A, IsPrecautionConfirmed=true, Status=In Progress)
-       → TaskFormActivity record 1 dibuat
+
+[Mechanic A buka form pertama kali]
+08:00  Mechanic A tap Start →
+       → TaskPersonalized sudah ada (tidak dibuat baru — sudah via Assign to Me)
+       → TaskPersonalizedLog record 1 dibuat (StartDate=08:00, ShiftName=Day Shift)
 
 [Mechanic A buka form lagi di hari berikutnya, shift sama]
-08:30  Mechanic A klik Start (Day Shift, hari berikutnya) →
-       → TaskPersonalized TIDAK dibuat lagi (sudah ada)
+08:30  Mechanic A tap Start (Day Shift, hari berikutnya) →
+       → TaskPersonalized tidak berubah (upsert by TaskId+UserCode — idempotent)
        → prevSession ditemukan → auto-close record 1: FinishedAt = 2026-06-22 18:00
-       → TaskFormActivity record 2 dibuat
+       → TaskPersonalizedLog record 2 dibuat
 ```
 | Id | TaskId | UserCode | StartedAt | FinishedAt | ShiftName |
 |----|--------|----------|-----------|------------|-----------|
@@ -253,15 +256,15 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 
 ---
 
-### Skenario 7: Mechanic klik Finish lalu Start lagi di shift yang sama
+### Skenario 7: Mechanic tap Finish lalu Start lagi di shift yang sama
 ```
 08:00  Mechanic A klik Start → record 1 (Day Shift, open)
-10:00  Mechanic A klik Finish → record 1 FinishedAt = 10:00
+10:00  Mechanic A tap Finish → record 1 FinishedAt = 10:00
        (pergi makan siang, kembali lagi)
 13:00  Mechanic A klik Start (Day Shift) →
        → cek open session Day Shift → tidak ada (record 1 sudah FinishedAt)
        → buat record 2 (Day Shift, open)
-15:00  Mechanic A klik Finish → record 2 FinishedAt = 15:00
+15:00  Mechanic A tap Finish → record 2 FinishedAt = 15:00
 ```
 | Id | TaskId | UserCode | StartedAt | FinishedAt | ShiftName |
 |----|--------|----------|-----------|------------|-----------|
@@ -273,12 +276,12 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 ### Skenario 8: Mechanic lanjut kerja ke Night Shift, klik Start lagi (auto-close via Start)
 ```
 16:00  Mechanic A klik Start (Day Shift) → record 1 (open)
-       (lanjut kerja melewati shift — tidak klik Finish, klik Start lagi di Night Shift)
+       (lanjut kerja melewati shift — tidak tap Finish, klik Start lagi di Night Shift)
 19:00  Mechanic A klik Start (Night Shift) →
        → open session ditemukan: record 1 (Day Shift)
        → auto-close record 1: FinishedAt = 2026-06-22 18:00 (Day Shift end)
        → buat record 2 (Night Shift, open)
-22:00  Mechanic A klik Finish → record 2 FinishedAt = 22:00
+22:00  Mechanic A tap Finish → record 2 FinishedAt = 22:00
 ```
 | Id | TaskId | UserCode | StartedAt | FinishedAt | ShiftName |
 |----|--------|----------|-----------|------------|-----------|
@@ -296,7 +299,7 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 
 [2026-06-22 — Night Shift]
 19:00  Mechanic A Start (Night Shift) →
-       → tidak ada open session Day Shift untuk A (sudah closed)
+       → tidak ada open session (EndDate IS NULL) di Day Shift untuk A
        → buat record A2 (Night Shift, open)
 21:00  Mechanic B Start (Night Shift) →
        → open session B1 (Day Shift) ditemukan
@@ -306,8 +309,10 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 [2026-06-23 — 02:00]
 02:00  Mechanic A submit form (submit time = 02:00) →
        → handleFormSubmit: A2 dan B2 masih open (Night Shift, end = 06:00)
-       → A2 FinishedAt = min(2026-06-23 06:00, 2026-06-23 02:00) = 2026-06-23 02:00
-       → B2 FinishedAt = min(2026-06-23 06:00, 2026-06-23 02:00) = 2026-06-23 02:00
+       → A2 (StartDate 22 Jun 19:00, Night Shift) → shift end dari StartDate = 23 Jun 06:00
+          FinishedAt = min(23 Jun 06:00, submit time 23 Jun 02:00) = 23 Jun 02:00
+       → B2 (StartDate 22 Jun 21:00, Night Shift) → shift end dari StartDate = 23 Jun 06:00
+          FinishedAt = min(23 Jun 06:00, submit time 23 Jun 02:00) = 23 Jun 02:00
 ```
 | Id | TaskId | UserCode | StartedAt | FinishedAt | ShiftName |
 |----|--------|----------|-----------|------------|-----------|
@@ -318,11 +323,11 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 
 ---
 
-### Skenario 10: Start dan Finish di shift berbeda — mechanic klik Finish sendiri
+### Skenario 10: Start dan Finish di shift berbeda — mechanic tap Finish sendiri
 ```
 16:00  Mechanic A klik Start (Day Shift) → record 1 (open, ShiftName = Day Shift)
-       (selesai kerja tapi lupa klik Finish)
-19:00  Mechanic A klik Finish (sudah Night Shift) →
+       (selesai kerja tapi lupa tap Finish)
+19:00  Mechanic A tap Finish (sudah Night Shift) →
        → record 1 FinishedAt = 19:00 (actual Finish click time)
        → ShiftName tetap Day Shift (mengikuti StartedAt)
 ```
@@ -330,14 +335,14 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 |----|--------|----------|-----------|------------|-----------|
 | 1 | T001 | mech_A | 2026-06-22 16:00 | **2026-06-22 19:00** | Day Shift |
 
-> Berbeda dari Skenario 8 dimana mechanic klik Start lagi di shift baru (trigger auto-close). Di sini mechanic langsung klik Finish — FinishedAt = waktu aktual klik, bukan shift end time.
+> Berbeda dari Skenario 8 dimana mechanic klik Start lagi di shift baru (trigger auto-close). Di sini mechanic langsung tap Finish — FinishedAt = waktu aktual klik, bukan shift end time.
 
 ---
 
 ### Skenario 11: Submit setelah shift end — lupa Finish, submit di shift berikutnya (shift end menang)
 ```
 08:00  Mechanic A klik Start (Day Shift, end = 18:00)
-       (selesai kerja tapi lupa klik Finish)
+       (selesai kerja tapi lupa tap Finish)
 19:00  Form disubmit di Night Shift →
        → shift end Day Shift = 18:00, submit time = 19:00
        → FinishedAt = min(18:00, 19:00) = 18:00
@@ -353,7 +358,7 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 **Case A: Finish sebelum tengah malam**
 ```
 20:00  Mechanic A klik Start (Night Shift) → record 1 (open)
-23:00  Mechanic A klik Finish →
+23:00  Mechanic A tap Finish →
        → record 1 FinishedAt = 23:00 (same date)
 ```
 | Id | TaskId | UserCode | StartedAt | FinishedAt | ShiftName |
@@ -363,7 +368,7 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 **Case B: Finish setelah tengah malam (masih Night Shift)**
 ```
 20:00  Mechanic A klik Start (Night Shift) → record 1 (open)
-03:00  Mechanic A klik Finish (dini hari, masih Night Shift) →
+03:00  Mechanic A tap Finish (dini hari, masih Night Shift) →
        → record 1 FinishedAt = 03:00 next day
 ```
 | Id | TaskId | UserCode | StartedAt | FinishedAt | ShiftName |
@@ -376,7 +381,7 @@ Server hanya menerima dan menyimpan data — tidak ada logic deteksi auto-close 
 ```
 [2026-06-22]
 08:00  Mechanic A klik Start (Day Shift, end = 18:00) → record 1 (open)
-       (selesai kerja, lupa klik Finish)
+       (selesai kerja, lupa tap Finish)
 
 [2026-06-23]
 19:00  Form disubmit di Night Shift (submit time = 2026-06-23 19:00) →

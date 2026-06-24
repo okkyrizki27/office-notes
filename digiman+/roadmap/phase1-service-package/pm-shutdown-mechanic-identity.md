@@ -81,9 +81,14 @@ Faktor penentu utama: **apakah mechanic punya device masing-masing atau shared d
 
 ---
 
+## Keputusan
+
+✅ **Opsi 2 — Individual Account** dipilih.
+- Mechanic, Foreman, dan Supervisor masing-masing memiliki akun individual
+- Device yang digunakan adalah device pribadi masing-masing (beragam spesifikasi)
+- Provisioning akun mechanic: dari data `UserEmploymentProfile` yang sudah ada
+
 ## Open Items
 
-- [ ] Konfirmasi ke client: apakah mechanic punya device masing-masing atau shared device?
-- [ ] Jika Opsi 1 dipilih: siapa yang bertanggung jawab maintain config mapping?
-- [ ] Jika Opsi 2 dipilih: bagaimana proses provisioning akun mechanic (bulk atau per request)?
-- [ ] Dashboard monitoring dan compliance report untuk track aktivitas mechanic (berlaku untuk kedua opsi)
+- [ ] Bagaimana proses provisioning akun mechanic — bulk atau per request?
+- [ ] Dashboard monitoring dan compliance report untuk track aktivitas mechanic

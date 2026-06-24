@@ -2,7 +2,7 @@
 
 Dokumen ini merangkum kondisi arsitektur dan fitur Digiman+ saat ini sebagai dasar diskusi roadmap ke depan.
 
-*Last updated: 2026-06-21*
+*Last updated: 2026-06-23*
 
 ---
 
@@ -24,10 +24,10 @@ Dokumen ini merangkum kondisi arsitektur dan fitur Digiman+ saat ini sebagai das
 | Service | Database | Tipe | Keterangan |
 |---------|----------|------|------------|
 | `dplan` | dplan | - | Digiplan — perencanaan |
-| `maintenance-execution` | maintenance-execution | SQL | Workorder, Task, submission data |
-| `maintenance-execution` | maintenance-execution | Cosmos DB | Form submission per tab (JSON) |
-| `maintenance-strategy` | Maintenance Strategy | SQL | Metadata form: nama, versioning, konfigurasi |
-| `maintenance-strategy` | Maintenance Strategy | Cosmos DB | Form template dalam bentuk JSON |
+| `maintenance-execution` | `cst-iams-sqldb-maintenance-execution` | SQL | Workorder, Task, submission data |
+| `maintenance-execution` | `MaintenanceExecution` | Cosmos DB | Form submission per tab (JSON) |
+| `maintenance-strategy` | `cst-iams-sqldb-maintenance-strategy` | SQL | Metadata form: nama, versioning, konfigurasi |
+| `maintenance-strategy` | `MaintenanceStrategy` | Cosmos DB | Form template dalam bentuk JSON (per tab) |
 | `workflow` | workflow | - | Workflow Builder |
 
 ---
@@ -56,27 +56,10 @@ Kondisi ini terjadi karena Digiplan awalnya dibangun sebagai aplikasi terpisah d
 
 ---
 
-## Data Structure — Form Submission
+## Form
 
-### SQL (`maintenance-execution`)
-```
-Workorder
-  └── Task  (berisi FormSubmissionId)
-        └── TaskPersonalized  ← data user yang submit
-              └── TaskPersonalizedFinding
-                        └── FindingEvidence
-```
-
-### Cosmos DB (`maintenance-execution`)
-```
-1 file JSON = 1 tab di dalam form
-└── setiap file berisi FormSubmissionId
-```
-
-### Relasi SQL ↔ Cosmos
-`Task.FormSubmissionId` ←→ `CosmosJSON.FormSubmissionId`
-
-1 Task → N file JSON (N = jumlah tab di form)
+- [Form Builder](form/form-builder.md) — tabel SQL, schema Form & FormAssetAssignment, versioning, Cosmos DB, Form Type
+- [Form Submission](form/form-submission.md) — data structure submission, flow submission & approval
 
 ---
 
@@ -86,16 +69,9 @@ Konfigurasi integrasi dilakukan melalui table `BusinessOperationalForm` di `main
 
 ---
 
-## Flow — Form Submission & Approval
+## PM Shutdown & BD Corrective
 
-1. Admin HO membuat form di **Form Builder** (web)
-2. Form dikonfigurasi agar muncul di menu **Form Submission** (mobile)
-3. User yang memiliki akses memilih form dari list (self-service pooling)
-4. User mengisi form dan submit — support **offline-first**
-5. Satu form diisi oleh **satu user** dari awal sampai submit (single-user, linear)
-6. Setelah submit → masuk ke **Approval Workflow**
-7. Jumlah step approval ditentukan oleh konfigurasi workflow
-8. Setelah semua step selesai → **Fully Approved**
+- [Workcard Sync Logic](pm-shutdown-bd-corrective/workcard-sync-logic.md) — logic pengambilan data workcard list (fresh install vs after last sync)
 
 ---
 
