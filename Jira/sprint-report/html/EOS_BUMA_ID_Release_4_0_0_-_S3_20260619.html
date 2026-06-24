@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>End of Sprint — Release 4.0.0 - S3 — BUMA ID Team</title>
+<style>
+  @page { size: A4 portrait; margin: 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #1a1a1a;
+          padding: 0 260px; background: #f5f6f5; }
+
+  .report-header { background: linear-gradient(135deg, #8FAD82, #5C7A52);
+    color: #fff; padding: 28px 32px; border-radius: 10px; margin: 20px 0 16px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.15); }
+  .report-header h1 { font-size: 22pt; font-weight: 800; margin-bottom: 5px; }
+  .report-header .sprint-name { font-size: 14pt; opacity: 0.9; margin-bottom: 4px; }
+  .report-header .meta { font-size: 9pt; opacity: 0.75; }
+
+  .stats-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .stat-card { flex: 1; min-width: 90px; background: #fff; border-radius: 10px;
+    padding: 14px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    text-align: center; border-top: 5px solid #8FAD82; }
+  .stat-num { font-size: 24pt; font-weight: 800; color: #5C7A52; line-height: 1; }
+  .stat-sp  { font-size: 9pt; color: #aaa; margin: 3px 0; }
+  .stat-label { font-size: 8pt; color: #888; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-top: 5px; }
+
+  .section { background: #fff; border-radius: 10px; padding: 20px 24px;
+    margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+  .section-title { font-size: 13pt; font-weight: 700; color: #5C7A52;
+    border-left: 5px solid #8FAD82; padding-left: 12px; margin-bottom: 14px; }
+
+  .completion-wrap { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+  .arc-item { text-align: center; }
+  .arc-label { font-size: 9.5pt; color: #555; font-weight: 600; margin-top: 5px; }
+  .day-bar-wrap { flex: 1; min-width: 180px; }
+  .day-bar-label { font-size: 9pt; color: #666; margin-bottom: 5px; }
+  .day-bar { background: #e8e8e8; border-radius: 8px; height: 20px; overflow: hidden; }
+  .day-bar-fill { height: 100%;
+    background: linear-gradient(90deg, #8FAD82, #5C7A52);
+    border-radius: 8px; }
+  .day-bar-pct { font-size: 9pt; color: #aaa; margin-top: 3px; text-align: right; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: 6px; }
+  th { background: #8FAD82; color: #fff; padding: 7px 10px;
+    text-align: left; font-weight: 600; }
+  td { padding: 6px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+  tr:nth-child(even) td { background: #EEF4EB; }
+  tr:hover td { background: #e4ede0; }
+  a { color: #5C7A52; text-decoration: none; font-weight: 600; }
+  .delay-badge { color: #c0392b; font-weight: 800; }
+  .empty-td { text-align: center; color: #bbb; font-style: italic; padding: 14px; }
+  .current-row td { background: #EEF4EB; font-weight: bold; }
+  .empty-note { color: #bbb; font-style: italic; font-size: 9.5pt; padding: 8px 0; }
+
+  .champion-box { border: 2px solid; border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+  .champion-header { color: #fff; padding: 10px 18px; font-size: 12pt;
+    font-weight: 800; letter-spacing: 1px; }
+  .champion-content { padding: 16px 18px; }
+  .champion-main { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .crown { font-size: 28pt; line-height: 1; }
+  .champion-name { font-size: 16pt; font-weight: 800; flex: 1; }
+  .champion-badge { color: #fff; padding: 4px 14px; border-radius: 20px;
+    font-size: 10pt; font-weight: 700; white-space: nowrap; }
+  .leaderboard { display: flex; flex-direction: column; gap: 5px; }
+  .lb-item { display: flex; align-items: center; gap: 10px; padding: 6px 12px;
+    background: #f5f5f5; border-radius: 6px; font-size: 9.5pt; }
+  .lb-name { flex: 1; font-weight: 600; }
+  .lb-count { color: #c0392b; font-weight: 700; }
+
+  .lb-cards { display: flex; flex-direction: column; gap: 8px; }
+  .lb-card { display: flex; align-items: center; gap: 14px; padding: 10px 16px;
+    border-radius: 8px; background: #f9f9f9; }
+  .lb-rank { font-size: 16pt; width: 36px; text-align: center; }
+  .lb-person { flex: 1; font-size: 11pt; font-weight: 600; }
+  .lb-sp { font-size: 14pt; font-weight: 800; }
+
+  .footer { text-align: center; font-size: 8pt; color: #ccc; margin: 20px 0 16px;
+    padding-top: 12px; border-top: 1px solid #eee; }
+  @media print {
+    body { padding: 0 20px; background: #fff; }
+    .report-header, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <h1>End of Sprint Report</h1>
+  <div class="sprint-name">Release 4.0.0 - S3</div>
+  <div class="meta">BUMA ID Team &nbsp;·&nbsp; 2026-04-29 → 2026-05-12 &nbsp;·&nbsp; Generated: 19 June 2026 19:38:41</div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-num">18</div>
+    <div class="stat-sp">60 SP</div>
+    <div class="stat-label">Total</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#27ae60;">18</div>
+    <div class="stat-sp">60 SP</div>
+    <div class="stat-label">Done</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#e67e22;">0</div>
+    <div class="stat-sp">0 SP</div>
+    <div class="stat-label">Outstanding</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#c0392b;">5</div>
+    <div class="stat-sp">&nbsp;</div>
+    <div class="stat-label">Reopened</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#c0392b;">7</div>
+    <div class="stat-sp">&nbsp;</div>
+    <div class="stat-label">Delayed Dev</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#e67e22;">1</div>
+    <div class="stat-sp">&nbsp;</div>
+    <div class="stat-label">Delayed QA</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">📊 Completion Rate</div>
+  <div class="completion-wrap">
+    <div class="arc-item">
+      <svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="40" fill="none" stroke="#e8e8e8" stroke-width="9"/><circle cx="55" cy="55" r="40" fill="none" stroke="#8FAD82" stroke-width="9" stroke-dasharray="251.3 0.0" stroke-dashoffset="62.8" stroke-linecap="round"/><text x="55" y="61" text-anchor="middle" font-size="17" font-weight="bold" fill="#8FAD82">100%</text></svg>
+      <div class="arc-label">Tickets</div>
+    </div>
+    <div class="arc-item">
+      <svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="40" fill="none" stroke="#e8e8e8" stroke-width="9"/><circle cx="55" cy="55" r="40" fill="none" stroke="#5C7A52" stroke-width="9" stroke-dasharray="251.3 0.0" stroke-dashoffset="62.8" stroke-linecap="round"/><text x="55" y="61" text-anchor="middle" font-size="17" font-weight="bold" fill="#5C7A52">100%</text></svg>
+      <div class="arc-label">Story Points</div>
+    </div>
+    <div class="day-bar-wrap">
+      <div class="day-bar-label">⏱ Sprint Day Progress: <b>9 / 9 hari kerja</b></div>
+      <div class="day-bar"><div class="day-bar-fill" style="width:100%"></div></div>
+      <div class="day-bar-pct">100% hari sprint telah dilalui</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">⏳ Outstanding Tickets <span style="font-weight:400;font-size:10pt;">(0 ticket)</span></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Status</th><th>Assignee</th><th>SP</th><th>Priority</th></tr></thead>
+  <tbody><tr><td colspan="6" class="empty-td">Semua ticket sudah Done! 🎉</td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">🔁 Reopened Tickets <span style="font-weight:400;font-size:10pt;">(5 ticket)</span></div>
+  <div class="champion-box" style="border-color:#8FAD82;"><div class="champion-header" style="background:#8FAD82;">🏆 CHAMPION</div><div class="champion-content"><div class="champion-main"><span class="crown">👑</span><span class="champion-name">nurrahman hadi</span><span class="champion-badge" style="background:#8FAD82;">1 ticket</span></div><div class="leaderboard"><div class="lb-item">🥈&nbsp;<span class="lb-name">Dian Heryana</span><span class="lb-count">1 ticket</span></div><div class="lb-item">🥉&nbsp;<span class="lb-name">Riki Ahmad Fadilah</span><span class="lb-count">1 ticket</span></div><div class="lb-item">#4&nbsp;<span class="lb-name">Unassigned</span><span class="lb-count">1 ticket</span></div><div class="lb-item">#5&nbsp;<span class="lb-name">dimas.wahyu</span><span class="lb-count">1 ticket</span></div></div></div></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Status</th><th>Assignee</th><th>Reopen</th><th>Last Reopen</th><th>Priority</th></tr></thead>
+  <tbody><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3596">IAMS30-3596</a></td><td>[Mobile] Homepage Revamp &amp; Mobile Navigation Update</td><td>Done</td><td>nurrahman hadi</td><td>5</td><td>2026-04-30</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3475">IAMS30-3475</a></td><td>[Web] Inspection Monitoring - List</td><td>Done</td><td>Dian Heryana</td><td>3</td><td>2026-05-07</td><td>Low</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3349">IAMS30-3349</a></td><td>[PRD Issue] [PM Shutdown] ADT - Delay tidak bisa di Submit</td><td>Done</td><td>Riki Ahmad Fadilah</td><td>1</td><td>2026-03-30</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3794">IAMS30-3794</a></td><td>[Mobile] Form Submission - Issue upload evidence</td><td>Closed</td><td>Unassigned</td><td>1</td><td>2026-04-29</td><td>Low</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3842">IAMS30-3842</a></td><td>[Web] [Inspection Monitoring] Make the display similar with mobile ins...</td><td>Done</td><td>dimas.wahyu</td><td>1</td><td>2026-05-06</td><td>High</td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">📈 Velocity Trend</div>
+  <table><thead><tr><th>#</th><th>Sprint</th><th>Completed SP</th></tr></thead>
+  <tbody><tr><td>S1</td><td>Bugs Production - Inp Fixing</td><td><b>14 SP</b></td></tr><tr><td>S2</td><td>Release 3.1.0 (Sprint 1)</td><td><b>58 SP</b></td></tr><tr><td>S3</td><td>Release 3.1.0 (Sprint 2)</td><td><b>73 SP</b></td></tr><tr><td>S4</td><td>Release 4.0.0 - S1</td><td><b>35 SP</b></td></tr><tr><td>S5</td><td>Release 4.0.0 - S2</td><td><b>63 SP</b></td></tr><tr class="current-row"><td>S6</td><td>Release 4.0.0 - S3 &nbsp;<b>← current</b></td><td><b>60 SP</b></td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">🏅 Dev Leaderboard — Story Points Completed</div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Ticket yang mencapai DEV DONE dalam rentang sprint ini dan status akhir QA PASSED / Done.</p>
+  <div class="lb-cards"><div class="lb-card" style="border-left:4px solid #8FAD82;"><span class="lb-rank">🥇</span><span class="lb-person">Riki Ahmad Fadilah</span><span class="lb-sp" style="color:#8FAD82;">26 SP</span></div><div class="lb-card" style="border-left:4px solid #8FAD82;"><span class="lb-rank">🥈</span><span class="lb-person">nurrahman hadi</span><span class="lb-sp" style="color:#8FAD82;">11 SP</span></div><div class="lb-card" style="border-left:4px solid #8FAD82;"><span class="lb-rank">🥉</span><span class="lb-person">Dian Heryana</span><span class="lb-sp" style="color:#8FAD82;">5 SP</span></div><div class="lb-card" style="border-left:4px solid #8FAD82;"><span class="lb-rank">#4</span><span class="lb-person">dimas.wahyu</span><span class="lb-sp" style="color:#8FAD82;">3 SP</span></div><div class="lb-card" style="border-left:4px solid #8FAD82;"><span class="lb-rank">#5</span><span class="lb-person">Unassigned</span><span class="lb-sp" style="color:#8FAD82;">0 SP</span></div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">🏅 QA Leaderboard — Story Points Completed</div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Ticket yang mencapai QA PASSED dalam rentang sprint ini dan status akhir QA PASSED / Done.</p>
+  <div class="lb-cards"><div class="lb-card" style="border-left:4px solid #5C7A52;"><span class="lb-rank">🥇</span><span class="lb-person">Muhammad Zaqi Ghifari</span><span class="lb-sp" style="color:#5C7A52;">25 SP</span></div><div class="lb-card" style="border-left:4px solid #5C7A52;"><span class="lb-rank">🥈</span><span class="lb-person">Gita Riskayanti</span><span class="lb-sp" style="color:#5C7A52;">10 SP</span></div><div class="lb-card" style="border-left:4px solid #5C7A52;"><span class="lb-rank">🥉</span><span class="lb-person">QA Samaran</span><span class="lb-sp" style="color:#5C7A52;">1 SP</span></div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">🔴 Delayed Tickets — Developer <span style="font-weight:400;font-size:10pt;">(7 ticket)</span></div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Total waktu In Progress vs baseline rata-rata per SP dari 5 sprint closed terakhir.</p>
+  <div class="champion-box" style="border-color:#8FAD82;"><div class="champion-header" style="background:#8FAD82;">🏆 CHAMPION</div><div class="champion-content"><div class="champion-main"><span class="crown">👑</span><span class="champion-name">nurrahman hadi</span><span class="champion-badge" style="background:#8FAD82;">3 tickets</span></div><div class="leaderboard"><div class="lb-item">🥈&nbsp;<span class="lb-name">Riki Ahmad Fadilah</span><span class="lb-count">3 tickets</span></div><div class="lb-item">🥉&nbsp;<span class="lb-name">Dian Heryana</span><span class="lb-count">1 ticket</span></div></div></div></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Assignee</th><th>SP</th><th>Actual (hari)</th><th>Baseline (hari)</th><th>Delay</th><th>Priority</th></tr></thead><tbody><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3596">IAMS30-3596</a></td><td>[Mobile] Homepage Revamp &amp; Mobile Navigation Update</td><td>nurrahman hadi</td><td>5</td><td>18.1</td><td>8.2</td><td><span class="delay-badge">+9.9</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3603">IAMS30-3603</a></td><td>[Mobile] PM Shutdown Page Revamp</td><td>nurrahman hadi</td><td>3</td><td>13.1</td><td>3.9</td><td><span class="delay-badge">+9.3</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3604">IAMS30-3604</a></td><td>[Mobile] BD Corrective Page Revamp</td><td>nurrahman hadi</td><td>3</td><td>12.3</td><td>3.9</td><td><span class="delay-badge">+8.4</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3475">IAMS30-3475</a></td><td>[Web] Inspection Monitoring - List</td><td>Dian Heryana</td><td>5</td><td>15.7</td><td>8.2</td><td><span class="delay-badge">+7.5</span></td><td>Low</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3597">IAMS30-3597</a></td><td>[Mobile] Outstanding Administrator feature</td><td>Riki Ahmad Fadilah</td><td>5</td><td>15.5</td><td>8.2</td><td><span class="delay-badge">+7.2</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3538">IAMS30-3538</a></td><td>[Mobile] PM Shutdown - Update Shutdown PIC List Retrieval Logic</td><td>Riki Ahmad Fadilah</td><td>3</td><td>6.1</td><td>3.9</td><td><span class="delay-badge">+2.2</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3762">IAMS30-3762</a></td><td>[Web Digiplan BUMA] EDMBD - Enhance consider notification status ...</td><td>Riki Ahmad Fadilah</td><td>3</td><td>3.9</td><td>3.9</td><td><span class="delay-badge">+0.1</span></td><td>Medium</td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">🟠 Delayed Tickets — QA <span style="font-weight:400;font-size:10pt;">(1 ticket)</span></div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Total waktu QA TEST vs baseline rata-rata per SP dari 5 sprint closed terakhir.</p>
+  <div class="champion-box" style="border-color:#5C7A52;"><div class="champion-header" style="background:#5C7A52;">🏆 CHAMPION</div><div class="champion-content"><div class="champion-main"><span class="crown">👑</span><span class="champion-name">Gita Riskayanti</span><span class="champion-badge" style="background:#5C7A52;">1 ticket</span></div><div class="leaderboard"></div></div></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Assignee</th><th>SP</th><th>Actual (hari)</th><th>Baseline (hari)</th><th>Delay</th><th>Priority</th></tr></thead><tbody><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3596">IAMS30-3596</a></td><td>[Mobile] Homepage Revamp &amp; Mobile Navigation Update</td><td>Gita Riskayanti</td><td>5</td><td>5.9</td><td>2.0</td><td><span class="delay-badge">+4.0</span></td><td>Medium</td></tr></tbody></table>
+</div>
+
+<div class="footer">Auto-generated by end_of_sprint_report.py — 19 June 2026 19:38:41</div>
+</body>
+</html>

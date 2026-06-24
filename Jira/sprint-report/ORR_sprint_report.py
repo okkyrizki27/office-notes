@@ -47,6 +47,30 @@ BASELINE_SPRINT_COUNT = 5  # jumlah sprint closed terakhir per tim untuk baselin
 BOARD_ID = 93
 PROJECT  = "IAMS30"
 
+TESTER_FIELD = "customfield_10438"
+
+# Anggota BUMA ID Team yang ditampilkan di velocity report.
+# label   : nama tampilan di report
+# role    : "Dev" atau "QA"
+# match   : substring case-insensitive untuk cocokkan displayName Jira
+# QA diattribute via Assignee + Tester field; Dev via Assignee + subtask assignees.
+BUMA_ID_MEMBERS = [
+    {"label": "Dimas Wahyu P",   "role": "Dev", "match": "dimas"},
+    {"label": "Dian Heryana",    "role": "Dev", "match": "dian heryana"},
+    {"label": "Nurrahman Hadi",  "role": "Dev", "match": "nurrahman"},
+    {"label": "Riki Ahmad F",    "role": "Dev", "match": "riki ahmad"},
+    {"label": "Gita Riskayanti", "role": "QA",  "match": "gita"},
+    {"label": "Muhammad Zaqi",   "role": "QA",  "match": "zaqi"},
+]
+
+def _match_member(display_name):
+    """Return BUMA_ID_MEMBERS entry label if display_name matches, else None."""
+    dn_lower = (display_name or "").lower()
+    for m in BUMA_ID_MEMBERS:
+        if m["match"] in dn_lower:
+            return m["label"]
+    return None
+
 # ── CONFIG / AUTH ─────────────────────────────────────────────────────────────
 def _load_jira_credentials():
     token_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -123,6 +147,127 @@ def fetch_sprint_issues_full(sprint_id):
         if start_at >= total or not batch:
             break
     return issues
+
+# ── PERSON VELOCITY ──────────────────────────────────────────────────────────
+def fetch_sprint_issues_for_velocity(sprint_id):
+    issues = []
+    start_at = 0
+    while True:
+        url = (f"{BASE_URL}/rest/agile/1.0/sprint/{sprint_id}/issue"
+               f"?fields=status,customfield_10016,issuetype,assignee,subtasks,{TESTER_FIELD}"
+               f"&maxResults=50&startAt={start_at}")
+        res = get(url)
+        batch = res.get("issues", [])
+        issues += batch
+        total = res.get("total", 0)
+        start_at += len(batch)
+        if start_at >= total or not batch:
+            break
+    return issues
+
+def fetch_issue_assignee(issue_key):
+    try:
+        res = get(f"{BASE_URL}/rest/api/3/issue/{issue_key}?fields=assignee")
+        return (res["fields"].get("assignee") or {}).get("displayName")
+    except Exception:
+        return None
+
+def compute_person_velocity(sprints):
+    """
+    Returns list of (sprint_name, {person: sp_total}) oldest -> newest.
+    SP from parent ticket only. Each person involved (parent + subtask assignees)
+    receives the full SP of the parent ticket.
+    """
+    result = []
+    for sprint_obj in sprints:
+        issues = fetch_sprint_issues_for_velocity(sprint_obj["id"])
+        issue_map = {i["key"]: i for i in issues}
+        person_sp = {}
+
+        for issue in issues:
+            f = issue["fields"]
+            if f.get("issuetype", {}).get("subtask", False):
+                continue
+            if f["status"]["name"] not in DONE_STATUSES:
+                continue
+            sp_val = sp(f)
+            if not sp_val:
+                continue
+
+            people = set()
+            parent_assignee = (f.get("assignee") or {}).get("displayName")
+            if parent_assignee:
+                people.add(parent_assignee)
+
+            for subtask_ref in f.get("subtasks", []):
+                sub_key = subtask_ref["key"]
+                if sub_key in issue_map:
+                    sub_assignee = (issue_map[sub_key]["fields"].get("assignee") or {}).get("displayName")
+                else:
+                    sub_assignee = fetch_issue_assignee(sub_key)
+                if sub_assignee:
+                    people.add(sub_assignee)
+
+            for person in people:
+                person_sp[person] = person_sp.get(person, 0.0) + sp_val
+
+        result.append((sprint_obj["name"], person_sp))
+    return result
+
+def compute_person_velocity_buma(sprints):
+    """
+    Velocity per orang untuk BUMA ID Team, hanya untuk BUMA_ID_MEMBERS.
+    Dev  : SP dari parent ticket, via Assignee (parent + subtask)
+    QA   : SP dari parent ticket, via Assignee + Tester field (parent ticket)
+    Returns list of (sprint_name, {member_label: sp_total}) oldest -> newest.
+    """
+    qa_labels = {m["label"] for m in BUMA_ID_MEMBERS if m["role"] == "QA"}
+
+    result = []
+    for sprint_obj in sprints:
+        issues = fetch_sprint_issues_for_velocity(sprint_obj["id"])
+        issue_map = {i["key"]: i for i in issues}
+        person_sp = {}
+
+        for issue in issues:
+            f = issue["fields"]
+            if f.get("issuetype", {}).get("subtask", False):
+                continue
+            if f["status"]["name"] not in DONE_STATUSES:
+                continue
+            sp_val = sp(f)
+            if not sp_val:
+                continue
+
+            people = set()
+
+            # Assignee parent ticket
+            label = _match_member((f.get("assignee") or {}).get("displayName"))
+            if label:
+                people.add(label)
+
+            # Subtask assignees (untuk Dev)
+            for subtask_ref in f.get("subtasks", []):
+                sub_key = subtask_ref["key"]
+                if sub_key in issue_map:
+                    sub_dn = (issue_map[sub_key]["fields"].get("assignee") or {}).get("displayName")
+                else:
+                    sub_dn = fetch_issue_assignee(sub_key)
+                sub_label = _match_member(sub_dn)
+                if sub_label and sub_label not in qa_labels:
+                    people.add(sub_label)
+
+            # Tester field (untuk QA)
+            for tester in (f.get(TESTER_FIELD) or []):
+                qa_label = _match_member(tester.get("displayName"))
+                if qa_label and qa_label in qa_labels:
+                    people.add(qa_label)
+
+            for person in people:
+                person_sp[person] = person_sp.get(person, 0.0) + sp_val
+
+        result.append((sprint_obj["name"], person_sp))
+    return result
 
 # ── BASELINE: cycle time To Do -> DEV DONE per SP ────────────────────────────
 def compute_dev_done_range(issue):
@@ -307,8 +452,24 @@ velocity_buma_by_sp = {
     for sp_val in TARGET_SP
 }
 
+print("Computing person velocity (MKP Team)...")
+person_velocity_mkp  = compute_person_velocity(list(reversed(mkp_closed)))   # oldest -> newest
+print("Computing person velocity (BUMA ID Team)...")
+person_velocity_buma = compute_person_velocity_buma(list(reversed(buma_closed)))  # oldest -> newest
+
+# Jika suatu tim tidak punya active sprint, gunakan last closed sprint tim tersebut
+active_teams = {team_for_sprint(s["name"]) for s in active_sprints}
+fallback_sprints = []
+for team_name, team_closed in [("MKP Team", mkp_closed), ("BUMA ID Team", buma_closed)]:
+    if team_name not in active_teams and team_closed:
+        fallback = dict(team_closed[0])  # last closed sprint (index 0 = paling baru)
+        fallback["_is_fallback"] = True
+        fallback_sprints.append(fallback)
+
+sprints_to_report = active_sprints + fallback_sprints
+
 delayed_by_sprint = []
-for sprint_obj in active_sprints:
+for sprint_obj in sprints_to_report:
     team_name, baseline = team_for_sprint(sprint_obj["name"], baselines)
     print(f"Checking '{sprint_obj['name']}' ({team_name})...")
     issues = fetch_sprint_issues_full(sprint_obj["id"])
@@ -520,7 +681,8 @@ for d in delayed_by_sprint:
     nobase_rows  = [r for r in rows if r["status_flag"] == "no-baseline"]
     total_delayed += len(delayed_rows)
 
-    lines.append(f"## {sprint_obj['name']} — {d['team']}\n")
+    sprint_label = " *(Last Completed Sprint — No Active Sprint)*" if sprint_obj.get("_is_fallback") else ""
+    lines.append(f"## {sprint_obj['name']} — {d['team']}{sprint_label}\n")
     lines.append(f"Total ticket In Progress: **{len(rows)}**  |  "
                   f"Delayed: **{len(delayed_rows)}**  |  "
                   f"On Track: **{len(ontrack_rows)}**  |  "
@@ -648,6 +810,78 @@ for i in range(0, len(TARGET_SP), 2):
         cols.append(f'<div class="chart-col"><h3>Story Point {sp_val}</h3>{chart_svg}</div>')
     lines.append('<div class="chart-row">' + "".join(cols) + '</div>')
     lines.append("")
+
+lines.append("---\n")
+
+# Person velocity section
+lines.append("## 👤 Velocity per Orang — 5 Sprint Terakhir\n")
+lines.append("SP dihitung dari ticket utama (parent). Setiap orang yang terlibat "
+             "(assignee ticket utama maupun sub-ticket) mendapatkan SP penuh dari ticket tersebut.\n")
+
+def render_person_velocity_table(person_velocity, sprint_label_map, people_order=None):
+    """
+    person_velocity : list of (sprint_name, {person: sp}), oldest -> newest.
+    people_order    : list of person labels to show in that order (optional).
+                      If None, sorted by total SP desc.
+    No Total column when people_order is provided (BUMA ID mode).
+    """
+    sprint_names = [name for name, _ in person_velocity]
+    show_total = people_order is None
+
+    if people_order is None:
+        all_people = sorted(
+            {p for _, ps in person_velocity for p in ps},
+            key=lambda p: -sum(ps.get(p, 0) for _, ps in person_velocity)
+        )
+    else:
+        all_people = people_order
+
+    if not all_people:
+        return ["Tidak ada data velocity untuk sprint ini.\n"]
+
+    headers = ["| Nama"] + [f"| {sprint_label_map[n]}" for n in sprint_names]
+    sep     = ["|------"] + ["|----" for _ in sprint_names]
+    if show_total:
+        headers += ["| **Total** |"]
+        sep     += ["|----------|"]
+    else:
+        headers[-1] += " |"
+
+    result = [" ".join(headers), " ".join(sep)]
+
+    for person in all_people:
+        cells = [f"| {person}"]
+        for _, ps in person_velocity:
+            v = ps.get(person, 0)
+            cells.append(f"| {v:.0f}" if v else "| -")
+        if show_total:
+            total = sum(ps.get(person, 0) for _, ps in person_velocity)
+            cells.append(f"| **{total:.0f}** |")
+        else:
+            cells[-1] += " |"
+        result.append(" ".join(cells))
+    result.append("")
+    return result
+
+sprint_label_map_mkp  = {name: f"S{i+1}" for i, (name, _) in enumerate(person_velocity_mkp)}
+sprint_label_map_buma = {name: f"S{i+1}" for i, (name, _) in enumerate(person_velocity_buma)}
+
+lines.append("### MKP Team\n")
+lines.append("| # | Sprint |")
+lines.append("|---|--------|")
+for i, (name, _) in enumerate(person_velocity_mkp):
+    lines.append(f"| S{i+1} | {name} |")
+lines.append("")
+lines += render_person_velocity_table(person_velocity_mkp, sprint_label_map_mkp)
+
+lines.append("### BUMA ID Team\n")
+lines.append("| # | Sprint |")
+lines.append("|---|--------|")
+for i, (name, _) in enumerate(person_velocity_buma):
+    lines.append(f"| S{i+1} | {name} |")
+lines.append("")
+buma_people_order = [m["label"] for m in BUMA_ID_MEMBERS]
+lines += render_person_velocity_table(person_velocity_buma, sprint_label_map_buma, people_order=buma_people_order)
 
 lines.append("---\n")
 

@@ -1,5 +1,5 @@
 # Delayed and Reopen Ticket Report
-**Generated:** 23 June 2026 09:10  |  **Project:** IAMS30  |  **Board:** IAMS 3.0
+**Generated:** 23 June 2026 13:23  |  **Project:** IAMS30  |  **Board:** IAMS 3.0
 
 Report ini membandingkan waktu ticket berstatus **In Progress** saat ini dengan rata-rata historis waktu pengerjaan **To Do → DEV DONE** (5 sprint terakhir per tim) untuk Story Point yang sama. Ticket dianggap **delayed** jika sudah In Progress lebih lama dari rata-rata tersebut.
 
@@ -17,7 +17,7 @@ Report ini membandingkan waktu ticket berstatus **In Progress** saat ini dengan 
 
 ---
 
-## 4.0.1 - Improve and Fix — BUMA ID Team
+## 4.1.0 - Improve and Fix — BUMA ID Team
 
 Total ticket In Progress: **2**  |  Delayed: **0**  |  On Track: **0**  |  No Baseline (SP di luar 1/2/3/5/8): **2**
 
@@ -33,20 +33,20 @@ Sepi banget di sini... gak ada ticket yang lagi on track. 🦗
 
 | Key | Summary | Assignee | SP | Started | Elapsed (hari) | Priority |
 |-----|---------|----------|----|---------|-----------------|----------|
-| [IAMS30-4081](https://bukittechnology.atlassian.net/browse/IAMS30-4081) | [PRD Issue] App freeze / ANR - Flutter render semua work card sekaligu... | nurrahman hadi | - | 2026-06-17 | 3.6 | Medium |
-| [IAMS30-4245](https://bukittechnology.atlassian.net/browse/IAMS30-4245) | [Mobile] Field Unit Serial Number tidak berfungsi di form submission | dimas.wahyu | - | 2026-06-19 | 1.5 | High |
+| [IAMS30-4081](https://bukittechnology.atlassian.net/browse/IAMS30-4081) | [PRD Issue] App freeze / ANR - Flutter render semua work card sekaligu... | nurrahman hadi | - | 2026-06-17 | 3.8 | Medium |
+| [IAMS30-4245](https://bukittechnology.atlassian.net/browse/IAMS30-4245) | [Mobile] Field Unit Serial Number tidak berfungsi di form submission | dimas.wahyu | - | 2026-06-19 | 1.6 | High |
 
 ### 🔁 Reopened Tickets
 
 | Key | Summary | Status | Assignee | Reopen Count | Priority | New Today |
 |-----|---------|--------|----------|--------------|----------|-----------|
-| [IAMS30-3995](https://bukittechnology.atlassian.net/browse/IAMS30-3995) | [Web] Monitoring Inspection - Invalid Ascending Sort on Description | QA PASSED | Dian Heryana | 1 | Lowest |  |
-| [IAMS30-4046](https://bukittechnology.atlassian.net/browse/IAMS30-4046) | [BE] Update Get List Inspection API: Add SectionTypeCode Filter Criter... | QA PASSED | Dian Heryana | 1 | Medium |  |
-| [IAMS30-4045](https://bukittechnology.atlassian.net/browse/IAMS30-4045) | [BE] Update Get Asset API: Add SectionTypeCode Filter Criteria | QA PASSED | Dian Heryana | 1 | Medium |  |
-| [IAMS30-4044](https://bukittechnology.atlassian.net/browse/IAMS30-4044) | [MOBILE] Retrieve Allowed Equipment Section List Based on User's Secti... | QA PASSED | nurrahman hadi | 1 | Medium |  |
-| [IAMS30-4020](https://bukittechnology.atlassian.net/browse/IAMS30-4020) | [MOBILE] View History Detail — Dynamic Form Submission | QA PASSED | nurrahman hadi | 1 | Medium |  |
+| [IAMS30-3995](https://bukittechnology.atlassian.net/browse/IAMS30-3995) | [Web] Monitoring Inspection - Invalid Ascending Sort on Description | Closed | Dian Heryana | 1 | Lowest |  |
+| [IAMS30-4046](https://bukittechnology.atlassian.net/browse/IAMS30-4046) | [BE] Update Get List Inspection API: Add SectionTypeCode Filter Criter... | Done | Dian Heryana | 1 | Medium |  |
+| [IAMS30-4044](https://bukittechnology.atlassian.net/browse/IAMS30-4044) | [MOBILE] Retrieve Allowed Equipment Section List Based on User's Secti... | Done | nurrahman hadi | 1 | Medium |  |
+| [IAMS30-4020](https://bukittechnology.atlassian.net/browse/IAMS30-4020) | [MOBILE] View History Detail — Dynamic Form Submission | Done | nurrahman hadi | 1 | Medium |  |
 | [IAMS30-4004](https://bukittechnology.atlassian.net/browse/IAMS30-4004) | [Mobile] Enhance Handle Konsistensi Data User - Remove Headers, Use To... | QA PASSED | nurrahman hadi | 1 | Medium |  |
-| [IAMS30-4050](https://bukittechnology.atlassian.net/browse/IAMS30-4050) | [BE] Create API to Upsert record for AssetSection | QA PASSED | Riki Ahmad Fadilah | 1 | Medium |  |
+| [IAMS30-4050](https://bukittechnology.atlassian.net/browse/IAMS30-4050) | [BE] Create API to Upsert record for AssetSection | Done | Riki Ahmad Fadilah | 1 | Medium |  |
+| [IAMS30-4045](https://bukittechnology.atlassian.net/browse/IAMS30-4045) | [BE] Update Get Asset API: Add SectionTypeCode Filter Criteria | Done | Dian Heryana | 1 | Medium |  |
 
 ### 📊 Current Progress Sprint
 
@@ -77,17 +77,17 @@ Total ticket In Progress: **8**  |  Delayed: **3**  |  On Track: **5**  |  No Ba
 
 | Key | Summary | Assignee | SP | Started | Sprint Start | Elapsed (hari) | Baseline (hari) | Delay (hari) | Priority |
 |-----|---------|----------|----|---------|--------------|-----------------|-------------------|---------------|----------|
-| [IAMS30-4085](https://bukittechnology.atlassian.net/browse/IAMS30-4085) | [FE] Action Remedy — List Page | Sarayevi Zalanderi | 1 | 2026-06-18 | 2026-06-12 | 2.4 | 2.2 | 0.2 | Low |
-| [IAMS30-4086](https://bukittechnology.atlassian.net/browse/IAMS30-4086) | [FE] Action Remedy — Add Action Remedy Modal | Sarayevi Zalanderi | 1 | 2026-06-18 | 2026-06-12 | 2.4 | 2.2 | 0.2 | Low |
-| [IAMS30-4087](https://bukittechnology.atlassian.net/browse/IAMS30-4087) | [FE] Action Remedy — Edit Action Remedy Modal | Sarayevi Zalanderi | 1 | 2026-06-18 | 2026-06-12 | 2.4 | 2.2 | 0.2 | Low |
+| [IAMS30-4085](https://bukittechnology.atlassian.net/browse/IAMS30-4085) | [FE] Action Remedy — List Page | Sarayevi Zalanderi | 1 | 2026-06-18 | 2026-06-12 | 2.6 | 2.2 | 0.4 | Low |
+| [IAMS30-4086](https://bukittechnology.atlassian.net/browse/IAMS30-4086) | [FE] Action Remedy — Add Action Remedy Modal | Sarayevi Zalanderi | 1 | 2026-06-18 | 2026-06-12 | 2.6 | 2.2 | 0.4 | Low |
+| [IAMS30-4087](https://bukittechnology.atlassian.net/browse/IAMS30-4087) | [FE] Action Remedy — Edit Action Remedy Modal | Sarayevi Zalanderi | 1 | 2026-06-18 | 2026-06-12 | 2.6 | 2.2 | 0.4 | Low |
 
 ### 🟢 On Track Tickets
 
 | Key | Summary | Assignee | SP | Started | Elapsed (hari) | Baseline (hari) | Priority |
 |-----|---------|----------|----|---------|-----------------|-------------------|----------|
-| [IAMS30-4133](https://bukittechnology.atlassian.net/browse/IAMS30-4133) | [FE] Damage Group — List, Add & Edit Page | Sarayevi Zalanderi | 1 | 2026-06-22 | 0.3 | 2.2 | Medium |
-| [IAMS30-4084](https://bukittechnology.atlassian.net/browse/IAMS30-4084) | [BE] Action Remedy — List, Create, Update API | Sarayevi Zalanderi | 3 | 2026-06-15 | 4.5 | 6.6 | Low |
-| [IAMS30-4134](https://bukittechnology.atlassian.net/browse/IAMS30-4134) |  [BE] Damage Group — List, Create, Update API | Sarayevi Zalanderi | 3 | 2026-06-18 | 2.5 | 6.6 | Medium |
+| [IAMS30-4133](https://bukittechnology.atlassian.net/browse/IAMS30-4133) | [FE] Damage Group — List, Add & Edit Page | Sarayevi Zalanderi | 1 | 2026-06-22 | 0.5 | 2.2 | Medium |
+| [IAMS30-4084](https://bukittechnology.atlassian.net/browse/IAMS30-4084) | [BE] Action Remedy — List, Create, Update API | Sarayevi Zalanderi | 3 | 2026-06-15 | 4.6 | 6.6 | Low |
+| [IAMS30-4134](https://bukittechnology.atlassian.net/browse/IAMS30-4134) |  [BE] Damage Group — List, Create, Update API | Sarayevi Zalanderi | 3 | 2026-06-18 | 2.7 | 6.6 | Medium |
 
 *...dan 2 ticket lainnya — lihat backlog di board.*
 
@@ -138,4 +138,4 @@ Rata-rata waktu penyelesaian (To Do -> DEV DONE) dalam hari, dihitung per sprint
 
 ---
 
-*Auto-generated by ORR_sprint_report.py — 23 June 2026 09:10:02*
+*Auto-generated by ORR_sprint_report.py — 23 June 2026 13:23:23*
