@@ -1,0 +1,178 @@
+{
+    "formId": "6046c032-fc99-4fa1-be51-cd56d12bdd12",
+    "formTabId": "51c2e42b-d0c7-4b7e-b047-f6c4cafb54a6",
+    "formCode": "FORM3",
+    "version": 4,
+    "title": "General",
+    "sections": [
+        {
+            "sectionId": "00000000-0000-0000-0000-000000000001",
+            "isAccordionActive": false,
+            "isSectionActive": true,
+            "isImmutable": true,
+            "title": "Nama Observer",
+            "elements": [
+                {
+                    "elementCode": "LABOURPERSONNEL",
+                    "label": "Nama Observer",
+                    "placeholder": "Select labour personnel name",
+                    "isAssetRelated": true,
+                    "value": "",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "isShow": true,
+                    "taskCode": "8b3841fc-d9ad-4124-be78-5ca5d7bc5386",
+                    "responseKey": "1"
+                },
+                {
+                    "elementCode": "ACTUALSERVICESTART",
+                    "label": "Actual Service Start (Each Labour Personnel)",
+                    "placeholder": "Actual Service Start (Each Labour Personnel)",
+                    "value": "",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "isShow": false,
+                    "taskCode": "0acb2063-9c60-435f-b951-849d21036b7c",
+                    "responseKey": "1"
+                },
+                {
+                    "elementCode": "SHIFT",
+                    "label": "Working Shift",
+                    "placeholder": "Select working shift",
+                    "value": "",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "isShow": false,
+                    "taskCode": "03f508dd-c00f-4ebc-965e-ae1a586520d1",
+                    "responseKey": "1"
+                }
+            ]
+        },
+        {
+            "sectionId": "00000000-0000-0000-0000-000000000002",
+            "isAccordionActive": false,
+            "isSectionActive": true,
+            "isImmutable": true,
+            "title": "Asset Information",
+            "elements": [
+                {
+                    "elementCode": "SITE",
+                    "label": "Site",
+                    "placeholder": "Select site",
+                    "value": "",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "isShow": true,
+                    "taskCode": "6ed80051-a5ec-432c-a66b-f8cfef803f9b",
+                    "responseKey": "1"
+                },
+                {
+                    "elementCode": "ASSETNUMBER",
+                    "label": "Asset Number",
+                    "placeholder": "Select asset number",
+                    "value": "",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "isShow": true,
+                    "taskCode": "1f3a526e-4094-4304-b96a-fecf38f978ba",
+                    "responseKey": "1"
+                },
+                {
+                    "elementCode": "SECTION",
+                    "label": "Section",
+                    "placeholder": "Select section",
+                    "value": "",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "isShow": true,
+                    "taskCode": "ab79f61e-30bf-4c4e-b3b2-159f25fa9bcd",
+                    "responseKey": "1"
+                },
+                {
+                    "elementCode": "WORKORDER",
+                    "label": "Work Order",
+                    "placeholder": "Select work order",
+                    "value": "",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "isShow": false,
+                    "taskCode": "61078214-e576-4cf2-a25c-3d175a5b46e7",
+                    "responseKey": "1"
+                },
+                {
+                    "elementCode": "TEXTFIELD",
+                    "label": "Machine SMU Value",
+                    "placeholder": "Input machine SMU value",
+                    "valueType": "int",
+                    "value": "",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "isShow": false,
+                    "taskCode": "e80dcb97-bf41-4e6c-8b3f-51a58fcbf55b",
+                    "responseKey": "1"
+                },
+                {
+                    "elementCode": "CAMERACAPTURE",
+                    "label": "Photo Machine SMU",
+                    "placeholder": "Select photo machine SMU",
+                    "valueType": "",
+                    "value": "",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "isShow": false,
+                    "taskCode": "5cef7db5-aa93-41c9-9d59-c1ceab6f4485",
+                    "responseKey": "1"
+                },
+                {
+                    "elementCode": "TEXTFIELD",
+                    "label": "Hour Meter Offset",
+                    "placeholder": "Input hour meter offset",
+                    "valueType": "int",
+                    "value": "",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "isShow": false,
+                    "taskCode": "0198c775-c74e-494c-8957-25e32ae3012d",
+                    "responseKey": "1"
+                }
+            ]
+        },
+        {
+            "sectionId": "00000000-0000-0000-0000-000000000003",
+            "isAccordionActive": false,
+            "isSectionActive": true,
+            "isImmutable": false,
+            "title": "WICOPE Quality Check",
+            "elements": [
+                {
+                    "elementCode": "CUSTOMCONTENT",
+                    "label": "",
+                    "value": "<p>WICOPE Quality Check dilakukan untuk memverifikasi proses maintenance yang sedang berlangsung oleh Frontliner atau Leader terkait.</p>",
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "valueCaption": ""
+                },
+                {
+                    "elementCode": "DATETIME",
+                    "label": "Tanggal",
+                    "value": "",
+                    "valueType": "DATE_ONLY",
+                    "placeholder": "DD-MMM-YYYY",
+                    "child": [],
+                    "isTaskValue": false,
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "taskCode": "0019e5e4-1ac2-4232-b77d-b2275470f14c",
+                    "responseKey": "1",
+                    "valueCaption": "Date Only"
+                },
+                {
+                    "elementCode": "DROPDOWN",
+                    "label": "Breakdown Category",
+                    "caption": "['SCHEDULED MAINTENANCE']",
+                    "itemValue": "[3]",
+                    "value": "",
+                    "valueType": "int",
+                    "child": [],
+                    "placeholder": "Select your answer",
+                    "isTaskValue": false,
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "taskCode": "03bb9f98-7948-45d7-befe-8b9405d3c1bf",
+                    "responseKey": "1"
+                }
+            ]
+        }
+    ],
+    "id": "3c882cd4-6a14-46eb-a17b-ba53d7aa0559",
+    "createdBy": "2009OBH.supervisor01@protonmail.com",
+    "createdDate": "2026-01-30T06:45:40.2152989Z",
+    "activeFlag": true
+}

@@ -1,0 +1,37 @@
+Code;Name;TypeCode;IsPeriodicalService;IsActive;CreatedAt;CreatedBy;ModifiedAt;ModifiedBy
+ACC;Accident;MCT_C;0;1;2025-03-20 02:15:19.987;Manual Migration;2025-03-20 02:15:19.987;Manual Migration
+BCK;Bucket Repair;MCT_C;0;1;2025-03-20 02:15:20.007;Manual Migration;2025-03-20 02:15:20.007;Manual Migration
+BEX;Backlog Execution;MCT_C;0;1;2025-03-20 02:15:20.013;Manual Migration;2025-03-20 02:15:20.013;Manual Migration
+BLD;Blade Repair;MCT_C;0;1;2025-03-20 02:15:20.020;Manual Migration;2025-03-20 02:15:20.020;Manual Migration
+CIP;Continuous Improvement Program;MCT_C;0;1;2025-03-20 02:15:20.023;Manual Migration;2025-03-20 02:15:20.023;Manual Migration
+CMT;Corrective Maintenance;MCT_C;0;1;2025-03-20 02:15:20.037;Manual Migration;2025-03-20 02:15:20.037;Manual Migration
+EHM;CBM Follow Up;MCT_C;0;1;2025-03-20 02:15:20.060;Manual Migration;2025-03-20 02:15:20.060;Manual Migration
+GTR;GET Replacement;MCT_C;0;1;2025-03-20 02:15:20.090;Manual Migration;2025-03-20 02:15:20.090;Manual Migration
+MDL;Module Repair;MCT_C;0;1;2025-03-20 02:15:20.137;Manual Migration;2025-03-20 02:15:20.137;Manual Migration
+VSL;Vessel Repair;MCT_C;0;1;2025-03-20 02:15:20.243;Manual Migration;2025-03-20 02:15:20.243;Manual Migration
+CMS;Commissioning;MCT_GIC;0;1;2025-03-20 02:15:20.030;Manual Migration;2025-03-20 02:15:20.030;Manual Migration
+CRI;Crack Inspection;MCT_GIC;0;1;2025-03-20 02:15:20.040;Manual Migration;2025-03-20 02:15:20.040;Manual Migration
+DRC;Drilling Consumable;MCT_GIC;0;1;2025-03-20 02:15:20.050;Manual Migration;2025-03-20 02:15:20.050;Manual Migration
+FIS;Failure In Service;MCT_GIC;0;1;2025-03-20 02:15:20.070;Manual Migration;2025-03-20 02:15:20.070;Manual Migration
+FSI;Fire Suppression Inspection;MCT_GIC;0;1;2025-03-20 02:15:20.077;Manual Migration;2025-03-20 02:15:20.077;Manual Migration
+IH7;Pre-Service Inspection;MCT_GIC;0;1;2025-03-20 02:15:20.120;Manual Migration;2025-03-20 02:15:20.120;Manual Migration
+INP;Inspection;MCT_GIC;0;1;2025-03-20 02:15:20.130;Manual Migration;2025-03-20 02:15:20.130;Manual Migration
+MOD;Modification;MCT_GIC;0;1;2025-03-20 02:15:20.140;Manual Migration;2025-03-20 02:15:20.140;Manual Migration
+MSO;Mis Operation;MCT_GIC;0;1;2025-03-20 02:15:20.147;Manual Migration;2025-03-20 02:15:20.147;Manual Migration
+OTR;Others;MCT_GIC;0;1;2025-03-20 02:15:20.160;Manual Migration;2025-03-20 02:15:20.160;Manual Migration
+PPA;Prog.Pemeriksaan Attachment;MCT_GIC;0;1;2025-03-20 02:15:20.217;Manual Migration;2025-03-20 02:15:20.217;Manual Migration
+PPM;Prog.Pemeriksaan Mesin;MCT_GIC;0;1;2025-03-20 02:15:20.220;Manual Migration;2025-03-20 02:15:20.220;Manual Migration
+RTR;Replace And Install Tyre/Rim;MCT_GIC;0;1;2025-03-20 02:15:20.227;Manual Migration;2025-03-20 02:15:20.227;Manual Migration
+SCH;Scheduled Replacement;MCT_GIC;0;1;2025-03-20 02:15:20.233;Manual Migration;2025-03-20 02:15:20.233;Manual Migration
+SUC;Surcharge;MCT_GIC;0;1;2025-03-20 02:15:20.240;Manual Migration;2025-03-20 02:15:20.240;Manual Migration
+WSH;Washing;MCT_GIC;0;1;2025-03-20 02:15:20.250;Manual Migration;2025-03-20 02:15:20.250;Manual Migration
+I01;Inspection H-0 PS 250;MCT_PI;1;1;2025-03-20 02:15:20.097;Manual Migration;2025-03-20 02:15:20.097;Manual Migration
+I02;Inspection H-0 PS 500;MCT_PI;1;1;2025-03-20 02:15:20.103;Manual Migration;2025-03-20 02:15:20.103;Manual Migration
+I03;Inspection H-0 PS 1000;MCT_PI;1;1;2025-03-20 02:15:20.107;Manual Migration;2025-03-20 02:15:20.107;Manual Migration
+I04;Inspection H-0 PS 2000;MCT_PI;1;1;2025-03-20 02:15:20.113;Manual Migration;2025-03-20 02:15:20.113;Manual Migration
+P01;PS-250;MCT_PS;1;1;2025-03-20 02:15:20.170;Manual Migration;2025-03-20 02:15:20.170;Manual Migration
+P02;PS-500;MCT_PS;1;1;2025-03-20 02:15:20.180;Manual Migration;2025-03-20 02:15:20.180;Manual Migration
+P03;PS-1000;MCT_PS;1;1;2025-03-20 02:15:20.183;Manual Migration;2025-03-20 02:15:20.183;Manual Migration
+P04;PS-2000;MCT_PS;1;1;2025-03-20 02:15:20.190;Manual Migration;2025-03-20 02:15:20.190;Manual Migration
+P05;PS-3000;MCT_PS;1;1;2025-03-20 02:15:20.200;Manual Migration;2025-03-20 02:15:20.200;Manual Migration
+P06;PS-4000;MCT_PS;1;1;2025-03-20 02:15:20.203;Manual Migration;2025-03-20 02:15:20.203;Manual Migration

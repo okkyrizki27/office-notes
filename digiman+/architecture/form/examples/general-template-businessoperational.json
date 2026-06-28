@@ -1,0 +1,50 @@
+{
+    "id": "general_template_businessoperational",
+    "formTabId": "00000000-0000-0000-0000-000000000001",
+    "formId": "00000000-0000-0000-0000-000000000001",
+    "version": 1,
+    "title": "General",
+    "sections": [
+        {
+            "sectionId": "00000000-0000-0000-0000-000000000001",
+            "title": "Service Labour Personnel",
+            "isAccordionActive": true,
+            "isSectionActive": true,
+            "isImmutable": true,
+            "elements": [
+                { "elementCode": "LABOURPERSONNEL", "label": "Labour Personnel Name", "placeholder": "Select labour personnel name", "value": "", "isShow": true },
+                { "elementCode": "ACTUALSERVICESTART", "label": "Actual Service Start (Each Labour Personnel)", "placeholder": "Actual Service Start (Each Labour Personnel)", "value": "", "isShow": true },
+                { "elementCode": "SHIFT", "label": "Working Shift", "placeholder": "Select working shift", "value": "", "isShow": true }
+            ]
+        },
+        {
+            "sectionId": "00000000-0000-0000-0000-000000000002",
+            "title": "Asset Information",
+            "isAccordionActive": true,
+            "isSectionActive": true,
+            "isImmutable": true,
+            "elements": [
+                { "elementCode": "SITE", "label": "Site", "placeholder": "Select site", "value": "", "isShow": true },
+                { "elementCode": "SECTION", "label": "Section", "placeholder": "Select section", "value": "", "isShow": true },
+                { "elementCode": "ASSETNUMBER", "label": "Asset Number", "placeholder": "Select asset number", "value": "", "isShow": true },
+                { "elementCode": "WORKORDER", "label": "Work Order", "placeholder": "Select work order", "value": "", "isShow": false },
+                { "elementCode": "TEXTFIELD", "label": "Machine SMU Value", "placeholder": "Input machine SMU value", "valueType": "int", "value": "", "isShow": true },
+                { "elementCode": "CAMERACAPTURE", "label": "Photo Machine SMU", "placeholder": "Select photo machine SMU", "value": "", "isShow": true },
+                { "elementCode": "TEXTFIELD", "label": "Hour Meter Offset", "placeholder": "Input hour meter offset", "valueType": "int", "value": "", "isShow": true }
+            ]
+        },
+        {
+            "sectionId": "00000000-0000-0000-0000-000000000003",
+            "title": "Safety Precautions",
+            "isAccordionActive": true,
+            "isSectionActive": true,
+            "isImmutable": false,
+            "elements": [
+                { "elementCode": "CUSTOMCONTENT", "label": "", "value": "<CKEditor HTML — safety precautions content with PPE instructions, isolation procedure, and safety checklist table>", "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]" },
+                { "elementCode": "MULTIPLECHOICE", "isTaskValue": false, "label": "Checklist", "showLabel": false, "caption": "['I have read and understood all safety precautions listed above']", "itemValue": "[1]", "value": "", "valueType": "int[]", "limitType": "NO_LIMIT", "limitValue": null },
+                { "elementCode": "PHOTOLIST", "label": "", "value": "", "caption": "['Take photo of completed Pre-Task Risk Assessment Form']" },
+                { "elementCode": "CHECKBOXWITHREASON", "label": "WASH AND CHECKS BEFORE MACHINE ENTERS THE WORKSHOP:", "caption": "['Truk dump body / module is free of dirt and material build up (empty body).','Wash truck.','Wash radiator.','Wash battery box.','Check machine tyres (temperature/condition) before entering workshop.)']", "reasonCaption": "Wash unable to be completed", "reasonValue": "0", "itemValue": "[1,2,3,4,5]", "value": "[]", "valueType": "int[]" }
+            ]
+        }
+    ]
+}

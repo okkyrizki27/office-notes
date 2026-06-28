@@ -1,0 +1,11 @@
+Code;Name;IsActive;CreatedAt;CreatedBy;ModifiedAt;ModifiedBy
+OE1;Coal Excavation;1;2025-03-20 02:42:24.207;Manual Migration;NULL;NULL
+OE2;Coal Hauling Road;1;2025-03-20 02:42:24.213;Manual Migration;NULL;NULL
+OE3;Disposal/Waste Dump;1;2025-03-20 02:42:24.220;Manual Migration;NULL;NULL
+OE4;Land Clearing Area;1;2025-03-20 02:42:24.230;Manual Migration;NULL;NULL
+OE5;Front/Overburden Excavation;1;2025-03-20 02:42:24.240;Manual Migration;NULL;NULL
+OE6;Overburden Hauling Road;1;2025-03-20 02:42:24.247;Manual Migration;NULL;NULL
+OE7;Other;1;2025-03-20 02:42:24.257;Manual Migration;NULL;NULL
+OE8;Processing Plant;1;2025-03-20 02:42:24.263;Manual Migration;NULL;NULL
+OE9;Stockpile Area;1;2025-03-20 02:42:24.270;Manual Migration;NULL;NULL
+OTHER;Other;1;2025-01-02 10:46:47.687;System;2025-01-02 10:46:47.687;System

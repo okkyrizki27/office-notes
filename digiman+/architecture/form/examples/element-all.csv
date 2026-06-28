@@ -1,0 +1,31 @@
+GroupElementCode;Code;Name;Type;ReferenceId;Description;IconUrl;IsShow;IsActive;CreatedAt;CreatedBy;ModifiedAt;ModifiedBy
+GENERALCHECK;ACTIONTASK;Action Task;TaskKit;872A4D35-1EEB-4CF9-8983-1849F1F09DA7;Action Task;NULL;1;1;53:54.6;Manual Migration;NULL;NULL
+GENERALCHECK;ASSESSMENTCHECK;Assessment Check;TaskKit;930D65A7-50FE-4418-B152-C2FCC08472E8;Assessment Check;NULL;1;1;53:54.8;Manual Migration;NULL;NULL
+INPUTLAYOUT;ASSESSMENTSCORE;Assessment Score;InputLayout;NULL;Table for Assessment Score;NULL;1;1;53:54.8;Manual Migration;NULL;NULL
+INPUTLAYOUT;CHECKBOXWITHREASON;Checkbox with Reason;InputLayout;NULL;Checkbox with a single choice containing Reason;NULL;1;1;53:54.8;Manual Migration;NULL;NULL
+GENERALCHECK;CONDITION_CHECK;Condition Check;TaskKit;8131F912-0C05-4603-8FA9-D8A73C1EB829;Condition Check;NULL;1;1;54:06.4;System;NULL;NULL
+CBM;CONDITIONTESTRATING;Condition Test Rating;TaskKit;933D70A3-A15A-498C-9B14-A3FE7E042C8A;Condition Test Rating;NULL;1;1;53:54.5;Manual Migration;NULL;NULL
+GUIDELINE;CONTAMINATIONS_OIL_SENSOR;Contaminations Oil Sensor;InputLayout;5BC03CE0-8A51-43C3-AFAD-28CACDE90743;Guideline to Contaminations Oil Sensor Case;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+GENERALCHECK;CRACKDEFECT;Crack Defect;TaskKit;D4487136-EB8D-44CB-BEE1-9F6E3A54E49F;Crack Defect or Defect Crack;NULL;1;1;53:54.6;Manual Migration;NULL;NULL
+INPUTLAYOUT;CUSTOMCONTENT;Custom Content;InputLayout;NULL;Custom Content;NULL;1;1;53:54.8;Manual Migration;NULL;NULL
+GUIDELINE;CYLINDER_LEAKS;Cylinder Leaks;InputLayout;60264385-60C1-4211-8C6C-C6ACA0111026;Guideline for Cylinder Leaks Case;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+GENERALCHECK;DATAINPUT;Data Input;TaskKit;E7D41822-2886-4AF3-81B0-7F349228D1BC;Data Input or Data Input with Failure;NULL;1;1;53:54.6;Manual Migration;NULL;NULL
+INPUTLAYOUT;DATETIME;Date Time;InputLayout;NULL;Input with datetime type;NULL;1;1;53:54.8;Manual Migration;NULL;NULL
+GENERALCHECK;DEFECTCHECK;Defect Check;TaskKit;F420DFBF-1E01-422D-9849-6B1B1196B5C4;Defect Check;NULL;1;1;53:54.6;Manual Migration;NULL;NULL
+INPUTLAYOUT;DROPDOWN;Dropdown;InputLayout;NULL;Drop down;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+GUIDELINE;FILTER_CUTS;Filter Cuts;InputLayout;1A11F013-E18D-4F96-9FAF-1D0C879BD585;Guideline for Filter Cuts Case;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+INPUTLAYOUT;INPUT;Text Input;InputLayout;NULL;Input with text type;NULL;1;1;53:54.8;Manual Migration;NULL;NULL
+INPUTLAYOUT;LABEL;Label;InputLayout;NULL;Label;NULL;1;1;53:54.8;Manual Migration;NULL;NULL
+GUIDELINE;LEAKS;Leaks;InputLayout;C0577CD8-0A93-4A94-96AB-31BA84936B9D;Guideline for Leaks Case;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+GUIDELINE;MAGNETIC_PLUG;Magnetic Plug;InputLayout;EDE39CB5-8DB9-416E-8E79-AD1297276E3F;Guideline for Magnetic Plug Case;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+GUIDELINE;MAGNETIC_SCREENS;Magnetic Screens;InputLayout;D44F1A2C-3A07-466F-A34D-BAFE1963EFFA;Guideline for Magnetic Screens Case;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+INPUTLAYOUT;MULTIPLECHOICE;Multiple Choice;InputLayout;NULL;Multiple choice;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+INPUTLAYOUT;NUMBER;Number;InputLayout;NULL;Input with numeric type;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+CBM;OEMSTD_ABCRATING;ABC Rating;TaskKit;B34B7127-2C0C-4125-A526-59F133C32453;OEM Standard Rating (ABC Rating);NULL;1;1;53:54.5;Manual Migration;NULL;NULL
+CBM;OEMSTD_INOUTSPECRATING;In Spec Rating;TaskKit;DC36E757-B918-4D14-A8A6-0CDB6C6F044E;OEM Standard Rating (In Spec Rating);NULL;1;1;53:54.5;Manual Migration;NULL;NULL
+INPUTLAYOUT;PHOTOLIST;Photo List;InputLayout;NULL;Input for taking several Photos;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+CBM;SENSERATING;Sense Rating;TaskKit;0FA62583-BBE7-410D-A53D-C7640578D8AA;Sense Rating;NULL;1;1;53:54.6;Manual Migration;NULL;NULL
+INPUTLAYOUT;SIGNATUREGROUP;Signature;InputLayout;NULL;Signature;NULL;1;1;53:54.7;Manual Migration;NULL;NULL
+INPUTLAYOUT;SINGLECHOICE;Single Choice;InputLayout;NULL;Single choice;NULL;1;1;53:54.8;Manual Migration;NULL;NULL
+CBM;TOOLBASEDRATING;Tool Based Rating;TaskKit;7491B247-B357-4184-8FE1-07B477B82793;Tool Based Rating;NULL;1;1;53:54.6;Manual Migration;NULL;NULL
+GENERALCHECK;WASHING;Washing;TaskKit;FA0035C2-4842-4B2A-ADF0-8C5D828295FF;Washing;NULL;1;1;53:54.8;Manual Migration;NULL;NULL

@@ -1,0 +1,106 @@
+{
+    "formId": "6046c032-fc99-4fa1-be51-cd56d12bdd12",
+    "formTabId": "ab120d57-9d1d-415f-af53-a14aa3ebf55c",
+    "formCode": "FORM3",
+    "version": 4,
+    "title": "Safety",
+    "sections": [
+        {
+            "sectionId": "5793f5b5-4139-45d3-9724-4938fd72fc14",
+            "isAccordionActive": false,
+            "isSectionActive": true,
+            "isImmutable": false,
+            "title": "Safety",
+            "elements": [
+                {
+                    "elementCode": "ASSESSMENTCHECK",
+                    "type": "TaskKit",
+                    "name": "General Check - Assessment Check",
+                    "category": "ASSESSMENT",
+                    "header": "['Task', 'Description', 'Status', '']",
+                    "hidableIndex": "[]",
+                    "hideIndex": "[]",
+                    "actionIndex": "",
+                    "taskValue": "",
+                    "groupTaskId": "d8f09fe6-670f-48ee-bd1c-a789e91f9f7a",
+                    "elements": [
+                        [
+                            {
+                                "elementCode": "NUMBERINGTEXT",
+                                "value": "13",
+                                "label": "Task"
+                            },
+                            {
+                                "elementCode": "BANKTASK",
+                                "value": "S1",
+                                "label": "Description",
+                                "placeholder": "Select",
+                                "valueCaption": "Pekerja sudah paham tugas dan bahaya terkait?"
+                            },
+                            {
+                                "elementCode": "DROPDOWN",
+                                "value": "",
+                                "label": "Status",
+                                "placeholder": "Select",
+                                "caption": "['Comply', 'Not Comply', 'Not Applicable']",
+                                "textColor": "['#18AF4A', '#FF4842','#FF9300']",
+                                "itemValue": "['ASSESSMENTCHECK_COMPLY', 'ASSESSMENTCHECK_NOTCOMPLY', 'ASSESSMENTCHECK_NOTAPPLICABLE']",
+                                "valueType": "string",
+                                "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                                "isTaskValue": true,
+                                "lastUpdatedBy": "",
+                                "taskCode": "S1",
+                                "responseKey": "1"
+                            },
+                            {
+                                "elementCode": "INLINE",
+                                "value": "",
+                                "label": "",
+                                "child": [
+                                    {
+                                        "elementCode": "TAKEPHOTO",
+                                        "value": "",
+                                        "isShow": true,
+                                        "customValidation": "[{'type': 'REQUIRED', 'value': ''}]",
+                                        "taskCode": "S1",
+                                        "responseKey": "2"
+                                    },
+                                    {
+                                        "elementCode": "ADDITIONALINFORMATION",
+                                        "value": "",
+                                        "isShow": true,
+                                        "customValidation": "[{'type': 'REQUIRED', 'value': ''}]",
+                                        "taskCode": "S1",
+                                        "responseKey": "3"
+                                    }
+                                ]
+                            }
+                        ]
+                    ],
+                    "id": "d8f09fe6-670f-48ee-bd1c-a789e91f9f7a",
+                    "referenceId": "930d65a7-50fe-4418-b152-c2fcc08472e8",
+                    "parentCode": "GENERALCHECK"
+                },
+                {
+                    "elementCode": "INPUT",
+                    "label": "Catatan Temuan \"Not Comply\" untuk ditindak lanjuti",
+                    "value": "",
+                    "valueType": "string",
+                    "placeholder": "Type your answer here",
+                    "child": [],
+                    "isTaskValue": true,
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "taskCode": "65498b39-9485-4118-8a76-be646f8eebc9",
+                    "responseKey": "1",
+                    "level": "1",
+                    "isParent": false,
+                    "taskNumber": "23"
+                }
+            ]
+        }
+    ],
+    "id": "2839ac87-d95e-4350-89e4-ee661af1c4c8",
+    "createdBy": "2009OBH.supervisor01@protonmail.com",
+    "createdDate": "2026-01-30T06:45:40.3111734Z",
+    "activeFlag": true
+}

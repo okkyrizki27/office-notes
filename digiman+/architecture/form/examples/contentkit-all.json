@@ -1,0 +1,112 @@
+[
+    {
+        "id": "c0577cd8-0a93-4a94-96ab-31ba84936b9d",
+        "type": "Guideline",
+        "content": {
+            "name": "Leaks",
+            "elements": [
+                {
+                    "groupElementCode": "GUIDELINE",
+                    "elementCode": "CUSTOMCONTENT",
+                    "label": "",
+                    "value": "<CKEditor HTML — tabel rating A/B/C/X dengan foto referensi kondisi kebocoran: A=No leaks, B=Slight weep dust dry, C=Surface wet slippery, X=Visibility leaking>",
+                    "customValidation": "[]"
+                }
+            ]
+        },
+        "createdBy": "sintongsimon@ecomindo.com",
+        "createdDate": "2024-12-11T02:22:06.250Z",
+        "activeFlag": true
+    },
+    {
+        "id": "d44f1a2c-3a07-466f-a34d-bafe1963effa",
+        "type": "Guideline",
+        "content": {
+            "name": "Magnetic Screens",
+            "elements": [
+                {
+                    "groupElementCode": "GUIDELINE",
+                    "elementCode": "CUSTOMCONTENT",
+                    "label": "",
+                    "value": "<CKEditor HTML — tabel rating A/B/C/X dengan foto referensi kondisi partikel di magnetic screen: A=No/few fine particles (normal wear), B=Slightly elevated but normal, C=Material accumulation above normal, X=Many large particles, fatal damage may have occurred>",
+                    "customValidation": "[]"
+                }
+            ]
+        },
+        "createdBy": "sintongsimon@ecomindo.com",
+        "createdDate": "2024-12-11T02:22:06.250Z",
+        "activeFlag": true
+    },
+    {
+        "id": "ede39cb5-8db9-416e-8e79-ad1297276e3f",
+        "type": "Guideline",
+        "content": {
+            "name": "Magnetic Plug",
+            "elements": [
+                {
+                    "groupElementCode": "GUIDELINE",
+                    "elementCode": "CUSTOMCONTENT",
+                    "label": "",
+                    "value": "<CKEditor HTML — tabel rating A/B/C/X dengan foto referensi kondisi partikel di magnetic plug: A=Fine wear particles like paste (normal), B=No chips/large fragments, C=Some larger pieces/debris, X=Failure occurred, large debris>",
+                    "customValidation": "[]"
+                }
+            ]
+        },
+        "createdBy": "sintongsimon@ecomindo.com",
+        "createdDate": "2024-12-11T02:22:06.250Z",
+        "activeFlag": true
+    },
+    {
+        "id": "1a11f013-e18d-4f96-9faf-1d0c879bd585",
+        "type": "Guideline",
+        "content": {
+            "name": "Filter Cuts",
+            "elements": [
+                {
+                    "groupElementCode": "GUIDELINE",
+                    "elementCode": "CUSTOMCONTENT",
+                    "label": "",
+                    "value": "<CKEditor HTML — tabel rating A/B/C/X dengan foto referensi kondisi filter cuts: A=No particles visible, B=Some particles visible, C=Material accumulation above normal, X=Many large particles>",
+                    "customValidation": "[]"
+                }
+            ]
+        },
+        "createdBy": "sintongsimon@ecomindo.com",
+        "createdDate": "2024-12-11T02:22:06.250Z",
+        "activeFlag": true
+    },
+    {
+        "id": "60264385-60c1-4211-8c6c-c6aca0111026",
+        "type": "Guideline",
+        "content": {
+            "name": "Cylinder Leaks",
+            "elements": [
+                {
+                    "groupElementCode": "GUIDELINE",
+                    "elementCode": "CUSTOMCONTENT",
+                    "label": "",
+                    "value": "<CKEditor HTML — tabel rating A/B/C/X dengan foto referensi kondisi kebocoran silinder>",
+                    "customValidation": "[]"
+                }
+            ]
+        },
+        "activeFlag": true
+    },
+    {
+        "id": "5bc03ce0-8a51-43c3-afad-28cacde90743",
+        "type": "Guideline",
+        "content": {
+            "name": "Contaminations Oil Sensor",
+            "elements": [
+                {
+                    "groupElementCode": "GUIDELINE",
+                    "elementCode": "CUSTOMCONTENT",
+                    "label": "",
+                    "value": "<CKEditor HTML — tabel rating A/B/C/X dengan foto referensi kondisi kontaminasi oil sensor>",
+                    "customValidation": "[]"
+                }
+            ]
+        },
+        "activeFlag": true
+    }
+]

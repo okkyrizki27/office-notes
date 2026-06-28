@@ -1,0 +1,310 @@
+[
+    {
+        "id": "d4487136-eb8d-44cb-bee1-9f6e3a54e49f",
+        "isActive": true,
+        "name": "General Check - Crack Defect",
+        "category": "CRACK",
+        "header": "['Task', 'Crack Inspection Check', 'Condition', '']",
+        "hideIndex": "[]",
+        "hidableIndex": "[]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "elementCode": "BANKTASK", "label": "Crack Inspection Check", "value": "", "valueCaption": "", "placeholder": "Select" },
+            {
+                "elementCode": "DROPDOWN", "label": "Condition", "placeholder": "Select",
+                "caption": "['No Crack Identified','Crack Identified: Monitor','Crack Identified: Repair Required','Not Applicable']",
+                "itemValue": "['CRACKDEFECT_NOCRACK','CRACKDEFECT_MINOR','CRACKDEFECT_MODERATE','CRACKDEFECT_NOTAPPLICABLE']",
+                "textColor": "['#18AF4A', '#FF4842','#FF4842', '#FF9300']",
+                "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": ""
+            },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "f420dfbf-1e01-422d-9849-6b1b1196b5c4",
+        "isActive": true,
+        "name": "General Check - Defect Check",
+        "category": "DEFECT",
+        "header": "['Task', 'Operational Check', 'Condition', '']",
+        "hideIndex": "[]",
+        "hidableIndex": "[]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "elementCode": "BANKTASK", "label": "Operational Check", "value": "", "valueCaption": "", "placeholder": "Select" },
+            {
+                "elementCode": "DROPDOWN", "label": "Condition", "placeholder": "Select",
+                "caption": "['Normal, system working','Defect Identified','Not Applicable']",
+                "itemValue": "['DEFECTCHECK_NORMAL','DEFECTCHECK_DEFECTIDENTIFIED','DEFECTCHECK_NOTAPPLICABLE']",
+                "textColor": "['#18AF4A', '#FF4842', '#FF9300']",
+                "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": ""
+            },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "872a4d35-1eeb-4cf9-8983-1849f1f09da7",
+        "isActive": true,
+        "name": "General Check - Action Task",
+        "category": "ACTION",
+        "header": "['Task', 'Task Description', 'Status', '']",
+        "hideIndex": "[]",
+        "hidableIndex": "[]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "elementCode": "BANKTASK", "label": "Task Description", "value": "", "valueCaption": "", "placeholder": "Select" },
+            {
+                "elementCode": "DROPDOWN", "label": "Status", "placeholder": "Select",
+                "caption": "['Complete', 'Not Applicable']",
+                "itemValue": "['ACTIONTASK_COMPLETE', 'ACTIONTASK_NOTAPPLICABLE']",
+                "textColor": "['#18AF4A', '#FF9300']",
+                "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": ""
+            },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "e7d41822-2886-4af3-81b0-7f349228d1bc",
+        "isActive": true,
+        "name": "General Check - Data Input",
+        "category": "DATAINPUT",
+        "header": "['Task', 'Task Description', 'Free Text Column', 'Volume', 'Response', '']",
+        "hideIndex": "[2]",
+        "hidableIndex": "[2,4]",
+        "actionIndex": "[3]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "elementCode": "BANKTASK", "label": "Task Description", "value": "", "valueCaption": "", "placeholder": "Select" },
+            { "elementCode": "TEXTCOLUMN", "value": "", "label": "Free Text Column", "placeholder": "Type here...", "valueType": "string" },
+            {
+                "elementCode": "NUMBER", "label": "Volume", "placeholder": "Input here...",
+                "value": "", "valueType": "int", "suffix": "",
+                "isTaskValue": true, "responseKey": "", "taskCode": ""
+            },
+            {
+                "elementCode": "DROPDOWN", "label": "Response", "placeholder": "Select",
+                "caption": "['Normal, System Working','Defect Identified','Not Applicable']",
+                "itemValue": "['DATAINPUT_NORMAL','DATAINPUT_DEFECTIDENTIFIED','DATAINPUT_NOTAPPLICABLE']",
+                "textColor": "['#18AF4A', '#FF4842', '#FF9300']",
+                "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": ""
+            },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "b34b7127-2c0c-4125-a526-59f133c32453",
+        "isActive": true,
+        "name": "CBM - OEM Standard Rating (ABC Rating)",
+        "category": "CBMMC2",
+        "rating": "ABC",
+        "header": "['Task', 'Measurement Location', 'CBM Type', 'OEM Spec', 'Respond', 'Previous Value', 'Measurement Value', 'Rating', 'Adjustment Measurement Value', 'Adjustment Rating', '']",
+        "hideIndex": "[5,8,9]",
+        "hidableIndex": "[5,8,9]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "key": "measurement_location", "elementCode": "COMPONENTSUBCOMPONENT", "label": "Measurement Location", "value": "", "valueCaption": "", "placeholder": "Select" },
+            { "key": "cbm_type", "elementCode": "CBMTYPE", "source": "measurement_location", "label": "CBM Type", "value": "", "valueCaption": "", "placeholder": "Select" },
+            { "elementCode": "OEMSPEC", "source": "cbm_type", "label": "OEM Spec", "value": "" },
+            { "elementCode": "DROPDOWN", "label": "Respond", "placeholder": "Select", "caption": "['Not Applicable']", "itemValue": "['CBMOEMABC_NOTAPPLICABLE']", "textColor": "['#FF9300']", "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "PREVIOUSVALUE", "label": "Previous Value", "value": "", "placeholder": "Previous Value" },
+            { "key": "measurement_value", "elementCode": "NUMBER", "label": "Measurement Value", "placeholder": "Input", "value": "", "valueType": "int", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "RATING", "source": "measurement_value", "label": "Rating", "placeholder": "A B C X", "value": "", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "key": "adjustment_measurement_value", "elementCode": "NUMBER", "label": "Adjustment Measurement Value", "placeholder": "Input", "value": "", "valueType": "int", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "RATING", "source": "adjustment_measurement_value", "label": "Adjustment Rating", "placeholder": "A B C X", "value": "", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "dc36e757-b918-4d14-a8a6-0cdb6c6f044e",
+        "isActive": true,
+        "name": "CBM - OEM Standard Rating (In Spec Rating)",
+        "category": "CBMMC2",
+        "rating": "INOUTSPEC",
+        "header": "['Task', 'Measurement Location', 'CBM Type', 'OEM Spec', 'Respond', 'Previous Value', 'Measurement Value', 'Status', 'Adjustment Measurement Value', 'Adjustment Status', '']",
+        "hideIndex": "[5,8,9]",
+        "hidableIndex": "[5,8,9]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "key": "measurement_location", "elementCode": "COMPONENTSUBCOMPONENT", "label": "Measurement Location", "value": "", "valueCaption": "", "placeholder": "Select" },
+            { "key": "cbm_type", "elementCode": "CBMTYPE", "source": "measurement_location", "label": "CBM Type", "value": "", "valueCaption": "", "placeholder": "Select" },
+            { "elementCode": "OEMSPEC", "source": "cbm_type", "label": "OEM Spec", "value": "" },
+            { "elementCode": "DROPDOWN", "label": "Respond", "placeholder": "Select", "caption": "['Not Applicable']", "itemValue": "['CBMOEMINOUTSPEC_NOTAPPLICABLE']", "textColor": "['#FF9300']", "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "PREVIOUSVALUE", "label": "Previous Value", "value": "", "placeholder": "Previous Value" },
+            { "key": "measurement_value", "elementCode": "NUMBER", "label": "Measurement Value", "placeholder": "Input", "value": "", "valueType": "int", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "RATING", "source": "measurement_value", "label": "Status", "placeholder": "In/Out Spec", "value": "", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "key": "adjustment_measurement_value", "elementCode": "NUMBER", "label": "Adjustment Measurement Value", "placeholder": "Input", "value": "", "valueType": "int", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "RATING", "source": "adjustment_measurement_value", "label": "Adjustment Status", "placeholder": "In/Out Spec", "value": "", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "7491b247-b357-4184-8fe1-07b477b82793",
+        "isActive": true,
+        "name": "CBM - Tool-Based Rating",
+        "category": "CBMMC3",
+        "rating": "ABC",
+        "header": "['Task', 'Measurement Location', 'CBM Type', 'Tools', 'OEM Spec', 'Respond', 'Previous Value', 'Measurement Value', 'Rating', 'Adjustment Measurement Value', 'Adjustment Rating', '']",
+        "hideIndex": "[6,9,10]",
+        "hidableIndex": "[6,9,10]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "key": "measurement_location", "elementCode": "COMPONENTSUBCOMPONENT", "label": "Measurement Location", "placeholder": "Select", "value": "", "valueCaption": "" },
+            { "key": "cbm_type", "elementCode": "CBMTYPE", "source": "measurement_location", "label": "CBM Type", "placeholder": "Select", "value": "", "valueCaption": "" },
+            { "elementCode": "CHECKINGTOOL", "key": "checking_tool", "source": "cbm_type", "label": "Tools", "placeholder": "Select", "dropdownData": "[]", "value": "", "responseKey": "", "taskCode": "" },
+            { "elementCode": "OEMSPEC", "source": "checking_tool", "label": "OEM Spec", "value": "" },
+            { "elementCode": "DROPDOWN", "label": "Respond", "placeholder": "Select", "caption": "['Not Applicable']", "itemValue": "['CBMTOOL_NOTAPPLICABLE']", "textColor": "['#FF9300']", "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "PREVIOUSVALUE", "label": "Previous Value", "value": "", "placeholder": "Previous Value" },
+            { "key": "measurement_value", "elementCode": "NUMBER", "label": "Measurement Value", "placeholder": "Input", "value": "", "valueType": "int", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "RATING", "source": "measurement_value", "label": "Rating", "placeholder": "A B C X", "value": "", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "key": "adjustment_measurement_value", "elementCode": "NUMBER", "label": "Adjustment Measurement Value", "placeholder": "Input", "value": "", "valueType": "int", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "RATING", "source": "adjustment_measurement_value", "label": "Adjustment Rating", "placeholder": "A B C X", "value": "", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "933d70a3-a15a-498c-9b14-a3fe7e042c8a",
+        "isActive": true,
+        "name": "CBM - Condition Test Rating",
+        "category": "CBMMC4",
+        "rating": "INOUTSPEC",
+        "header": "['Task', 'Measurement Location', 'CBM Type', 'Condition', 'OEM Spec', 'Respond', 'Previous Value', 'Measurement Value', 'Status', 'Adjustment Measurement Value', 'Adjustment Status', '']",
+        "hideIndex": "[6,9,10]",
+        "hidableIndex": "[6,9,10]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "key": "measurement_location", "elementCode": "COMPONENTSUBCOMPONENT", "label": "Measurement Location", "placeholder": "Select", "value": "", "valueCaption": "" },
+            { "key": "cbm_type", "elementCode": "CBMTYPE", "source": "measurement_location", "label": "CBM Type", "placeholder": "Select", "value": "", "valueCaption": "" },
+            { "key": "checking_condition", "elementCode": "CHECKINGCONDITION", "source": "cbm_type", "label": "Tools", "placeholder": "Select", "dropdownData": "[]", "value": "" },
+            { "elementCode": "OEMSPEC", "source": "checking_condition", "label": "OEM Spec", "value": "" },
+            { "elementCode": "DROPDOWN", "label": "Respond", "placeholder": "Select", "caption": "['Not Applicable']", "itemValue": "['CBMCONDITION_NOTAPPLICABLE']", "textColor": "['#FF9300']", "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "PREVIOUSVALUE", "label": "Previous Value", "placeholder": "Previous Value", "value": "" },
+            { "key": "measurement_value", "elementCode": "NUMBER", "label": "Measurement Value", "placeholder": "Input", "value": "", "valueType": "int", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "RATING", "source": "measurement_value", "label": "Status", "placeholder": "In/Out Spec", "value": "", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "key": "adjustment_measurement_value", "elementCode": "NUMBER", "label": "Adjustment Measurement Value", "placeholder": "Input", "value": "", "valueType": "int", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "RATING", "source": "adjustment_measurement_value", "label": "Adjustment Status", "placeholder": "In/Out Spec", "value": "", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "0fa62583-bbe7-410d-a53d-c7640578d8aa",
+        "isActive": true,
+        "name": "CBM - Sense Rating",
+        "category": "CBMMC1",
+        "rating": "ABC",
+        "header": "['Task', 'Measurement Location', 'CBM Type', 'Rating', 'Response', '']",
+        "hideIndex": "[]",
+        "hidableIndex": "[]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "elementCode": "COMPONENTSUBCOMPONENT", "label": "Measurement Location", "key": "measurement_location", "value": "", "valueCaption": "", "placeholder": "Select" },
+            { "elementCode": "CBMTYPE", "label": "CBM Type", "source": "measurement_location", "value": "", "valueCaption": "", "placeholder": "Select" },
+            {
+                "elementCode": "RATINGDROPDOWN", "label": "Rating", "placeholder": "Select",
+                "caption": "['A', 'B', 'C', 'X']",
+                "itemValue": "['CBMSENSE_A', 'CBMSENSE_B', 'CBMSENSE_C', 'CBMSENSE_X']",
+                "textColor": "['#138C3B', '#CC9A06', '#CC3A35', '#138C3B']",
+                "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": ""
+            },
+            { "elementCode": "DROPDOWN", "label": "Response", "placeholder": "Select", "caption": "['Not Applicable']", "itemValue": "['CBMSENSE_NOTAPPLICABLE']", "textColor": "['#FF9300']", "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": "" },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "fa0035c2-4842-4b2a-adf0-8c5d828295ff",
+        "isActive": true,
+        "name": "General Check - Washing",
+        "category": "WASHING",
+        "header": "['Task', 'Description', 'Status', '']",
+        "hideIndex": "[]",
+        "hidableIndex": "[]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "elementCode": "BANKTASK", "label": "Description", "placeholder": "Select", "value": "", "valueCaption": "" },
+            {
+                "elementCode": "DROPDOWN", "label": "Status", "placeholder": "Select",
+                "caption": "['Clean', 'Dirty', 'Not Applicable']",
+                "itemValue": "['WASHING_CLEAN', 'WASHING_DIRTY', 'WASHING_NOTAPPLICABLE']",
+                "textColor": "['#18AF4A', '#FF4842', '#FF9300']",
+                "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": ""
+            },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "930d65a7-50fe-4418-b152-c2fcc08472e8",
+        "isActive": true,
+        "name": "General Check - Assessment Check",
+        "category": "ASSESSMENT",
+        "header": "['Task', 'Description', 'Status', '']",
+        "hideIndex": "[]",
+        "hidableIndex": "[]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "elementCode": "BANKTASK", "label": "Description", "placeholder": "Select", "value": "", "valueCaption": "" },
+            {
+                "elementCode": "DROPDOWN", "label": "Status", "placeholder": "Select",
+                "caption": "['Comply', 'Not Comply', 'Not Applicable']",
+                "itemValue": "['ASSESSMENTCHECK_COMPLY', 'ASSESSMENTCHECK_NOTCOMPLY', 'ASSESSMENTCHECK_NOTAPPLICABLE']",
+                "textColor": "['#18AF4A', '#FF4842','#FF9300']",
+                "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": ""
+            },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    },
+    {
+        "id": "8131f912-0c05-4603-8fa9-d8a73c1eb829",
+        "isActive": true,
+        "name": "General Check - Condition Check",
+        "category": "CONDITION_CHECK",
+        "header": "['Task', 'Operational Check', 'Condition', '']",
+        "hideIndex": "[]",
+        "hidableIndex": "[]",
+        "elements": [
+            { "elementCode": "NUMBERINGTEXT", "label": "Task", "value": "" },
+            { "elementCode": "BANKTASK", "label": "Operational Check", "value": "", "valueCaption": "", "placeholder": "Select" },
+            {
+                "elementCode": "DROPDOWN", "label": "Condition", "placeholder": "Select",
+                "caption": "['Ok','Not Ok']",
+                "itemValue": "['CONDITION_CHECK_OK','CONDITION_CHECK_NOTOK']",
+                "textColor": "['#18AF4A', '#FF4842', '#FF9300']",
+                "value": "", "valueType": "string", "isTaskValue": true, "responseKey": "", "taskCode": ""
+            },
+            { "elementCode": "INLINE", "child": [
+                { "elementCode": "TAKEPHOTO", "value": "", "isShow": true, "responseKey": "", "taskCode": "" },
+                { "elementCode": "ADDITIONALINFORMATION", "value": "", "isShow": true, "responseKey": "", "taskCode": "" }
+            ]}
+        ]
+    }
+]

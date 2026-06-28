@@ -1,0 +1,123 @@
+{
+    "formId": "6046c032-fc99-4fa1-be51-cd56d12bdd12",
+    "formTabId": "dc368911-f9ff-46bd-8416-8b11d039ec8e",
+    "formCode": "FORM3",
+    "version": 4,
+    "title": "CBM",
+    "sections": [
+        {
+            "sectionId": "845b9951-b823-4b77-a05d-d972fd9f9ae5",
+            "isAccordionActive": false,
+            "isSectionActive": true,
+            "isImmutable": false,
+            "title": "CBM",
+            "elements": [
+                {
+                    "elementCode": "MULTIPLECHOICE",
+                    "label": "Aktifitas CBM yang dicheck",
+                    "showLabel": true,
+                    "caption": "['SOS', 'PPM', 'PPU', 'PPA', 'OMS', 'Swing bearing deflection']",
+                    "itemValue": "[1, 2, 3, 4, 5, 6]",
+                    "value": "",
+                    "valueType": "int[]",
+                    "limitType": "NO_LIMIT",
+                    "limitValue": null,
+                    "child": [],
+                    "placeholder": "",
+                    "isTaskValue": true,
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "taskCode": "199e4a28-b26f-4331-9fdd-477101b0fbe0",
+                    "responseKey": "1",
+                    "valueCaption": "",
+                    "taskNumber": "1"
+                },
+                {
+                    "elementCode": "ASSESSMENTCHECK",
+                    "type": "TaskKit",
+                    "name": "General Check - Assessment Check",
+                    "category": "ASSESSMENT",
+                    "header": "['Task', 'Description', 'Status', '']",
+                    "hidableIndex": "[]",
+                    "hideIndex": "[]",
+                    "actionIndex": "",
+                    "taskValue": "",
+                    "groupTaskId": "5784ba24-fb58-4db0-b179-2aa1d6b2204c",
+                    "elements": [
+                        [
+                            {
+                                "elementCode": "NUMBERINGTEXT",
+                                "value": "2",
+                                "label": "Task"
+                            },
+                            {
+                                "elementCode": "BANKTASK",
+                                "value": "C1",
+                                "label": "Description",
+                                "placeholder": "Select",
+                                "valueCaption": "Aktifitas CBM dilakukan sesuai rencana?"
+                            },
+                            {
+                                "elementCode": "DROPDOWN",
+                                "value": "",
+                                "label": "Status",
+                                "placeholder": "Select",
+                                "caption": "['Comply', 'Not Comply', 'Not Applicable']",
+                                "textColor": "['#18AF4A', '#FF4842','#FF9300']",
+                                "itemValue": "['ASSESSMENTCHECK_COMPLY', 'ASSESSMENTCHECK_NOTCOMPLY', 'ASSESSMENTCHECK_NOTAPPLICABLE']",
+                                "valueType": "string",
+                                "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                                "isTaskValue": true,
+                                "lastUpdatedBy": "",
+                                "taskCode": "C1",
+                                "responseKey": "1"
+                            },
+                            {
+                                "elementCode": "INLINE",
+                                "value": "",
+                                "label": "",
+                                "child": [
+                                    {
+                                        "elementCode": "TAKEPHOTO",
+                                        "value": "",
+                                        "isShow": true,
+                                        "customValidation": "[{'type': 'REQUIRED', 'value': ''}]",
+                                        "taskCode": "C1",
+                                        "responseKey": "2"
+                                    },
+                                    {
+                                        "elementCode": "ADDITIONALINFORMATION",
+                                        "value": "",
+                                        "isShow": true,
+                                        "customValidation": "[{'type': 'REQUIRED', 'value': ''}]",
+                                        "taskCode": "C1",
+                                        "responseKey": "3"
+                                    }
+                                ]
+                            }
+                        ]
+                    ],
+                    "id": "5784ba24-fb58-4db0-b179-2aa1d6b2204c",
+                    "referenceId": "930d65a7-50fe-4418-b152-c2fcc08472e8",
+                    "parentCode": "GENERALCHECK"
+                },
+                {
+                    "elementCode": "INPUT",
+                    "label": "Catatan Temuan \"Not Comply\" untuk ditindak lanjuti",
+                    "value": "",
+                    "valueType": "string",
+                    "placeholder": "Type your answer here",
+                    "child": [],
+                    "isTaskValue": true,
+                    "customValidation": "[{'type': 'REQUIRED', 'value': 'required'}]",
+                    "taskCode": "bc221546-e0cf-40de-88c6-26f477d470f4",
+                    "responseKey": "1",
+                    "taskNumber": "12"
+                }
+            ]
+        }
+    ],
+    "id": "0b75ed6f-cbfd-4a03-8dbc-522a8f15d1dd",
+    "createdBy": "2009OBH.supervisor01@protonmail.com",
+    "createdDate": "2026-01-30T06:45:40.2790314Z",
+    "activeFlag": true
+}
