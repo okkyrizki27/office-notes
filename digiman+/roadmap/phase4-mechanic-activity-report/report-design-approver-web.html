@@ -43,21 +43,173 @@
   /* ── LAYOUT ── */
   .page { max-width: 1100px; margin: 0 auto; padding: 28px 32px 60px; }
 
-  /* Breadcrumb */
-  .breadcrumb { font-size: 12px; color: #94a3b8; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
-  .breadcrumb a { color: #2d6a4f; text-decoration: none; font-weight: 500; }
+  /* ── PAGE HEADER ── */
+  .page-header { margin-bottom: 8px; }
+  .page-title { font-size: 22px; font-weight: 800; color: #1e293b; margin-bottom: 2px; }
+  .page-subtitle { font-size: 13px; color: #64748b; }
+
+  /* ── PERIOD PILL ── */
+  .period-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #d8f3dc; color: #1b4332;
+    font-size: 13px; font-weight: 700;
+    padding: 5px 14px; border-radius: 20px;
+    margin-bottom: 20px; margin-top: 10px;
+  }
+
+  /* ── SUMMARY CARDS (list view) ── */
+  .summary-row-6 { display: flex; gap: 10px; margin-bottom: 14px; }
+  .sum6-card {
+    flex: 1; background: #fff;
+    border-radius: 12px; padding: 16px 16px 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    border-top: 4px solid transparent;
+  }
+  .sum6-card.s-personel  { border-top-color: #0369a1; }
+  .sum6-card.s-actual    { border-top-color: #2d6a4f; }
+  .sum6-card.s-expected  { border-top-color: #64748b; }
+  .sum6-card.s-deviasi   { border-top-color: #dc2626; }
+  .sum6-card.s-util      { border-top-color: #f59e0b; }
+  .sum6-card.s-approval  { border-top-color: #7c3aed; }
+  .sum6-val { font-size: 24px; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: 2px; }
+  .sum6-card.s-personel  .sum6-val { color: #0369a1; }
+  .sum6-card.s-actual    .sum6-val { color: #2d6a4f; }
+  .sum6-card.s-deviasi   .sum6-val { color: #dc2626; }
+  .sum6-card.s-util      .sum6-val { color: #f59e0b; }
+  .sum6-card.s-approval  .sum6-val { color: #7c3aed; }
+  .sum6-unit { font-size: 11px; color: #94a3b8; margin-bottom: 5px; line-height: 1.4; }
+  .sum6-label { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── BASELINE NOTE BAR ── */
+  .baseline-bar {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    font-size: 12px; color: #475569;
+    display: flex; align-items: center; gap: 6px;
+    border-left: 4px solid #2d6a4f;
+    flex-wrap: wrap;
+  }
+  .baseline-bar strong { color: #1e293b; }
+  .baseline-sep { color: #cbd5e1; margin: 0 4px; }
+
+  /* ── LIST TABLE CARD ── */
+  .list-table-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+  .list-table-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .lth-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+  .lth-count {
+    background: #f1f5f9; color: #64748b;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+  }
+
+  /* ── UTIL MINI BAR ── */
+  .mini-bar { display: flex; align-items: center; gap: 6px; }
+  .mb-track { width: 60px; height: 5px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+  .mb-fill  { height: 100%; border-radius: 3px; }
+  .mb-high  { background: #2d6a4f; }
+  .mb-med   { background: #f59e0b; }
+  .mb-low   { background: #ef4444; }
+  .util-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 700;
+    padding: 3px 9px; border-radius: 20px;
+  }
+  .up-high { background: #d8f3dc; color: #1b4332; }
+  .up-med  { background: #fef3c7; color: #92400e; }
+  .up-low  { background: #fee2e2; color: #dc2626; }
+
+  /* ── STATUS CHIPS ── */
+  .status-chip {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 6px;
+    white-space: nowrap;
+  }
+  .sc-submitted { background: #fef3c7; color: #92400e; }
+  .sc-approved  { background: #d8f3dc; color: #1b4332; }
+  .sc-draft     { background: #f1f5f9; color: #94a3b8; }
+
+  /* ── TABLE SHARED ── */
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #f8fafc; }
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px; font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+  }
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f8fafc;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8faf8; }
+
+  .td-name { font-weight: 700; color: #1e293b; }
+  .td-eid  { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+  .level-tag {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 6px;
+  }
+  .lt-mechanic { background: #d8f3dc; color: #1b4332; }
+  .lt-foreman  { background: #dbeafe; color: #1d4ed8; }
+  .td-jam { font-weight: 600; color: #1e293b; }
+  .td-dev-neg { color: #dc2626; font-weight: 600; }
+
+  .view-btn {
+    font-size: 12px; font-weight: 600; color: #2d6a4f;
+    background: #d8f3dc; border: none; cursor: pointer;
+    padding: 5px 12px; border-radius: 8px;
+    transition: background 0.1s;
+    white-space: nowrap;
+  }
+  .view-btn:hover { background: #b7e4c7; }
+
+  .table-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #f1f5f9;
+    font-size: 12px; color: #94a3b8;
+  }
+
+  /* ── DETAIL VIEW ── */
+  #detail-view { display: none; }
+
+  /* Back button + breadcrumb */
+  .back-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .back-btn-web {
+    font-size: 13px; font-weight: 600; color: #2d6a4f;
+    background: #d8f3dc; border: none; cursor: pointer;
+    padding: 6px 14px; border-radius: 8px;
+  }
+  .back-btn-web:hover { background: #b7e4c7; }
+  .breadcrumb { font-size: 12px; color: #94a3b8; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: #2d6a4f; text-decoration: none; font-weight: 500; cursor: pointer; }
   .breadcrumb .sep { color: #cbd5e1; }
 
-  /* ── REPORT HEADER CARD ── */
+  /* Report Header Card */
   .report-header-card {
     background: #fff;
     border-radius: 14px;
     padding: 24px 28px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-    display: flex;
-    align-items: flex-start;
-    gap: 24px;
+    display: flex; align-items: flex-start; gap: 24px;
   }
   .mechanic-avatar-big {
     width: 56px; height: 56px;
@@ -70,30 +222,22 @@
   .mechanic-details { flex: 1; }
   .mechanic-name-big { font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
   .mechanic-meta-row { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 6px; }
-  .meta-chip {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 12px; color: #64748b;
-  }
+  .meta-chip { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #64748b; }
   .meta-chip .mc-icon { font-size: 13px; }
   .meta-chip strong { color: #1e293b; }
   .status-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-  .status-badge {
-    font-size: 12px; font-weight: 700;
-    padding: 5px 14px; border-radius: 20px;
-  }
+  .status-badge { font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 20px; }
   .status-submitted { background: #fef3c7; color: #92400e; }
   .status-approved  { background: #d8f3dc; color: #1b4332; }
   .period-badge {
-    font-size: 13px; font-weight: 600;
-    color: #2d6a4f;
-    background: #d8f3dc;
-    padding: 5px 14px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; color: #2d6a4f;
+    background: #d8f3dc; padding: 5px 14px; border-radius: 8px;
     display: flex; align-items: center; gap: 6px;
   }
   .submitted-info { font-size: 11px; color: #94a3b8; text-align: right; }
 
-  /* ── SUMMARY CARDS ── */
-  .summary-row { display: flex; gap: 12px; margin-bottom: 20px; }
+  /* Detail summary TOP ROW 3 cards */
+  .detail-sum-top { display: flex; gap: 12px; margin-bottom: 10px; }
   .sum-card {
     flex: 1; background: #fff;
     border-radius: 12px; padding: 18px 20px;
@@ -103,17 +247,40 @@
   .sum-card.total    { border-top-color: #2d6a4f; }
   .sum-card.maint    { border-top-color: #1b4332; }
   .sum-card.nonmaint { border-top-color: #7c3aed; }
-  .sum-card.days     { border-top-color: #64748b; }
   .sum-val { font-size: 28px; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: 4px; }
   .sum-card.total    .sum-val { color: #2d6a4f; }
   .sum-card.nonmaint .sum-val { color: #7c3aed; }
   .sum-unit { font-size: 12px; color: #94a3b8; }
   .sum-label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 6px; }
 
-  /* ── MAIN CONTENT ── */
+  /* Detail BASELINE STRIP */
+  .detail-baseline-strip {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-left: 4px solid #2d6a4f;
+  }
+  .dbs-item { padding: 0 16px; border-right: 1px solid #f1f5f9; }
+  .dbs-item:first-child { padding-left: 0; }
+  .dbs-item:last-child { border-right: none; }
+  .dbs-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .dbs-val { font-size: 20px; font-weight: 800; color: #1e293b; line-height: 1; }
+  .dbs-val.green { color: #2d6a4f; }
+  .dbs-val.red   { color: #dc2626; }
+  .dbs-val.amber { color: #d97706; }
+  .dbs-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+  .dbs-bar-wrap { margin-top: 6px; background: #f1f5f9; border-radius: 4px; height: 5px; overflow: hidden; }
+  .dbs-bar-fill { height: 100%; border-radius: 4px; background: #d97706; }
+
+  /* ── CONTENT GRID ── */
   .content-grid { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
 
-  /* ── ACTIVITY TABLE ── */
+  /* ── ACTIVITY CARD (day-grouped) ── */
   .activity-card {
     background: #fff;
     border-radius: 14px;
@@ -139,124 +306,70 @@
   }
   .filter-tab.active { background: #d8f3dc; color: #1b4332; }
 
-  /* Table */
-  table { width: 100%; border-collapse: collapse; }
-  thead tr { background: #f8fafc; }
-  th {
-    padding: 10px 14px;
-    text-align: left;
-    font-size: 11px; font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  /* Day group header row */
+  .day-group-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px 8px;
+    background: #f8faf8;
     border-bottom: 1px solid #f1f5f9;
-    white-space: nowrap;
+    border-left: 4px solid transparent;
   }
-  td {
-    padding: 12px 14px;
-    border-bottom: 1px solid #f8fafc;
-    vertical-align: middle;
-  }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #f8faf8; }
+  .day-group-header.dg-work  { border-left-color: #2d6a4f; }
+  .day-group-header.dg-night { border-left-color: #0369a1; }
+  .day-group-header.dg-off   { border-left-color: #e2e8f0; background: #fff; }
+  .day-group-header.dg-warn  { border-left-color: #f59e0b; background: #fffbeb; }
 
-  .td-date { font-weight: 600; color: #1e293b; white-space: nowrap; }
-  .td-date .td-day { font-size: 11px; color: #94a3b8; font-weight: 400; }
-  .shift-badge {
-    font-size: 11px; font-weight: 600;
-    padding: 3px 8px; border-radius: 6px; white-space: nowrap;
-  }
+  .dg-date { font-size: 13px; font-weight: 700; color: #1e293b; min-width: 58px; }
+  .dg-date.off-color { color: #94a3b8; }
+  .dg-date.warn-color { color: #f59e0b; }
+
+  .shift-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
   .sb-day   { background: #d8f3dc; color: #1b4332; }
   .sb-night { background: #e0f2fe; color: #0369a1; }
   .sb-off   { background: #f1f5f9; color: #94a3b8; }
 
-  .td-unit {
-    font-size: 12px; font-weight: 600;
-    color: #2d6a4f;
-    background: #d8f3dc;
-    padding: 2px 8px; border-radius: 6px;
-    display: inline-block; white-space: nowrap;
+  .dg-total { font-size: 12px; font-weight: 700; color: #2d6a4f; margin-left: auto; }
+  .dg-dev {
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 8px;
   }
-  .td-unit.no-unit { color: #94a3b8; background: #f1f5f9; font-weight: 400; font-style: italic; }
+  .dg-dev.neg { background: #fee2e2; color: #dc2626; }
+  .dg-dev.pos { background: #dcfce7; color: #16a34a; }
 
-  .cat-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+  /* Activity rows inside a group */
+  .day-group-body { border-bottom: 2px solid #f1f5f9; }
+  .act-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 14px 9px 18px;
+    border-bottom: 1px solid #f8fafc;
+    font-size: 12px;
+  }
+  .act-row:last-child { border-bottom: none; }
+
+  .td-unit-sm {
+    font-size: 11px; font-weight: 600;
+    color: #2d6a4f; background: #d8f3dc;
+    padding: 2px 7px; border-radius: 5px;
+    white-space: nowrap; min-width: 90px;
+  }
+  .td-unit-sm.no-unit { color: #94a3b8; background: #f1f5f9; font-weight: 400; font-style: italic; }
+  .act-name { flex: 1; color: #1e293b; font-weight: 500; }
+  .act-time { color: #475569; white-space: nowrap; }
+  .act-dur  { font-weight: 700; color: #2d6a4f; white-space: nowrap; }
+
+  .cat-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
   .cat-m  { background: #d8f3dc; color: #1b4332; }
   .cat-nm { background: #ede9fe; color: #6d28d9; }
 
-  .src-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; }
-  .src-sys-dot { background: #2d6a4f; }
-  .src-man-dot { background: #d97706; }
+  .src-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 3px; }
+  .src-sys-dot  { background: #2d6a4f; }
+  .src-man-dot  { background: #d97706; }
+  .src-label { font-size: 11px; color: #64748b; }
 
-  .td-dur { font-weight: 700; color: #2d6a4f; white-space: nowrap; }
+  /* Off / warn inline */
+  .dg-off-text { padding: 10px 18px; font-size: 12px; color: #cbd5e1; font-style: italic; border-bottom: 2px solid #f1f5f9; }
+  .dg-warn-text { padding: 10px 18px; font-size: 12px; color: #92400e; border-bottom: 2px solid #f1f5f9; display: flex; align-items: center; gap: 6px; }
 
-  /* Off row */
-  .tr-off td { color: #94a3b8; }
-  .tr-warn td:first-child { color: #f59e0b; }
-
-  /* Warn row */
-  .warn-indicator { color: #f59e0b; font-size: 13px; }
-
-  /* ── APPROVAL PANEL ── */
-  .approval-panel { display: flex; flex-direction: column; gap: 12px; }
-
-  .ap-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 20px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-  }
-  .ap-title { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 14px; }
-
-  .ap-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; }
-  .ap-info-row .ai-label { color: #94a3b8; }
-  .ap-info-row .ai-val { font-weight: 600; color: #1e293b; }
-
-  .ap-divider { height: 1px; background: #f1f5f9; margin: 12px 0; }
-
-  .comment-label { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px; }
-  .comment-box {
-    width: 100%;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 12px;
-    color: #475569;
-    resize: none;
-    font-family: inherit;
-    background: #f8fafc;
-    line-height: 1.5;
-  }
-  .comment-box:focus { outline: none; border-color: #2d6a4f; background: #fff; }
-
-  .approve-btn {
-    width: 100%;
-    background: #2d6a4f; color: #fff;
-    border: none; border-radius: 10px;
-    padding: 13px; font-size: 14px; font-weight: 700;
-    cursor: pointer; margin-top: 12px;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
-  .reject-btn {
-    width: 100%;
-    background: #fff; color: #dc2626;
-    border: 1.5px solid #fecaca;
-    border-radius: 10px;
-    padding: 11px; font-size: 13px; font-weight: 600;
-    cursor: pointer; margin-top: 8px;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
-
-  /* checklist summary for approver */
-  .check-item {
-    display: flex; align-items: flex-start; gap: 8px;
-    font-size: 12px; color: #475569;
-    margin-bottom: 8px;
-  }
-  .check-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-  .check-warn { color: #f59e0b; }
-  .check-ok   { color: #2d6a4f; }
-
-  /* Pagination */
   .table-footer {
     padding: 12px 16px;
     border-top: 1px solid #f1f5f9;
@@ -269,6 +382,45 @@
     font-size: 12px; cursor: pointer; color: #475569;
   }
   .page-btn.active { background: #2d6a4f; color: #fff; border-color: #2d6a4f; }
+
+  /* ── APPROVAL PANEL ── */
+  .approval-panel { display: flex; flex-direction: column; gap: 12px; }
+  .ap-card {
+    background: #fff; border-radius: 14px;
+    padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .ap-title { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 14px; }
+  .ap-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; }
+  .ap-info-row .ai-label { color: #94a3b8; }
+  .ap-info-row .ai-val { font-weight: 600; color: #1e293b; }
+  .ap-divider { height: 1px; background: #f1f5f9; margin: 12px 0; }
+  .comment-label { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px; }
+  .comment-box {
+    width: 100%; border: 1px solid #e2e8f0;
+    border-radius: 8px; padding: 10px 12px;
+    font-size: 12px; color: #475569;
+    resize: none; font-family: inherit;
+    background: #f8fafc; line-height: 1.5;
+  }
+  .comment-box:focus { outline: none; border-color: #2d6a4f; background: #fff; }
+  .approve-btn {
+    width: 100%; background: #2d6a4f; color: #fff;
+    border: none; border-radius: 10px;
+    padding: 13px; font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 12px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .reject-btn {
+    width: 100%; background: #fff; color: #dc2626;
+    border: 1.5px solid #fecaca; border-radius: 10px;
+    padding: 11px; font-size: 13px; font-weight: 600;
+    cursor: pointer; margin-top: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .check-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #475569; margin-bottom: 8px; }
+  .check-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .check-warn { color: #f59e0b; }
+  .check-ok   { color: #2d6a4f; }
 </style>
 </head>
 <body>
@@ -284,38 +436,260 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════
+     LIST VIEW (default)
+═══════════════════════════════════════════════════════ -->
+<div id="list-view">
 <div class="page">
 
-  <!-- BREADCRUMB -->
-  <div class="breadcrumb">
-    <a href="#">Activity Reports</a>
-    <span class="sep">›</span>
-    <span>Agus Priyanto — Juni 2026</span>
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-title">Activity Reports — OB Hauler</div>
+    <div class="page-subtitle">Supervisor: Rudi Santoso &nbsp;·&nbsp; 12 personel</div>
+  </div>
+  <div class="period-pill">📅 Juni 2026</div>
+
+  <!-- SUMMARY CARDS 6 -->
+  <div class="summary-row-6">
+    <div class="sum6-card s-personel">
+      <div class="sum6-val">12</div>
+      <div class="sum6-unit">orang</div>
+      <div class="sum6-label">Total Personel</div>
+    </div>
+    <div class="sum6-card s-actual">
+      <div class="sum6-val">1,890</div>
+      <div class="sum6-unit">rata-rata 157.5j/orang</div>
+      <div class="sum6-label">Total Jam Actual</div>
+    </div>
+    <div class="sum6-card s-expected">
+      <div class="sum6-val">2,640</div>
+      <div class="sum6-unit">12 × 220 jam</div>
+      <div class="sum6-label">Expected Jam</div>
+    </div>
+    <div class="sum6-card s-deviasi">
+      <div class="sum6-val">−750</div>
+      <div class="sum6-unit">rata-rata −62.5j</div>
+      <div class="sum6-label">Total Deviasi</div>
+    </div>
+    <div class="sum6-card s-util">
+      <div class="sum6-val">71.6%</div>
+      <div class="sum6-unit">1,890 / 2,640 jam</div>
+      <div class="sum6-label">Avg Utilization</div>
+    </div>
+    <div class="sum6-card s-approval">
+      <div class="sum6-val">4</div>
+      <div class="sum6-unit">8 sudah Approved</div>
+      <div class="sum6-label">Menunggu Approval</div>
+    </div>
   </div>
 
-  <!-- REPORT HEADER -->
+  <!-- BASELINE NOTE BAR -->
+  <div class="baseline-bar">
+    ⚙ <strong>Baseline Site ADT</strong>
+    <span class="baseline-sep">|</span>
+    Jam kerja/hari: <strong>10 jam</strong>
+    <span class="baseline-sep">|</span>
+    Hari kerja: <strong>22 hari</strong>
+    <span class="baseline-sep">|</span>
+    Expected/orang: <strong>220 jam</strong>
+    <span class="baseline-sep">|</span>
+    <span style="color:#94a3b8;">Dikonfigurasi oleh Admin HO</span>
+  </div>
+
+  <!-- LIST TABLE -->
+  <div class="list-table-card">
+    <div class="list-table-header">
+      <div class="lth-title">Daftar Personel</div>
+      <div class="lth-count">12 orang</div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Level</th>
+          <th>Utilization</th>
+          <th>Total Actual</th>
+          <th>Expected</th>
+          <th>Deviasi</th>
+          <th>Status Report</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="td-name">Agus Priyanto</div>
+            <div class="td-eid">10028706</div>
+          </td>
+          <td><span class="level-tag lt-mechanic">Mechanic</span></td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-med" style="width:72%"></div></div>
+              <span class="util-pill up-med">72%</span>
+            </div>
+          </td>
+          <td class="td-jam">158 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td class="td-dev-neg">−62 jam</td>
+          <td><span class="status-chip sc-submitted">Submitted</span></td>
+          <td><button class="view-btn" onclick="showDetail('Agus Priyanto','10028706','AP','Mechanic','72','up-med','mb-med','158','−62','sc-submitted','Submitted')">Lihat ›</button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Deni Kurniawan</div>
+            <div class="td-eid">10031240</div>
+          </td>
+          <td><span class="level-tag lt-foreman">Foreman</span></td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-high" style="width:80%"></div></div>
+              <span class="util-pill up-high">80%</span>
+            </div>
+          </td>
+          <td class="td-jam">176 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td class="td-dev-neg">−44 jam</td>
+          <td><span class="status-chip sc-approved">Approved</span></td>
+          <td><button class="view-btn" onclick="showDetail('Deni Kurniawan','10031240','DK','Foreman','80','up-high','mb-high','176','−44','sc-approved','Approved')">Lihat ›</button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Budi Santoso</div>
+            <div class="td-eid">10030881</div>
+          </td>
+          <td><span class="level-tag lt-mechanic">Mechanic</span></td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-med" style="width:65%"></div></div>
+              <span class="util-pill up-med">65%</span>
+            </div>
+          </td>
+          <td class="td-jam">143 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td class="td-dev-neg">−77 jam</td>
+          <td><span class="status-chip sc-submitted">Submitted</span></td>
+          <td><button class="view-btn" onclick="showDetail('Budi Santoso','10030881','BS','Mechanic','65','up-med','mb-med','143','−77','sc-submitted','Submitted')">Lihat ›</button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Rizal Firmansyah</div>
+            <div class="td-eid">10029340</div>
+          </td>
+          <td><span class="level-tag lt-mechanic">Mechanic</span></td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-high" style="width:88%"></div></div>
+              <span class="util-pill up-high">88%</span>
+            </div>
+          </td>
+          <td class="td-jam">194 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td class="td-dev-neg">−26 jam</td>
+          <td><span class="status-chip sc-approved">Approved</span></td>
+          <td><button class="view-btn" onclick="showDetail('Rizal Firmansyah','10029340','RF','Mechanic','88','up-high','mb-high','194','−26','sc-approved','Approved')">Lihat ›</button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Heru Wibowo</div>
+            <div class="td-eid">10028990</div>
+          </td>
+          <td><span class="level-tag lt-mechanic">Mechanic</span></td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-low" style="width:51%"></div></div>
+              <span class="util-pill up-low">51%</span>
+            </div>
+          </td>
+          <td class="td-jam">112 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td class="td-dev-neg">−108 jam</td>
+          <td><span class="status-chip sc-submitted">Submitted</span></td>
+          <td><button class="view-btn" onclick="showDetail('Heru Wibowo','10028990','HW','Mechanic','51','up-low','mb-low','112','−108','sc-submitted','Submitted')">Lihat ›</button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Andi Permana</div>
+            <div class="td-eid">10031005</div>
+          </td>
+          <td><span class="level-tag lt-mechanic">Mechanic</span></td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-high" style="width:82%"></div></div>
+              <span class="util-pill up-high">82%</span>
+            </div>
+          </td>
+          <td class="td-jam">180 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td class="td-dev-neg">−40 jam</td>
+          <td><span class="status-chip sc-approved">Approved</span></td>
+          <td><button class="view-btn" onclick="showDetail('Andi Permana','10031005','AP','Mechanic','82','up-high','mb-high','180','−40','sc-approved','Approved')">Lihat ›</button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Fauzi Rahmat</div>
+            <div class="td-eid">10029677</div>
+          </td>
+          <td><span class="level-tag lt-mechanic">Mechanic</span></td>
+          <td>
+            <div class="mini-bar">
+              <div class="mb-track"><div class="mb-fill mb-med" style="width:69%"></div></div>
+              <span class="util-pill up-med">69%</span>
+            </div>
+          </td>
+          <td class="td-jam">152 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td class="td-dev-neg">−68 jam</td>
+          <td><span class="status-chip sc-submitted">Submitted</span></td>
+          <td><button class="view-btn" onclick="showDetail('Fauzi Rahmat','10029677','FR','Mechanic','69','up-med','mb-med','152','−68','sc-submitted','Submitted')">Lihat ›</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="table-footer">Menampilkan 7 dari 12 personel</div>
+  </div>
+
+</div>
+</div><!-- end #list-view -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     DETAIL VIEW (hidden by default)
+═══════════════════════════════════════════════════════ -->
+<div id="detail-view">
+<div class="page">
+
+  <!-- BACK + BREADCRUMB -->
+  <div class="back-row">
+    <button class="back-btn-web" onclick="showList()">← Kembali</button>
+    <div class="breadcrumb">
+      <a onclick="showList()">Activity Reports — Tim Saya</a>
+      <span class="sep">›</span>
+      <span id="d-breadcrumb-name">Agus Priyanto — Juni 2026</span>
+    </div>
+  </div>
+
+  <!-- REPORT HEADER CARD -->
   <div class="report-header-card">
-    <div class="mechanic-avatar-big">AP</div>
+    <div class="mechanic-avatar-big" id="d-avatar">AP</div>
     <div class="mechanic-details">
-      <div class="mechanic-name-big">Agus Priyanto</div>
+      <div class="mechanic-name-big" id="d-name">Agus Priyanto</div>
       <div class="mechanic-meta-row">
-        <div class="meta-chip"><span class="mc-icon">🪪</span> <strong>10028706</strong></div>
-        <div class="meta-chip"><span class="mc-icon">⚙️</span> Mechanic</div>
-        <div class="meta-chip"><span class="mc-icon">📍</span> ADT</div>
+        <div class="meta-chip"><span class="mc-icon">🪪</span> <strong id="d-eid">10028706</strong></div>
+        <div class="meta-chip"><span class="mc-icon">⚙️</span> <span id="d-jabatan">Mechanic</span></div>
+        <div class="meta-chip"><span class="mc-icon">📍</span> Site ADT</div>
         <div class="meta-chip"><span class="mc-icon">🏗</span> OB Hauler</div>
       </div>
     </div>
     <div class="status-area">
-      <div class="status-badge status-submitted">⏳ Menunggu Approval</div>
-      <div class="period-badge">📅 22 Jun – 22 Jul 2026</div>
+      <div class="status-badge" id="d-status-badge">⏳ Menunggu Approval</div>
+      <div class="period-badge">📅 Juni 2026</div>
       <div class="submitted-info">Disubmit: 22 Jul 2026, 08:14</div>
     </div>
   </div>
 
-  <!-- SUMMARY -->
-  <div class="summary-row">
+  <!-- DETAIL SUMMARY TOP ROW -->
+  <div class="detail-sum-top">
     <div class="sum-card total">
-      <div class="sum-val">158</div>
+      <div class="sum-val" id="d-total-jam">158</div>
       <div class="sum-unit">jam</div>
       <div class="sum-label">Total Jam</div>
     </div>
@@ -329,21 +703,41 @@
       <div class="sum-unit">jam</div>
       <div class="sum-label">Non Maintenance</div>
     </div>
-    <div class="sum-card days">
-      <div class="sum-val">21</div>
-      <div class="sum-unit">dari 30 hari</div>
-      <div class="sum-label">Hari Aktif</div>
+  </div>
+
+  <!-- DETAIL BASELINE STRIP -->
+  <div class="detail-baseline-strip">
+    <div class="dbs-item">
+      <div class="dbs-label">Baseline</div>
+      <div class="dbs-val">10 jam/hari</div>
+      <div class="dbs-sub">Konfigurasi site ADT</div>
+    </div>
+    <div class="dbs-item">
+      <div class="dbs-label">Expected</div>
+      <div class="dbs-val green">220 jam</div>
+      <div class="dbs-sub">10j × 22 hari kerja</div>
+    </div>
+    <div class="dbs-item">
+      <div class="dbs-label">Deviasi</div>
+      <div class="dbs-val red" id="d-deviasi">−62 jam</div>
+      <div class="dbs-sub">Di bawah expected</div>
+    </div>
+    <div class="dbs-item">
+      <div class="dbs-label">Utilization Rate</div>
+      <div class="dbs-val amber" id="d-util-pct">71.8%</div>
+      <div class="dbs-sub" id="d-util-sub">158/220 jam</div>
+      <div class="dbs-bar-wrap"><div class="dbs-bar-fill" id="d-util-bar" style="width:71.8%"></div></div>
     </div>
   </div>
 
   <!-- MAIN CONTENT GRID -->
   <div class="content-grid">
 
-    <!-- ACTIVITY TABLE -->
+    <!-- ACTIVITY CARD — day groups -->
     <div class="activity-card">
       <div class="activity-card-header">
         <div class="ach-title">Detail Aktivitas</div>
-        <div class="ach-count">30 hari</div>
+        <div class="ach-count">9 hari ditampilkan</div>
         <div class="filter-tabs">
           <button class="filter-tab active">Semua</button>
           <button class="filter-tab">Work</button>
@@ -352,155 +746,149 @@
         </div>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Tanggal</th>
-            <th>Shift</th>
-            <th>Unit</th>
-            <th>Aktivitas</th>
-            <th>Kategori</th>
-            <th>Waktu</th>
-            <th>Durasi</th>
-            <th>Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- 22 Jun — Work, ada aktivitas -->
-          <tr>
-            <td class="td-date">
-              22 Jun
-              <div class="td-day">Minggu</div>
-            </td>
-            <td><span class="shift-badge sb-day">Day</span></td>
-            <td><span class="td-unit">HDKM78002</span></td>
-            <td>Service Sheet 500hrs</td>
-            <td><span class="cat-badge cat-m">Maintenance</span></td>
-            <td style="white-space:nowrap;color:#475569;">08:00 – 11:30</td>
-            <td class="td-dur">3.5 jam</td>
-            <td style="font-size:12px;color:#16a34a;"><span class="src-dot src-sys-dot"></span>system</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td><span class="td-unit">HDKM78002</span></td>
-            <td>Welding Form</td>
-            <td><span class="cat-badge cat-m">Maintenance</span></td>
-            <td style="white-space:nowrap;color:#475569;">13:00 – 15:00</td>
-            <td class="td-dur">2 jam</td>
-            <td style="font-size:12px;color:#16a34a;"><span class="src-dot src-sys-dot"></span>system</td>
-          </tr>
+      <!-- 22 Jun — Day Shift: 5.5j | −4.5j -->
+      <div class="day-group-header dg-work">
+        <div class="dg-date">22 Jun</div>
+        <span class="shift-badge sb-day">Day Shift</span>
+        <div class="dg-total">5.5 jam</div>
+        <span class="dg-dev neg">−4.5j</span>
+      </div>
+      <div class="day-group-body">
+        <div class="act-row">
+          <span class="td-unit-sm">HDKM78002</span>
+          <span class="act-name">Service Sheet 500hrs</span>
+          <span class="act-time">08:00 – 11:30</span>
+          <span class="act-dur">3.5 jam</span>
+          <span class="cat-badge cat-m">Maint.</span>
+          <span class="src-label"><span class="src-dot src-sys-dot"></span>system</span>
+        </div>
+        <div class="act-row">
+          <span class="td-unit-sm">HDKM78002</span>
+          <span class="act-name">Welding Form</span>
+          <span class="act-time">13:00 – 15:00</span>
+          <span class="act-dur">2 jam</span>
+          <span class="cat-badge cat-m">Maint.</span>
+          <span class="src-label"><span class="src-dot src-sys-dot"></span>system</span>
+        </div>
+      </div>
 
-          <!-- 23 Jun — Night Shift -->
-          <tr>
-            <td class="td-date">
-              23 Jun
-              <div class="td-day">Senin</div>
-            </td>
-            <td><span class="shift-badge sb-night">Night</span></td>
-            <td><span class="td-unit no-unit">–</span></td>
-            <td>Safety Briefing</td>
-            <td><span class="cat-badge cat-nm">Non Maint.</span></td>
-            <td style="white-space:nowrap;color:#475569;">18:00 – 19:00</td>
-            <td class="td-dur">1 jam</td>
-            <td style="font-size:12px;color:#d97706;"><span class="src-dot src-man-dot"></span>manual</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td><span class="td-unit">HDCT890002</span></td>
-            <td>Backlog Execution</td>
-            <td><span class="cat-badge cat-m">Maintenance</span></td>
-            <td style="white-space:nowrap;color:#475569;">19:00 – 23:00</td>
-            <td class="td-dur">4 jam</td>
-            <td style="font-size:12px;color:#16a34a;"><span class="src-dot src-sys-dot"></span>system</td>
-          </tr>
+      <!-- 23 Jun — Night Shift: 5j | −5j -->
+      <div class="day-group-header dg-night">
+        <div class="dg-date">23 Jun</div>
+        <span class="shift-badge sb-night">Night Shift</span>
+        <div class="dg-total">5 jam</div>
+        <span class="dg-dev neg">−5j</span>
+      </div>
+      <div class="day-group-body">
+        <div class="act-row">
+          <span class="td-unit-sm no-unit">–</span>
+          <span class="act-name">Safety Briefing</span>
+          <span class="act-time">18:00 – 19:00</span>
+          <span class="act-dur">1 jam</span>
+          <span class="cat-badge cat-nm">Non M.</span>
+          <span class="src-label"><span class="src-dot src-man-dot"></span>manual</span>
+        </div>
+        <div class="act-row">
+          <span class="td-unit-sm">HDCT890002</span>
+          <span class="act-name">Backlog Execution</span>
+          <span class="act-time">19:00 – 23:00</span>
+          <span class="act-dur">4 jam</span>
+          <span class="cat-badge cat-m">Maint.</span>
+          <span class="src-label"><span class="src-dot src-sys-dot"></span>system</span>
+        </div>
+      </div>
 
-          <!-- 24 Jun — Off -->
-          <tr class="tr-off">
-            <td class="td-date">
-              24 Jun
-              <div class="td-day">Selasa</div>
-            </td>
-            <td><span class="shift-badge sb-off">Off</span></td>
-            <td colspan="5" style="color:#cbd5e1;font-style:italic;font-size:12px;">—</td>
-          </tr>
+      <!-- 24 Jun — Off -->
+      <div class="day-group-header dg-off">
+        <div class="dg-date off-color">24 Jun</div>
+        <span class="shift-badge sb-off">Off</span>
+      </div>
+      <div class="dg-off-text">—</div>
 
-          <!-- 25 Jun — Off -->
-          <tr class="tr-off">
-            <td class="td-date">
-              25 Jun
-              <div class="td-day">Rabu</div>
-            </td>
-            <td><span class="shift-badge sb-off">Off</span></td>
-            <td colspan="5" style="color:#cbd5e1;font-style:italic;font-size:12px;">—</td>
-          </tr>
+      <!-- 25 Jun — Off -->
+      <div class="day-group-header dg-off">
+        <div class="dg-date off-color">25 Jun</div>
+        <span class="shift-badge sb-off">Off</span>
+      </div>
+      <div class="dg-off-text">—</div>
 
-          <!-- 26 Jun — Kosong (warning) -->
-          <tr class="tr-warn" style="background:#fffbeb;">
-            <td class="td-date" style="color:#f59e0b;">
-              26 Jun
-              <div class="td-day" style="color:#f59e0b;">Kamis</div>
-            </td>
-            <td><span class="shift-badge sb-day">Day</span></td>
-            <td colspan="5" style="color:#92400e;font-size:12px;">
-              <span class="warn-indicator">⚠</span> Tidak ada aktivitas tercatat di hari kerja ini
-            </td>
-          </tr>
+      <!-- 26 Jun — Day Shift KOSONG: −10j -->
+      <div class="day-group-header dg-warn">
+        <div class="dg-date warn-color">26 Jun</div>
+        <span class="shift-badge sb-day">Day Shift</span>
+        <div class="dg-total" style="color:#f59e0b;">0 jam</div>
+        <span class="dg-dev neg">−10j</span>
+      </div>
+      <div class="dg-warn-text">⚠ Tidak ada aktivitas tercatat</div>
 
-          <!-- 27 Jun — Work -->
-          <tr>
-            <td class="td-date">
-              27 Jun
-              <div class="td-day">Jumat</div>
-            </td>
-            <td><span class="shift-badge sb-day">Day</span></td>
-            <td><span class="td-unit">HDKM78003</span></td>
-            <td>Service Sheet 1000hrs</td>
-            <td><span class="cat-badge cat-m">Maintenance</span></td>
-            <td style="white-space:nowrap;color:#475569;">07:30 – 12:00</td>
-            <td class="td-dur">4.5 jam</td>
-            <td style="font-size:12px;color:#16a34a;"><span class="src-dot src-sys-dot"></span>system</td>
-          </tr>
+      <!-- 27 Jun — Day Shift: 4.5j | −5.5j -->
+      <div class="day-group-header dg-work">
+        <div class="dg-date">27 Jun</div>
+        <span class="shift-badge sb-day">Day Shift</span>
+        <div class="dg-total">4.5 jam</div>
+        <span class="dg-dev neg">−5.5j</span>
+      </div>
+      <div class="day-group-body">
+        <div class="act-row">
+          <span class="td-unit-sm">HDKM78003</span>
+          <span class="act-name">Service Sheet 1000hrs</span>
+          <span class="act-time">07:30 – 12:00</span>
+          <span class="act-dur">4.5 jam</span>
+          <span class="cat-badge cat-m">Maint.</span>
+          <span class="src-label"><span class="src-dot src-sys-dot"></span>system</span>
+        </div>
+      </div>
 
-          <!-- 28-29 Jun — Off -->
-          <tr class="tr-off">
-            <td class="td-date">
-              28 Jun
-              <div class="td-day">Sabtu</div>
-            </td>
-            <td><span class="shift-badge sb-off">Off</span></td>
-            <td colspan="5" style="color:#cbd5e1;font-style:italic;font-size:12px;">—</td>
-          </tr>
-          <tr class="tr-off">
-            <td class="td-date">
-              29 Jun
-              <div class="td-day">Minggu</div>
-            </td>
-            <td><span class="shift-badge sb-off">Off</span></td>
-            <td colspan="5" style="color:#cbd5e1;font-style:italic;font-size:12px;">—</td>
-          </tr>
+      <!-- 28 Jun — Off -->
+      <div class="day-group-header dg-off">
+        <div class="dg-date off-color">28 Jun</div>
+        <span class="shift-badge sb-off">Off</span>
+      </div>
+      <div class="dg-off-text">—</div>
 
-          <!-- 30 Jun — Night -->
-          <tr>
-            <td class="td-date">
-              30 Jun
-              <div class="td-day">Senin</div>
-            </td>
-            <td><span class="shift-badge sb-night">Night</span></td>
-            <td><span class="td-unit">HDKM78003</span></td>
-            <td>Service Sheet 250hrs</td>
-            <td><span class="cat-badge cat-m">Maintenance</span></td>
-            <td style="white-space:nowrap;color:#475569;">20:00 – 00:30</td>
-            <td class="td-dur">4.5 jam</td>
-            <td style="font-size:12px;color:#16a34a;"><span class="src-dot src-sys-dot"></span>system</td>
-          </tr>
+      <!-- 29 Jun — Off -->
+      <div class="day-group-header dg-off">
+        <div class="dg-date off-color">29 Jun</div>
+        <span class="shift-badge sb-off">Off</span>
+      </div>
+      <div class="dg-off-text">—</div>
 
-        </tbody>
-      </table>
+      <!-- 30 Jun — Night Shift: 12j | +2j -->
+      <div class="day-group-header dg-night">
+        <div class="dg-date">30 Jun</div>
+        <span class="shift-badge sb-night">Night Shift</span>
+        <div class="dg-total">12 jam</div>
+        <span class="dg-dev pos">+2j</span>
+      </div>
+      <div class="day-group-body">
+        <div class="act-row">
+          <span class="td-unit-sm">HDKM78003</span>
+          <span class="act-name">Service Sheet 250hrs</span>
+          <span class="act-time">20:00 – 00:30</span>
+          <span class="act-dur">4.5 jam</span>
+          <span class="cat-badge cat-m">Maint.</span>
+          <span class="src-label"><span class="src-dot src-sys-dot"></span>system</span>
+        </div>
+        <div class="act-row">
+          <span class="td-unit-sm">HDCT890002</span>
+          <span class="act-name">Backlog Execution</span>
+          <span class="act-time">01:00 – 05:30</span>
+          <span class="act-dur">4.5 jam</span>
+          <span class="cat-badge cat-m">Maint.</span>
+          <span class="src-label"><span class="src-dot src-sys-dot"></span>system</span>
+        </div>
+        <div class="act-row">
+          <span class="td-unit-sm no-unit">–</span>
+          <span class="act-name">Standby menunggu parts</span>
+          <span class="act-time">05:30 – 08:30</span>
+          <span class="act-dur">3 jam</span>
+          <span class="cat-badge cat-nm">Non M.</span>
+          <span class="src-label"><span class="src-dot src-man-dot"></span>manual</span>
+        </div>
+      </div>
 
       <div class="table-footer">
-        Menampilkan 9 dari 30 hari &nbsp;
+        Menampilkan 9 hari &nbsp;
         <button class="page-btn active">1</button>
         <button class="page-btn">2</button>
         <button class="page-btn">3</button>
@@ -516,11 +904,11 @@
         <div class="ap-title">Ringkasan untuk Approver</div>
         <div class="check-item">
           <span class="check-icon check-ok">✅</span>
-          <span>21 hari kerja tercatat dengan aktivitas</span>
+          <span>21 hari ada aktivitas</span>
         </div>
         <div class="check-item">
           <span class="check-icon check-warn">⚠️</span>
-          <span><strong>1 hari kerja</strong> tidak ada aktivitas (26 Jun)</span>
+          <span><strong>1 hari kosong</strong> tanpa aktivitas (26 Jun)</span>
         </div>
         <div class="check-item">
           <span class="check-icon check-ok">✅</span>
@@ -528,7 +916,11 @@
         </div>
         <div class="check-item">
           <span class="check-icon check-ok">✅</span>
-          <span>Total 158 jam tercatat</span>
+          <span id="d-sum-jam">158 jam</span> tercatat
+        </div>
+        <div class="check-item">
+          <span class="check-icon check-ok">✅</span>
+          <span>Utilization <strong id="d-sum-util">71.8%</strong></span>
         </div>
         <div class="check-item" style="margin-top:4px;">
           <span class="check-icon" style="font-size:13px;">📝</span>
@@ -539,25 +931,21 @@
       <!-- Approval action -->
       <div class="ap-card">
         <div class="ap-title">Keputusan Approval</div>
-
         <div class="ap-info-row">
           <span class="ai-label">Mechanic</span>
-          <span class="ai-val">Agus Priyanto</span>
+          <span class="ai-val" id="d-ap-name">Agus Priyanto</span>
         </div>
         <div class="ap-info-row">
           <span class="ai-label">Periode</span>
-          <span class="ai-val">22 Jun – 22 Jul 2026</span>
+          <span class="ai-val">Juni 2026</span>
         </div>
         <div class="ap-info-row">
           <span class="ai-label">Disubmit</span>
           <span class="ai-val">22 Jul 2026, 08:14</span>
         </div>
-
         <div class="ap-divider"></div>
-
         <div class="comment-label">Catatan (opsional)</div>
         <textarea class="comment-box" rows="3" placeholder="Tulis catatan untuk mechanic..."></textarea>
-
         <button class="approve-btn">✓ &nbsp;Approve Report</button>
         <button class="reject-btn">✕ &nbsp;Kembalikan ke Mechanic</button>
       </div>
@@ -566,5 +954,47 @@
   </div>
 
 </div>
+</div><!-- end #detail-view -->
+
+<script>
+  function showDetail(name, eid, initials, jabatan, util, utilPillClass, utilBarClass, totalJam, deviasi, statusClass, statusText) {
+    // populate dynamic fields
+    document.getElementById('d-avatar').textContent = initials;
+    document.getElementById('d-name').textContent = name;
+    document.getElementById('d-eid').textContent = eid;
+    document.getElementById('d-jabatan').textContent = jabatan;
+    document.getElementById('d-breadcrumb-name').textContent = name + ' — Juni 2026';
+    document.getElementById('d-total-jam').textContent = totalJam;
+    document.getElementById('d-deviasi').textContent = deviasi + ' jam';
+    document.getElementById('d-ap-name').textContent = name;
+    document.getElementById('d-sum-jam').textContent = totalJam + ' jam';
+
+    // status badge
+    var badge = document.getElementById('d-status-badge');
+    badge.className = 'status-badge ' + statusClass;
+    badge.textContent = statusClass === 'sc-submitted' ? '⏳ Menunggu Approval' : '✓ Approved';
+
+    // utilization
+    var utilNum = parseInt(util);
+    var jamNum  = parseInt(totalJam.replace(',',''));
+    var utilPct = (jamNum / 220 * 100).toFixed(1) + '%';
+    document.getElementById('d-util-pct').textContent = utilNum + '%';
+    document.getElementById('d-util-sub').textContent = totalJam + '/220 jam';
+    document.getElementById('d-util-bar').style.width = util + '%';
+    document.getElementById('d-sum-util').textContent = utilNum + '%';
+
+    // switch views
+    document.getElementById('list-view').style.display = 'none';
+    document.getElementById('detail-view').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function showList() {
+    document.getElementById('detail-view').style.display = 'none';
+    document.getElementById('list-view').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+</script>
+
 </body>
 </html>

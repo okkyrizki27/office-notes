@@ -16,6 +16,7 @@ Logic:
 
 import urllib.request, base64, json, os, subprocess, re
 from datetime import datetime, timezone, timedelta
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 DONE_STATUSES     = {"Done", "Closed", "QA PASSED"}
 PROGRESS_STATUSES = {"In Progress", "DEV DONE", "QA TEST", "Re-open"}
@@ -63,13 +64,32 @@ BUMA_ID_MEMBERS = [
     {"label": "Muhammad Zaqi",   "role": "QA",  "match": "zaqi"},
 ]
 
-def _match_member(display_name):
-    """Return BUMA_ID_MEMBERS entry label if display_name matches, else None."""
+MKP_MEMBERS = [
+    {"label": "Darwin Samalo",          "role": "Dev", "match": "darwin"},
+    {"label": "Yvonne Priscilla",       "role": "Dev", "match": "yvonne"},
+    {"label": "Sarayevi Zalanderi",     "role": "Dev", "match": "sarayevi"},
+    {"label": "Varian Aditya Iryanto",  "role": "Dev", "match": "varian"},
+    {"label": "Herianto Salim",         "role": "Dev", "match": "herianto"},
+    {"label": "Andrian Sebayang",       "role": "QA",  "match": "andrian"},
+    {"label": "Muhammad Zul Fikar",     "role": "QA",  "match": "zul fikar"},
+    {"label": "Gita Riskayanti",        "role": "QA",  "match": "gita"},
+]
+
+def _match_member_from(display_name, members):
+    """Return member label if display_name matches any entry in members list, else None."""
     dn_lower = (display_name or "").lower()
-    for m in BUMA_ID_MEMBERS:
+    for m in members:
         if m["match"] in dn_lower:
             return m["label"]
     return None
+
+def _match_member(display_name):
+    """Return BUMA_ID_MEMBERS entry label if display_name matches, else None."""
+    return _match_member_from(display_name, BUMA_ID_MEMBERS)
+
+def _match_mkp_member(display_name):
+    """Return MKP_MEMBERS entry label if display_name matches, else None."""
+    return _match_member_from(display_name, MKP_MEMBERS)
 
 # ── CONFIG / AUTH ─────────────────────────────────────────────────────────────
 def _load_jira_credentials():
@@ -115,14 +135,16 @@ def status_transitions(issue):
     transitions.sort(key=lambda t: t[0])
     return transitions
 
-# ── FETCH ISSUES (with changelog) ────────────────────────────────────────────
-def fetch_sprint_issues(sprint_id):
+# ── FETCH ISSUES ─────────────────────────────────────────────────────────────
+def fetch_sprint_issues_combined(sprint_id):
+    """Single fetch per sprint with all fields needed for baseline + velocity + report."""
     issues = []
     start_at = 0
+    fields = (f"status,customfield_10016,summary,assignee,priority,created,"
+              f"issuetype,subtasks,{TESTER_FIELD}")
     while True:
         url = (f"{BASE_URL}/rest/agile/1.0/sprint/{sprint_id}/issue"
-               f"?fields=status,customfield_10016,issuetype"
-               f"&expand=changelog&maxResults=50&startAt={start_at}")
+               f"?fields={fields}&expand=changelog&maxResults=50&startAt={start_at}")
         res = get(url)
         batch = res.get("issues", [])
         issues += batch
@@ -132,55 +154,71 @@ def fetch_sprint_issues(sprint_id):
             break
     return issues
 
-def fetch_sprint_issues_full(sprint_id):
-    issues = []
-    start_at = 0
-    while True:
-        url = (f"{BASE_URL}/rest/agile/1.0/sprint/{sprint_id}/issue"
-               f"?fields=status,customfield_10016,summary,assignee,priority,created"
-               f"&expand=changelog&maxResults=50&startAt={start_at}")
-        res = get(url)
-        batch = res.get("issues", [])
-        issues += batch
-        total = res.get("total", 0)
-        start_at += len(batch)
-        if start_at >= total or not batch:
-            break
-    return issues
+def fetch_sprints_parallel(sprint_objs, max_workers=6):
+    """Fetch all sprint issues in parallel. Returns {sprint_id: issues}."""
+    results = {}
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(fetch_sprint_issues_combined, s["id"]): s["id"]
+                   for s in sprint_objs}
+        for future in as_completed(futures):
+            sid = futures[future]
+            results[sid] = future.result()
+    return results
 
-# ── PERSON VELOCITY ──────────────────────────────────────────────────────────
-def fetch_sprint_issues_for_velocity(sprint_id):
-    issues = []
-    start_at = 0
-    while True:
-        url = (f"{BASE_URL}/rest/agile/1.0/sprint/{sprint_id}/issue"
-               f"?fields=status,customfield_10016,issuetype,assignee,subtasks,{TESTER_FIELD}"
-               f"&maxResults=50&startAt={start_at}")
-        res = get(url)
-        batch = res.get("issues", [])
-        issues += batch
-        total = res.get("total", 0)
-        start_at += len(batch)
-        if start_at >= total or not batch:
-            break
-    return issues
+def fetch_assignees_batch(issue_keys):
+    """Fetch assignees for multiple issue keys in one API call (batch of 100)."""
+    if not issue_keys:
+        return {}
+    result = {}
+    keys_list = list(issue_keys)
+    for i in range(0, len(keys_list), 100):
+        batch = keys_list[i:i + 100]
+        jql = "key in (" + ",".join(batch) + ")"
+        data = json.dumps({"jql": jql, "fields": ["assignee"], "maxResults": 100}).encode()
+        req = urllib.request.Request(
+            f"{BASE_URL}/rest/api/3/search/jql",
+            data=data,
+            headers={"Authorization": f"Basic {_CREDS}",
+                     "Accept": "application/json",
+                     "Content-Type": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(req) as r:
+                for issue in json.loads(r.read()).get("issues", []):
+                    dn = (issue["fields"].get("assignee") or {}).get("displayName")
+                    result[issue["key"]] = dn
+        except Exception:
+            pass
+    return result
 
-def fetch_issue_assignee(issue_key):
-    try:
-        res = get(f"{BASE_URL}/rest/api/3/issue/{issue_key}?fields=assignee")
-        return (res["fields"].get("assignee") or {}).get("displayName")
-    except Exception:
-        return None
+# ── PERSON VELOCITY ───────────────────────────────────────────────────────────
 
-def compute_person_velocity(sprints):
+def _collect_missing_subtask_keys(sprints, issues_cache):
+    """Collect subtask keys not present in any sprint's issue_map."""
+    missing = set()
+    for sprint_obj in sprints:
+        issues = issues_cache[sprint_obj["id"]]
+        issue_map = {i["key"] for i in issues}
+        for issue in issues:
+            if issue["fields"].get("issuetype", {}).get("subtask", False):
+                continue
+            for subtask_ref in issue["fields"].get("subtasks", []):
+                if subtask_ref["key"] not in issue_map:
+                    missing.add(subtask_ref["key"])
+    return missing
+
+def compute_person_velocity(sprints, issues_cache):
     """
     Returns list of (sprint_name, {person: sp_total}) oldest -> newest.
-    SP from parent ticket only. Each person involved (parent + subtask assignees)
-    receives the full SP of the parent ticket.
+    Uses pre-fetched issues_cache {sprint_id: issues}.
+    Batch-fetches missing subtask assignees in one API call.
     """
+    missing_keys = _collect_missing_subtask_keys(sprints, issues_cache)
+    subtask_assignees = fetch_assignees_batch(missing_keys)
+
     result = []
     for sprint_obj in sprints:
-        issues = fetch_sprint_issues_for_velocity(sprint_obj["id"])
+        issues = issues_cache[sprint_obj["id"]]
         issue_map = {i["key"]: i for i in issues}
         person_sp = {}
 
@@ -201,10 +239,10 @@ def compute_person_velocity(sprints):
 
             for subtask_ref in f.get("subtasks", []):
                 sub_key = subtask_ref["key"]
-                if sub_key in issue_map:
-                    sub_assignee = (issue_map[sub_key]["fields"].get("assignee") or {}).get("displayName")
-                else:
-                    sub_assignee = fetch_issue_assignee(sub_key)
+                sub_assignee = (
+                    (issue_map[sub_key]["fields"].get("assignee") or {}).get("displayName")
+                    if sub_key in issue_map else subtask_assignees.get(sub_key)
+                )
                 if sub_assignee:
                     people.add(sub_assignee)
 
@@ -214,18 +252,20 @@ def compute_person_velocity(sprints):
         result.append((sprint_obj["name"], person_sp))
     return result
 
-def compute_person_velocity_buma(sprints):
+def compute_person_velocity_mkp(sprints, issues_cache):
     """
-    Velocity per orang untuk BUMA ID Team, hanya untuk BUMA_ID_MEMBERS.
-    Dev  : SP dari parent ticket, via Assignee (parent + subtask)
-    QA   : SP dari parent ticket, via Assignee + Tester field (parent ticket)
-    Returns list of (sprint_name, {member_label: sp_total}) oldest -> newest.
+    Velocity per orang untuk MKP Team, hanya untuk MKP_MEMBERS.
+    Uses pre-fetched issues_cache {sprint_id: issues}.
+    Batch-fetches missing subtask assignees in one API call.
     """
-    qa_labels = {m["label"] for m in BUMA_ID_MEMBERS if m["role"] == "QA"}
+    qa_labels = {m["label"] for m in MKP_MEMBERS if m["role"] == "QA"}
+
+    missing_keys = _collect_missing_subtask_keys(sprints, issues_cache)
+    subtask_assignees = fetch_assignees_batch(missing_keys)
 
     result = []
     for sprint_obj in sprints:
-        issues = fetch_sprint_issues_for_velocity(sprint_obj["id"])
+        issues = issues_cache[sprint_obj["id"]]
         issue_map = {i["key"]: i for i in issues}
         person_sp = {}
 
@@ -241,23 +281,74 @@ def compute_person_velocity_buma(sprints):
 
             people = set()
 
-            # Assignee parent ticket
+            label = _match_mkp_member((f.get("assignee") or {}).get("displayName"))
+            if label:
+                people.add(label)
+
+            for subtask_ref in f.get("subtasks", []):
+                sub_key = subtask_ref["key"]
+                sub_dn = (
+                    (issue_map[sub_key]["fields"].get("assignee") or {}).get("displayName")
+                    if sub_key in issue_map else subtask_assignees.get(sub_key)
+                )
+                sub_label = _match_mkp_member(sub_dn)
+                if sub_label and sub_label not in qa_labels:
+                    people.add(sub_label)
+
+            for tester in (f.get(TESTER_FIELD) or []):
+                qa_label = _match_mkp_member(tester.get("displayName"))
+                if qa_label and qa_label in qa_labels:
+                    people.add(qa_label)
+
+            for person in people:
+                person_sp[person] = person_sp.get(person, 0.0) + sp_val
+
+        result.append((sprint_obj["name"], person_sp))
+    return result
+
+def compute_person_velocity_buma(sprints, issues_cache):
+    """
+    Velocity per orang untuk BUMA ID Team, hanya untuk BUMA_ID_MEMBERS.
+    Uses pre-fetched issues_cache {sprint_id: issues}.
+    Batch-fetches missing subtask assignees in one API call.
+    """
+    qa_labels = {m["label"] for m in BUMA_ID_MEMBERS if m["role"] == "QA"}
+
+    missing_keys = _collect_missing_subtask_keys(sprints, issues_cache)
+    subtask_assignees = fetch_assignees_batch(missing_keys)
+
+    result = []
+    for sprint_obj in sprints:
+        issues = issues_cache[sprint_obj["id"]]
+        issue_map = {i["key"]: i for i in issues}
+        person_sp = {}
+
+        for issue in issues:
+            f = issue["fields"]
+            if f.get("issuetype", {}).get("subtask", False):
+                continue
+            if f["status"]["name"] not in DONE_STATUSES:
+                continue
+            sp_val = sp(f)
+            if not sp_val:
+                continue
+
+            people = set()
+
             label = _match_member((f.get("assignee") or {}).get("displayName"))
             if label:
                 people.add(label)
 
-            # Subtask assignees (untuk Dev)
             for subtask_ref in f.get("subtasks", []):
                 sub_key = subtask_ref["key"]
-                if sub_key in issue_map:
-                    sub_dn = (issue_map[sub_key]["fields"].get("assignee") or {}).get("displayName")
-                else:
-                    sub_dn = fetch_issue_assignee(sub_key)
+                sub_dn = (
+                    (issue_map[sub_key]["fields"].get("assignee") or {}).get("displayName")
+                    if sub_key in issue_map else subtask_assignees.get(sub_key)
+                )
                 sub_label = _match_member(sub_dn)
                 if sub_label and sub_label not in qa_labels:
                     people.add(sub_label)
 
-            # Tester field (untuk QA)
             for tester in (f.get(TESTER_FIELD) or []):
                 qa_label = _match_member(tester.get("displayName"))
                 if qa_label and qa_label in qa_labels:
@@ -316,21 +407,15 @@ def compute_dev_done_hours(issue):
     hours = business_hours_between(parse_dt(start_time), parse_dt(end_time))
     return hours if hours >= 0 else None
 
-def build_baseline(sprints):
-    """sprints: list of sprint objects (with id, startDate, endDate), oldest or newest order doesn't matter.
+def build_baseline(sprints, issues_cache):
+    """sprints: list of sprint objects (with id, startDate, endDate).
+    issues_cache: {sprint_id: issues} pre-fetched.
 
     Returns (baseline_by_sp, velocity_by_sprint_id, velocity_by_sp_and_sprint_id).
-    baseline_by_sp: avg cycle hours (To Do -> DEV DONE) per Story Point.
-    velocity_by_sprint_id: avg cycle days (To Do -> DEV DONE) per sprint, across TARGET_SP tickets.
-    velocity_by_sp_and_sprint_id: avg cycle days (To Do -> DEV DONE) per sprint, per Story Point.
-
-    Tickets that carry over multiple sprints are only counted once, attributed
-    to the sprint whose date range contains the ticket's (last) DEV DONE time.
     """
-    # Dedupe issues across sprints (carry-over tickets show up in multiple sprint queries)
     issues_by_key = {}
     for sprint_obj in sprints:
-        for issue in fetch_sprint_issues(sprint_obj["id"]):
+        for issue in issues_cache[sprint_obj["id"]]:
             issues_by_key[issue["key"]] = issue
 
     data = {sp_val: [] for sp_val in TARGET_SP}
@@ -431,18 +516,32 @@ buma_closed = [s for s in closed_sprints if team_for_sprint(s["name"]) == "BUMA 
 print(f"Baseline sprints (MKP Team): {[s['name'] for s in mkp_closed]}")
 print(f"Baseline sprints (BUMA ID Team): {[s['name'] for s in buma_closed]}")
 
+# Jika suatu tim tidak punya active sprint, gunakan last closed sprint tim tersebut
+active_teams = {team_for_sprint(s["name"]) for s in active_sprints}
+fallback_sprints = []
+for team_name, team_closed in [("MKP Team", mkp_closed), ("BUMA ID Team", buma_closed)]:
+    if team_name not in active_teams and team_closed:
+        fallback = dict(team_closed[0])
+        fallback["_is_fallback"] = True
+        fallback_sprints.append(fallback)
+
+sprints_to_report = active_sprints + fallback_sprints
+
+# ── PARALLEL FETCH semua sprint sekaligus ─────────────────────────────────────
+all_sprints_to_fetch = list({s["id"]: s for s in mkp_closed + buma_closed + sprints_to_report}.values())
+print(f"Fetching {len(all_sprints_to_fetch)} sprints in parallel...")
+issues_cache = fetch_sprints_parallel(all_sprints_to_fetch)
+
 print("Building baseline (MKP Team)...")
-baseline_mkp, velocity_mkp_by_id, velocity_mkp_by_sp_id = build_baseline(mkp_closed)
+baseline_mkp, velocity_mkp_by_id, velocity_mkp_by_sp_id = build_baseline(mkp_closed, issues_cache)
 print("Building baseline (BUMA ID Team)...")
-baseline_buma, velocity_buma_by_id, velocity_buma_by_sp_id = build_baseline(buma_closed)
+baseline_buma, velocity_buma_by_id, velocity_buma_by_sp_id = build_baseline(buma_closed, issues_cache)
 
 baselines = {"MKP Team": baseline_mkp, "BUMA ID Team": baseline_buma}
 
-# Velocity trend (oldest -> newest) for the last BASELINE_SPRINT_COUNT closed sprints per team
 velocity_mkp  = [(s["name"], velocity_mkp_by_id[s["id"]])  for s in reversed(mkp_closed)]
 velocity_buma = [(s["name"], velocity_buma_by_id[s["id"]]) for s in reversed(buma_closed)]
 
-# Velocity trend per Story Point (oldest -> newest)
 velocity_mkp_by_sp = {
     sp_val: [(s["name"], velocity_mkp_by_sp_id[sp_val][s["id"]]) for s in reversed(mkp_closed)]
     for sp_val in TARGET_SP
@@ -453,26 +552,15 @@ velocity_buma_by_sp = {
 }
 
 print("Computing person velocity (MKP Team)...")
-person_velocity_mkp  = compute_person_velocity(list(reversed(mkp_closed)))   # oldest -> newest
+person_velocity_mkp  = compute_person_velocity_mkp(list(reversed(mkp_closed)), issues_cache)
 print("Computing person velocity (BUMA ID Team)...")
-person_velocity_buma = compute_person_velocity_buma(list(reversed(buma_closed)))  # oldest -> newest
-
-# Jika suatu tim tidak punya active sprint, gunakan last closed sprint tim tersebut
-active_teams = {team_for_sprint(s["name"]) for s in active_sprints}
-fallback_sprints = []
-for team_name, team_closed in [("MKP Team", mkp_closed), ("BUMA ID Team", buma_closed)]:
-    if team_name not in active_teams and team_closed:
-        fallback = dict(team_closed[0])  # last closed sprint (index 0 = paling baru)
-        fallback["_is_fallback"] = True
-        fallback_sprints.append(fallback)
-
-sprints_to_report = active_sprints + fallback_sprints
+person_velocity_buma = compute_person_velocity_buma(list(reversed(buma_closed)), issues_cache)
 
 delayed_by_sprint = []
 for sprint_obj in sprints_to_report:
     team_name, baseline = team_for_sprint(sprint_obj["name"], baselines)
     print(f"Checking '{sprint_obj['name']}' ({team_name})...")
-    issues = fetch_sprint_issues_full(sprint_obj["id"])
+    issues = issues_cache[sprint_obj["id"]]
     rows = []
     for issue in issues:
         f = issue["fields"]
@@ -818,15 +906,14 @@ lines.append("## 👤 Velocity per Orang — 5 Sprint Terakhir\n")
 lines.append("SP dihitung dari ticket utama (parent). Setiap orang yang terlibat "
              "(assignee ticket utama maupun sub-ticket) mendapatkan SP penuh dari ticket tersebut.\n")
 
-def render_person_velocity_table(person_velocity, sprint_label_map, people_order=None):
+def render_person_velocity_table(person_velocity, sprint_label_map, people_order=None, show_total=False):
     """
     person_velocity : list of (sprint_name, {person: sp}), oldest -> newest.
     people_order    : list of person labels to show in that order (optional).
                       If None, sorted by total SP desc.
-    No Total column when people_order is provided (BUMA ID mode).
+    show_total      : tampilkan kolom Total di kanan (default False).
     """
     sprint_names = [name for name, _ in person_velocity]
-    show_total = people_order is None
 
     if people_order is None:
         all_people = sorted(
@@ -872,7 +959,8 @@ lines.append("|---|--------|")
 for i, (name, _) in enumerate(person_velocity_mkp):
     lines.append(f"| S{i+1} | {name} |")
 lines.append("")
-lines += render_person_velocity_table(person_velocity_mkp, sprint_label_map_mkp)
+mkp_people_order = [m["label"] for m in MKP_MEMBERS]
+lines += render_person_velocity_table(person_velocity_mkp, sprint_label_map_mkp, people_order=mkp_people_order)
 
 lines.append("### BUMA ID Team\n")
 lines.append("| # | Sprint |")

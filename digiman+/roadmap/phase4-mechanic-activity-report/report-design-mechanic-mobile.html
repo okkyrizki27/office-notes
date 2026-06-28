@@ -83,6 +83,21 @@
   .s-unit { font-size: 11px; color: #94a3b8; margin-top: 2px; }
   .summary-card.total .s-unit { color: #b7e4c7; }
 
+  /* ── BASELINE ROW ── */
+  .baseline-row { background:#fff; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:8px; box-shadow:0 1px 4px rgba(0,0,0,0.06); margin-bottom:8px; }
+  .bl-item { flex:1; text-align:center; }
+  .bl-label { font-size:10px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px; }
+  .bl-val { font-size:15px; font-weight:800; color:#1e293b; }
+  .bl-unit { font-size:10px; color:#94a3b8; }
+  .bl-divider { width:1px; height:36px; background:#f1f5f9; }
+  .bl-val.neg { color:#dc2626; }
+  .bl-val.pos { color:#16a34a; }
+  .util-bar-wrap { margin-top:4px; background:#f1f5f9; border-radius:4px; height:4px; overflow:hidden; }
+  .util-bar-fill { height:100%; border-radius:4px; background:#2d6a4f; }
+  .day-deviation { margin-left:auto; font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px; }
+  .dev-pos { background:#dcfce7; color:#16a34a; }
+  .dev-neg { background:#fee2e2; color:#dc2626; }
+
   /* ── LEGEND ── */
   .legend {
     display: flex; gap: 10px;
@@ -233,9 +248,28 @@
         <div class="s-unit">jam</div>
       </div>
       <div class="summary-card total">
-        <div class="s-label">Total</div>
+        <div class="s-label">Total Actual</div>
         <div class="s-hours">158</div>
         <div class="s-unit">jam</div>
+      </div>
+    </div>
+    <div class="baseline-row">
+      <div class="bl-item">
+        <div class="bl-label">Expected</div>
+        <div class="bl-val">220</div>
+        <div class="bl-unit">jam (10j × 22 hari)</div>
+      </div>
+      <div class="bl-divider"></div>
+      <div class="bl-item">
+        <div class="bl-label">Deviasi</div>
+        <div class="bl-val neg">−62 jam</div>
+        <div class="bl-unit">di bawah baseline</div>
+      </div>
+      <div class="bl-divider"></div>
+      <div class="bl-item">
+        <div class="bl-label">Utilization</div>
+        <div class="bl-val" style="color:#d97706;">71.8%</div>
+        <div class="util-bar-wrap"><div class="util-bar-fill" style="width:71.8%;background:#d97706;"></div></div>
       </div>
     </div>
   </div>
@@ -264,6 +298,7 @@
           <div class="day-schedule">Jadwal: Day Shift</div>
         </div>
         <div class="day-tag tag-day">Day Shift</div>
+        <span class="day-deviation dev-neg">−4.5j</span>
       </div>
       <div class="day-divider"></div>
       <div class="day-activities">
@@ -303,6 +338,7 @@
           <div class="day-schedule">Jadwal: Night Shift</div>
         </div>
         <div class="day-tag tag-night">Night Shift</div>
+        <span class="day-deviation dev-neg">−5j</span>
       </div>
       <div class="day-divider"></div>
       <div class="day-activities">
@@ -366,6 +402,7 @@
           <div class="day-schedule">Jadwal: Day Shift</div>
         </div>
         <div class="day-tag tag-warn">⚠ Kosong</div>
+        <span class="day-deviation dev-neg">−10j</span>
       </div>
       <div class="day-divider"></div>
       <div class="no-activity">
@@ -383,6 +420,7 @@
           <div class="day-schedule">Jadwal: Day Shift</div>
         </div>
         <div class="day-tag tag-day">Day Shift</div>
+        <span class="day-deviation dev-neg">−5.5j</span>
       </div>
       <div class="day-divider"></div>
       <div class="day-activities">
@@ -432,6 +470,7 @@
           <div class="day-schedule">Jadwal: Night Shift</div>
         </div>
         <div class="day-tag tag-night">Night Shift</div>
+        <span class="day-deviation dev-pos">+2j</span>
       </div>
       <div class="day-divider"></div>
       <div class="day-activities">

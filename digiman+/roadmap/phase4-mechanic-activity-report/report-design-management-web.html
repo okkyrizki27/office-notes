@@ -92,6 +92,9 @@
   .ss-card.nonmaint { border-left-color: #7c3aed; }
   .ss-card.util     { border-left-color: #f59e0b; }
   .ss-card.active   { border-left-color: #0369a1; }
+  .ss-card.expected { border-left-color: #64748b; }
+  .ss-card.deviasi  { border-left-color: #dc2626; }
+  .ss-card.deviasi  .ss-val { color: #dc2626; }
   .ss-icon { font-size: 22px; }
   .ss-text { }
   .ss-val { font-size: 22px; font-weight: 800; color: #1e293b; line-height: 1; }
@@ -144,11 +147,28 @@
   .fill-med  { background: #f59e0b; }
   .fill-low  { background: #ef4444; }
 
+  /* ── BASELINE NOTE BAR ── */
+  .baseline-bar {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    font-size: 12px; color: #475569;
+    display: flex; align-items: center; gap: 6px;
+    border-left: 4px solid #2d6a4f;
+    flex-wrap: wrap;
+  }
+  .baseline-bar strong { color: #1e293b; }
+  .baseline-sep { color: #cbd5e1; margin: 0 4px; }
+
   /* Section stats grid */
   .sec-stats {
-    display: grid; grid-template-columns: repeat(3, 1fr);
+    display: grid; grid-template-columns: repeat(5, 1fr);
     border-top: 1px solid #f1f5f9;
   }
+  .sec-stat-val.red { color: #dc2626; }
+  .sec-stat-val.amber { color: #d97706; }
   .sec-stat {
     padding: 12px 16px;
     border-right: 1px solid #f1f5f9;
@@ -355,30 +375,47 @@
       <div class="ss-icon">⏱</div>
       <div class="ss-text">
         <div class="ss-val">18,240</div>
-        <div class="ss-label">Total Jam</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:1px;">143.6 jam / orang</div>
+        <div class="ss-label">Total Jam (Actual)</div>
       </div>
     </div>
-    <div class="ss-card maint">
-      <div class="ss-icon">🔧</div>
+    <div class="ss-card expected">
+      <div class="ss-icon">📐</div>
       <div class="ss-text">
-        <div class="ss-val">15,820</div>
-        <div class="ss-label">Jam Maintenance</div>
+        <div class="ss-val">27,940</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:1px;">127 × 220 jam</div>
+        <div class="ss-label">Expected Jam</div>
       </div>
     </div>
-    <div class="ss-card nonmaint">
-      <div class="ss-icon">📋</div>
+    <div class="ss-card deviasi">
+      <div class="ss-icon">📉</div>
       <div class="ss-text">
-        <div class="ss-val">2,420</div>
-        <div class="ss-label">Jam Non Maintenance</div>
+        <div class="ss-val">−9,700</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:1px;">−76.4 jam / orang</div>
+        <div class="ss-label">Total Deviasi</div>
       </div>
     </div>
     <div class="ss-card util">
       <div class="ss-icon">📊</div>
       <div class="ss-text">
-        <div class="ss-val">76%</div>
+        <div class="ss-val">65.3%</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:1px;">18,240 / 27,940 jam</div>
         <div class="ss-label">Avg Utilization</div>
       </div>
     </div>
+  </div>
+
+  <!-- BASELINE NOTE BAR -->
+  <div class="baseline-bar">
+    ⚙ <strong>Baseline Site ADT</strong>
+    <span class="baseline-sep">|</span>
+    Jam kerja per hari: <strong>10 jam</strong>
+    <span class="baseline-sep">|</span>
+    Hari kerja periode ini: <strong>22 hari</strong>
+    <span class="baseline-sep">|</span>
+    Expected per orang: <strong>220 jam</strong>
+    <span class="baseline-sep">|</span>
+    <span style="color:#94a3b8;">Dikonfigurasi oleh Admin HO</span>
   </div>
 
   <!-- SECTION CARDS -->
@@ -410,7 +447,15 @@
         </div>
         <div class="sec-stat">
           <div class="sec-stat-val gray">6,544</div>
-          <div class="sec-stat-label">Total Jam</div>
+          <div class="sec-stat-label">Total Actual</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val gray">9,240</div>
+          <div class="sec-stat-label">Expected</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val amber">−2,696</div>
+          <div class="sec-stat-label">Deviasi</div>
         </div>
       </div>
       <div class="sec-levels">
@@ -448,7 +493,15 @@
         </div>
         <div class="sec-stat">
           <div class="sec-stat-val gray">4,890</div>
-          <div class="sec-stat-label">Total Jam</div>
+          <div class="sec-stat-label">Total Actual</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val gray">7,700</div>
+          <div class="sec-stat-label">Expected</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val red">−2,810</div>
+          <div class="sec-stat-label">Deviasi</div>
         </div>
       </div>
       <div class="sec-levels">
@@ -486,7 +539,15 @@
         </div>
         <div class="sec-stat">
           <div class="sec-stat-val gray">4,040</div>
-          <div class="sec-stat-label">Total Jam</div>
+          <div class="sec-stat-label">Total Actual</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val gray">6,160</div>
+          <div class="sec-stat-label">Expected</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val amber">−2,120</div>
+          <div class="sec-stat-label">Deviasi</div>
         </div>
       </div>
       <div class="sec-levels">
@@ -524,7 +585,15 @@
         </div>
         <div class="sec-stat">
           <div class="sec-stat-val gray">2,766</div>
-          <div class="sec-stat-label">Total Jam</div>
+          <div class="sec-stat-label">Total Actual</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val gray">4,840</div>
+          <div class="sec-stat-label">Expected</div>
+        </div>
+        <div class="sec-stat">
+          <div class="sec-stat-val red">−2,074</div>
+          <div class="sec-stat-label">Deviasi</div>
         </div>
       </div>
       <div class="sec-levels">
@@ -556,9 +625,9 @@
           <th>Level</th>
           <th>Section</th>
           <th class="sortable">Utilization <span class="sort-arrow">↓</span></th>
-          <th class="sortable">Jam Maint.</th>
-          <th>Jam Non M.</th>
-          <th>Total Jam</th>
+          <th class="sortable">Total Actual</th>
+          <th>Expected</th>
+          <th>Deviasi</th>
           <th>Status Report</th>
           <th></th>
         </tr>
@@ -577,9 +646,9 @@
               <span class="util-pill up-high">86%</span>
             </div>
           </td>
-          <td style="font-weight:700;color:#2d6a4f;">142 jam</td>
-          <td style="color:#7c3aed;">16 jam</td>
           <td style="font-weight:600;">158 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td style="color:#dc2626;font-weight:600;">−62 jam</td>
           <td><span class="status-chip sc-submitted">Submitted</span></td>
           <td><button class="view-btn">Lihat ›</button></td>
         </tr>
@@ -596,9 +665,9 @@
               <span class="util-pill up-high">80%</span>
             </div>
           </td>
-          <td style="font-weight:700;color:#2d6a4f;">148 jam</td>
-          <td style="color:#7c3aed;">22 jam</td>
-          <td style="font-weight:600;">170 jam</td>
+          <td style="font-weight:600;">176 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td style="color:#dc2626;font-weight:600;">−44 jam</td>
           <td><span class="status-chip sc-approved">Approved</span></td>
           <td><button class="view-btn">Lihat ›</button></td>
         </tr>
@@ -615,9 +684,9 @@
               <span class="util-pill up-med">68%</span>
             </div>
           </td>
-          <td style="font-weight:700;color:#2d6a4f;">118 jam</td>
-          <td style="color:#7c3aed;">28 jam</td>
           <td style="font-weight:600;">146 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td style="color:#dc2626;font-weight:600;">−74 jam</td>
           <td><span class="status-chip sc-approved">Approved</span></td>
           <td><button class="view-btn">Lihat ›</button></td>
         </tr>
@@ -634,9 +703,9 @@
               <span class="util-pill up-low">54%</span>
             </div>
           </td>
-          <td style="font-weight:700;color:#2d6a4f;">96 jam</td>
-          <td style="color:#7c3aed;">34 jam</td>
           <td style="font-weight:600;">130 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td style="color:#dc2626;font-weight:600;">−90 jam</td>
           <td><span class="status-chip sc-draft">Draft</span></td>
           <td><button class="view-btn">Lihat ›</button></td>
         </tr>
@@ -653,9 +722,9 @@
               <span class="util-pill up-high">78%</span>
             </div>
           </td>
-          <td style="font-weight:700;color:#2d6a4f;">138 jam</td>
-          <td style="color:#7c3aed;">18 jam</td>
           <td style="font-weight:600;">156 jam</td>
+          <td style="color:#64748b;">220 jam</td>
+          <td style="color:#dc2626;font-weight:600;">−64 jam</td>
           <td><span class="status-chip sc-submitted">Submitted</span></td>
           <td><button class="view-btn">Lihat ›</button></td>
         </tr>

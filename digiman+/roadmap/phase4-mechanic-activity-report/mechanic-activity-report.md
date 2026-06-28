@@ -21,6 +21,39 @@ Setiap bulan, mechanic menyusun dan mengsubmit **activity report** yang merangku
 
 ---
 
+## Baseline Jam Kerja
+
+Baseline adalah target jam kerja harian yang dikonfigurasi per site oleh **Admin HO**. Digunakan sebagai pembanding terhadap jam aktual mechanic dalam satu periode laporan.
+
+### Konfigurasi
+
+| Field | Keterangan |
+|-------|------------|
+| `SiteCode` | Site yang berlaku |
+| `HoursPerDay` | Target jam kerja per hari (misal: 10 jam) |
+| `EffectiveFrom` | Tanggal mulai berlaku — historis terjaga jika baseline berubah |
+| `IsActive` | Soft flag |
+| `CreatedBy / CreatedAt` | Audit |
+
+> Konfigurasi dilakukan oleh Admin HO. Satu site bisa punya satu baseline aktif. Jika baseline berubah, laporan historis menggunakan baseline yang berlaku pada periode laporan tersebut (`EffectiveFrom`).
+
+### Perhitungan
+
+```
+Expected Hours = HoursPerDay × jumlah hari kerja dalam periode
+                 (hari kerja = hari kalender - weekend - hari libur nasional)
+
+Actual Hours   = total durasi semua aktivitas dalam periode
+
+Deviasi        = Actual - Expected
+                 → positif (+x jam) jika melebihi baseline
+                 → negatif (-y jam) jika belum memenuhi baseline
+
+Utilization Rate = (Actual / Expected) × 100%
+```
+
+---
+
 ## Data yang Ditampilkan
 
 ### Header / Identitas
@@ -41,7 +74,10 @@ Setiap bulan, mechanic menyusun dan mengsubmit **activity report** yang merangku
 |------|------------|
 | Total Jam Maintenance | Jumlah durasi semua baris kategori Maintenance |
 | Total Jam Non Maintenance | Jumlah durasi semua baris kategori Non Maintenance |
-| Total Jam Keseluruhan | Gabungan keduanya |
+| Total Jam Keseluruhan (Actual) | Gabungan keduanya |
+| Expected Hours | `HoursPerDay` × hari kerja dalam periode (dari baseline site) |
+| Deviasi | Actual − Expected → ditampilkan sebagai `+x jam` atau `−y jam` |
+| Utilization Rate | `(Actual / Expected) × 100%` |
 
 ### Daily Detail
 
@@ -81,7 +117,10 @@ Setiap baris = satu sesi aktivitas:
 |----------|-----------|
 | Maintenance | 142 jam |
 | Non Maintenance | 16 jam |
-| **Total** | **158 jam** |
+| **Total Actual** | **158 jam** |
+| Expected (10 jam × 22 hari kerja) | 220 jam |
+| **Deviasi** | **−62 jam** |
+| **Utilization Rate** | **71.8%** |
 
 ### Daily Detail
 
@@ -110,6 +149,8 @@ Setiap baris = satu sesi aktivitas:
 
 ## Open Items
 
+- [x] Baseline jam kerja — per hari, per site, dikonfigurasi Admin HO. Ditampilkan sebagai Expected vs Actual + Deviasi (+/-) + Utilization Rate
+- [ ] Apakah utilization rate perlu dipecah per kategori (Maintenance vs Non Maintenance), atau cukup total?
 - [ ] Approval flow detail — single level supervisor atau bisa bertahap ke superintendent?
 - [ ] Platform approval — web atau mobile?
 - [ ] Kebijakan editing setelah submit — apakah mechanic bisa recall/edit report yang sudah Submitted?

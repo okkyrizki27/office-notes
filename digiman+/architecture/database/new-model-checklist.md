@@ -73,6 +73,28 @@ Urutan mengikuti dependency chain: Tenant → Asset → User.
 
 ---
 
+## 4. Permission & Group (`cst-shared-sqldb-user` / User Management)
+
+### Permission Code — Akses Fitur
+- [ ] User sudah di-mapping ke **permission code** yang sesuai agar fitur dapat diakses
+  - Contoh: permission untuk akses Inspection, Order, Work Card, dll
+  - Verifikasi di User Management: pastikan role/permission user sudah include permission code yang diperlukan
+  - Jika belum: assign permission code yang sesuai ke role user tersebut
+
+### Group: BUMA ID Inspector — Muncul di List Assign to Inspection
+- [ ] User yang perlu muncul di list **"Assign to Inspector"** sudah ditambahkan ke group **`BUMA ID Inspector`**
+  - Verifikasi: cek group membership user di User Management
+  - Jika belum: tambahkan user ke group `BUMA ID Inspector`
+  - Tanpa ini: nama user tidak akan muncul sebagai pilihan saat assign inspection ke inspector
+
+### Group: BUMA ID Approver — Mendapatkan Data Approval di Workflow
+- [ ] User yang berperan sebagai Approver sudah ditambahkan ke group **`BUMA ID Approver`**
+  - Verifikasi: cek group membership user di User Management
+  - Jika belum: tambahkan user ke group `BUMA ID Approver`
+  - Tanpa ini: user tidak akan mendapatkan notifikasi/data approval di Workflow
+
+---
+
 ## Summary Dependency
 
 ```
@@ -87,10 +109,13 @@ Urutan mengikuti dependency chain: Tenant → Asset → User.
 [9] asset.SubComponentDamage     → mapping subcomponent ke damage code
 [10] asset.Asset                 → AssetModelCode terisi benar
 [11] user.UserEmploymentProfile  → SectionId sesuai OrganizationUnit
+[12] Permission Code             → user di-assign ke permission code yang sesuai
+[13] Group BUMA ID Inspector     → user muncul di list assign to inspection
+[14] Group BUMA ID Approver      → approver mendapatkan data approval di Workflow
 ```
 
-Jika salah satu step terlewat, user tidak akan bisa melihat data asset/component/damage untuk model tersebut.
+Jika salah satu step terlewat, user tidak akan bisa melihat data asset/component/damage untuk model tersebut, atau tidak muncul di list yang seharusnya.
 
 ---
 
-*Last updated: 2026-06-18*
+*Last updated: 2026-06-26*

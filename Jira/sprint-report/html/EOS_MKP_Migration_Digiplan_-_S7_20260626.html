@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>End of Sprint — Migration Digiplan - S7 — MKP Team</title>
+<style>
+  @page { size: A4 portrait; margin: 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #1a1a1a;
+          padding: 0 260px; background: #f5f6f5; }
+
+  .report-header { background: linear-gradient(135deg, #7BA3C0, #4A7A9B);
+    color: #fff; padding: 28px 32px; border-radius: 10px; margin: 20px 0 16px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.15); }
+  .report-header h1 { font-size: 22pt; font-weight: 800; margin-bottom: 5px; }
+  .report-header .sprint-name { font-size: 14pt; opacity: 0.9; margin-bottom: 4px; }
+  .report-header .meta { font-size: 9pt; opacity: 0.75; }
+
+  .stats-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .stat-card { flex: 1; min-width: 90px; background: #fff; border-radius: 10px;
+    padding: 14px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    text-align: center; border-top: 5px solid #7BA3C0; }
+  .stat-num { font-size: 24pt; font-weight: 800; color: #4A7A9B; line-height: 1; }
+  .stat-sp  { font-size: 9pt; color: #aaa; margin: 3px 0; }
+  .stat-label { font-size: 8pt; color: #888; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-top: 5px; }
+
+  .section { background: #fff; border-radius: 10px; padding: 20px 24px;
+    margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+  .section-title { font-size: 13pt; font-weight: 700; color: #4A7A9B;
+    border-left: 5px solid #7BA3C0; padding-left: 12px; margin-bottom: 14px; }
+
+  .completion-wrap { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+  .arc-item { text-align: center; }
+  .arc-label { font-size: 9.5pt; color: #555; font-weight: 600; margin-top: 5px; }
+  .day-bar-wrap { flex: 1; min-width: 180px; }
+  .day-bar-label { font-size: 9pt; color: #666; margin-bottom: 5px; }
+  .day-bar { background: #e8e8e8; border-radius: 8px; height: 20px; overflow: hidden; }
+  .day-bar-fill { height: 100%;
+    background: linear-gradient(90deg, #7BA3C0, #4A7A9B);
+    border-radius: 8px; }
+  .day-bar-pct { font-size: 9pt; color: #aaa; margin-top: 3px; text-align: right; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: 6px; }
+  th { background: #7BA3C0; color: #fff; padding: 7px 10px;
+    text-align: left; font-weight: 600; }
+  td { padding: 6px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+  tr:nth-child(even) td { background: #EAF2F8; }
+  tr:hover td { background: #e4ede0; }
+  a { color: #4A7A9B; text-decoration: none; font-weight: 600; }
+  .delay-badge { color: #c0392b; font-weight: 800; }
+  .empty-td { text-align: center; color: #bbb; font-style: italic; padding: 14px; }
+  .current-row td { background: #EAF2F8; font-weight: bold; }
+  .empty-note { color: #bbb; font-style: italic; font-size: 9.5pt; padding: 8px 0; }
+
+  .champion-box { border: 2px solid; border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+  .champion-header { color: #fff; padding: 10px 18px; font-size: 12pt;
+    font-weight: 800; letter-spacing: 1px; }
+  .champion-content { padding: 16px 18px; }
+  .champion-main { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .crown { font-size: 28pt; line-height: 1; }
+  .champion-name { font-size: 16pt; font-weight: 800; flex: 1; }
+  .champion-badge { color: #fff; padding: 4px 14px; border-radius: 20px;
+    font-size: 10pt; font-weight: 700; white-space: nowrap; }
+  .leaderboard { display: flex; flex-direction: column; gap: 5px; }
+  .lb-item { display: flex; align-items: center; gap: 10px; padding: 6px 12px;
+    background: #f5f5f5; border-radius: 6px; font-size: 9.5pt; }
+  .lb-name { flex: 1; font-weight: 600; }
+  .lb-count { color: #c0392b; font-weight: 700; }
+
+  .lb-cards { display: flex; flex-direction: column; gap: 8px; }
+  .lb-card { display: flex; align-items: center; gap: 14px; padding: 10px 16px;
+    border-radius: 8px; background: #f9f9f9; }
+  .lb-rank { font-size: 16pt; width: 36px; text-align: center; }
+  .lb-person { flex: 1; font-size: 11pt; font-weight: 600; }
+  .lb-sp { font-size: 14pt; font-weight: 800; }
+
+  .footer { text-align: center; font-size: 8pt; color: #ccc; margin: 20px 0 16px;
+    padding-top: 12px; border-top: 1px solid #eee; }
+  @media print {
+    body { padding: 0 20px; background: #fff; }
+    .report-header, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <h1>End of Sprint Report</h1>
+  <div class="sprint-name">Migration Digiplan - S7</div>
+  <div class="meta">MKP Team &nbsp;·&nbsp; 2026-06-12 → 2026-06-26 &nbsp;·&nbsp; Generated: 26 June 2026 14:19:04</div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-num">40</div>
+    <div class="stat-sp">89 SP</div>
+    <div class="stat-label">Total</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#27ae60;">40</div>
+    <div class="stat-sp">89 SP</div>
+    <div class="stat-label">Done</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#e67e22;">0</div>
+    <div class="stat-sp">0 SP</div>
+    <div class="stat-label">Outstanding</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#c0392b;">0</div>
+    <div class="stat-sp">&nbsp;</div>
+    <div class="stat-label">Reopened</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#c0392b;">5</div>
+    <div class="stat-sp">&nbsp;</div>
+    <div class="stat-label">Delayed Dev</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#e67e22;">13</div>
+    <div class="stat-sp">&nbsp;</div>
+    <div class="stat-label">Delayed QA</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">📊 Completion Rate</div>
+  <div class="completion-wrap">
+    <div class="arc-item">
+      <svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="40" fill="none" stroke="#e8e8e8" stroke-width="9"/><circle cx="55" cy="55" r="40" fill="none" stroke="#7BA3C0" stroke-width="9" stroke-dasharray="251.3 0.0" stroke-dashoffset="62.8" stroke-linecap="round"/><text x="55" y="61" text-anchor="middle" font-size="17" font-weight="bold" fill="#7BA3C0">100%</text></svg>
+      <div class="arc-label">Tickets</div>
+    </div>
+    <div class="arc-item">
+      <svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="40" fill="none" stroke="#e8e8e8" stroke-width="9"/><circle cx="55" cy="55" r="40" fill="none" stroke="#4A7A9B" stroke-width="9" stroke-dasharray="251.3 0.0" stroke-dashoffset="62.8" stroke-linecap="round"/><text x="55" y="61" text-anchor="middle" font-size="17" font-weight="bold" fill="#4A7A9B">100%</text></svg>
+      <div class="arc-label">Story Points</div>
+    </div>
+    <div class="day-bar-wrap">
+      <div class="day-bar-label">⏱ Sprint Day Progress: <b>10 / 10 hari kerja</b></div>
+      <div class="day-bar"><div class="day-bar-fill" style="width:100%"></div></div>
+      <div class="day-bar-pct">100% hari sprint telah dilalui</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">⏳ Outstanding Tickets <span style="font-weight:400;font-size:10pt;">(0 ticket)</span></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Status</th><th>Assignee</th><th>SP</th><th>Priority</th></tr></thead>
+  <tbody><tr><td colspan="6" class="empty-td">Semua ticket sudah Done! 🎉</td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">🔁 Reopened Tickets <span style="font-weight:400;font-size:10pt;">(0 ticket)</span></div>
+  <p class="empty-note">Tidak ada data — semua bersih! 🎉</p>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Status</th><th>Assignee</th><th>Reopen</th><th>Last Reopen</th><th>Priority</th></tr></thead>
+  <tbody><tr><td colspan="7" class="empty-td">Tidak ada ticket yang reopen! 💪</td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">📈 Velocity Trend</div>
+  <table><thead><tr><th>#</th><th>Sprint</th><th>Completed SP</th></tr></thead>
+  <tbody><tr><td>S1</td><td>Migrating Digiplan - S2</td><td><b>58 SP</b></td></tr><tr><td>S2</td><td>Migrating Digiplan - S3</td><td><b>88 SP</b></td></tr><tr><td>S3</td><td>Migration Digiplan - S4</td><td><b>84 SP</b></td></tr><tr><td>S4</td><td>Migration Digiplan - S5</td><td><b>88 SP</b></td></tr><tr><td>S5</td><td>Migration Digiplan - S6</td><td><b>122 SP</b></td></tr><tr class="current-row"><td>S6</td><td>Migration Digiplan - S7 &nbsp;<b>← current</b></td><td><b>89 SP</b></td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">🏅 Dev Leaderboard — Story Points Completed</div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Ticket yang mencapai DEV DONE dalam rentang sprint ini dan status akhir QA PASSED / Done.</p>
+  <div class="lb-cards"><div class="lb-card" style="border-left:4px solid #7BA3C0;"><span class="lb-rank">🥇</span><span class="lb-person">Yvonne Priscilla</span><span class="lb-sp" style="color:#7BA3C0;">22 SP</span></div><div class="lb-card" style="border-left:4px solid #7BA3C0;"><span class="lb-rank">🥈</span><span class="lb-person">Sarayevi Zalanderi</span><span class="lb-sp" style="color:#7BA3C0;">18 SP</span></div><div class="lb-card" style="border-left:4px solid #7BA3C0;"><span class="lb-rank">🥉</span><span class="lb-person">v-darwin.samalo</span><span class="lb-sp" style="color:#7BA3C0;">17 SP</span></div><div class="lb-card" style="border-left:4px solid #7BA3C0;"><span class="lb-rank">#4</span><span class="lb-person">Muhammad Abdu Ar Rahman</span><span class="lb-sp" style="color:#7BA3C0;">11 SP</span></div><div class="lb-card" style="border-left:4px solid #7BA3C0;"><span class="lb-rank">#5</span><span class="lb-person">Varian Aditya Iryanto</span><span class="lb-sp" style="color:#7BA3C0;">4 SP</span></div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">🏅 QA Leaderboard — Story Points Completed</div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Ticket yang mencapai QA PASSED dalam rentang sprint ini dan status akhir QA PASSED / Done.</p>
+  <div class="lb-cards"><div class="lb-card" style="border-left:4px solid #4A7A9B;"><span class="lb-rank">🥇</span><span class="lb-person">Andrian Sebayang</span><span class="lb-sp" style="color:#4A7A9B;">50 SP</span></div><div class="lb-card" style="border-left:4px solid #4A7A9B;"><span class="lb-rank">🥈</span><span class="lb-person">Muhammad Zul Fikar</span><span class="lb-sp" style="color:#4A7A9B;">23 SP</span></div><div class="lb-card" style="border-left:4px solid #4A7A9B;"><span class="lb-rank">🥉</span><span class="lb-person">Gita Riskayanti</span><span class="lb-sp" style="color:#4A7A9B;">11 SP</span></div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">🔴 Delayed Tickets — Developer <span style="font-weight:400;font-size:10pt;">(5 ticket)</span></div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Total waktu In Progress vs baseline rata-rata per SP dari 5 sprint closed terakhir.</p>
+  <div class="champion-box" style="border-color:#7BA3C0;"><div class="champion-header" style="background:#7BA3C0;">🏆 CHAMPION</div><div class="champion-content"><div class="champion-main"><span class="crown">👑</span><span class="champion-name">Sarayevi Zalanderi</span><span class="champion-badge" style="background:#7BA3C0;">4 tickets</span></div><div class="leaderboard"><div class="lb-item">🥈&nbsp;<span class="lb-name">Yvonne Priscilla</span><span class="lb-count">1 ticket</span></div></div></div></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Assignee</th><th>SP</th><th>Actual (hari)</th><th>Baseline (hari)</th><th>Delay</th><th>Priority</th></tr></thead><tbody><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4085">IAMS30-4085</a></td><td>[FE] Action Remedy — List Page</td><td>Sarayevi Zalanderi</td><td>1</td><td>3.7</td><td>1.7</td><td><span class="delay-badge">+2.0</span></td><td>Low</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4086">IAMS30-4086</a></td><td>[FE] Action Remedy — Add Action Remedy Modal</td><td>Sarayevi Zalanderi</td><td>1</td><td>3.7</td><td>1.7</td><td><span class="delay-badge">+2.0</span></td><td>Low</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4087">IAMS30-4087</a></td><td>[FE] Action Remedy — Edit Action Remedy Modal</td><td>Sarayevi Zalanderi</td><td>1</td><td>3.7</td><td>1.7</td><td><span class="delay-badge">+2.0</span></td><td>Low</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4084">IAMS30-4084</a></td><td>[BE] Action Remedy — List, Create, Update API</td><td>Sarayevi Zalanderi</td><td>3</td><td>5.0</td><td>4.3</td><td><span class="delay-badge">+0.7</span></td><td>Low</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4178">IAMS30-4178</a></td><td>[FE] Equipment List — &quot;Edit Equipment Mapping&quot; Action</td><td>Yvonne Priscilla</td><td>1</td><td>2.2</td><td>1.7</td><td><span class="delay-badge">+0.5</span></td><td>Medium</td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">🟠 Delayed Tickets — QA <span style="font-weight:400;font-size:10pt;">(13 ticket)</span></div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Total waktu QA TEST vs baseline rata-rata per SP dari 5 sprint closed terakhir.</p>
+  <div class="champion-box" style="border-color:#4A7A9B;"><div class="champion-header" style="background:#4A7A9B;">🏆 CHAMPION</div><div class="champion-content"><div class="champion-main"><span class="crown">👑</span><span class="champion-name">Muhammad Zul Fikar</span><span class="champion-badge" style="background:#4A7A9B;">7 tickets</span></div><div class="leaderboard"><div class="lb-item">🥈&nbsp;<span class="lb-name">Andrian Sebayang</span><span class="lb-count">6 tickets</span></div></div></div></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Assignee</th><th>SP</th><th>Actual (hari)</th><th>Baseline (hari)</th><th>Delay</th><th>Priority</th></tr></thead><tbody><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4147">IAMS30-4147</a></td><td>[FE] Menu &amp; Tab Access Control — Equipment Management &amp; M...</td><td>Andrian Sebayang</td><td>1</td><td>5.2</td><td>0.2</td><td><span class="delay-badge">+5.0</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4213">IAMS30-4213</a></td><td>[MKP2] Pipeline generate dim_date parquet untuk MKP</td><td>Andrian Sebayang</td><td>2</td><td>1.8</td><td>1.3</td><td><span class="delay-badge">+0.5</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4178">IAMS30-4178</a></td><td>[FE] Equipment List — &quot;Edit Equipment Mapping&quot; Action</td><td>Andrian Sebayang</td><td>1</td><td>0.7</td><td>0.2</td><td><span class="delay-badge">+0.5</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4106">IAMS30-4106</a></td><td>[BE] Create Department Table in DB SharedUser and Migrate Data fr...</td><td>Andrian Sebayang</td><td>1</td><td>0.7</td><td>0.2</td><td><span class="delay-badge">+0.5</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4065">IAMS30-4065</a></td><td>[BE] [Web] User Management - Search by EmployeeId</td><td>Andrian Sebayang</td><td>1</td><td>0.7</td><td>0.2</td><td><span class="delay-badge">+0.5</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4159">IAMS30-4159</a></td><td>[FE] Refactor CRUD System with VeeValidate Integration and Type S...</td><td>Andrian Sebayang</td><td>3</td><td>2.0</td><td>1.6</td><td><span class="delay-badge">+0.4</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4103">IAMS30-4103</a></td><td>[FE] Sub Component — Add Sub Component Modal</td><td>Muhammad Zul Fikar</td><td>1</td><td>0.4</td><td>0.2</td><td><span class="delay-badge">+0.2</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4101">IAMS30-4101</a></td><td>[BE] Sub Component — List, Create, Update API</td><td>Muhammad Zul Fikar</td><td>3</td><td>1.8</td><td>1.6</td><td><span class="delay-badge">+0.2</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4098">IAMS30-4098</a></td><td>[FE] Component — Edit Component Modal</td><td>Muhammad Zul Fikar</td><td>1</td><td>0.4</td><td>0.2</td><td><span class="delay-badge">+0.1</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4095">IAMS30-4095</a></td><td>[BE] Component — List, Create, Update API</td><td>Muhammad Zul Fikar</td><td>3</td><td>1.7</td><td>1.6</td><td><span class="delay-badge">+0.1</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4097">IAMS30-4097</a></td><td>[FE] Component — Add Component Modal</td><td>Muhammad Zul Fikar</td><td>1</td><td>0.3</td><td>0.2</td><td><span class="delay-badge">+0.1</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4135">IAMS30-4135</a></td><td>[FE] Cause Group — List, Add &amp; Edit Page</td><td>Muhammad Zul Fikar</td><td>1</td><td>0.3</td><td>0.2</td><td><span class="delay-badge">+0.0</span></td><td>Low</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4143">IAMS30-4143</a></td><td>[FE] Damage — List, Add &amp; Edit Page</td><td>Muhammad Zul Fikar</td><td>1</td><td>0.2</td><td>0.2</td><td><span class="delay-badge">+0.0</span></td><td>Medium</td></tr></tbody></table>
+</div>
+
+<div class="footer">Auto-generated by end_of_sprint_report.py — 26 June 2026 14:19:04</div>
+</body>
+</html>

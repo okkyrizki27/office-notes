@@ -1,5 +1,5 @@
 # Delayed and Reopen Ticket Report
-**Generated:** 24 June 2026 23:51  |  **Project:** IAMS30  |  **Board:** IAMS 3.0
+**Generated:** 26 June 2026 14:33  |  **Project:** IAMS30  |  **Board:** IAMS 3.0
 
 Report ini membandingkan waktu ticket berstatus **In Progress** saat ini dengan rata-rata historis waktu pengerjaan **To Do → DEV DONE** (5 sprint terakhir per tim) untuk Story Point yang sama. Ticket dianggap **delayed** jika sudah In Progress lebih lama dari rata-rata tersebut.
 
@@ -11,7 +11,7 @@ Report ini membandingkan waktu ticket berstatus **In Progress** saat ini dengan 
 |-------------|------------------|----------------------|
 | 1 | 2.18 | 1.09 |
 | 2 | 6.37 | 2.42 |
-| 3 | 6.63 | 7.56 |
+| 3 | 6.63 | 8.25 |
 | 5 | 9.44 | 9.76 |
 | 8 | 15.89 | 21.63 |
 
@@ -19,46 +19,7 @@ Report ini membandingkan waktu ticket berstatus **In Progress** saat ini dengan 
 
 ## Migration Digiplan - S7 — MKP Team
 
-Total ticket In Progress: **4**  |  Delayed: **0**  |  On Track: **4**  |  No Baseline (SP di luar 1/2/3/5/8): **0**
-
-### 🔴 Delayed Tickets
-
-Selamat, tidak ada ticket yang delayed hari ini.
-
-### 🟢 On Track Tickets
-
-| Key | Summary | Assignee | SP | Started | Elapsed (hari) | Baseline (hari) | Priority |
-|-----|---------|----------|----|---------|-----------------|-------------------|----------|
-| [IAMS30-4143](https://bukittechnology.atlassian.net/browse/IAMS30-4143) | [FE] Damage — List, Add & Edit Page | Sarayevi Zalanderi | 1 | 2026-06-24 | 0.3 | 2.2 | Medium |
-| [IAMS30-4055](https://bukittechnology.atlassian.net/browse/IAMS30-4055) | Mobile Waterfall Sync Log Monitoring | Muhammad Abdu Ar Rahman | 3 | 2026-06-24 | 0.4 | 6.6 | Medium |
-| [IAMS30-4144](https://bukittechnology.atlassian.net/browse/IAMS30-4144) | [BE] Damage — List, Create, Update API | Sarayevi Zalanderi | 3 | 2026-06-24 | 0.3 | 6.6 | Medium |
-
-*...dan 1 ticket lainnya — lihat backlog di board.*
-
-### 🔁 Reopened Tickets
-
-Nihil! Gak ada ticket yang bolak-balik reopen — sekali jadi langsung mantap. 💪
-
-### 📊 Current Progress Sprint
-
-| Metric | Tickets | Story Points |
-|--------|---------|--------------|
-| Total | 37 | 79 SP |
-| Done / QA Passed | 22 (59%) | 39 SP (49%) |
-| In Progress / Dev Done / QA Test | 15 | 40 SP |
-| To Do | 0 | 0 SP |
-| **Progress (Tickets / SP)** | <div class="progress-bar"><div class="progress-fill" style="width:59%"></div></div><span class="progress-pct">59%</span> | <div class="progress-bar"><div class="progress-fill" style="width:49%"></div></div><span class="progress-pct">49%</span> |
-| **Sprint Day Progress** | 8 / 10 hari kerja | <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div><span class="progress-pct">80%</span> |
-
-### 📋 To Do Tickets
-
-To Do list-nya kosong melompong. Semua udah jalan duluan, gas terus! 🚀
-
----
-
-## 4.1.0 - Improve and Fix — BUMA ID Team *(Last Completed Sprint — No Active Sprint)*
-
-Total ticket In Progress: **2**  |  Delayed: **0**  |  On Track: **0**  |  No Baseline (SP di luar 1/2/3/5/8): **2**
+Total ticket In Progress: **0**  |  Delayed: **0**  |  On Track: **0**  |  No Baseline (SP di luar 1/2/3/5/8): **0**
 
 ### 🔴 Delayed Tickets
 
@@ -68,45 +29,78 @@ Selamat, tidak ada ticket yang delayed hari ini.
 
 Sepi banget di sini... gak ada ticket yang lagi on track. 🦗
 
-### ⚪ No Baseline (SP tidak termasuk 1/2/3/5/8)
-
-| Key | Summary | Assignee | SP | Started | Elapsed (hari) | Priority |
-|-----|---------|----------|----|---------|-----------------|----------|
-| [IAMS30-4081](https://bukittechnology.atlassian.net/browse/IAMS30-4081) | [PRD Issue] App freeze / ANR - Flutter render semua work card sekaligu... | nurrahman hadi | - | 2026-06-17 | 5.3 | Medium |
-| [IAMS30-4245](https://bukittechnology.atlassian.net/browse/IAMS30-4245) | [Mobile] Field Unit Serial Number tidak berfungsi di form submission | dimas.wahyu | - | 2026-06-19 | 3.1 | High |
-
 ### 🔁 Reopened Tickets
 
-| Key | Summary | Status | Assignee | Reopen Count | Priority | New Today |
-|-----|---------|--------|----------|--------------|----------|-----------|
-| [IAMS30-3995](https://bukittechnology.atlassian.net/browse/IAMS30-3995) | [Web] Monitoring Inspection - Invalid Ascending Sort on Description | Done | Dian Heryana | 2 | Lowest | <span style="color:#fff;background:#c0392b;padding:1px 6px;border-radius:3px;font-size:8pt;font-weight:bold;">NEW</span> |
-| [IAMS30-4004](https://bukittechnology.atlassian.net/browse/IAMS30-4004) | [Mobile] Enhance Handle Konsistensi Data User - Remove Headers, Use To... | Done | nurrahman hadi | 1 | Medium |  |
-| [IAMS30-4046](https://bukittechnology.atlassian.net/browse/IAMS30-4046) | [BE] Update Get List Inspection API: Add SectionTypeCode Filter Criter... | Done | Dian Heryana | 1 | Medium |  |
-| [IAMS30-4044](https://bukittechnology.atlassian.net/browse/IAMS30-4044) | [MOBILE] Retrieve Allowed Equipment Section List Based on User's Secti... | Done | nurrahman hadi | 1 | Medium |  |
-| [IAMS30-4020](https://bukittechnology.atlassian.net/browse/IAMS30-4020) | [MOBILE] View History Detail — Dynamic Form Submission | Done | nurrahman hadi | 1 | Medium |  |
-| [IAMS30-4050](https://bukittechnology.atlassian.net/browse/IAMS30-4050) | [BE] Create API to Upsert record for AssetSection | Done | Riki Ahmad Fadilah | 1 | Medium |  |
-| [IAMS30-4045](https://bukittechnology.atlassian.net/browse/IAMS30-4045) | [BE] Update Get Asset API: Add SectionTypeCode Filter Criteria | Done | Dian Heryana | 1 | Medium |  |
+Nihil! Gak ada ticket yang bolak-balik reopen — sekali jadi langsung mantap. 💪
 
 ### 📊 Current Progress Sprint
 
 | Metric | Tickets | Story Points |
 |--------|---------|--------------|
-| Total | 45 | 81 SP |
-| Done / QA Passed | 38 (84%) | 81 SP (100%) |
-| In Progress / Dev Done / QA Test | 2 | 0 SP |
-| To Do | 5 | 0 SP |
-| **Progress (Tickets / SP)** | <div class="progress-bar"><div class="progress-fill" style="width:84%"></div></div><span class="progress-pct">84%</span> | <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div><span class="progress-pct">100%</span> |
+| Total | 40 | 89 SP |
+| Done / QA Passed | 40 (100%) | 89 SP (100%) |
+| In Progress / Dev Done / QA Test | 0 | 0 SP |
+| To Do | 0 | 0 SP |
+| **Progress (Tickets / SP)** | <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div><span class="progress-pct">100%</span> | <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div><span class="progress-pct">100%</span> |
 | **Sprint Day Progress** | 10 / 10 hari kerja | <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div><span class="progress-pct">100%</span> |
+
+### 📋 To Do Tickets
+
+To Do list-nya kosong melompong. Semua udah jalan duluan, gas terus! 🚀
+
+---
+
+## S2 IAMS — BUMA ID Team
+
+Total ticket In Progress: **9**  |  Delayed: **0**  |  On Track: **5**  |  No Baseline (SP di luar 1/2/3/5/8): **4**
+
+### 🔴 Delayed Tickets
+
+Selamat, tidak ada ticket yang delayed hari ini.
+
+### 🟢 On Track Tickets
+
+| Key | Summary | Assignee | SP | Started | Elapsed (hari) | Baseline (hari) | Priority |
+|-----|---------|----------|----|---------|-----------------|-------------------|----------|
+| [IAMS30-4076](https://bukittechnology.atlassian.net/browse/IAMS30-4076) | [FE] Inspection Monitoring - Download PDF Button on Detail Page | dimas.wahyu | 1 | 2026-06-25 | 0.6 | 1.1 | Highest |
+| [IAMS30-4264](https://bukittechnology.atlassian.net/browse/IAMS30-4264) | [BE] Form Package — Add Column FormName and IsMandatory | Riki Ahmad Fadilah | 1 | 2026-06-26 | 0.0 | 1.1 | Medium |
+| [IAMS30-4270](https://bukittechnology.atlassian.net/browse/IAMS30-4270) | [FE] Form Bundle — Choose Form: Step 2 Stepper in Create Plan Modal de... | dimas.wahyu | 2 | 2026-06-26 | 0.0 | 2.4 | Medium |
+
+*...dan 2 ticket lainnya — lihat backlog di board.*
+
+### ⚪ No Baseline (SP tidak termasuk 1/2/3/5/8)
+
+| Key | Summary | Assignee | SP | Started | Elapsed (hari) | Priority |
+|-----|---------|----------|----|---------|-----------------|----------|
+| [IAMS30-4245](https://bukittechnology.atlassian.net/browse/IAMS30-4245) | [Mobile] Field Unit Serial Number tidak berfungsi di form submission | dimas.wahyu | - | 2026-06-25 | 1.1 | High |
+| [IAMS30-4081](https://bukittechnology.atlassian.net/browse/IAMS30-4081) | [PRD Issue] App freeze / ANR - Flutter render semua work card sekaligu... | nurrahman hadi | - | 2026-06-25 | 1.1 | Medium |
+| [IAMS30-4284](https://bukittechnology.atlassian.net/browse/IAMS30-4284) | [Mobile] PM Shutdown Component List Tidak Lengkap | nurrahman hadi | - | 2026-06-25 | 1.0 | High |
+| [IAMS30-4261](https://bukittechnology.atlassian.net/browse/IAMS30-4261) | [Mobile] PM/BD: assign task unresponsive/slow response UI at some devi... | nurrahman hadi | - | 2026-06-25 | 0.6 | Medium |
+
+### 🔁 Reopened Tickets
+
+Nihil! Gak ada ticket yang bolak-balik reopen — sekali jadi langsung mantap. 💪
+
+### 📊 Current Progress Sprint
+
+| Metric | Tickets | Story Points |
+|--------|---------|--------------|
+| Total | 40 | 63 SP |
+| Done / QA Passed | 4 (10%) | 7 SP (11%) |
+| In Progress / Dev Done / QA Test | 9 | 9 SP |
+| To Do | 27 | 47 SP |
+| **Progress (Tickets / SP)** | <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div><span class="progress-pct">10%</span> | <div class="progress-bar"><div class="progress-fill" style="width:11%"></div></div><span class="progress-pct">11%</span> |
+| **Sprint Day Progress** | 2 / 10 hari kerja | <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div><span class="progress-pct">20%</span> |
 
 ### 📋 To Do Tickets
 
 | Key | Summary | Status | Assignee | SP | Priority |
 |-----|---------|--------|----------|----|----------|
-| [IAMS30-4284](https://bukittechnology.atlassian.net/browse/IAMS30-4284) | [Mobile] PM Shutdown Component List Tidak Lengkap | To Do | nurrahman hadi | - | High |
-| [IAMS30-4080](https://bukittechnology.atlassian.net/browse/IAMS30-4080) | [PRD Issue] PM Shutdown - Workcard nyangkut setelah sync offline user ... | To Do | Unassigned | - | Medium |
-| [IAMS30-4197](https://bukittechnology.atlassian.net/browse/IAMS30-4197) | [PRD Issue] Asset Number kosong di SQL DB untuk data WICOPE Check dan ... | To Do | Dian Heryana | - | Medium |
+| [IAMS30-4273](https://bukittechnology.atlassian.net/browse/IAMS30-4273) | [MOBILE] Form Package — Tab Form: Form List, Summary Bar, Status, and ... | To Do | nurrahman hadi | 5 | Medium |
+| [IAMS30-4274](https://bukittechnology.atlassian.net/browse/IAMS30-4274) | [MOBILE] Form Package — Tap Form Card: Render Form from Cosmos Snapsho... | To Do | nurrahman hadi | 5 | Medium |
+| [IAMS30-4053](https://bukittechnology.atlassian.net/browse/IAMS30-4053) | [AutoCreate] Refinement auto create Plan for Unschedule Breakdown | To Do | Unassigned | 3 | Medium |
 
-*...dan 2 ticket lainnya — lihat backlog di board.*
+*...dan 24 ticket lainnya — lihat backlog di board.*
 
 ---
 
@@ -146,16 +140,14 @@ SP dihitung dari ticket utama (parent). Setiap orang yang terlibat (assignee tic
 
 | Nama | S1 | S2 | S3 | S4 | S5 |
 |------ |---- |---- |---- |---- |----
-| v-darwin.samalo | 30 | 42 | 54 | 53 | 42 |
+| Darwin Samalo | 30 | 42 | 54 | 53 | 42 |
 | Yvonne Priscilla | 38 | 26 | 28 | 20 | 50 |
-| Andrian Sebayang | - | 24 | 24 | 24 | - |
 | Sarayevi Zalanderi | 13 | 16 | 5 | 8 | 27 |
-| nurrahman hadi | 5 | 21 | 21 | 16 | - |
 | Varian Aditya Iryanto | - | 5 | 8 | 14 | 12 |
-| Riki Ahmad Fadilah | - | 8 | 10 | 8 | - |
-| Rudy Hariyanto | 7 | 12 | 5 | - | - |
-| Herianto salim | - | 5 | - | 6 | 6 |
-| dimas.wahyu | - | 3 | - | - | - |
+| Herianto Salim | - | 5 | - | 6 | 6 |
+| Andrian Sebayang | - | 24 | 46 | 60 | 62 |
+| Muhammad Zul Fikar | 48 | 44 | 30 | 24 | 41 |
+| Gita Riskayanti | 5 | 10 | 7 | 5 | 22 |
 
 ### BUMA ID Team
 
@@ -178,4 +170,4 @@ SP dihitung dari ticket utama (parent). Setiap orang yang terlibat (assignee tic
 
 ---
 
-*Auto-generated by ORR_sprint_report.py — 24 June 2026 23:51:53*
+*Auto-generated by ORR_sprint_report.py — 26 June 2026 14:33:40*

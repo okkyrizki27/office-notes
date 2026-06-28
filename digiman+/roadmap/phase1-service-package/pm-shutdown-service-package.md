@@ -2,7 +2,7 @@
 
 Dokumen ini merangkum diskusi tentang gap dan arah pengembangan fitur PM Shutdown terkait service sheet dan package form.
 
-*Last updated: 2026-06-22*
+*Last updated: 2026-06-26*
 
 ---
 
@@ -89,7 +89,10 @@ Snapshot terbentuk **saat plan berpindah ke status SUBMIT (DRAFT → SUBMIT)**, 
 | Form assignment terkunci setelah SUBMIT | Setelah plan di-SUBMIT, tidak bisa tambah, ubah, maupun hapus form assignment |
 | Pre-SUBMIT validation popup | Sistem cek ketersediaan semua FormCode di maintenance-strategy sebelum Planner bisa Confirm submit. Form dianggap tidak available jika: tidak ditemukan sama sekali (hard deleted), `IsActive = 0`, atau `Status = 'Archived'`. Form yang tidak available harus dihapus dari assignment — kecuali jika masih bisa di-aktifkan/un-archive di Form Builder |
 | Jika service sheet tidak ada di Form Builder | Tidak ada blocker — Planner tetap bisa submit plan, eksekusi tetap bisa complete. Prinsip: konsistensi across flow |
-| Filter form suggestion | Menampilkan form berdasarkan model saja DAN model + service hour — keduanya ditampilkan |
+| Filter form suggestion | Menampilkan form berdasarkan model saja DAN model + service hour — keduanya ditampilkan dalam dua grup (Grup 1: match model + service type, Grup 2: match model only) |
+| Choose Form — kolom Asset Type | Tabel Choose Form menampilkan kolom **Asset Type** agar Planner bisa memastikan form sesuai tipe unit yang akan di-service |
+| Choose Form — Filter Panel | Filter panel tersedia di modal Choose Form untuk filter berdasarkan Asset Type, Asset Model, dan Service Type. Filtering dilakukan **client-side** dari list yang sudah difetch — tidak trigger API call baru. Filter tidak mereset selection state. |
+| Choose Form — Search Input | Search input tersedia untuk pencarian form by name secara **client-side**. Bisa dikombinasikan dengan filter panel. |
 | Modifikasi package dari lapangan (field) | **Deferred to next MVP** |
 
 ---
@@ -130,10 +133,61 @@ Workcard
 
 ---
 
+## Choose Form Modal — UI Detail
+
+### Tabel
+
+| Kolom | Source | Keterangan |
+|-------|--------|------------|
+| Checkbox | — | Multi-select per baris. Tidak ada minimum selection. |
+| Form Name | `formName` | Nama form dari API response. |
+| Asset Type | `assetType` | Tipe aset (Heavy Equipment, Light Vehicle, dll). Penting untuk Planner memilih form yang sesuai unit. |
+| Asset Model | `assetModel` | Model aset yang di-tag ke form. Nullable. |
+| Service Type | `serviceType` | Tipe service. Nullable. |
+| Maintenance Category Type | `maintenanceCategoryType` | Kategori maintenance. Nullable. |
+| Mandatory | toggle state | Default OFF. Pre-set ON jika `isSuggestedMandatory=true` dari API (service sheet). Planner bebas override. |
+
+### Filter Panel
+
+Filter panel tersedia untuk memfilter list form berdasarkan:
+- **Asset Type** — multi-select dropdown dari nilai yang ada di list
+- **Asset Model** — multi-select dari nilai yang ada di list
+- **Service Type** — multi-select dari nilai yang ada di list
+
+Semua filter beroperasi **client-side** dari list yang sudah difetch:
+- Tidak trigger API call baru
+- Tidak mereset selection state — form yang sudah dicentang tetap tercentang meski tersembunyi
+- Ketika filter dibersihkan: semua form tampil kembali dengan selection state tetap
+
+### Search Input
+
+Search input tersedia di samping filter panel:
+- Filter berdasarkan Form Name, case-insensitive, partial match
+- Client-side — tidak trigger API call
+- Bisa dikombinasikan dengan filter panel
+- Tidak mereset selection state
+
+### Grouping
+
+List ditampilkan dalam dua grup:
+- **Grup 1**: form yang match Equipment Model + Service Type (ditampilkan lebih atas, paling relevan)
+- **Grup 2**: form yang match Equipment Model saja
+
+Section header per grup untuk membedakan secara visual.
+
+### Fetch Behavior
+
+- Fetch dipicu saat Planner klik "Choose Form" — **bukan** saat Equipment field berubah
+- Parameter: `equipmentModel` (required), `serviceType` (optional dari Activity Type)
+- List di-cache setelah fetch pertama; invalidated jika Equipment diganti
+- Filter/search beroperasi pada cache lokal — tidak perlu fetch ulang
+
+---
+
 ## Open Items
 
-- [ ] Desain UX Planner untuk package composition di Digiplan (web)
+- [x] Desain UX Planner untuk package composition di Digiplan (web) → **Selesai — lihat Choose Form Modal section di atas**
 - [ ] Desain UX Tab Form di workcard mobile (list form, status indicator)
 - [x] Enforcement mandatory form saat eksekusi → **blocking** — Finish Execution tidak bisa dilakukan sampai semua mandatory form status `Complete` (lihat `pm-shutdown-form-execution.md`)
 - [ ] Skenario field team menemukan pekerjaan tak terduga → **next MVP**
-- [ ] Konfirmasi: apakah ada data package config yang perlu disimpan di dplan DB juga, atau cukup di maintenance-execution
+- [x] Data package config disimpan di dplan DB (tabel `PlanForm`) — lihat `pm-shutdown-data-model.md`
