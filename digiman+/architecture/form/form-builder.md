@@ -539,21 +539,6 @@ ModifiedAt, ModifiedBy
 
 Data lengkap: [operational-environment-all.csv](examples/operational-environment-all.csv)
 
-### Data
-
-| Code | Name |
-|------|------|
-| `OE1` | Coal Excavation |
-| `OE2` | Coal Hauling Road |
-| `OE3` | Disposal/Waste Dump |
-| `OE4` | Land Clearing Area |
-| `OE5` | Front/Overburden Excavation |
-| `OE6` | Overburden Hauling Road |
-| `OE7` | Other |
-| `OE8` | Processing Plant |
-| `OE9` | Stockpile Area |
-| `OTHER` | Other |
-
 ---
 
 ## MaintenanceTool
@@ -606,44 +591,3 @@ Data lengkap: [maintenance-category-all.csv](examples/maintenance-category-all.c
 | `MCT_GIC` | General Inspection/Check | 0 |
 | `MCT_PI` | Periodical Inspection | 1 |
 | `MCT_PS` | Periodical Service (PM Shutdown) | 1 |
-
-### Data
-
-| Code | Name | TypeCode | IsPeriodicalService |
-|------|------|----------|---------------------|
-| `ACC` | Accident | MCT_C | 0 |
-| `BCK` | Bucket Repair | MCT_C | 0 |
-| `BEX` | Backlog Execution | MCT_C | 0 |
-| `BLD` | Blade Repair | MCT_C | 0 |
-| `CIP` | Continuous Improvement Program | MCT_C | 0 |
-| `CMT` | Corrective Maintenance | MCT_C | 0 |
-| `EHM` | CBM Follow Up | MCT_C | 0 |
-| `GTR` | GET Replacement | MCT_C | 0 |
-| `MDL` | Module Repair | MCT_C | 0 |
-| `VSL` | Vessel Repair | MCT_C | 0 |
-| `CMS` | Commissioning | MCT_GIC | 0 |
-| `CRI` | Crack Inspection | MCT_GIC | 0 |
-| `DRC` | Drilling Consumable | MCT_GIC | 0 |
-| `FIS` | Failure In Service | MCT_GIC | 0 |
-| `FSI` | Fire Suppression Inspection | MCT_GIC | 0 |
-| `IH7` | Pre-Service Inspection | MCT_GIC | 0 |
-| `INP` | Inspection | MCT_GIC | 0 |
-| `MOD` | Modification | MCT_GIC | 0 |
-| `MSO` | Mis Operation | MCT_GIC | 0 |
-| `OTR` | Others | MCT_GIC | 0 |
-| `PPA` | Prog.Pemeriksaan Attachment | MCT_GIC | 0 |
-| `PPM` | Prog.Pemeriksaan Mesin | MCT_GIC | 0 |
-| `RTR` | Replace And Install Tyre/Rim | MCT_GIC | 0 |
-| `SCH` | Scheduled Replacement | MCT_GIC | 0 |
-| `SUC` | Surcharge | MCT_GIC | 0 |
-| `WSH` | Washing | MCT_GIC | 0 |
-| `I01` | Inspection H-0 PS 250 | MCT_PI | 1 |
-| `I02` | Inspection H-0 PS 500 | MCT_PI | 1 |
-| `I03` | Inspection H-0 PS 1000 | MCT_PI | 1 |
-| `I04` | Inspection H-0 PS 2000 | MCT_PI | 1 |
-| `P01` | PS-250 | MCT_PS | 1 |
-| `P02` | PS-500 | MCT_PS | 1 |
-| `P03` | PS-1000 | MCT_PS | 1 |
-| `P04` | PS-2000 | MCT_PS | 1 |
-| `P05` | PS-3000 | MCT_PS | 1 |
-| `P06` | PS-4000 | MCT_PS | 1 |
