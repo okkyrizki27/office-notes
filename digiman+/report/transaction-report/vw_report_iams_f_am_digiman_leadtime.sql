@@ -1,4 +1,4 @@
-/****** Object:  View [am].[vw_report_iams_f_am_digiman_leadtime]    Script Date: 2026-05-12 16:47:33 ******/
+/****** Object:  View [am].[vw_report_iams_f_am_digiman_leadtime]    Script Date: 2026-06-17 13:57:20 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -281,7 +281,7 @@ select distinct
 from
 (
 	select a.*,
-	first_value(a.status_code) over(partition by a.Id, a.TaskId, a.TaskPersonalizedId order by a.status_code asc) status
+	first_value(a.status_name) over(partition by a.Id, a.TaskId, a.TaskPersonalizedId order by a.status_code asc) status
 	from
 
 	(
@@ -341,7 +341,7 @@ from
 		on tp.id = tpl.taskpersonalizedid
 		left join mechanicorderlist as mol
 		on wo.id = mol.workorderid and tpf.id = mol.taskpersonalizedfindingid
-		inner join workflowtransaction as wft  -- fix: LEFT JOIN → INNER JOIN (hanya ambil WO yang sudah approved)
+		inner join workflowtransaction as wft
 		on wo.id = wft.referencetransactionid
 		left join sectiontype as st
 		on wo.sectiontypecode = st.code

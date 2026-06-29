@@ -1,17 +1,83 @@
 """
-Delayed and Reopen Ticket Report
-Run: python ORR_sprint_report.py
-Output: Sprint_Report_YYYYMMDD.md / .html / Sprint Report YYYYMMDD.pdf
+ORR Sprint Report — Delayed & Reopen Ticket Report
+===================================================
+Run    : python ORR_sprint_report.py
+Output : Jira/sprint-report/
+           html/Sprint_Report_YYYYMMDD.html
+           md/Sprint_Report_YYYYMMDD.md
+           pdf/Sprint Report YYYYMMDD.pdf
 
-Logic:
-  1. Hitung baseline rata-rata cycle time (To Do -> DEV DONE) per Story Point,
-     terpisah untuk MKP Team (Migration/Migrating Digiplan) dan
-     BUMA ID Team (Release 4.0.x / 3.1.0), dari 5 sprint terakhir yang closed.
-  2. Untuk setiap active sprint, ambil ticket yang statusnya "In Progress".
-  3. Hitung berapa lama ticket sudah berada di "In Progress" (sejak keluar
-     dari To Do/Backlog).
-  4. Bandingkan dengan baseline rata-rata untuk SP & team yang sesuai.
-  5. Ticket dianggap "delayed" jika waktu berjalan > baseline rata-rata.
+Credentials
+-----------
+Baca dari Jira/token/jira-api-token.md dengan format:
+    JIRA_EMAIL="..."
+    JIRA_TOKEN="..."
+    JIRA_URL="..."
+
+Alur Utama
+----------
+1.  Fetch semua sprint dari board BOARD_ID (93).
+2.  Pisahkan: active sprint (status=active) dan closed sprint per tim.
+3.  Tentukan tim dari nama sprint:
+      - Mengandung "Digiplan" → MKP Team   (Migration/Migrating Digiplan)
+      - Lainnya               → BUMA ID Team (Release 4.0.x / 3.1.0)
+4.  Ambil 5 sprint closed terakhir per tim sebagai data baseline.
+5.  Fetch semua issue sprint yang dibutuhkan secara paralel (ThreadPoolExecutor).
+6.  Hitung baseline rata-rata cycle time (To Do → DEV DONE) per Story Point
+    per tim, dari 5 sprint closed tersebut. Satuan: jam, konversi ke hari
+    di output. Hanya SP dalam TARGET_SP = [1, 2, 3, 5, 8] yang di-baseline.
+7.  Untuk setiap active sprint (atau last closed sprint jika tidak ada active):
+      a. Ambil ticket berstatus "In Progress".
+      b. Hitung waktu elapsed sejak pertama keluar dari To Do/Backlog,
+         di-cap ke sprint start date (whichever is more recent).
+      c. Bandingkan elapsed vs baseline SP yang sesuai:
+           elapsed > baseline  → "delayed"
+           elapsed ≤ baseline  → "ontrack"
+           SP di luar baseline → "no-baseline"
+      d. Kumpulkan ticket yang pernah Re-open (reopen_rows).
+      e. Kumpulkan ticket masih di To Do/Backlog (todo_rows), top 3 per prioritas.
+      f. Hitung progress sprint (done/progress/todo dalam tickets & SP).
+8.  Hitung velocity per orang (SP done per sprint) untuk 5 sprint terakhir,
+    terpisah untuk MKP_MEMBERS dan BUMA_ID_MEMBERS.
+      - Dev : diatribusikan dari assignee ticket utama + assignee subtask
+      - QA  : diatribusikan dari customfield_10438 (Tester field) dan assignee
+9.  Render laporan ke Markdown → konversi ke HTML (custom renderer) → cetak PDF
+    via headless Chrome.
+
+Fallback Sprint
+---------------
+Jika salah satu tim tidak punya active sprint, script menggunakan sprint
+closed terakhir tim tersebut (ditandai _is_fallback=True) agar laporan
+tetap menampilkan kedua tim.
+
+Kalender Bisnis
+---------------
+Semua perhitungan waktu (elapsed, baseline) menggunakan jam/hari kerja:
+- Senin–Jumat saja (weekday < 5)
+- Mengecualikan hari libur nasional Indonesia 2026 (hardcoded di ID_HOLIDAYS)
+
+Konfigurasi yang Perlu Diupdate per Tahun / Sprint
+----------------------------------------------------
+BOARD_ID            : ID board Jira Agile (saat ini 93)
+PROJECT             : Kode proyek Jira (saat ini "IAMS30")
+TESTER_FIELD        : Custom field ID untuk Tester (saat ini "customfield_10438")
+ID_HOLIDAYS         : Update setiap tahun dengan kalender libur nasional terbaru
+BUMA_ID_MEMBERS     : Anggota BUMA ID Team; "match" = substring displayName Jira (case-insensitive)
+MKP_MEMBERS         : Anggota MKP Team; idem
+BASELINE_SPRINT_COUNT : Jumlah sprint closed untuk hitung baseline (default 5)
+TARGET_SP           : Story Point yang masuk hitungan baseline (default [1,2,3,5,8])
+TODO_LIST_LIMIT     : Maksimal ticket To Do dan On Track yang ditampilkan di report (default 3)
+
+Struktur Output Report (per sprint)
+------------------------------------
+- Delayed Tickets     : In Progress melewati baseline, diurutkan terlama
+- On Track Tickets    : In Progress masih dalam baseline, top 3 terdekat batas
+- No Baseline         : SP tidak ada di TARGET_SP
+- Reopened Tickets    : Pernah pindah ke status "Re-open" (tanda QA reject)
+- Current Progress    : Ringkasan done/progress/todo + progress bar sprint
+- To Do Tickets       : Top 3 belum dimulai (diurutkan prioritas + SP terbesar)
+- Velocity Trend      : Line chart SVG cycle time per SP, 5 sprint terakhir
+- Velocity per Orang  : SP done per member per sprint, dev dan QA dipisah
 """
 
 import urllib.request, base64, json, os, subprocess, re

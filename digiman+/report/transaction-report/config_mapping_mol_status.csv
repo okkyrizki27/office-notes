@@ -1,0 +1,8 @@
+status,status_name,status_desc,mol_status,is_active,workflow_transaction_status,require_mono
+MLOP,Open,Open Defect Finding need MOR/MOL,Open,1,,
+MLSU,Submitted,MOL Submitted,Complete,1,In Progress,
+MLSU,Submitted,MOL Submitted,Complete,1,,
+MLCO,Approved,MOL Complete Approved by Supervisor,Complete,1,Complete,0
+MLDL,Deleted,Delete MOL Pooling & Validation,Open,0,,
+MLDL,Deleted,Delete MOL Pooling & Validation,Complete,0,,
+MLOK,Completed,Create MO to SAP,Complete,1,Complete,1
