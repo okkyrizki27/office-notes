@@ -235,8 +235,6 @@
 <p><b>View terdampak:</b> <code>am.vw_report_iams_f_am_digiman_dorder</code> (D'Order Result & Ordering Compliance)</p>
 <p><b>Sifat:</b> Bukan gap dari kondisi existing — ini desain perbaikan untuk mengikuti kapabilitas baru aplikasi Digiman+ yang sekarang mendukung approval <b>berjenjang</b> (1, 2, atau lebih level), bukan lagi satu level approval seperti yang dibaca SQL saat ini.</p>
 <br>
-<blockquote>Dokumen desain lengkap (skema sumber, conceptual SQL, daftar asumsi): <code>gap-analysis/multi-level-approval-design.md</code>. Skema tabel workflow secara umum (di luar konteks report ini) terdokumentasi di <code>architecture/workflow.md</code>.</blockquote>
-<br>
 <h3>Konteks</h3>
 <br>
 <p>Order (eMOL) saat ini disetujui lewat satu <code>WorkflowTransaction</code> per Order. SQL existing hanya membaca header-nya (satu status, satu approver, satu tanggal) — belum aware terhadap step-level approval yang sekarang ada.</p>
@@ -253,10 +251,10 @@
 <br>
 <h3>State Machine (Ringkasan)</h3>
 <br>
-<p>1. <b>Submit</b> — step <code>StepOrder=0</code> ("User Submit") dibuat dengan <code>Status='Submitted'</code>; bersamaan, seluruh step approval berikutnya langsung dibuat semua dengan <code>Status='In Progress'</code> (bukan satu-satu saat gilirannya tiba).</p>
-<p>2. <b>Approve di level N</b> — step <code>StepOrder=N</code> berubah <code>In Progress</code> → <code>Approved</code>, tercatat di <code>ModifiedBy</code>/<code>ModifiedAt</code>.</p>
+<p>1. <b>Submit</b> — step <code>StepOrder=0</code> ("User Submit") dibuat dengan <code>Status='Submitted'</code>; bersamaan, seluruh step approval berikutnya langsung dibuat semua dengan <code>Status='In Progress'</code> (bukan satu-satu saat gilirannya tiba). Header <code>WorkflowTransaction.Status</code> ikut jadi <code>In Progress</code>.</p>
+<p>2. <b>Approve di level N</b> — step <code>StepOrder=N</code> berubah <code>In Progress</code> → <code>Approved</code>, tercatat di <code>ModifiedBy</code>/<code>ModifiedAt</code>. Header tetap <code>In Progress</code> selama masih ada step yang belum <code>Approved</code>.</p>
 <p>3. <b>Belum ada fitur reject</b> — alur hanya maju, tidak ada percabangan mundur/revisi.</p>
-<p>4. <b>Selesai</b> — semua step <code>Approved</code> → header <code>WorkflowTransaction.Status</code> jadi <code>Complete</code>, dan <code>CurrentWorkflowStepId</code> kembali NULL.</p>
+<p>4. <b>Selesai</b> — semua step <code>Approved</code> → header <code>WorkflowTransaction.Status</code> berubah jadi <code>Complete</code>, dan <code>CurrentWorkflowStepId</code> kembali NULL.</p>
 <br>
 <h3>Desain Perubahan (Ringkasan)</h3>
 <br>

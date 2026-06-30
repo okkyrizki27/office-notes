@@ -52,10 +52,10 @@
 
 ## 3. State Machine
 
-1. **Submit** → satu baris `WorkflowTransactionStep` untuk step `StepOrder=0` dibuat dengan `Status='Submitted'`. **Bersamaan**, seluruh step berikutnya (sesuai jumlah `WorkflowStep` master untuk workflow tersebut) langsung dibuat semua dengan `Status='In Progress'` — bukan dibuat satu per satu saat gilirannya tiba.
-2. **Approve di level N** → baris step dengan `StepOrder=N` berubah dari `In Progress` → `Approved`, tercatat di `ModifiedBy`/`ModifiedAt`.
+1. **Submit** → satu baris `WorkflowTransactionStep` untuk step `StepOrder=0` dibuat dengan `Status='Submitted'`. **Bersamaan**, seluruh step berikutnya (sesuai jumlah `WorkflowStep` master untuk workflow tersebut) langsung dibuat semua dengan `Status='In Progress'` — bukan dibuat satu per satu saat gilirannya tiba. Header `WorkflowTransaction.Status` ikut menjadi `In Progress`.
+2. **Approve di level N** → baris step dengan `StepOrder=N` berubah dari `In Progress` → `Approved`, tercatat di `ModifiedBy`/`ModifiedAt`. Header tetap `In Progress` selama masih ada step yang belum `Approved`.
 3. **Belum ada fitur reject** — alur hanya maju (`Submitted`/`In Progress` → `Approved`), tidak ada percabangan mundur/revisi yang perlu ditangani report saat ini.
-4. **Selesai** → ketika seluruh step `StepOrder ≥ 1` berstatus `Approved`, header `WorkflowTransaction.Status` diasumsikan ikut menjadi `Complete` — ini perilaku yang **sudah dipakai** SQL saat ini (`coalesce(wft1.status, wft2.status) = 'Complete'`) dan tidak berubah.
+4. **Selesai** → ketika seluruh step `StepOrder ≥ 1` berstatus `Approved`, header `WorkflowTransaction.Status` berubah dari `In Progress` menjadi `Complete` — **Confirmed**, konsisten dengan perilaku yang **sudah dipakai** SQL saat ini (`coalesce(wft1.status, wft2.status) = 'Complete'`) dan tidak berubah.
 
 **Konsekuensi desain:** karena semua step *pre-created* sejak submit, **total level** dan **level saat ini** bisa dihitung langsung dari baris `WorkflowTransactionStep` yang sudah ada — tidak perlu join terpisah ke master `WorkflowStep` per `WorkflowSiteId` untuk tahu "berapa total level seharusnya". Join ke `WorkflowStep` tetap diperlukan untuk dapat `StepOrder` (urutan) dan `Name` (nama level), tapi bukan untuk menghitung total.
 

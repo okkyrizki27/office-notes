@@ -190,8 +190,6 @@ Masalah berikut muncul di lebih dari satu view. Memperbaikinya sekali akan berda
 **View terdampak:** `am.vw_report_iams_f_am_digiman_dorder` (D'Order Result & Ordering Compliance)
 **Sifat:** Bukan gap dari kondisi existing — ini desain perbaikan untuk mengikuti kapabilitas baru aplikasi Digiman+ yang sekarang mendukung approval **berjenjang** (1, 2, atau lebih level), bukan lagi satu level approval seperti yang dibaca SQL saat ini.
 
-> Dokumen desain lengkap (skema sumber, conceptual SQL, daftar asumsi): `gap-analysis/multi-level-approval-design.md`. Skema tabel workflow secara umum (di luar konteks report ini) terdokumentasi di `architecture/workflow.md`.
-
 ### Konteks
 
 Order (eMOL) saat ini disetujui lewat satu `WorkflowTransaction` per Order. SQL existing hanya membaca header-nya (satu status, satu approver, satu tanggal) — belum aware terhadap step-level approval yang sekarang ada.
@@ -208,10 +206,10 @@ Approval terjadi di level **Order**, bukan di level eMOL — semua eMOL di bawah
 
 ### State Machine (Ringkasan)
 
-1. **Submit** — step `StepOrder=0` ("User Submit") dibuat dengan `Status='Submitted'`; bersamaan, seluruh step approval berikutnya langsung dibuat semua dengan `Status='In Progress'` (bukan satu-satu saat gilirannya tiba).
-2. **Approve di level N** — step `StepOrder=N` berubah `In Progress` → `Approved`, tercatat di `ModifiedBy`/`ModifiedAt`.
+1. **Submit** — step `StepOrder=0` ("User Submit") dibuat dengan `Status='Submitted'`; bersamaan, seluruh step approval berikutnya langsung dibuat semua dengan `Status='In Progress'` (bukan satu-satu saat gilirannya tiba). Header `WorkflowTransaction.Status` ikut jadi `In Progress`.
+2. **Approve di level N** — step `StepOrder=N` berubah `In Progress` → `Approved`, tercatat di `ModifiedBy`/`ModifiedAt`. Header tetap `In Progress` selama masih ada step yang belum `Approved`.
 3. **Belum ada fitur reject** — alur hanya maju, tidak ada percabangan mundur/revisi.
-4. **Selesai** — semua step `Approved` → header `WorkflowTransaction.Status` jadi `Complete`, dan `CurrentWorkflowStepId` kembali NULL.
+4. **Selesai** — semua step `Approved` → header `WorkflowTransaction.Status` berubah jadi `Complete`, dan `CurrentWorkflowStepId` kembali NULL.
 
 ### Desain Perubahan (Ringkasan)
 
