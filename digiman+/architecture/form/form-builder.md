@@ -45,7 +45,7 @@ Tabel Bank Task: `FormTask`, `FormTaskCategory` (lihat section [Bank Task](#bank
 
 Tabel lain: `FormTaskAsset`, `FormTaskAssetMaintenanceCategory`, `LookupMasterData`, `MaintenanceCategory`, `MaintenanceTool`, `AuditLog`, `RevertTable`
 
-Tabel CBM (cluster tersendiri): `CBMConfig`, `CBMConfigMaintenanceCategory`, `CBMConfigRating`, `CBMGroup`, `CBMGroupTypeParameter`, `CBMMMainCategory`, `CBMParameter`, `CBMType`, `ConditionTesting`
+Tabel CBM (cluster tersendiri): `CBMConfig`, `CBMConfigMaintenanceCategory`, `CBMConfigRating`, `CBMGroup`, `CBMGroupTypeParameter`, `CBMMainCategory`, `CBMParameter`, `CBMType`, `ConditionTesting` (lihat section [CBM](#cbm))
 
 ---
 
@@ -308,6 +308,145 @@ Form: **WICOPE CBM** (`FORM3`, version 4). Terdiri dari 3 dokumen (3 tab):
 | [wicope-cbm-general-tab.json](examples/wicope-cbm-general-tab.json) | General | Tab sistem dengan immutable sections (Nama Observer, Asset Information) + section custom WICOPE Quality Check |
 | [wicope-cbm-cbm-tab.json](examples/wicope-cbm-cbm-tab.json) | CBM | Tab spesifik dengan ASSESSMENTCHECK (category: ASSESSMENT) berisi Bank Task C1–C11 |
 | [wicope-cbm-safety-tab.json](examples/wicope-cbm-safety-tab.json) | Safety | Tab spesifik dengan ASSESSMENTCHECK (category: ASSESSMENT) berisi Bank Task S1–S12 |
+
+---
+
+## CBM
+
+> **Status:** Diskusi berlangsung — bagian ini akan dilanjutkan/dikoreksi di sesi berikutnya. Beberapa relasi masih perlu dikonfirmasi (lihat "Open Questions" di bawah).
+
+CBM (Condition Based Monitoring) task type di Task Kit hanya muncul saat membuat form `FT_MaintenanceForm` — di-exclude untuk `FT_BusinessOperationalForm` via `Configuration.ExcludedFormElement_BusinessOperational` (lihat section [Configuration](#configuration)).
+
+### Mapping Task Kit CBM → kolom form builder
+
+Lima task type CBM di palette Task Kit (lihat juga section [TaskKit](#taskkit)), berurutan sesuai tampilan UI, dengan kolom yang muncul saat task ditambahkan ke form:
+
+| Urutan UI | Task Kit | `category`/`rating` | Kolom di Form Builder |
+|---|---|---|---|
+| 1 | Condition Test Rating | `CBMMC4` / `INOUTSPEC` | Task, Measurement Location, CBM Type, Condition, OEM Spec, Respond, Measurement Value, Status |
+| 2 | ABC Rating | `CBMMC2` / `ABC` | Task, Measurement Location, CBM Type, OEM Spec, Respond, Measurement Value, Rating |
+| 3 | In Spec Rating | `CBMMC2` / `INOUTSPEC` | Task, Measurement Location, CBM Type, OEM Spec, Respond, Measurement Value, Status |
+| 4 | Sense Rating | `CBMMC1` / `ABC` | Task, Measurement Location, CBM Type, Rating, Response |
+| 5 | Tool Based Rating | `CBMMC3` / `ABC` | Task, Measurement Location, CBM Type, Tools, OEM Spec, Respond, Measurement Value, Rating |
+
+Kolom **Measurement Location** = pilihan component/sub-component dari asset (relevan dengan catatan MOM EHMS: "Area diisi dengan Sub Component dari Digiman+ jika ada" — lihat [cbm-integration-ehms.md](../../mom/cbm-integration-ehms.md)).
+
+Jumlah kolom di atas lebih sedikit dari jumlah kolom TaskKit yang tercatat (`CBMMC1`=6, `CBMMC2`=11, `CBMMC3`=12, `CBMMC4`=12) — selisihnya kemungkinan dari kolom INLINE (action: photo + additional information) yang tidak tampak sebagai header terpisah di UI.
+
+### Schema Tabel Master CBM (`cst-iams-sqldb-maintenance-strategy`)
+
+**`CBMMainCategory`** — lookup
+```
+Code (PK, varchar(64))
+Name (varchar(256))
+Description (varchar(max), null)
+IsActive (bit)
+CreatedAt, CreatedBy
+ModifiedAt, ModifiedBy
+```
+
+**`CBMParameter`** — lookup
+```
+Code (PK, varchar(64))
+Name (varchar(256))
+IsActive (bit)
+CreatedAt, CreatedBy
+ModifiedAt, ModifiedBy
+```
+
+**`CBMType`** — lookup
+```
+Code (PK, varchar(64))
+Name (varchar(256))
+IsActive (bit)
+CreatedAt, CreatedBy
+ModifiedAt, ModifiedBy
+```
+
+**`CBMGroup`** — lookup
+```
+Code (PK, varchar(64))
+Name (varchar(256))
+IsActive (bit)
+CreatedAt, CreatedBy
+ModifiedAt, ModifiedBy
+```
+
+**`CBMGroupTypeParameter`** — junction 3-way, mendefinisikan kombinasi valid Group × Type × Parameter
+```
+CBMGroupCode (PK, FK → CBMGroup.Code, varchar(64))
+CBMTypeCode (PK, FK → CBMType.Code, varchar(64))
+CBMParameterCode (PK, FK → CBMParameter.Code, varchar(64))
+Description (varchar(max), null)
+IsActive (bit)
+CreatedAt, CreatedBy
+ModifiedAt, ModifiedBy
+```
+
+**`CBMConfig`** — tabel pusat: master measurement point per kombinasi asset + component
+```
+Id (PK, bigint)
+TaskKey (varchar(64), null)
+Code (varchar(64), null)
+Version (bigint, null)
+Description (varchar(max), null)
+AssetTypeCode (varchar(64), null)
+AssetBrandCode (varchar(64), null)
+AssetModelCode (varchar(64), null)
+AssetVariantCode (varchar(64), null)   ← kombinasi 4 kolom ini = scope asset
+ComponentCode (varchar(64), null)
+SubComponentCode (varchar(64), null)
+CBMMainCategoryCode (FK → CBMMainCategory.Code, varchar(64))
+CBMGroupCode (FK → CBMGroup.Code, varchar(64))
+CBMTypeCode (FK → CBMType.Code, varchar(64))
+RatingCategoryCode (varchar(64), null)
+MaintenanceToolCode (FK → MaintenanceTool.Code, varchar(64))
+ConditionTestingCode (FK → ConditionTesting.Code, varchar(64))
+UoMCode (varchar(64), null)
+OEMStandardMin (float, null)
+OEMStandardMax (float, null)
+OEMOperatorMin (varchar(4), null)
+OEMOperatorMax (varchar(4), null)
+IsActive (bit)
+CreatedAt, CreatedBy
+ModifiedAt, ModifiedBy
+```
+
+**`CBMConfigRating`** — threshold rating (1-to-many dari `CBMConfig`)
+```
+Id (PK, bigint)
+CBMConfigId (FK → CBMConfig.Id, bigint)
+CBMConfigCode (varchar(64), null)
+RatingCode (varchar(64), null)         ← mis. A / B / C / X
+Version (int)
+ValueMin (float, null)
+ValueMax (float, null)
+OperatorMin (varchar(4), null)
+OperatorMax (varchar(4), null)
+IsActive (bit)
+CreatedAt, CreatedBy
+ModifiedAt, ModifiedBy
+```
+
+**`CBMConfigMaintenanceCategory`** — scope maintenance category (1-to-many dari `CBMConfig`)
+```
+Id (PK, bigint)
+CBMConfigId (FK → CBMConfig.Id, bigint)
+CBMConfigCode (varchar(64), null)
+MaintenanceCategoryCode (FK → MaintenanceCategory.Code, varchar(64))
+Version (int)
+IsActive (bit)
+CreatedAt, CreatedBy
+ModifiedAt, ModifiedBy
+```
+
+**`ConditionTesting`** — belum dibahas, schema belum dicatat.
+
+### Open Questions
+
+1. `CBMConfig.TaskKey` — relasinya ke apa? Apakah ini Task Key yang dipakai untuk mapping ke EHMS (`external_code`)?
+2. `CBMConfig.RatingCategoryCode` vs `CBMConfigRating.RatingCode` — apa beda fungsinya?
+3. `ConditionTestingCode` mengarah ke tabel `ConditionTesting` — belum dibahas schema-nya.
 
 ---
 

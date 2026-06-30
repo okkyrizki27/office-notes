@@ -75,9 +75,10 @@ Urutan mengikuti dependency chain: Tenant → Asset → User.
 
 ## 4. Permission & Group (`cst-shared-sqldb-user` / User Management)
 
+> Detail sistem permission dan group: lihat [permission.md](../permission.md)
+
 ### Permission Code — Akses Fitur
 - [ ] User sudah di-mapping ke **permission code** yang sesuai agar fitur dapat diakses
-  - Contoh: permission untuk akses Inspection, Order, Work Card, dll
   - Verifikasi di User Management: pastikan role/permission user sudah include permission code yang diperlukan
   - Jika belum: assign permission code yang sesuai ke role user tersebut
 
@@ -92,6 +93,7 @@ Urutan mengikuti dependency chain: Tenant → Asset → User.
   - Verifikasi: cek group membership user di User Management
   - Jika belum: tambahkan user ke group `BUMA ID Approver`
   - Tanpa ini: user tidak akan mendapatkan notifikasi/data approval di Workflow
+  - Detail konfigurasi workflow: lihat [workflow.md](../workflow.md)
 
 ---
 
