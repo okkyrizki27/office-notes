@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Digiman Transaction Report - Gap Analysis</title>
+<style>
+  @page { size: A4 portrait; margin: 16mm; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #1a1a1a; padding: 0 60px; margin: 0; }
+  h1 { font-size: 19pt; color: #1f3a5f; border-bottom: 3px solid #1f3a5f; padding-bottom: 8px; margin-bottom: 6px; }
+  h2 { font-size: 13.5pt; color: #fff; background: #1f3a5f; padding: 7px 12px; border-radius: 3px; margin: 24px 0 10px; page-break-after: avoid; break-after: avoid; }
+  h3 { font-size: 11.5pt; color: #1f3a5f; border-left: 4px solid #1f3a5f; padding-left: 10px; margin: 18px 0 8px; page-break-after: avoid; break-after: avoid; }
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 8.3pt; margin: 8px 0 14px; }
+  th { background: #1f3a5f; color: #fff; padding: 6px 7px; text-align: left; font-weight: 600; word-wrap: break-word; }
+  td { padding: 5px 7px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+  tr { page-break-inside: avoid; break-inside: avoid; }
+  tr:nth-child(even) td { background: #f4f7fa; }
+  code { background: #f0f0f0; color: #1a1a1a; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9pt; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 16px 0; }
+  a { color: #1f3a5f; text-decoration: none; }
+  p { margin: 4px 0; line-height: 1.6; }
+  b { color: #111; }
+  blockquote { margin: 8px 0; padding: 8px 14px; background: #f4f7fa; border-left: 4px solid #1f3a5f; font-style: italic; color: #333; }
+  .sev-high { display:inline-block; color:#fff; background:#c0392b; padding:1px 7px; border-radius:3px; font-size:8pt; font-weight:bold; }
+  .sev-medium { display:inline-block; color:#fff; background:#d68910; padding:1px 7px; border-radius:3px; font-size:8pt; font-weight:bold; }
+  .sev-low { display:inline-block; color:#fff; background:#7f8c8d; padding:1px 7px; border-radius:3px; font-size:8pt; font-weight:bold; }
+  .sev-pending { display:inline-block; color:#fff; background:#2c3e50; padding:1px 7px; border-radius:3px; font-size:8pt; font-weight:bold; }
+  .sev-resolved { display:inline-block; color:#fff; background:#1e8449; padding:1px 7px; border-radius:3px; font-size:8pt; font-weight:bold; }
+  .sev-open { display:inline-block; color:#fff; background:#7d3c98; padding:1px 7px; border-radius:3px; font-size:8pt; font-weight:bold; }
+  .footer { margin-top: 30px; font-size: 9pt; color: #888; text-align: center; border-top: 1px solid #ddd; padding-top: 8px; }
+  @media print { h2, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; } body { padding: 0 30px; } }
+</style>
+</head>
+<body>
+<h1>Digiman Transaction Report — Gap Analysis & Discussion Document</h1>
+<br>
+<p><b>Tujuan dokumen:</b> Merangkum hasil analisa teknis terhadap 5 halaman Digiman Transaction Report (skema <code>[am]</code>, Synapse/SQL Serverless) menjadi temuan gap, usulan solusi, dan daftar konfirmasi yang dibutuhkan dari business stakeholder. Dokumen ini dipakai sebagai bahan diskusi bersama tim engineer/developer dan business stakeholder.</p>
+<br>
+<p><b>Scope:</b> D'Inspect Result, D'Order Result, Inspection Compliance, Ordering Compliance, Lead Time Report — total 5 view SQL (<code>vw_report_iams_inspection_results</code>, <code>vw_report_iams_f_am_digiman_dorder</code>, <code>vw_report_iams_get_molist</code>, <code>vw_report_iams_get_assignment</code>, <code>vw_report_iams_f_am_digiman_leadtime</code>).</p>
+<br>
+<p><b>Cara membaca:</b> Setiap halaman report dibahas dengan struktur yang sama — Business Question, tabel Gap & Proposed Solution (diurutkan severity), Business Rules yang sudah dikonfirmasi, dan pertanyaan terbuka untuk bisnis. Bagian Cross-Cutting Issues di awal merangkum masalah yang berulang di lebih dari satu view — ini yang paling berdampak jika diperbaiki karena efeknya menyebar ke beberapa report sekaligus. Chapter 5 berbeda sifat dari chapter 1–4: bukan gap dari kondisi existing, melainkan desain perbaikan (improvement) untuk mengikuti kapabilitas baru aplikasi (multi-level approval).</p>
+<br>
+<hr>
+<br>
+<h2>Executive Summary</h2>
+<br>
+<table><thead>
+<tr><th>Report Page</th><th>View(s)</th><th>Total Issues</th><th>High</th><th>Medium</th><th>Low</th><th>Pending Confirmation</th></tr>
+</thead><tbody>
+<tr><td>D'Inspect Result</td><td><code>vw_report_iams_inspection_results</code></td><td>6</td><td>0</td><td>3</td><td>3</td><td>0</td></tr>
+<tr><td>D'Order Result & Ordering Compliance</td><td><code>vw_report_iams_f_am_digiman_dorder</code></td><td>17</td><td>2</td><td>9</td><td>5</td><td>1</td></tr>
+<tr><td>Inspection Compliance</td><td><code>vw_report_iams_get_molist</code> + <code>vw_report_iams_get_assignment</code></td><td>13</td><td>3</td><td>5</td><td>5</td><td>0</td></tr>
+<tr><td>Lead Time Report</td><td><code>vw_report_iams_f_am_digiman_leadtime</code></td><td>10</td><td>0</td><td>4</td><td>6</td><td>0</td></tr>
+<tr><td><b>Cross-Cutting (lintas view)</b></td><td>Semua view</td><td>7</td><td>4</td><td>2</td><td>1</td><td>0</td></tr>
+</tbody></table>
+<br>
+<p><b>Highlight utama:</b></p>
+<p>- 4 dari 7 masalah cross-cutting berkategori <b>High</b> — perbaikan di sini berdampak ke lebih dari satu report sekaligus, sehingga sebaiknya diprioritaskan sebelum perbaikan per-view.</p>
+<p>- Tidak ada gap yang menyebabkan data salah secara fatal — sebagian besar adalah <b>silent drop</b> (data hilang tanpa error) atau <b>inkonsistensi penamaan/timezone</b> yang berisiko menyesatkan saat membaca angka KPI.</p>
+<p>- Beberapa hal sudah dikonfirmasi disengaja oleh business owner (lihat bagian "Business Rules Confirmed" tiap halaman) — tidak perlu didiskusikan ulang.</p>
+<br>
+<hr>
+<br>
+<h2>Cross-Cutting Issues (Lintas View)</h2>
+<br>
+<p>Masalah berikut muncul di lebih dari satu view. Memperbaikinya sekali akan berdampak ke seluruh report.</p>
+<br>
+<table><thead>
+<tr><th>#</th><th>Issue</th><th>View Terdampak</th><th>Severity</th><th>Proposed Solution</th></tr>
+</thead><tbody>
+<tr><td>1</td><td><b>Timezone tidak konsisten</b> — sebagian view pakai UTC murni, sebagian konversi via <code>site.utcoffset</code>, satu view pakai hardcode <code>UTC+7</code></td><td><code>get_molist</code> (UTC), <code>get_assignment</code> (utcoffset), <code>leadtime</code> (<code>load_date</code> hardcode +7), <code>dorder</code> (utcoffset konsisten)</td><td><span class="sev-high">High</span></td><td>Tetapkan satu standar timezone untuk seluruh view: gunakan <code>site.utcoffset</code> di semua tempat yang melakukan overdue-check atau date-display, hapus hardcode <code>+7</code>. Butuh keputusan bisnis: apakah semua site memang WIB, atau perlu per-site offset.</td></tr>
+<tr><td>2</td><td><b><code>tenantcode = 'MKP'</code> hardcoded</b> di join <code>sectiontype</code>/<code>site</code></td><td><code>inspection_results</code>, <code>dorder</code>, <code>get_molist</code>, <code>get_assignment</code>, <code>leadtime</code> (5 dari 5 view)</td><td><span class="sev-high">High</span></td><td>Jika Digiman+ direncanakan multi-tenant, parameterisasi <code>tenantcode</code> (misal via session context atau view per-tenant). Jika dipastikan single-tenant selamanya, dokumentasikan eksplisit sebagai keputusan arsitektur agar tidak dianggap bug saat tenant baru onboard.</td></tr>
+<tr><td>3</td><td><b>Filter <code>isactive</code> pada tabel <code>user</code> tidak konsisten</b> — beberapa view tampilkan user nonaktif (historis), beberapa tidak</td><td>Tampil: <code>inspection_results</code>, <code>leadtime</code>. Tidak tampil: <code>dorder</code>, <code>get_molist</code>/<code>get_assignment</code></td><td><span class="sev-medium">Medium</span></td><td>Tetapkan kebijakan baku: report historis (siapa yang mengerjakan apa) sebaiknya <b>tidak</b> filter <code>isactive</code> agar nama tetap muncul meski user di-deactivate kemudian. Terapkan konsisten di semua view atau dokumentasikan alasan per-view jika memang harus berbeda.</td></tr>
+<tr><td>4</td><td><b>Status resolution via config CSV → silent drop</b> jika ada kombinasi status baru di sistem yang belum terdaftar di <code>config_mapping_wo_status.csv</code> / <code>config_mapping_mol_status.csv</code></td><td><code>get_molist</code>, <code>get_assignment</code>, <code>leadtime</code> (WO status), <code>dorder</code> (MOL status)</td><td><span class="sev-high">High</span></td><td>Tambahkan baris fallback <code>'Unknown'</code>/<code>'Unmapped'</code> di config CSV untuk kombinasi yang tidak match, atau buat monitoring terpisah yang menghitung berapa WO/MOL yang gagal resolve status — agar tim aware ketika ada status baru ditambahkan di aplikasi tapi config belum diupdate.</td></tr>
+<tr><td>5</td><td><b><code>SELECT DISTINCT</code> sebagai satu-satunya safeguard duplikasi</b> dari join fan-out (multiple finding, multiple TP, dll)</td><td><code>inspection_results</code>, <code>leadtime</code></td><td><span class="sev-medium">Medium</span></td><td><code>DISTINCT</code> tidak efektif jika baris berbeda di satu kolom numerik saja (misal leadtime). Review join yang berpotensi fan-out, pertimbangkan window function/aggregation eksplisit alih-alih bergantung pada DISTINCT di akhir query.</td></tr>
+<tr><td>6</td><td><b>Kolom bernama "Utc" tapi nilainya sudah local time</b> — membingungkan bagi yang membaca laporan tanpa konteks SQL</td><td><code>get_assignment</code> (<code>CreatedUtcDate</code>, <code>SubmittedUtcDate</code>), <code>dorder</code> (<code>SubmittedUtcDateUTC</code>, <code>ApprovalDateUTC</code>)</td><td><span class="sev-low">Low</span></td><td>Rename kolom mengikuti isinya yang sebenarnya (<code>CreatedLocalDate</code>, dst), atau tambahkan kolom UTC terpisah dengan suffix konsisten. Perubahan nama kolom perlu koordinasi dengan tim PBI (breaking change).</td></tr>
+<tr><td>7</td><td><b>Kolom placeholder NULL</b> tersebar di banyak view (SAP fields, <code>Notes</code>, <code>CompletedUtcDate</code>, dll) tanpa timeline kapan akan diisi</td><td><code>inspection_results</code> (11 kolom), <code>get_molist</code> (8 kolom), <code>get_assignment</code> (2 kolom), <code>dorder</code> (<code>Notes</code>)</td><td><span class="sev-low">Low</span></td><td>Konfirmasi roadmap: apakah integrasi SAP/field ini akan diisi dalam waktu dekat? Jika tidak ada rencana, evaluasi penghapusan kolom untuk mengurangi kebingungan konsumen report.</td></tr>
+</tbody></table>
+<br>
+<hr>
+<br>
+<h2>1. D'Inspect Result</h2>
+<br>
+<p><b>View:</b> <code>am.vw_report_iams_inspection_results</code></p>
+<p><b>Business Question:</b> Apa saja temuan defect/kerusakan dari hasil inspeksi unit yang sudah diselesaikan inspector?</p>
+<br>
+<h3>Gap & Proposed Solution</h3>
+<br>
+<table><thead>
+<tr><th>#</th><th>Issue</th><th>Severity</th><th>Proposed Solution</th></tr>
+</thead><tbody>
+<tr><td>1</td><td><code>damagecodegroup</code> pakai <b>INNER JOIN</b> — finding dengan <code>damagecode</code> yang tidak match master data akan <b>hilang tanpa error</b></td><td><span class="sev-medium">Medium</span></td><td>Ubah ke LEFT JOIN agar finding tetap muncul dengan damage info kosong, atau jalankan data quality check rutin untuk memastikan semua <code>damagecode</code> di transaksi sudah terdaftar di master.</td></tr>
+<tr><td>2</td><td><code>Date</code> (tanggal selesai inspeksi, local time) bisa NULL jika <code>sitecode</code> WO tidak match di tabel <code>site</code></td><td><span class="sev-medium">Medium</span></td><td>Validasi coverage mapping <code>sitecode → site</code> secara berkala; pastikan semua site aktif terdaftar di master <code>site</code>.</td></tr>
+<tr><td>3</td><td><code>SELECT DISTINCT</code> sebagai dedup — lihat Cross-Cutting #5</td><td><span class="sev-medium">Medium</span></td><td>Lihat solusi cross-cutting.</td></tr>
+<tr><td>4</td><td>11 kolom placeholder selalu NULL — lihat Cross-Cutting #7</td><td><span class="sev-low">Low</span></td><td>Lihat solusi cross-cutting.</td></tr>
+<tr><td>5</td><td><code>user</code> tanpa filter <code>isactive</code></td><td><span class="sev-low">Low</span></td><td>Sudah dikonfirmasi disengaja (lihat Business Rules). Tidak perlu tindakan, hanya perlu diseragamkan dengan view lain (Cross-Cutting #3).</td></tr>
+<tr><td>6</td><td><code>taskpersonalized</code> filter hanya <code>status = 'Complete'</code> — task yang masih <code>In Progress</code> tidak akan punya finding tampil</td><td><span class="sev-low">Low</span></td><td>Sudah sesuai desain (findings hanya valid setelah inspeksi selesai). Tidak perlu tindakan.</td></tr>
+</tbody></table>
+<br>
+<h3>Business Rules (Confirmed)</h3>
+<p>- WO lifecycle: <code>Open → Pending → In Progress → Complete → Close</code>. Status <code>Close</code> = auto-close sistem karena tidak dieksekusi (bukan selesai) — filter <code>NOT IN ('Close','Cancelled')</code> sudah benar.</p>
+<p>- Findings tampil real-time begitu inspector submit, baik WO <code>In Progress</code> maupun <code>Complete</code> — disengaja.</p>
+<p>- <code>isimmediateexecutable = 1</code> tanpa priority → label <code>'CLOSE'</code> — menandakan quick-fix yang langsung diperbaiki saat inspeksi, bukan status WO closed.</p>
+<p>- Inspector nonaktif tetap tampil — disengaja, report historis.</p>
+<p>- Priority hanya diambil dari <code>group = 'Inspection'</code>.</p>
+<br>
+<h3>Open Questions for Business</h3>
+<p>- Apakah ada cara untuk memvalidasi bahwa semua <code>damagecode</code> transaksi sudah lengkap di master data, supaya INNER JOIN tidak diam-diam membuang finding?</p>
+<p>- Apakah 11 kolom placeholder (RouteId, ComponentId, dll) ada di roadmap pengisian, atau aman dihapus dari view?</p>
+<br>
+<hr>
+<br>
+<h2>2. D'Order Result & Ordering Compliance</h2>
+<br>
+<p><b>View:</b> <code>am.vw_report_iams_f_am_digiman_dorder</code> <em>(dipakai untuk dua halaman report — D'Order Result dan Ordering Compliance)</em></p>
+<p><b>Business Question:</b> Apa status spare part order (eMOL) dari temuan inspeksi maupun additional order, dari submission hingga approval, SAP push, dan GR/GI?</p>
+<br>
+<h3>Gap & Proposed Solution</h3>
+<br>
+<table><thead>
+<tr><th>#</th><th>Issue</th><th>Severity</th><th>Proposed Solution</th></tr>
+</thead><tbody>
+<tr><td>1</td><td><code>mechanicorderlist</code> filter <code>isactive</code> <b>dikomentari</b> — semua MOL masuk, hanya disaring via <code>correct_status</code> dari config</td><td><span class="sev-high">High</span></td><td>Lihat Cross-Cutting #4. Tambahkan fallback status agar kombinasi baru tidak silently dropped.</td></tr>
+<tr><td>2</td><td><b>SAP MO number prefix <code>'00'</code> hardcoded</b> (<code>concat('00', mono)</code>) untuk match ke <code>moapproval.monumber</code> — gagal silent jika tenant/site beda format SAP</td><td><span class="sev-high">High</span></td><td>Pindahkan prefix ke config per-site/tenant, atau validasi format MO number SAP di semua site sebelum mengandalkan hardcode ini.</td></tr>
+<tr><td>3</td><td><code>user</code> filter <code>isactive=1</code> — <b>inkonsisten</b> dengan view lain</td><td><span class="sev-medium">Medium</span></td><td>Lihat Cross-Cutting #3.</td></tr>
+<tr><td>4</td><td><code>canactiondigimandelete</code>, <code>canactionsappushdelete</code>, <code>cancreatemo</code>, <code>cancreatemowithnote</code> dihitung di CTE tapi <b>tidak masuk output view</b></td><td><span class="sev-medium">Medium</span></td><td>Konfirmasi apakah field ini dipakai di layer aplikasi Digiman+ lain. Jika tidak, hapus dari CTE untuk mengurangi kompleksitas; jika ya, dokumentasikan dependency-nya.</td></tr>
+<tr><td>5</td><td><code>poolingstatus NOT IN ('MOJ','MOK')</code> — magic string tanpa dokumentasi arti</td><td><span class="sev-medium">Medium</span></td><td>Tambahkan kamus/glossary status pooling (MOJ, MOK, dst) di config atau dokumentasi terpisah agar tidak jadi tribal knowledge.</td></tr>
+<tr><td>6</td><td><code>moapproval</code> tanpa filter <code>isactive</code> — bisa ambil approval yang sudah tidak valid</td><td><span class="sev-medium">Medium</span></td><td>Tambahkan filter <code>isactive=1</code> kecuali ada alasan bisnis spesifik untuk menyertakan approval nonaktif.</td></tr>
+<tr><td>7</td><td><code>sapmosyncorder</code> tanpa filter <code>isactive</code></td><td><span class="sev-medium">Medium</span></td><td>Sama seperti di atas — review apakah perlu filter <code>isactive=1</code>.</td></tr>
+<tr><td>8</td><td><code>moapprovaldate</code> dihitung dari <b>perbandingan string</b> <code>YYYYMMDD</code> — rapuh jika format SAP tidak konsisten</td><td><span class="sev-medium">Medium</span></td><td>Validasi format tanggal dari SAP source secara berkala, atau cast ke tipe date sebelum dibandingkan.</td></tr>
+<tr><td>9</td><td><code>sectiontype</code> hardcoded <code>tenantcode='MKP'</code></td><td><span class="sev-medium">Medium</span></td><td>Lihat Cross-Cutting #2.</td></tr>
+<tr><td>10</td><td><code>SubComponentId</code> menyimpan <code>componentcode</code> (bukan subcomponent ID) — naming bug</td><td><span class="sev-low">Low</span></td><td>Perbaiki nama kolom atau isinya agar sesuai — perlu cek dampak ke konsumen (PBI) sebelum mengubah.</td></tr>
+<tr><td>11</td><td>Kolom "UTC" sudah local time — lihat Cross-Cutting #6</td><td><span class="sev-low">Low</span></td><td>Lihat solusi cross-cutting.</td></tr>
+<tr><td>12</td><td><code>Notes</code> selalu NULL</td><td><span class="sev-low">Low</span></td><td>Lihat Cross-Cutting #7.</td></tr>
+<tr><td>13</td><td><code>Aging</code> dihitung real-time (<code>DATEDIFF</code> terhadap <code>GETUTCDATE()</code>)</td><td><span class="sev-low">Low</span></td><td>Expected behavior untuk live dashboard — tidak perlu tindakan, hanya perlu disadari bahwa snapshot historis akan selalu menunjukkan aging terbaru saat query dijalankan.</td></tr>
+<tr><td>14</td><td>Dual workflow <code>COALESCE(wft1.status, wft2.status)</code></td><td><span class="sev-low">Low</span></td><td>Sudah aman by design (mutually exclusive). Tidak perlu tindakan.</td></tr>
+<tr><td>15</td><td><code>pvr1</code> vs <code>pvr2</code> COALESCE (validasi material vs detail)</td><td><span class="sev-low">Low</span></td><td>Sudah disengaja — material-level diutamakan. Tidak perlu tindakan.</td></tr>
+<tr><td>16</td><td><code>PriorityName</code> NULL untuk additional order</td><td><span class="sev-low">Low</span></td><td>Expected — additional order tidak punya finding sehingga tidak ada priority. Tidak perlu tindakan.</td></tr>
+<tr><td>17</td><td><code>MaterialStatus</code> (<code>'Add'</code>/<code>'Ok'</code>/<code>'Delete'</code>) — tujuan bisnisnya di report belum dikonfirmasi</td><td><span class="sev-pending">Pending Confirmation</span></td><td><b>Perlu jawaban bisnis</b>: kolom ini dipakai untuk apa di PBI? <code>'Add'</code> = dibuat & dimodifikasi orang yang sama, <code>'Ok'</code> = dimodifikasi orang lain (kemungkinan supervisor).</td></tr>
+</tbody></table>
+<br>
+<h3>Business Rules (Confirmed)</h3>
+<p>- MOL berasal dari dua sumber: <b>Inspeksi</b> (<code>summaryreference=0</code>, punya <code>workorderid</code>) atau <b>Additional Order</b> (<code>summaryreference=1</code>, tanpa WO).</p>
+<p>- <code>correct_status=1</code> adalah gating filter utama berdasarkan <code>config_mapping_mol_status.csv</code> (kombinasi <code>mol_status</code> × <code>isactive</code> × <code>workflow_status</code> × <code>require_mono</code>).</p>
+<p>- MOL bisa dengan atau tanpa material; pooling validation berlaku untuk keduanya dengan fallback material-level → detail-level.</p>
+<p>- Special case: <code>actionremedycode='AR0010'</code> tanpa material → <code>canactiondigimandelete</code> di-override jadi <code>1</code>.</p>
+<br>
+<h3>Open Questions for Business</h3>
+<p>- <b><code>MaterialStatus</code></b> dipakai untuk visual/aksi apa di Power BI? <em>(lihat item Pending Confirmation di atas)</em></p>
+<p>- Apakah semua site/tenant memakai format SAP MO number dengan prefix <code>'00'</code>? Jika ada yang berbeda, ini akan silently broken.</p>
+<p>- Apakah field <code>canactiondigimandelete</code> dkk memang sudah tidak terpakai di aplikasi, sehingga aman dihapus dari CTE?</p>
+<br>
+<hr>
+<br>
+<h2>3. Inspection Compliance</h2>
+<br>
+<p><b>Views:</b> <code>am.vw_report_iams_get_molist</code> (dimensi MO) + <code>am.vw_report_iams_get_assignment</code> (dimensi personel)</p>
+<p><b>Business Question:</b> Apakah setiap MO Inspection sudah dikerjakan oleh inspector yang ditugaskan, kapan dikerjakan, dan apa status aktualnya?</p>
+<br>
+<blockquote>Dua view ini saling melengkapi — <code>get_molist</code> fokus ke dimensi MO (equipment, section, status), <code>get_assignment</code> fokus ke dimensi personel (inspector, SPV, waktu). Consumer PBI men-join keduanya via <code>MOId = Id</code>.</blockquote>
+<br>
+<h3>Gap & Proposed Solution</h3>
+<br>
+<table><thead>
+<tr><th>#</th><th>Issue</th><th>View</th><th>Severity</th><th>Proposed Solution</th></tr>
+</thead><tbody>
+<tr><td>1</td><td><b>Timezone overdue-check berbeda</b> — <code>get_molist</code> pakai UTC murni, <code>get_assignment</code> pakai local time via <code>utcoffset</code></td><td>Lintas view</td><td><span class="sev-high">High</span></td><td>Lihat Cross-Cutting #1. WO yang sama bisa mendapat status berbeda (<code>INF/ING</code> vs <code>INA/INB</code>) di batas tengah malam.</td></tr>
+<tr><td>2</td><td><b>Sumber waktu "selesai" berbeda</b> — <code>get_molist</code> pakai <code>tp.modifiedat</code>, <code>get_assignment</code> pakai <code>max(taskpersonalizedlog.enddate)</code></td><td>Lintas view</td><td><span class="sev-high">High</span></td><td>Tentukan satu sumber canonical. Jika <code>taskpersonalizedlog.enddate</code> dianggap lebih akurat (audit trail), tambahkan CTE yang sama ke <code>get_molist</code>.</td></tr>
+<tr><td>3</td><td><b>Tidak ada <code>TaskPersonalizedId</code></b> di output <code>get_assignment</code> — join ke <code>get_molist</code> hanya via <code>MOId</code>, berisiko cartesian product untuk WO dengan banyak inspector</td><td><code>get_assignment</code></td><td><span class="sev-high">High</span></td><td>Tambahkan kolom <code>TaskPersonalizedId</code> ke output <code>get_assignment</code> agar PBI bisa join tepat per assignment, bukan per WO.</td></tr>
+<tr><td>4</td><td>Site join via <code>d.siteid</code> (site inspector) — jika inspector tidak punya <code>siteid</code>, <b>seluruh datetime jadi NULL</b> dan baris hilang dari hasil</td><td><code>get_assignment</code></td><td><span class="sev-medium">Medium</span></td><td>Validasi data quality <code>useremploymentprofile.siteid</code> — pastikan semua inspector aktif punya siteid terisi. Pertimbangkan fallback ke <code>site</code> WO jika inspector tidak punya site.</td></tr>
+<tr><td>5</td><td><code>CTE site</code> diambil tapi <b>dead code</b> (tidak dipakai)</td><td><code>get_molist</code></td><td><span class="sev-medium">Medium</span></td><td>Hapus CTE yang tidak terpakai, atau terapkan <code>utcoffset</code> agar konsisten dengan <code>get_assignment</code> (selaras dengan solusi #1).</td></tr>
+<tr><td>6</td><td><code>MOUtcDate</code> = duplikat <code>ScheduleDate</code> (sama-sama <code>wo.schedulestartdate</code>, tidak ada konversi)</td><td><code>get_molist</code></td><td><span class="sev-medium">Medium</span></td><td>Klarifikasi maksud kolom — jika <code>MOUtcDate</code> seharusnya beda timezone dari <code>ScheduleDate</code>, perbaiki logic; jika tidak, hapus salah satu kolom.</td></tr>
+<tr><td>7</td><td><code>CompletedUtcDate</code> & <code>CompletedUtcDate22</code> selalu NULL</td><td><code>get_assignment</code></td><td><span class="sev-medium">Medium</span></td><td>Lihat Cross-Cutting #7 — konfirmasi roadmap pengisian atau hapus kolom.</td></tr>
+<tr><td>8</td><td><code>AssignedBy</code> naming misleading — isinya orang yang <em>di-assign</em>, bukan yang melakukan assign</td><td><code>get_molist</code></td><td><span class="sev-low">Low</span></td><td>Rename ke <code>InspectorId</code> untuk selaras dengan penamaan di <code>get_assignment</code>.</td></tr>
+<tr><td>9</td><td><code>ATWRT</code> = duplikat <code>SectionTypeName</code></td><td><code>get_molist</code></td><td><span class="sev-low">Low</span></td><td>Pertahankan jika untuk kompatibilitas penamaan SAP; dokumentasikan alasannya agar tidak dianggap bug.</td></tr>
+<tr><td>10</td><td>Kolom "Utc" sudah local time</td><td><code>get_assignment</code></td><td><span class="sev-low">Low</span></td><td>Lihat Cross-Cutting #6.</td></tr>
+<tr><td>11</td><td><code>SPVName</code> bisa berisi akun sistem (jika <code>tp.createdby</code> adalah scheduler/sistem)</td><td><code>get_assignment</code></td><td><span class="sev-low">Low</span></td><td>Validasi terhadap data aktual — exclude service account jika ditemukan.</td></tr>
+<tr><td>12</td><td>8 kolom SAP placeholder selalu NULL</td><td><code>get_molist</code></td><td><span class="sev-low">Low</span></td><td>Lihat Cross-Cutting #7.</td></tr>
+<tr><td>13</td><td><code>mincreatedat</code> (earliest assignment) dihitung lintas semua TP dalam satu task — semua inspector dalam task yang sama berbagi nilai yang identik</td><td><code>get_molist</code></td><td><span class="sev-low">Low</span></td><td>Dokumentasikan sebagai known limitation, atau ubah window function jika bisnis butuh nilai per-inspector.</td></tr>
+</tbody></table>
+<br>
+<h3>Business Rules (Confirmed)</h3>
+<p>- Status resolusi (INA/INB/INE/INF/ING/INI) berdasarkan <code>config_mapping_wo_status.csv</code> — identik di kedua view.</p>
+<p>- Granularitas: per WO per taskpersonalized — satu WO dengan N inspector menghasilkan N baris di masing-masing view.</p>
+<p>- <code>tenantcode='MKP'</code> hardcoded — lihat Cross-Cutting #2.</p>
+<p>- SPV didefinisikan sebagai <code>tp.createdby</code> (yang membuat record assignment).</p>
+<br>
+<h3>Open Questions for Business</h3>
+<p>- Timezone mana yang jadi acuan resmi untuk overdue check? <em>(lihat Cross-Cutting #1)</em></p>
+<p>- <code>taskpersonalizedlog.enddate</code> atau <code>tp.modifiedat</code> — mana yang jadi acuan KPI compliance untuk "waktu TP selesai"?</p>
+<p>- Bagaimana cara PBI men-join kedua view saat ini? Apakah sudah ada handling untuk WO dengan banyak inspector?</p>
+<p>- Apakah <code>config_wicope_manual.csv</code> seharusnya direferensikan di salah satu view ini, atau memang murni dipakai di layer PBI?</p>
+<br>
+<hr>
+<br>
+<h2>4. Lead Time Report</h2>
+<br>
+<p><b>View:</b> <code>am.vw_report_iams_f_am_digiman_leadtime</code></p>
+<p><b>Business Question:</b> Berapa lama waktu yang dibutuhkan dari penugasan inspector hingga eMOL disetujui — diukur per tahapan: assignment → submit inspeksi → buat eMOL → approval.</p>
+<br>
+<blockquote>Sudah dikonfirmasi: laporan ini <b>by design</b> hanya menampilkan WO yang sudah menyelesaikan full cycle (approved). WO yang masih berjalan tidak akan muncul.</blockquote>
+<br>
+<h3>Gap & Proposed Solution</h3>
+<br>
+<table><thead>
+<tr><th>#</th><th>Issue</th><th>Severity</th><th>Proposed Solution</th></tr>
+</thead><tbody>
+<tr><td>1</td><td><code>fullcycle_leadtime_target</code> sering NULL — join <code>lower(sectiontype.name) = lower(config.type_status)</code> bergantung pada kesamaan nama section type persis; beda tenant bisa beda nama</td><td><span class="sev-medium">Medium</span></td><td><em>(Sudah dikonfirmasi sebagai risiko nyata.)</em> Bangun mapping table yang lebih robust (site + section type code, bukan name string) untuk target SLA, atau normalisasi penamaan section type di config per site.</td></tr>
+<tr><td>2</td><td>Multiple <code>workflowtransaction Complete</code> per WO bisa menghasilkan baris ganda per siklus re-approval</td><td><span class="sev-medium">Medium</span></td><td>Profilasi data untuk memastikan apakah kasus ini benar terjadi. Jika ya, putuskan aturan: ambil approval terakhir (<code>MAX(modifiedat)</code>) saja per WO.</td></tr>
+<tr><td>3</td><td><code>SELECT DISTINCT</code> sebagai safeguard duplikasi — lihat Cross-Cutting #5</td><td><span class="sev-medium">Medium</span></td><td>Lihat solusi cross-cutting.</td></tr>
+<tr><td>4</td><td>TP tanpa finding → tidak akan pernah match ke <code>mechanicorderlist</code> → <code>leadtime_create_emol</code>, <code>leadtime_approval</code>, <code>fullcycle_leadtime</code> semua NULL</td><td><span class="sev-medium">Medium</span></td><td><em>(Sudah dikonfirmasi sebagai expected behavior — WO tanpa finding memang tidak punya eMOL.)</em> Tidak perlu tindakan teknis, cukup dokumentasikan agar konsumen report tidak salah interpretasi NULL sebagai data hilang.</td></tr>
+<tr><td>5</td><td><code>leadtime_assignment</code> bisa negatif jika inspector ditugaskan sebelum <code>schedulestartdate</code></td><td><span class="sev-low">Low</span></td><td>Tidak ada guard saat ini. Bisa ditambahkan flag "early assignment" di layer PBI, atau dibiarkan sebagai informasi valid (assignment lebih cepat dari rencana).</td></tr>
+<tr><td>6</td><td><code>load_date = dateadd(hour, 7, getutcdate())</code> — UTC+7 hardcoded</td><td><span class="sev-low">Low</span></td><td>Lihat Cross-Cutting #1. Ganti dengan offset dinamis per site jika ada site di luar WIB.</td></tr>
+<tr><td>7</td><td><code>date_id</code> = duplikat <code>schedule_date</code></td><td><span class="sev-low">Low</span></td><td>Hapus salah satu kolom redundan (perlu cek dampak ke PBI sebelum diubah).</td></tr>
+<tr><td>8</td><td><code>workflowtransaction</code> join hanya via <code>referencetransactionid</code> tanpa filter tipe referensi — risiko false match jika ID dipakai entitas lain</td><td><span class="sev-low">Low</span></td><td>Tambahkan filter tipe referensi jika kolomnya tersedia di sumber data.</td></tr>
+<tr><td>9</td><td><code>inspection_submittedby</code> menyimpan usercode (bukan fullname) — representasi beda dengan kolom *by lainnya</td><td><span class="sev-low">Low</span></td><td><em>(Sudah dikonfirmasi by design — satu baris = satu TP, jadi submittedby = inspector TP tersebut, bisa beda orang antar baris.)</em> Opsional: ubah ke fullname agar konsisten secara visual dengan <code>assignmentby</code>, <code>approvedby</code>, dll.</td></tr>
+<tr><td>10</td><td><code>TFCx3 = 72 jam</code> di <code>config_wicope_manual.csv</code> tidak terpakai (filter <code>type_id='TFC'</code> saja)</td><td><span class="sev-low">Low</span></td><td><em>(Sudah dikonfirmasi sebagai dead configuration.)</em> Jadwalkan penghapusan baris <code>TFCx3</code> dari CSV pada siklus maintenance config berikutnya.</td></tr>
+</tbody></table>
+<br>
+<h3>Business Rules (Confirmed)</h3>
+<p>- <b>Hanya WO yang sudah approved</b> yang tampil — INNER JOIN ke <code>workflowtransaction WHERE status='Complete'</code> adalah disengaja.</p>
+<p>- <b>Granularitas per WO per TP per finding</b> — satu WO dengan beberapa inspector dan beberapa finding menghasilkan beberapa baris, ini expected.</p>
+<p>- <b><code>inspection_submittedby</code></b> = usercode milik TP tersebut, valid karena satu inspeksi bisa dikerjakan lebih dari satu orang (multiple <code>taskpersonalized</code> per task) — setiap baris merepresentasikan satu assignment.</p>
+<p>- Target SLA full cycle: 24 jam (<code>TFC</code>), berlaku untuk site/unit type yang match di config.</p>
+<p>- <code>user</code> tanpa filter <code>isactive</code> — disengaja, report historis.</p>
+<br>
+<h3>Open Questions for Business</h3>
+<p>- Apakah semua site benar-benar di zona waktu WIB (UTC+7), atau ada site WITA/WIT yang butuh offset berbeda?</p>
+<p>- Boleh dijadwalkan kapan baris <code>TFCx3</code> dihapus dari <code>config_wicope_manual.csv</code>?</p>
+<p>- Apakah nama <code>sectiontype</code> per site sudah terstandarisasi, atau memang bervariasi antar tenant sehingga target SLA perlu pendekatan mapping yang berbeda?</p>
+<br>
+<hr>
+<br>
+<h2>5. Improvement Initiative: Multi-Level Approval</h2>
+<br>
+<p><b>View terdampak:</b> <code>am.vw_report_iams_f_am_digiman_dorder</code> (D'Order Result & Ordering Compliance)</p>
+<p><b>Sifat:</b> Bukan gap dari kondisi existing — ini desain perbaikan untuk mengikuti kapabilitas baru aplikasi Digiman+ yang sekarang mendukung approval <b>berjenjang</b> (1, 2, atau lebih level), bukan lagi satu level approval seperti yang dibaca SQL saat ini.</p>
+<br>
+<blockquote>Dokumen desain lengkap (skema sumber, conceptual SQL, daftar asumsi): <code>gap-analysis/multi-level-approval-design.md</code>. Skema tabel workflow secara umum (di luar konteks report ini) terdokumentasi di <code>architecture/workflow.md</code>.</blockquote>
+<br>
+<h3>Konteks</h3>
+<br>
+<p>Order (eMOL) saat ini disetujui lewat satu <code>WorkflowTransaction</code> per Order. SQL existing hanya membaca header-nya (satu status, satu approver, satu tanggal) — belum aware terhadap step-level approval yang sekarang ada.</p>
+<br>
+<p>```</p>
+<p>1 Inspection (WO)        = N Findings              = 1 Order</p>
+<p>1 Finding                = 1 eMOL</p>
+<p>1 Order                  = 1 WorkflowTransaction</p>
+<p>1 WorkflowTransaction    = N WorkflowTransactionStep</p>
+<p>1 WorkflowTransactionStep → 1 WorkflowStep (master: nama level, urutan, min approver)</p>
+<p>```</p>
+<br>
+<p>Approval terjadi di level <b>Order</b>, bukan di level eMOL — semua eMOL di bawah Order yang sama berbagi approval chain yang identik. Grain <code>dorder</code> (per-eMOL) <b>tidak berubah</b> pada desain ini.</p>
+<br>
+<h3>State Machine (Ringkasan)</h3>
+<br>
+<p>1. <b>Submit</b> — step <code>StepOrder=0</code> ("User Submit") dibuat dengan <code>Status='Submitted'</code>; bersamaan, seluruh step approval berikutnya langsung dibuat semua dengan <code>Status='In Progress'</code> (bukan satu-satu saat gilirannya tiba).</p>
+<p>2. <b>Approve di level N</b> — step <code>StepOrder=N</code> berubah <code>In Progress</code> → <code>Approved</code>, tercatat di <code>ModifiedBy</code>/<code>ModifiedAt</code>.</p>
+<p>3. <b>Belum ada fitur reject</b> — alur hanya maju, tidak ada percabangan mundur/revisi.</p>
+<p>4. <b>Selesai</b> — semua step <code>Approved</code> → header <code>WorkflowTransaction.Status</code> jadi <code>Complete</code>, dan <code>CurrentWorkflowStepId</code> kembali NULL.</p>
+<br>
+<h3>Desain Perubahan (Ringkasan)</h3>
+<br>
+<table><thead>
+<tr><th>Komponen</th><th>Perubahan</th></tr>
+</thead><tbody>
+<tr><td>View <code>dorder</code> (grain tidak berubah, tetap per-eMOL)</td><td>Ganti kolom approval single-level (<code>ApprovalName</code>, <code>ApprovalDateUTC</code>) dengan ringkasan: <code>ApprovalTotalLevel</code>, <code>ApprovalApprovedLevel</code>, <code>ApprovalCurrentLevel</code>, <code>ApprovalCurrentLevelName</code>, <code>FinalApprovedBy</code>, <code>FinalApprovedDate</code></td></tr>
+<tr><td>View baru — audit trail</td><td><code>vw_report_iams_f_am_digiman_order_approval_detail</code> (usulan nama) — satu baris per Order per level approval, untuk drill-through di PBI tanpa mengubah grain <code>dorder</code></td></tr>
+<tr><td>Penyederhanaan kunci</td><td><code>WorkflowTransaction.CurrentWorkflowStepId</code> menunjuk langsung ke level pending — tidak perlu aggregasi <code>MIN(StepOrder)</code> dari step</td></tr>
+</tbody></table>
+<br>
+<p><b>Contoh nilai di <code>dorder</code> per skenario:</b></p>
+<br>
+<table><thead>
+<tr><th>Skenario</th><th><code>ApprovalCurrentLevel</code></th><th><code>ApprovalCurrentLevelName</code></th><th><code>FinalApprovedBy</code></th><th><code>FinalApprovedDate</code></th></tr>
+</thead><tbody>
+<tr><td>Baru submit, pending di level 1</td><td><code>1</code></td><td><code>SPV Approval</code></td><td><code>NULL</code></td><td><code>NULL</code></td></tr>
+<tr><td>Sudah lewat level 1, pending di level 2</td><td><code>2</code></td><td><code>Manager Approval</code></td><td><code>NULL</code></td><td><code>NULL</code></td></tr>
+<tr><td>Semua level Approved (Order Complete)</td><td><code>NULL</code></td><td><code>NULL</code></td><td><code>Budi Santoso</code></td><td><code>2026-06-28 14:32:00</code></td></tr>
+</tbody></table>
+<br>
+<p><code>ApprovalCurrentLevel<em></code> dan <code>FinalApproved</em></code> saling eksklusif — selama Order berjalan hanya yang pertama terisi, begitu selesai berbalik jadi hanya yang kedua terisi.</p>
+<br>
+<p><b>Kenapa perlu view audit trail terpisah:</b> Ringkasan di <code>dorder</code> hanya menjawab "level berapa sekarang" dan "siapa approver terakhir" — tidak bisa menjawab pertanyaan yang butuh <b>seluruh riwayat chain</b>, misalnya siapa approve di level 1 (bukan cuma level terakhir), Order macet di level mana dan sudah berapa lama, atau level mana yang paling sering jadi bottleneck lintas banyak Order. View detail menjawab itu dengan grain per Order per level (satu Order 3 level → 3 baris), dipakai sebagai drill-through page di PBI tanpa mengubah grain tabel utama.</p>
+<br>
+<h3>Status Keputusan & Diskusi</h3>
+<br>
+<table><thead>
+<tr><th>#</th><th>Topik</th><th>Status</th></tr>
+</thead><tbody>
+<tr><td>1</td><td>PK header <code>WorkflowTransaction</code> = <code>Id</code></td><td><span class="sev-resolved">Resolved</span></td></tr>
+<tr><td>2</td><td><code>MinApprover</code> tidak mengubah cara hitung (tetap 1 baris step per level)</td><td><span class="sev-resolved">Resolved</span></td></tr>
+<tr><td>3</td><td>Kode <code>TransactionType</code> untuk Order approval = <code>'Mechanic Order'</code></td><td><span class="sev-resolved">Resolved</span></td></tr>
+<tr><td>4</td><td><code>CurrentWorkflowStepId</code> kembali NULL setelah Complete</td><td><span class="sev-resolved">Resolved</span></td></tr>
+<tr><td>5</td><td>Step "User Submit" dikeluarkan dari audit trail</td><td><span class="sev-resolved">Decided</span></td></tr>
+<tr><td>6</td><td>Adopsi kolom <code>SubmittedBy</code>/<code>SubmittedDate</code> di <code>dorder</code></td><td><span class="sev-open">Open — bahas dengan engineer</span></td></tr>
+</tbody></table>
+<br>
+<p><b>Catatan implementasi tambahan:</b> join existing SQL production ke <code>workflowtransaction</code> (<code>mol.workorderid = wft1.referencetransactionid</code>) saat ini <b>belum memfilter <code>TransactionType</code></b> — karena tabel ini polymorphic/shared antar jenis transaksi, filter ini perlu ditambahkan saat implementasi, bukan hanya untuk fitur baru tapi juga memperbaiki risiko di logic yang sudah ada.</p>
+<br>
+<hr>
+<br>
+<h2>Consolidated Action Items</h2>
+<br>
+<p>Urutan berdasarkan severity — disarankan dikerjakan dari atas ke bawah.</p>
+<br>
+<table><thead>
+<tr><th>#</th><th>Report</th><th>Issue</th><th>Severity</th><th>Decision Needed From</th></tr>
+</thead><tbody>
+<tr><td>1</td><td>Cross-Cutting</td><td>Timezone tidak konsisten antar view</td><td><span class="sev-high">High</span></td><td>Engineer + Business (konfirmasi zona waktu site)</td></tr>
+<tr><td>2</td><td>Cross-Cutting</td><td><code>tenantcode='MKP'</code> hardcoded di 5 view</td><td><span class="sev-high">High</span></td><td>Business (rencana multi-tenant?)</td></tr>
+<tr><td>3</td><td>Cross-Cutting</td><td>Status resolution silent-drop jika status baru belum ada di config</td><td><span class="sev-high">High</span></td><td>Engineer (tambah fallback/monitoring)</td></tr>
+<tr><td>4</td><td>D'Order Result</td><td><code>mechanicorderlist</code> isactive dikomentari, hanya andalkan <code>correct_status</code></td><td><span class="sev-high">High</span></td><td>Engineer</td></tr>
+<tr><td>5</td><td>D'Order Result</td><td>SAP MO number prefix <code>'00'</code> hardcoded</td><td><span class="sev-high">High</span></td><td>Engineer + Business (konfirmasi format SAP per site)</td></tr>
+<tr><td>6</td><td>Inspection Compliance</td><td>Timezone overdue-check beda antara <code>get_molist</code> & <code>get_assignment</code></td><td><span class="sev-high">High</span></td><td>Engineer + Business</td></tr>
+<tr><td>7</td><td>Inspection Compliance</td><td>Sumber "waktu selesai" beda (<code>modifiedat</code> vs log <code>enddate</code>)</td><td><span class="sev-high">High</span></td><td>Business (pilih sumber canonical)</td></tr>
+<tr><td>8</td><td>Inspection Compliance</td><td>Tidak ada <code>TaskPersonalizedId</code> di <code>get_assignment</code> → risiko cartesian join</td><td><span class="sev-high">High</span></td><td>Engineer</td></tr>
+<tr><td>9</td><td>D'Order Result</td><td><code>MaterialStatus</code> — tujuan bisnis belum dikonfirmasi</td><td><span class="sev-pending">Pending</span></td><td>Business</td></tr>
+<tr><td>10</td><td>Cross-Cutting & semua view</td><td>Filter <code>isactive</code> pada <code>user</code> tidak konsisten</td><td><span class="sev-medium">Medium</span></td><td>Business (tetapkan kebijakan baku)</td></tr>
+<tr><td>11</td><td>Lead Time</td><td><code>fullcycle_leadtime_target</code> sering NULL karena name-matching section type</td><td><span class="sev-medium">Medium</span></td><td>Engineer + Business</td></tr>
+<tr><td>12</td><td>D'Inspect Result</td><td>INNER JOIN <code>damagecodegroup</code> — silent drop finding</td><td><span class="sev-medium">Medium</span></td><td>Engineer</td></tr>
+<tr><td>13</td><td>D'Order Result</td><td><code>canactiondigimandelete</code> dkk dihitung tapi tidak diekspos — dead code?</td><td><span class="sev-medium">Medium</span></td><td>Business + Engineer</td></tr>
+<tr><td>14</td><td>D'Order Result</td><td><code>poolingstatus</code> magic string <code>MOJ</code>/<code>MOK</code> tidak terdokumentasi</td><td><span class="sev-medium">Medium</span></td><td>Business</td></tr>
+<tr><td>15</td><td>D'Order Result (Improvement)</td><td>Adopsi kolom <code>SubmittedBy</code>/<code>SubmittedDate</code> di <code>dorder</code> — lihat Chapter 5</td><td><span class="sev-open">Open</span></td><td>Engineer + Business</td></tr>
+<tr><td><em>Sisanya</em></td><td>Semua</td><td>Lihat tabel per-halaman di atas (Low severity / sudah confirmed)</td><td><span class="sev-low">Low</span></td><td>—</td></tr>
+</tbody></table>
+<br>
+<hr>
+<br>
+<p><em>Dokumen ini disusun berdasarkan analisa SQL view per 2026-06-30. Detail teknis lengkap per view tersedia di file dokumentasi masing-masing pada folder <code>digiman+/report/transaction-report/</code>.</em></p>
+<br>
+</body>
+</html>

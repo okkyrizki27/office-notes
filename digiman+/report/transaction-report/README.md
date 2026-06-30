@@ -2,6 +2,10 @@
 
 Report transaksi Digiman yang terdiri dari 5 halaman. Semua view dibuat di schema `[am]` di Synapse/SQL serverless.
 
+**Gap Analysis & Discussion Document:** [gap-analysis/Digiman_Transaction_Report_Gap_Analysis.pdf](gap-analysis/Digiman_Transaction_Report_Gap_Analysis.pdf) — dokumen rangkuman gap, usulan solusi, dan konfirmasi yang dibutuhkan dari business stakeholder lintas 5 halaman report. Sumber: [gap-analysis/gap-analysis.md](gap-analysis/gap-analysis.md), regenerate via `python gap-analysis/generate_pdf.py`.
+
+**Improvement Design — Multi-Level Approval:** [gap-analysis/multi-level-approval-design.md](gap-analysis/multi-level-approval-design.md) — desain perubahan D'Order Result & Ordering Compliance untuk mendukung approval berjenjang (`WorkflowTransactionStep` + `WorkflowStep`).
+
 ---
 
 ## Mapping Report → View
