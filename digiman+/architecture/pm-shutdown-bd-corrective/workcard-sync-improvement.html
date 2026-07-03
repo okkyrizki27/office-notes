@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Workcard Sync — Proposed Improvement</title>
+<style>
+  @page { size: A4 portrait; margin: 16mm; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #1a1a1a; padding: 0 60px; margin: 0; }
+  h1 { font-size: 19pt; color: #1f3a5f; border-bottom: 3px solid #1f3a5f; padding-bottom: 8px; margin-bottom: 6px; }
+  h2 { font-size: 13.5pt; color: #fff; background: #1f3a5f; padding: 7px 12px; border-radius: 3px; margin: 24px 0 10px; page-break-after: avoid; break-after: avoid; }
+  h3 { font-size: 11.5pt; color: #1f3a5f; border-left: 4px solid #1f3a5f; padding-left: 10px; margin: 18px 0 8px; page-break-after: avoid; break-after: avoid; }
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 8.5pt; margin: 8px 0 14px; }
+  th { background: #1f3a5f; color: #fff; padding: 6px 8px; text-align: left; font-weight: 600; word-wrap: break-word; }
+  td { padding: 5px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; }
+  tr { page-break-inside: avoid; break-inside: avoid; }
+  tr:nth-child(even) td { background: #f4f7fa; }
+  code { background: #f0f0f0; color: #1a1a1a; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 8.5pt; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 16px 0; }
+  p { margin: 4px 0; line-height: 1.6; }
+  b { color: #111; }
+  ul { margin: 4px 0 8px 0; padding-left: 20px; line-height: 1.8; }
+  li { margin-bottom: 2px; }
+  blockquote { margin: 8px 0; padding: 8px 14px; background: #f4f7fa; border-left: 4px solid #1f3a5f; color: #333; }
+  .badge-before { display:inline-block; color:#fff; background:#c0392b; padding:1px 8px; border-radius:3px; font-size:8pt; font-weight:bold; }
+  .badge-after  { display:inline-block; color:#fff; background:#1e8449; padding:1px 8px; border-radius:3px; font-size:8pt; font-weight:bold; }
+  .badge-new    { display:inline-block; color:#fff; background:#2471a3; padding:1px 8px; border-radius:3px; font-size:8pt; font-weight:bold; }
+  .footer { margin-top: 30px; font-size: 9pt; color: #888; text-align: center; border-top: 1px solid #ddd; padding-top: 8px; }
+  .confirm-box { border: 1.5px solid #1f3a5f; border-radius: 4px; padding: 10px 16px; margin: 10px 0; background: #f0f4fa; }
+  @media print { h2, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; } body { padding: 0 30px; } }
+</style>
+</head>
+<body>
+
+<h1>Workcard Sync — Proposed Improvement</h1>
+<br>
+<p><b>Dokumen:</b> Usulan perbaikan logic sync data Workcard untuk PM Shutdown dan BD Corrective di aplikasi Mobile Digiman+</p>
+<p><b>Tujuan:</b> Konfirmasi pendekatan sebelum implementasi di BE dan FE</p>
+<p><b>Tanggal:</b> 3 Juli 2026</p>
+<br>
+<hr>
+<br>
+
+<h2>1. Latar Belakang</h2>
+<br>
+<p>Terdapat laporan dari site bahwa proses sync workcard memakan waktu yang cukup lama, khususnya pada dua kondisi:</p>
+<ul>
+  <li><b>Fresh install (pertama kali login)</b> — sync awal tidak selesai-selesai</li>
+</ul>
+<br>
+<p>Setelah analisis, ditemukan dua gap utama pada logic filtering data di BE yang menjadi penyebab volume data yang ditarik terlalu besar.</p>
+<br>
+
+<h2>2. Gap yang Ditemukan</h2>
+<br>
+
+<h3>Gap 1 — Fresh Install: Sebagian Data Tidak Ada Batas Tanggal</h3>
+<p>Pada kondisi INPROGRESS tertentu, data diambil <b>tanpa filter tanggal apapun (semua data)</b>, sehingga workcard yang sudah sangat lama ikut ditarik.</p>
+<br>
+<table>
+  <thead>
+    <tr><th>Status</th><th>Kondisi</th><th>Filter Saat Ini</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>SUBMIT</code></td><td>—</td><td>ProjectFinish &gt;= today − 2 bulan</td></tr>
+    <tr><td><code>IN PROGRESS</code></td><td>NotifNo terisi <b>dan</b> FinishBreakdown terisi</td><td>FinishBreakdown &gt;= today − 2 bulan</td></tr>
+    <tr><td><code>IN PROGRESS</code></td><td>NotifNo terisi <b>dan</b> FinishBreakdown <b>NULL</b></td><td><span class="badge-before">SEMUA DATA</span></td></tr>
+    <tr><td><code>IN PROGRESS</code></td><td>NotifNo <b>NULL</b></td><td><span class="badge-before">SEMUA DATA</span></td></tr>
+  </tbody>
+</table>
+<br>
+
+<h3>Gap 2 — After Last Sync: LastSyncDate Terlalu Lama</h3>
+<p>Jika user tidak membuka aplikasi selama berbulan-bulan, <code>LastSyncDate</code> menjadi sangat jauh ke belakang. Filter <code>ModifiedUtcDate &gt;= LastSyncDate</code> akan menarik delta yang hampir sebesar fresh install — bahkan tanpa batas range.</p>
+<br>
+
+<h2>3. Usulan Perbaikan</h2>
+<br>
+
+<h3>3.1 Konfigurasi Range (Baru)</h3>
+<p>Range hari dijadikan configurable melalui table <code>Setting</code> di <b>DPlanDB</b>, sehingga dapat diubah tanpa perlu deploy ulang.</p>
+<br>
+<table>
+  <thead>
+    <tr><th style="width:30%">SettingCategory</th><th style="width:30%">SettingCode</th><th>SettingName (nilai awal)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>WORKCARD_DIGIMAN+</code></td><td><code>LAST_DAY_RANGE</code></td><td><code>30</code> (hari)</td></tr>
+  </tbody>
+</table>
+<p>Seluruh filter tanggal di bawah menggunakan nilai ini sebagai <b>N</b>.</p>
+<br>
+
+<h3>3.2 Fresh Install — Logic Baru</h3>
+<br>
+<table>
+  <thead>
+    <tr><th style="width:18%">Status</th><th style="width:35%">Kondisi</th><th style="width:22%">Field Tanggal</th><th>Filter</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>SUBMIT</code></td>
+      <td>—</td>
+      <td><code>ProjectFinish</code></td>
+      <td>&gt;= today − N hari <span class="badge-after">DIPERKETAT</span></td>
+    </tr>
+    <tr>
+      <td><code>IN PROGRESS</code></td>
+      <td>NotifNo terisi <b>dan</b> FinishBreakdown terisi</td>
+      <td><code>FinishBreakdown</code></td>
+      <td>&gt;= today − N hari <span class="badge-after">DIPERKETAT</span></td>
+    </tr>
+    <tr>
+      <td><code>IN PROGRESS</code></td>
+      <td>NotifNo terisi <b>dan</b> FinishBreakdown <b>NULL</b></td>
+      <td><code>ModifiedUtcDate</code></td>
+      <td>&gt;= today − N hari <span class="badge-new">BERUBAH</span></td>
+    </tr>
+    <tr>
+      <td><code>IN PROGRESS</code></td>
+      <td>NotifNo <b>NULL</b></td>
+      <td><code>ModifiedUtcDate</code></td>
+      <td>&gt;= today − N hari <span class="badge-new">BERUBAH</span></td>
+    </tr>
+    <tr>
+      <td><code>FINISH</code> / <code>CANCEL</code></td>
+      <td>—</td>
+      <td>—</td>
+      <td>❌ Tidak diambil</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<blockquote>
+  <b>Alasan penggunaan field:</b><br>
+  <code>ProjectFinish</code> dipakai untuk <code>SUBMIT</code> karena <code>ModifiedUtcDate</code> bisa jauh ke belakang (saat workcard dibuat), sementara <code>ProjectFinish</code> masih dalam range relevan.<br><br>
+  <code>ModifiedUtcDate</code> dipakai untuk INPROGRESS tanpa target finish — sebagai proxy aktivitas terakhir workcard. Data yang tidak disentuh lebih dari N hari dianggap tidak relevan.
+</blockquote>
+<br>
+
+<h3>3.3 After Last Sync — Logic Baru</h3>
+<br>
+<p><b>Kondisi Normal</b> — <code>LastSyncDate &gt;= today − N hari</code></p>
+<p>Tidak ada perubahan signifikan. Filter tetap <code>ModifiedUtcDate &gt;= LastSyncDate</code> untuk semua status.</p>
+<br>
+<table>
+  <thead>
+    <tr><th style="width:25%">Status</th><th>Filter</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>SUBMIT</code></td><td><code>ModifiedUtcDate &gt;= LastSyncDate</code></td></tr>
+    <tr><td><code>IN PROGRESS</code></td><td><code>ModifiedUtcDate &gt;= LastSyncDate</code></td></tr>
+    <tr><td><code>FINISH</code></td><td><code>ModifiedUtcDate &gt;= LastSyncDate</code> — diambil untuk <b>remove</b> dari device, tidak ditampilkan</td></tr>
+    <tr><td><code>CANCEL</code></td><td><code>ModifiedUtcDate &gt;= LastSyncDate</code> — diambil untuk <b>remove</b> dari device, tidak ditampilkan</td></tr>
+  </tbody>
+</table>
+<br>
+<p><b>Kondisi LastSyncDate Terlalu Lama</b> — <code>LastSyncDate &lt; today − N hari</code> <span class="badge-new">BARU</span></p>
+<p>Jika user tidak membuka aplikasi lebih dari N hari → <b>gunakan Fresh Install logic</b> (full refresh, replace seluruh data lokal di device).</p>
+<br>
+<blockquote>
+  <b>Mengapa full refresh dan bukan compare-and-remove?</b><br>
+  Delta sync hanya mengembalikan data yang <em>berubah</em>, bukan seluruh data valid saat ini. Pendekatan compare-and-remove akan salah menghapus workcard INPROGRESS yang masih valid namun tidak dimodifikasi dalam N hari. Full refresh lebih aman dan konsisten dengan batas relevansi N hari yang sudah disepakati.
+</blockquote>
+<br>
+
+<h2>4. Poin Konfirmasi</h2>
+<br>
+<div class="confirm-box">
+  <p><b>❓ Perlu konfirmasi dari user/stakeholder:</b></p>
+  <ul>
+    <li>Filter <b>30 hari terakhir</b> akan berdampak pada data dengan status <b>Open</b> (SUBMIT) maupun <b>In Progress</b> (INPROGRESS) — apakah acceptable jika workcard dengan status tersebut yang berumur lebih dari 30 hari <b>tidak muncul</b> di device?</li>
+    <li>Apakah acceptable jika user yang tidak membuka app lebih dari 30 hari akan mendapat <b>full refresh</b> (data lama di device terhapus dan diganti)?</li>
+  </ul>
+</div>
+<br>
+
+<div class="footer">Digiman+ — Workcard Sync Improvement Proposal &nbsp;|&nbsp; 3 Juli 2026</div>
+
+</body>
+</html>
