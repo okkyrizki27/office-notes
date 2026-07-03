@@ -648,6 +648,7 @@ for sprint_obj in sprints_to_report:
         rows.append({
             "key": issue["key"],
             "summary": f["summary"][:70] + ("..." if len(f["summary"]) > 70 else ""),
+            "issuetype": (f.get("issuetype") or {}).get("name", "-"),
             "assignee": (f.get("assignee") or {}).get("displayName", "Unassigned"),
             "priority": (f.get("priority") or {}).get("name", "-"),
             "sp": sp_val,
@@ -882,8 +883,9 @@ for d in delayed_by_sprint:
         lines.append("|-----|---------|----------|----|---------|-----------------|----------|")
         for r in sorted(nobase_rows, key=lambda x: -x["elapsed_days"]):
             sp_str = f"{r['sp']:.0f}" if r["sp"] is not None else "-"
+            summary_with_type = f"{r['issuetype']} - {r['summary']}"
             lines.append(
-                f"| [{r['key']}]({BASE_URL}/browse/{r['key']}) | {r['summary']} | {r['assignee']} | "
+                f"| [{r['key']}]({BASE_URL}/browse/{r['key']}) | {summary_with_type} | {r['assignee']} | "
                 f"{sp_str} | {r['started']} | {r['elapsed_days']:.1f} | {r['priority']} |"
             )
         lines.append("")

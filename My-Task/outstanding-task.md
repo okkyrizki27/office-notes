@@ -8,6 +8,7 @@
 - [ ] `P1` Create Timeline Service Sheet for BUMA ID
 - [ ] `P1` Create template untuk isi bank task dan lain-lain
 - [ ] `P1` Create process flow of Digiman+ Form request Uda Sunardi
+- [ ] `P1` Check berapa lama data digiplan stay di in list breakdown and outstanding administration
 - [ ] `P2` Follow up to Ko Herianto terkait view untuk details of Intervention
 - [~] `P2` Compare data master dan transaksi EHMS dengan data master Digiman+ *(menunggu diskusi dengan Soraya di hari Kamis, 21 Mei 2026)*
 - [ ] `P2` Confirmation to MKP perlakuan terhadap order yang gagal karena over budget — reject or pending, once budget release sync again to SAP
