@@ -69,9 +69,18 @@ Konfigurasi integrasi dilakukan melalui table `BusinessOperationalForm` di `main
 
 ---
 
+## Homepage
+
+- [Homepage Revamp](homepage/homepage-revamp.md) — sections, formula count Needs Attention, kriteria per kategori (Inspection / PM Shutdown / BD Corrective), Settings, permission (post Release 4.0.0)
+
+---
+
 ## PM Shutdown & BD Corrective
 
 - [Workcard Sync Logic](pm-shutdown-bd-corrective/workcard-sync-logic.md) — logic pengambilan data workcard list (fresh install vs after last sync)
+- [PM Shutdown Page Revamp](pm-shutdown-bd-corrective/pm-shutdown-page-revamp.md) — kriteria data list, perubahan filter, permission (post Release 4.0.0)
+- [BD Corrective Page Revamp](pm-shutdown-bd-corrective/bd-corrective-page-revamp.md) — kriteria data list, perubahan filter, permission (post Release 4.0.0)
+- [Outstanding Administration](pm-shutdown-bd-corrective/outstanding-administration.md) — sub-fitur di PM Shutdown & BD Corrective: kriteria data outstanding task, filter Settings, permission scope
 
 ---
 
