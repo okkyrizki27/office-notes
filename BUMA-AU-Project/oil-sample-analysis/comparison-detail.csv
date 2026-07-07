@@ -1,0 +1,73 @@
+category;parameter_name;description;uom;web_column;web_value;api_field;api_value;availability
+IDENTITY;unit_no;Equipment unit number;;unitno;DZ0957;unit_no;DZ0957;Both
+IDENTITY;serial_no;Equipment serial number;;serialno;AMA00589;serial_no_equip;AMA00589;Both
+IDENTITY;make;Equipment make;;make;CATERPILLAR;make_name;CATERPILLAR;Both
+IDENTITY;model;Equipment model;;modelid;D11T;model_name;D11T;Both
+IDENTITY;compartment_name;Compartment name;;compart;ENGINE PRIMARY - DIESEL;compartment_name;ENGINE PRIMARY - DIESEL;Both
+IDENTITY;compartment_id;Compartment ID;;compartid;101;compartment_id;101;Both
+IDENTITY;job_site;Mine site location;;job_site;Commodore Mine;jobsite;Goonyella;Both (different at sample time)
+IDENTITY;customer_name;Customer name;;;(not in web);customer_name;BUMA AUSTRALIA PTY LTD;API only
+IDENTITY;customer_id;Customer ID;;;(not in web);customer_id;2054221;API only
+IDENTITY;region;Mine region;;;(not in web);region;Mackay;API only
+IDENTITY;market_status;Market status (CAT/NON CAT);;;(not in web);market_status;CAT;API only
+IDENTITY;sump_capacity;Sump capacity (litres);;(not in web);;sump_capacity;103;API only
+IDENTITY;fluid_change_interval;Oil change interval (hours);;(not in web);;fluid_change_interval;250;API only
+IDENTITY;fluid_sample_interval;Sample interval (hours);;(not in web);;fluid_sample_interval;250;API only
+SAMPLE_INFO;sample_id;Lab sample ID;;labno;14758637;sample_id;23384934;Both
+SAMPLE_INFO;date_sampled;Sample collection date;;sampledate;02/05/2020;date_sampled;2026-06-25T00:00:00.000000+10:00;Both
+SAMPLE_INFO;date_processed;Date processed by lab;;processdate;08/05/2020;date_first_processed;2026-07-04T15:36:10.690000+10:00;Both
+SAMPLE_INFO;date_reported;Report published date;;datereported;11/05/2020;date_last_processed;2026-07-04T15:36:10.690000+10:00;Both (different meaning)
+SAMPLE_INFO;date_received;Date sample received by lab;;(not in web);;date_received;2026-07-01T12:10:30.000000+10:00;API only
+SAMPLE_INFO;smu;Service Meter Unit (total machine hours);;meterread;17000;smu;41677;Both
+SAMPLE_INFO;fmu;Fluid Meter Unit (hours on current oil);hr;(not in web);;fmu;303;API only
+SAMPLE_INFO;oil_hours;Hours on oil (web label);hr;oilhours;250;(mapped to fmu);;Web only label
+SAMPLE_INFO;cmu;Cumulative Meter Unit;;(not in web);;cmu;41677;API only
+SAMPLE_INFO;sample_type;Sample type (Oil/Coolant/Grease);;(not in web);;sample_type;Oil;API only
+SAMPLE_INFO;oil_type;Oil brand/type;;coolantid;Mobil Delvac Modern Extreme Ready Mixed (RED);oil_type;TOTAL RUBIA WORKS 5000;Both
+SAMPLE_INFO;oil_grade;Oil grade (e.g. 15W40);;oilgradeid;15W40;oil_grade;10W40;Both
+SAMPLE_INFO;coolant_type;Coolant type;;;(not in web);coolant_type;(empty for this sample);API only
+SAMPLE_INFO;evaluation;Evaluation code (A/B/C);;evalcode;A;evaluation;A;Both
+SAMPLE_INFO;interpretation;Lab interpretation text;;notesos;Viscosity acceptable for oil grade indicated.Additive levels suggest a different oil type/formulation is in use.Infrared analysis appears acceptable.Wear levels below the 5 micron range appear acceptable.All other test results appear acceptable. Suggested Action:Next sample please confirm exact oil type used.Continue sampling at regular intervals.;interpretation;All completed tests appear acceptable. Suggested action: Continue sampling at the recommended interval.;Both
+SAMPLE_INFO;interpreter;Lab interpreter name;;(not in web);;interpreter;Jason Neyenhuys;API only
+SAMPLE_INFO;oil_changed;Whether oil was changed;;oilchanged;TRUE;fluid_changed;Y;Both
+SAMPLE_INFO;filter_changed;Whether filter was changed;;(not in web);;filter_changed;Y;API only
+SAMPLE_INFO;actioned;Whether sample has been actioned;;(not in web);;actioned;N;API only
+SAMPLE_INFO;resolved;Whether issue is resolved;;(not in web);;resolved;N;API only
+SAMPLE_INFO;analysis_ids;List of analysis types performed;;(not in web);;analysis_ids;ICP|DEP|F|Visc|Wat|PQ|FTIR;API only
+ICP;cu;Copper — bearing/bushing wear indicator;ppm;cu;<1;Cu;<1;Both, matches
+ICP;fe;Iron — ferrous wear (rings/liners/gears);ppm;fe;10;Fe;8;Both
+ICP;cr;Chromium — ring/liner wear indicator;ppm;cr;<1;Cr;<1;Both, matches
+ICP;pb;Lead — bearing overlay wear indicator;ppm;pb;<1;Pb;<1;Both, matches
+ICP;al;Aluminium — piston/housing wear indicator;ppm;al;<1;Al;2;Both
+ICP;si;Silicon — dust/dirt contamination indicator;ppm;si;5;Si;8;Both
+ICP;sn;Tin — bearing overlay wear indicator;ppm;sn;<1;Sn;<1;Both, matches
+ICP;ni;Nickel — wear indicator;ppm;ni;<1;Ni;<1;Both, matches
+ICP;na;Sodium — coolant leak indicator;ppm;na;4;Na;3;Both
+ICP;k;Potassium — coolant leak indicator;ppm;k;1;K;4;Both
+ICP;mo;Molybdenum — additive or wear indicator;ppm;mo;206;Mo;<1;Both (different oil formulation)
+ICP;ca;Calcium — detergent additive;ppm;ca;2917;Ca;1308;Both (different oil formulation)
+ICP;mg;Magnesium — additive;ppm;mg;155;Mg;625;Both (different oil formulation)
+ICP;p;Phosphorus — anti-wear additive (ZDDP);ppm;p;1078;P;619;Both (different oil formulation)
+ICP;zn;Zinc — anti-wear additive (ZDDP);ppm;zn;1246;Zn;681;Both (different oil formulation)
+ICP;ti;Titanium — wear indicator;ppm;ti;<1;Ti;<1;Both, matches
+ICP;sb;Antimony — wear indicator;ppm;sb;<1;Sb;<1;Both, matches
+ICP;v;Vanadium — wear indicator;ppm;v;<1;V;<1;Both, matches
+ICP;b;Boron — additive/coolant indicator;ppm;b;74;B;55;Both
+ICP;ag;Silver — wear indicator;ppm;ag;<1;Ag;<1;Both, matches
+ICP;mn;Manganese — wear indicator;ppm;mn;<1;Mn;<1;Both, matches
+ICP;cd;Cadmium — wear indicator;ppm;cd;<1;Cd;<1;Both, matches
+ICP;ba;Barium — additive;ppm;ba;<1;Ba;<1;Both, matches
+ICP;li;Lithium — grease contamination indicator;ppm;li;<1;Li;<1;Both, matches
+ICP;in;Indium — wear indicator;ppm;(not in web);;In;<1;API only
+ICP;bi;Bismuth — additive/wear indicator;ppm;(not in web);;Bi;<1;API only
+VISC;v40;Kinematic Viscosity @ 40°C;cSt;v40;113;(no value returned for this sample);;Both (v40 not returned this time)
+VISC;v100;Kinematic Viscosity @ 100°C;cSt;v100;13.8;V100;12.5;Both
+VISC;vi;Viscosity Index;;vi;121;VI;147;Both
+FTIR;ust;Soot/Carbon — incomplete combustion byproduct;abs/0.1mm;ust;8;UST;8;Both, matches
+FTIR;uoxi;Oxidation — oil oxidative degradation;abs/0.1mm;uoxi;16;UOXI;15;Both
+FTIR;usul;Sulfation — sulfur contamination;abs/0.1mm;usul;22;USUL;22;Both, matches
+FTIR;unit;Nitration — nitrogen contamination;abs/0.1mm;unit;8;UNIT;<1;Both
+F;f;Fuel Dilution — fuel entry into oil;%;f;<2.0;F;<2.0;Both, matches
+WAT;wat;Water Content — water in oil;%;wat;<0.1;WAT;0.1;Both
+PQ;pq;Particle Quantifier Index — ferrous magnetic particles;;pq;<1;PQ;<1;Both, matches
+DEP;dep;Debris Evaluation Code — debris type classification;;dep;N--B;DEP;N--B;Both, matches

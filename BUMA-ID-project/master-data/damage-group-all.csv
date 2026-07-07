@@ -1,0 +1,24 @@
+Code;Name;IsActive;Description;CreatedAt;CreatedBy;ModifiedAt;ModifiedBy
+DG0001;Air Leaks;1;Kebocoran Udara;2025-09-25 19:48:56.673;Manual Migration;;
+DG0002;Calibration;1;Permasalahan Kalibrasi;2025-09-25 19:48:56.673;Manual Migration;;
+DG0003;Damaged;1;Kerusakan Fisik Part;2025-09-25 19:48:56.673;Manual Migration;;
+DG0004;Damaged Tire;1;Kerusakan Fisik Tire Mengalami;2025-09-25 19:48:56.673;Manual Migration;;
+DG0005;Display;1;Permasalahan Yang Muncul Pada Display / Monitor Unit;2025-09-25 19:48:56.673;Manual Migration;;
+DG0006;Electrical Issue;1;Permasalahan Elektrik;2025-09-25 19:48:56.673;Manual Migration;;
+DG0007;Fluid Level;1;Level Fluida Tidak Normal;2025-09-25 19:48:56.673;Manual Migration;;
+DG0008;Fouled;1;Akumulasi Material Yang Menghambat Kerja Sistem;2025-09-25 19:48:56.673;Manual Migration;;
+DG0009;Fuel Leaks;1;Kebocoran Bahan Bakar;2025-09-25 19:48:56.673;Manual Migration;;
+DG0010;Function;1;Sistem Dari Suatu Komponen Tidak Berfungsi Semestinya;2025-09-25 19:48:56.673;Manual Migration;;
+DG0011;Grease Leaks;1;Kebocoran Grease;2025-09-25 19:48:56.673;Manual Migration;;
+DG0012;Lighting;1;Kerusakan Lampu;2025-09-25 19:48:56.673;Manual Migration;;
+DG0013;Mechanical Adjustment;1;Permasalahan Pengaturan Mekanikal;2025-09-25 19:48:56.673;Manual Migration;;
+DG0014;Misaligned;1;Permasalahan Ketidakpresisian;2025-09-25 19:48:56.673;Manual Migration;;
+DG0015;Noise;1;Suara Tidak Normal Yang Muncul Pada Sistem Bergerak;2025-09-25 19:48:56.673;Manual Migration;;
+DG0016;Oil Leaks;1;Kebocoran Oli;2025-09-25 19:48:56.673;Manual Migration;;
+DG0017;Pests;1;Kerusakan Disebabkan Oleh Serangga;2025-09-25 19:48:56.673;Manual Migration;;
+DG0018;Pressure;1;Permasalahan Tekanan;2025-09-25 19:48:56.673;Manual Migration;;
+DG0019;Smell;1;Permasalahan Bau;2025-09-25 19:48:56.673;Manual Migration;;
+DG0020;Smoke;1;Adanya Asap Yang Nampak Pada Sistem;2025-09-25 19:48:56.673;Manual Migration;;
+DG0021;Temperature Problem;1;Permasalahan Temperatur Diluar Standar Spesifikasi;2025-09-25 19:48:56.673;Manual Migration;;
+DG0022;Vibrating;1;Getaran;2025-09-25 19:48:56.673;Manual Migration;;
+DG0023;Water Leaks;1;Kebocoran Air;2025-09-25 19:48:56.673;Manual Migration;;

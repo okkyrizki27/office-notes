@@ -1,14 +1,12 @@
 # Outstanding Task
 
 - [ ] `P1` Plan to execute data config
-- [ ] `P1` Analyse the Digiman Transaction Report logic
-- [ ] `P1` Assess ticket untuk filter add subtask : MO SAP
 - [ ] `P1` Assessment via Nexus *(Due Date: 03 Jun 2026)*
-- [ ] `P1` How to show second and third approval in the Digiman Transaction Dashboard
 - [ ] `P1` Create Timeline Service Sheet for BUMA ID
 - [ ] `P1` Create template untuk isi bank task dan lain-lain
-- [ ] `P1` Create process flow of Digiman+ Form request Uda Sunardi
-- [ ] `P1` Check berapa lama data digiplan stay di in list breakdown and outstanding administration
+- [ ] `P1` Export data damage code, cause code, action remedy dari PRD; ask notification field dari MKP SAP team
+- [ ] `P1` Test in UAT for IIR Form
+- [ ] `P1` Provide data structure of IIR form to BUMA ID
 - [ ] `P2` Follow up to Ko Herianto terkait view untuk details of Intervention
 - [~] `P2` Compare data master dan transaksi EHMS dengan data master Digiman+ *(menunggu diskusi dengan Soraya di hari Kamis, 21 Mei 2026)*
 - [ ] `P2` Confirmation to MKP perlakuan terhadap order yang gagal karena over budget — reject or pending, once budget release sync again to SAP
@@ -56,3 +54,8 @@
 - [x] `P2` Persiapan data untuk implementasi Inspection and Order site IPR, effort 1 sprint *(Done: 18 Jun 2026)*
 - [x] `P1` Email to BUMA AU Regarding issue intervention blank and archiving strategy follow up action *(Done: 19 Jun 2026)*
 - [x] `P2` Add new field EDD after user select Priority when ordering parts *(Done: 19 Jun 2026)*
+- [x] `P1` Assess ticket untuk filter add subtask : MO SAP *(Done: 06 Jul 2026)*
+- [x] `P1` Analyse the Digiman Transaction Report logic — Epic [IAMS30-4437](https://bukittechnology.atlassian.net/browse/IAMS30-4437) *(Done: 06 Jul 2026)*
+- [x] `P1` How to show second and third approval in the Digiman Transaction Dashboard — Duplicate, sudah tercover di Epic [IAMS30-4437](https://bukittechnology.atlassian.net/browse/IAMS30-4437) (lihat ticket [IAMS30-4451](https://bukittechnology.atlassian.net/browse/IAMS30-4451) & desain multi-level approval Chapter 5 gap-analysis.md) *(Done: 06 Jul 2026)*
+- [x] `P1` Create process flow of Digiman+ Form request Uda Sunardi *(Done: 06 Jul 2026)*
+- [x] `P1` Check berapa lama data digiplan stay di in list breakdown and outstanding administration — [IAMS30-4419](https://bukittechnology.atlassian.net/browse/IAMS30-4419) *(Done: 06 Jul 2026)*

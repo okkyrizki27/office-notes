@@ -1,0 +1,20 @@
+Code;Name;Description;IsActive;CreatedAt;CreatedBy;ModifiedAt;ModifiedBy
+AR0001;Flushing;Membersihkan sistem dengan cairan.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0002;Follow Up;Memeriksa kemajuan atau hasil setelah tindakan.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0003;Kawashima;Tindakan perawatan khusus (tergantung konteks).;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0004;Monitoring;Memeriksa dan mengamati peralatan secara rutin.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0005;Rebearing;Mengganti bearing/bantalan pada mesin.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0006;Rebushing;Mengganti bushing pada peralatan.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0007;Recondition;Mengembalikan ke kondisi baik.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0008;Regasket;Mengganti gasket untuk mencegah kebocoran.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0009;Reoring;Mengganti O-ring pada peralatan.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0010;Repair;Memperbaiki suatu item.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0011;Replace;Mengganti part/komponen dengan yang baru.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0012;Reseal;Mengaplikasikan kembali seal untuk mencegah kebocoran.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0013;Restore/Adjust;Mengembalikan ke kondisi asli atau menyetel ulang.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0014;Retorque;Mengencangkan kembali dengan torsi tertentu.;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0015;Welding;Pengelasan (menggabungkan bahan menggunakan panas).;1;2025-09-25 19:48:56.653;Manual Migration;;
+AR0016;Install;Memasang atau menempatkan komponen, peralatan, atau sistem baru agar berfungsi.;1;2026-01-08 08:48:59.983;Manual Migration;;
+AR0017;Cleaning;Membersihkan komponen dari debu, kotoran, atau material asing untuk menjaga fungsi dan performa peralatan.;1;2026-01-08 08:48:59.983;Manual Migration;;
+AR0018;Top Up;Menambahkan fluida hingga level yang ditentukan.;1;2026-01-21 09:00:04.050;Manual Migration;;
+AR0021;Washing;Mencuci peralatan atau komponen untuk menghilangkan kotoran.;1;2026-01-21 09:00:04.050;Manual Migration;;

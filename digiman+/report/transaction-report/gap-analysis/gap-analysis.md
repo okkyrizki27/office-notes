@@ -6,6 +6,8 @@
 
 **Cara membaca:** Setiap halaman report dibahas dengan struktur yang sama — Business Question, tabel Gap & Proposed Solution (diurutkan severity), Business Rules yang sudah dikonfirmasi, dan pertanyaan terbuka untuk bisnis. Bagian Cross-Cutting Issues di awal merangkum masalah yang berulang di lebih dari satu view — ini yang paling berdampak jika diperbaiki karena efeknya menyebar ke beberapa report sekaligus. Chapter 5 berbeda sifat dari chapter 1–4: bukan gap dari kondisi existing, melainkan desain perbaikan (improvement) untuk mengikuti kapabilitas baru aplikasi (multi-level approval).
 
+**Jira Tracking:** Epic [IAMS30-4437](https://bukittechnology.atlassian.net/browse/IAMS30-4437) — 14 child ticket dengan prefix `[Transaction Dashboard]` (IAMS30-4438 s.d. IAMS30-4451), satu ticket per action item di bawah (nomor ticket dicantumkan di kolom Issue tiap tabel).
+
 ---
 
 ## Executive Summary
@@ -31,10 +33,10 @@ Masalah berikut muncul di lebih dari satu view. Memperbaikinya sekali akan berda
 
 | # | Issue | View Terdampak | Severity | Proposed Solution |
 |---|-------|----------------|:---:|---|
-| 1 | **Timezone tidak konsisten** — sebagian view pakai UTC murni, sebagian konversi via `site.utcoffset`, satu view pakai hardcode `UTC+7` | `get_molist` (UTC), `get_assignment` (utcoffset), `leadtime` (`load_date` hardcode +7), `dorder` (utcoffset konsisten) | <span class="sev-high">High</span> | Tetapkan satu standar timezone untuk seluruh view: gunakan `site.utcoffset` di semua tempat yang melakukan overdue-check atau date-display, hapus hardcode `+7`. Butuh keputusan bisnis: apakah semua site memang WIB, atau perlu per-site offset. |
-| 2 | **`tenantcode = 'MKP'` hardcoded** di join `sectiontype`/`site` | `inspection_results`, `dorder`, `get_molist`, `get_assignment`, `leadtime` (5 dari 5 view) | <span class="sev-high">High</span> | Jika Digiman+ direncanakan multi-tenant, parameterisasi `tenantcode` (misal via session context atau view per-tenant). Jika dipastikan single-tenant selamanya, dokumentasikan eksplisit sebagai keputusan arsitektur agar tidak dianggap bug saat tenant baru onboard. |
-| 3 | **Filter `isactive` pada tabel `user` tidak konsisten** — beberapa view tampilkan user nonaktif (historis), beberapa tidak | Tampil: `inspection_results`, `leadtime`. Tidak tampil: `dorder`, `get_molist`/`get_assignment` | <span class="sev-medium">Medium</span> | Tetapkan kebijakan baku: report historis (siapa yang mengerjakan apa) sebaiknya **tidak** filter `isactive` agar nama tetap muncul meski user di-deactivate kemudian. Terapkan konsisten di semua view atau dokumentasikan alasan per-view jika memang harus berbeda. |
-| 4 | **Status resolution via config CSV → silent drop** jika ada kombinasi status baru di sistem yang belum terdaftar di `config_mapping_wo_status.csv` / `config_mapping_mol_status.csv` | `get_molist`, `get_assignment`, `leadtime` (WO status), `dorder` (MOL status) | <span class="sev-high">High</span> | Tambahkan baris fallback `'Unknown'`/`'Unmapped'` di config CSV untuk kombinasi yang tidak match, atau buat monitoring terpisah yang menghitung berapa WO/MOL yang gagal resolve status — agar tim aware ketika ada status baru ditambahkan di aplikasi tapi config belum diupdate. |
+| 1 | **Timezone tidak konsisten** — sebagian view pakai UTC murni, sebagian konversi via `site.utcoffset`, satu view pakai hardcode `UTC+7` [[IAMS30-4438](https://bukittechnology.atlassian.net/browse/IAMS30-4438)] | `get_molist` (UTC), `get_assignment` (utcoffset), `leadtime` (`load_date` hardcode +7), `dorder` (utcoffset konsisten) | <span class="sev-high">High</span> | Tetapkan satu standar timezone untuk seluruh view: gunakan `site.utcoffset` di semua tempat yang melakukan overdue-check atau date-display, hapus hardcode `+7`. Butuh keputusan bisnis: apakah semua site memang WIB, atau perlu per-site offset. |
+| 2 | ~~`tenantcode = 'MKP'` hardcoded di join `sectiontype`/`site`~~ | `inspection_results`, `dorder`, `get_molist`, `get_assignment`, `leadtime` (5 dari 5 view) | <span class="sev-resolved">Confirmed — Not an Issue</span> | **Acceptable.** Report ini saat ini memang khusus tenant MKP — hardcode ini konsisten dengan scope yang berlaku, bukan gap. Dipindahkan ke Business Rules Confirmed. |
+| 3 | **Filter `isactive` pada tabel `user` tidak konsisten** — beberapa view tampilkan user nonaktif (historis), beberapa tidak [[IAMS30-4446](https://bukittechnology.atlassian.net/browse/IAMS30-4446)] | Tampil: `inspection_results`, `leadtime`. Tidak tampil: `dorder`, `get_molist`/`get_assignment` | <span class="sev-medium">Medium</span> | Tetapkan kebijakan baku: report historis (siapa yang mengerjakan apa) sebaiknya **tidak** filter `isactive` agar nama tetap muncul meski user di-deactivate kemudian. Terapkan konsisten di semua view atau dokumentasikan alasan per-view jika memang harus berbeda. |
+| 4 | **Status resolution via config CSV → silent drop** jika ada kombinasi status baru di sistem yang belum terdaftar di `config_mapping_wo_status.csv` / `config_mapping_mol_status.csv` [[IAMS30-4439](https://bukittechnology.atlassian.net/browse/IAMS30-4439)] | `get_molist`, `get_assignment`, `leadtime` (WO status), `dorder` (MOL status) | <span class="sev-high">High</span> | Tambahkan baris fallback `'Unknown'`/`'Unmapped'` di config CSV untuk kombinasi yang tidak match, atau buat monitoring terpisah yang menghitung berapa WO/MOL yang gagal resolve status — agar tim aware ketika ada status baru ditambahkan di aplikasi tapi config belum diupdate. |
 | 5 | **`SELECT DISTINCT` sebagai satu-satunya safeguard duplikasi** dari join fan-out (multiple finding, multiple TP, dll) | `inspection_results`, `leadtime` | <span class="sev-medium">Medium</span> | `DISTINCT` tidak efektif jika baris berbeda di satu kolom numerik saja (misal leadtime). Review join yang berpotensi fan-out, pertimbangkan window function/aggregation eksplisit alih-alih bergantung pada DISTINCT di akhir query. |
 | 6 | **Kolom bernama "Utc" tapi nilainya sudah local time** — membingungkan bagi yang membaca laporan tanpa konteks SQL | `get_assignment` (`CreatedUtcDate`, `SubmittedUtcDate`), `dorder` (`SubmittedUtcDateUTC`, `ApprovalDateUTC`) | <span class="sev-low">Low</span> | Rename kolom mengikuti isinya yang sebenarnya (`CreatedLocalDate`, dst), atau tambahkan kolom UTC terpisah dengan suffix konsisten. Perubahan nama kolom perlu koordinasi dengan tim PBI (breaking change). |
 | 7 | **Kolom placeholder NULL** tersebar di banyak view (SAP fields, `Notes`, `CompletedUtcDate`, dll) tanpa timeline kapan akan diisi | `inspection_results` (11 kolom), `get_molist` (8 kolom), `get_assignment` (2 kolom), `dorder` (`Notes`) | <span class="sev-low">Low</span> | Konfirmasi roadmap: apakah integrasi SAP/field ini akan diisi dalam waktu dekat? Jika tidak ada rencana, evaluasi penghapusan kolom untuk mengurangi kebingungan konsumen report. |
@@ -50,7 +52,7 @@ Masalah berikut muncul di lebih dari satu view. Memperbaikinya sekali akan berda
 
 | # | Issue | Severity | Proposed Solution |
 |---|-------|:---:|---|
-| 1 | `damagecodegroup` pakai **INNER JOIN** — finding dengan `damagecode` yang tidak match master data akan **hilang tanpa error** | <span class="sev-medium">Medium</span> | Ubah ke LEFT JOIN agar finding tetap muncul dengan damage info kosong, atau jalankan data quality check rutin untuk memastikan semua `damagecode` di transaksi sudah terdaftar di master. |
+| 1 | `damagecodegroup` pakai **INNER JOIN** — finding dengan `damagecode` yang tidak match master data akan **hilang tanpa error** [[IAMS30-4448](https://bukittechnology.atlassian.net/browse/IAMS30-4448)] | <span class="sev-medium">Medium</span> | Ubah ke LEFT JOIN agar finding tetap muncul dengan damage info kosong, atau jalankan data quality check rutin untuk memastikan semua `damagecode` di transaksi sudah terdaftar di master. |
 | 2 | `Date` (tanggal selesai inspeksi, local time) bisa NULL jika `sitecode` WO tidak match di tabel `site` | <span class="sev-medium">Medium</span> | Validasi coverage mapping `sitecode → site` secara berkala; pastikan semua site aktif terdaftar di master `site`. |
 | 3 | `SELECT DISTINCT` sebagai dedup — lihat Cross-Cutting #5 | <span class="sev-medium">Medium</span> | Lihat solusi cross-cutting. |
 | 4 | 11 kolom placeholder selalu NULL — lihat Cross-Cutting #7 | <span class="sev-low">Low</span> | Lihat solusi cross-cutting. |
@@ -79,11 +81,11 @@ Masalah berikut muncul di lebih dari satu view. Memperbaikinya sekali akan berda
 
 | # | Issue | Severity | Proposed Solution |
 |---|-------|:---:|---|
-| 1 | `mechanicorderlist` filter `isactive` **dikomentari** — semua MOL masuk, hanya disaring via `correct_status` dari config | <span class="sev-high">High</span> | Lihat Cross-Cutting #4. Tambahkan fallback status agar kombinasi baru tidak silently dropped. |
-| 2 | **SAP MO number prefix `'00'` hardcoded** (`concat('00', mono)`) untuk match ke `moapproval.monumber` — gagal silent jika tenant/site beda format SAP | <span class="sev-high">High</span> | Pindahkan prefix ke config per-site/tenant, atau validasi format MO number SAP di semua site sebelum mengandalkan hardcode ini. |
+| 1 | `mechanicorderlist` filter `isactive` **dikomentari** — semua MOL masuk, hanya disaring via `correct_status` dari config [[IAMS30-4440](https://bukittechnology.atlassian.net/browse/IAMS30-4440)] | <span class="sev-high">High</span> | Lihat Cross-Cutting #4. Tambahkan fallback status agar kombinasi baru tidak silently dropped. |
+| 2 | **SAP MO number prefix `'00'` hardcoded** (`concat('00', mono)`) untuk match ke `moapproval.monumber` — gagal silent jika tenant/site beda format SAP [[IAMS30-4441](https://bukittechnology.atlassian.net/browse/IAMS30-4441)] | <span class="sev-high">High</span> | Pindahkan prefix ke config per-site/tenant, atau validasi format MO number SAP di semua site sebelum mengandalkan hardcode ini. |
 | 3 | `user` filter `isactive=1` — **inkonsisten** dengan view lain | <span class="sev-medium">Medium</span> | Lihat Cross-Cutting #3. |
-| 4 | `canactiondigimandelete`, `canactionsappushdelete`, `cancreatemo`, `cancreatemowithnote` dihitung di CTE tapi **tidak masuk output view** | <span class="sev-medium">Medium</span> | Konfirmasi apakah field ini dipakai di layer aplikasi Digiman+ lain. Jika tidak, hapus dari CTE untuk mengurangi kompleksitas; jika ya, dokumentasikan dependency-nya. |
-| 5 | `poolingstatus NOT IN ('MOJ','MOK')` — magic string tanpa dokumentasi arti | <span class="sev-medium">Medium</span> | Tambahkan kamus/glossary status pooling (MOJ, MOK, dst) di config atau dokumentasi terpisah agar tidak jadi tribal knowledge. |
+| 4 | `canactiondigimandelete`, `canactionsappushdelete`, `cancreatemo`, `cancreatemowithnote` dihitung di CTE tapi **tidak masuk output view** [[IAMS30-4449](https://bukittechnology.atlassian.net/browse/IAMS30-4449)] | <span class="sev-medium">Medium</span> | Konfirmasi apakah field ini dipakai di layer aplikasi Digiman+ lain. Jika tidak, hapus dari CTE untuk mengurangi kompleksitas; jika ya, dokumentasikan dependency-nya. |
+| 5 | `poolingstatus NOT IN ('MOJ','MOK')` — magic string tanpa dokumentasi arti [[IAMS30-4450](https://bukittechnology.atlassian.net/browse/IAMS30-4450)] | <span class="sev-medium">Medium</span> | Tambahkan kamus/glossary status pooling (MOJ, MOK, dst) di config atau dokumentasi terpisah agar tidak jadi tribal knowledge. |
 | 6 | `moapproval` tanpa filter `isactive` — bisa ambil approval yang sudah tidak valid | <span class="sev-medium">Medium</span> | Tambahkan filter `isactive=1` kecuali ada alasan bisnis spesifik untuk menyertakan approval nonaktif. |
 | 7 | `sapmosyncorder` tanpa filter `isactive` | <span class="sev-medium">Medium</span> | Sama seperti di atas — review apakah perlu filter `isactive=1`. |
 | 8 | `moapprovaldate` dihitung dari **perbandingan string** `YYYYMMDD` — rapuh jika format SAP tidak konsisten | <span class="sev-medium">Medium</span> | Validasi format tanggal dari SAP source secara berkala, atau cast ke tipe date sebelum dibandingkan. |
@@ -95,18 +97,20 @@ Masalah berikut muncul di lebih dari satu view. Memperbaikinya sekali akan berda
 | 14 | Dual workflow `COALESCE(wft1.status, wft2.status)` | <span class="sev-low">Low</span> | Sudah aman by design (mutually exclusive). Tidak perlu tindakan. |
 | 15 | `pvr1` vs `pvr2` COALESCE (validasi material vs detail) | <span class="sev-low">Low</span> | Sudah disengaja — material-level diutamakan. Tidak perlu tindakan. |
 | 16 | `PriorityName` NULL untuk additional order | <span class="sev-low">Low</span> | Expected — additional order tidak punya finding sehingga tidak ada priority. Tidak perlu tindakan. |
-| 17 | `MaterialStatus` (`'Add'`/`'Ok'`/`'Delete'`) — tujuan bisnisnya di report belum dikonfirmasi | <span class="sev-pending">Pending Confirmation</span> | **Perlu jawaban bisnis**: kolom ini dipakai untuk apa di PBI? `'Add'` = dibuat & dimodifikasi orang yang sama, `'Ok'` = dimodifikasi orang lain (kemungkinan supervisor). |
+| 17 | `MaterialStatus` (`'Add'`/`'Ok'`/`'Delete'`) — tujuan bisnisnya di report belum dikonfirmasi [[IAMS30-4445](https://bukittechnology.atlassian.net/browse/IAMS30-4445)] | <span class="sev-pending">Pending Confirmation</span> | **Perlu jawaban bisnis**: kolom ini dipakai untuk apa di PBI? `'Add'` = dibuat & dimodifikasi orang yang sama, `'Ok'` = dimodifikasi orang lain (kemungkinan supervisor). |
 
 ### Business Rules (Confirmed)
+- `tenantcode='MKP'` hardcoded — **acceptable**, report ini saat ini memang khusus tenant MKP (lihat Cross-Cutting #2).
 - MOL berasal dari dua sumber: **Inspeksi** (`summaryreference=0`, punya `workorderid`) atau **Additional Order** (`summaryreference=1`, tanpa WO).
 - `correct_status=1` adalah gating filter utama berdasarkan `config_mapping_mol_status.csv` (kombinasi `mol_status` × `isactive` × `workflow_status` × `require_mono`).
 - MOL bisa dengan atau tanpa material; pooling validation berlaku untuk keduanya dengan fallback material-level → detail-level.
-- Special case: `actionremedycode='AR0010'` tanpa material → `canactiondigimandelete` di-override jadi `1`.
+- Special case: `actionremedycode='AR0010'` tanpa material → `canactiondigimandelete` di-override jadi `1`. Dari master data Action Remedy (data client BUMA ID, lihat `BUMA-ID-project/master-data/action-remedy-all.csv`), `AR0010 = 'Repair'` — indikasi awal: tindakan "Repair" murni tanpa penggantian part (tanpa material) dianggap sudah final di level Digiman+ tanpa perlu menunggu proses SAP push, sehingga delete diizinkan. **Interpretasi ini belum final** — perlu didiskusikan dan dikonfirmasi bersama tim technical sebelum dianggap sebagai business rule resmi.
 
 ### Open Questions for Business
 - **`MaterialStatus`** dipakai untuk visual/aksi apa di Power BI? *(lihat item Pending Confirmation di atas)*
 - Apakah semua site/tenant memakai format SAP MO number dengan prefix `'00'`? Jika ada yang berbeda, ini akan silently broken.
 - Apakah field `canactiondigimandelete` dkk memang sudah tidak terpakai di aplikasi, sehingga aman dihapus dari CTE?
+- **`AR0010='Repair'` tanpa material → override `canactiondigimandelete`** — apakah pemahaman ini benar, atau ada kombinasi action remedy lain yang seharusnya diberi perlakuan serupa? *(perlu dikonfirmasi ke tim technical)*
 
 ---
 
@@ -121,9 +125,9 @@ Masalah berikut muncul di lebih dari satu view. Memperbaikinya sekali akan berda
 
 | # | Issue | View | Severity | Proposed Solution |
 |---|-------|------|:---:|---|
-| 1 | **Timezone overdue-check berbeda** — `get_molist` pakai UTC murni, `get_assignment` pakai local time via `utcoffset` | Lintas view | <span class="sev-high">High</span> | Lihat Cross-Cutting #1. WO yang sama bisa mendapat status berbeda (`INF/ING` vs `INA/INB`) di batas tengah malam. |
-| 2 | **Sumber waktu "selesai" berbeda** — `get_molist` pakai `tp.modifiedat`, `get_assignment` pakai `max(taskpersonalizedlog.enddate)` | Lintas view | <span class="sev-high">High</span> | Tentukan satu sumber canonical. Jika `taskpersonalizedlog.enddate` dianggap lebih akurat (audit trail), tambahkan CTE yang sama ke `get_molist`. |
-| 3 | **Tidak ada `TaskPersonalizedId`** di output `get_assignment` — join ke `get_molist` hanya via `MOId`, berisiko cartesian product untuk WO dengan banyak inspector | `get_assignment` | <span class="sev-high">High</span> | Tambahkan kolom `TaskPersonalizedId` ke output `get_assignment` agar PBI bisa join tepat per assignment, bukan per WO. |
+| 1 | **Timezone overdue-check berbeda** — `get_molist` pakai UTC murni, `get_assignment` pakai local time via `utcoffset` [[IAMS30-4442](https://bukittechnology.atlassian.net/browse/IAMS30-4442)] | Lintas view | <span class="sev-high">High</span> | Lihat Cross-Cutting #1. WO yang sama bisa mendapat status berbeda (`INF/ING` vs `INA/INB`) di batas tengah malam. |
+| 2 | **Sumber waktu "selesai" berbeda** — `get_molist` pakai `tp.modifiedat`, `get_assignment` pakai `max(taskpersonalizedlog.enddate)` [[IAMS30-4443](https://bukittechnology.atlassian.net/browse/IAMS30-4443)] | Lintas view | <span class="sev-high">High</span> | Tentukan satu sumber canonical. Jika `taskpersonalizedlog.enddate` dianggap lebih akurat (audit trail), tambahkan CTE yang sama ke `get_molist`. |
+| 3 | **Tidak ada `TaskPersonalizedId`** di output `get_assignment` — join ke `get_molist` hanya via `MOId`, berisiko cartesian product untuk WO dengan banyak inspector [[IAMS30-4444](https://bukittechnology.atlassian.net/browse/IAMS30-4444)] | `get_assignment` | <span class="sev-high">High</span> | Tambahkan kolom `TaskPersonalizedId` ke output `get_assignment` agar PBI bisa join tepat per assignment, bukan per WO. |
 | 4 | Site join via `d.siteid` (site inspector) — jika inspector tidak punya `siteid`, **seluruh datetime jadi NULL** dan baris hilang dari hasil | `get_assignment` | <span class="sev-medium">Medium</span> | Validasi data quality `useremploymentprofile.siteid` — pastikan semua inspector aktif punya siteid terisi. Pertimbangkan fallback ke `site` WO jika inspector tidak punya site. |
 | 5 | `CTE site` diambil tapi **dead code** (tidak dipakai) | `get_molist` | <span class="sev-medium">Medium</span> | Hapus CTE yang tidak terpakai, atau terapkan `utcoffset` agar konsisten dengan `get_assignment` (selaras dengan solusi #1). |
 | 6 | `MOUtcDate` = duplikat `ScheduleDate` (sama-sama `wo.schedulestartdate`, tidak ada konversi) | `get_molist` | <span class="sev-medium">Medium</span> | Klarifikasi maksud kolom — jika `MOUtcDate` seharusnya beda timezone dari `ScheduleDate`, perbaiki logic; jika tidak, hapus salah satu kolom. |
@@ -160,7 +164,7 @@ Masalah berikut muncul di lebih dari satu view. Memperbaikinya sekali akan berda
 
 | # | Issue | Severity | Proposed Solution |
 |---|-------|:---:|---|
-| 1 | `fullcycle_leadtime_target` sering NULL — join `lower(sectiontype.name) = lower(config.type_status)` bergantung pada kesamaan nama section type persis; beda tenant bisa beda nama | <span class="sev-medium">Medium</span> | *(Sudah dikonfirmasi sebagai risiko nyata.)* Bangun mapping table yang lebih robust (site + section type code, bukan name string) untuk target SLA, atau normalisasi penamaan section type di config per site. |
+| 1 | `fullcycle_leadtime_target` sering NULL — join `lower(sectiontype.name) = lower(config.type_status)` bergantung pada kesamaan nama section type persis; beda tenant bisa beda nama [[IAMS30-4447](https://bukittechnology.atlassian.net/browse/IAMS30-4447)] | <span class="sev-medium">Medium</span> | *(Sudah dikonfirmasi sebagai risiko nyata.)* Bangun mapping table yang lebih robust (site + section type code, bukan name string) untuk target SLA, atau normalisasi penamaan section type di config per site. |
 | 2 | Multiple `workflowtransaction Complete` per WO bisa menghasilkan baris ganda per siklus re-approval | <span class="sev-medium">Medium</span> | Profilasi data untuk memastikan apakah kasus ini benar terjadi. Jika ya, putuskan aturan: ambil approval terakhir (`MAX(modifiedat)`) saja per WO. |
 | 3 | `SELECT DISTINCT` sebagai safeguard duplikasi — lihat Cross-Cutting #5 | <span class="sev-medium">Medium</span> | Lihat solusi cross-cutting. |
 | 4 | TP tanpa finding → tidak akan pernah match ke `mechanicorderlist` → `leadtime_create_emol`, `leadtime_approval`, `fullcycle_leadtime` semua NULL | <span class="sev-medium">Medium</span> | *(Sudah dikonfirmasi sebagai expected behavior — WO tanpa finding memang tidak punya eMOL.)* Tidak perlu tindakan teknis, cukup dokumentasikan agar konsumen report tidak salah interpretasi NULL sebagai data hilang. |
@@ -240,7 +244,7 @@ Approval terjadi di level **Order**, bukan di level eMOL — semua eMOL di bawah
 | 3 | Kode `TransactionType` untuk Order approval = `'Mechanic Order'` | <span class="sev-resolved">Resolved</span> |
 | 4 | `CurrentWorkflowStepId` kembali NULL setelah Complete | <span class="sev-resolved">Resolved</span> |
 | 5 | Step "User Submit" dikeluarkan dari audit trail | <span class="sev-resolved">Decided</span> |
-| 6 | Adopsi kolom `SubmittedBy`/`SubmittedDate` di `dorder` | <span class="sev-open">Open — bahas dengan engineer</span> |
+| 6 | Adopsi kolom `SubmittedBy`/`SubmittedDate` di `dorder` [[IAMS30-4451](https://bukittechnology.atlassian.net/browse/IAMS30-4451)] | <span class="sev-open">Open — bahas dengan engineer</span> |
 
 **Catatan implementasi tambahan:** join existing SQL production ke `workflowtransaction` (`mol.workorderid = wft1.referencetransactionid`) saat ini **belum memfilter `TransactionType`** — karena tabel ini polymorphic/shared antar jenis transaksi, filter ini perlu ditambahkan saat implementasi, bukan hanya untuk fitur baru tapi juga memperbaiki risiko di logic yang sudah ada.
 
@@ -250,24 +254,24 @@ Approval terjadi di level **Order**, bukan di level eMOL — semua eMOL di bawah
 
 Urutan berdasarkan severity — disarankan dikerjakan dari atas ke bawah.
 
-| # | Report | Issue | Severity | Decision Needed From |
-|---|--------|-------|:---:|---|
-| 1 | Cross-Cutting | Timezone tidak konsisten antar view | <span class="sev-high">High</span> | Engineer + Business (konfirmasi zona waktu site) |
-| 2 | Cross-Cutting | `tenantcode='MKP'` hardcoded di 5 view | <span class="sev-high">High</span> | Business (rencana multi-tenant?) |
-| 3 | Cross-Cutting | Status resolution silent-drop jika status baru belum ada di config | <span class="sev-high">High</span> | Engineer (tambah fallback/monitoring) |
-| 4 | D'Order Result | `mechanicorderlist` isactive dikomentari, hanya andalkan `correct_status` | <span class="sev-high">High</span> | Engineer |
-| 5 | D'Order Result | SAP MO number prefix `'00'` hardcoded | <span class="sev-high">High</span> | Engineer + Business (konfirmasi format SAP per site) |
-| 6 | Inspection Compliance | Timezone overdue-check beda antara `get_molist` & `get_assignment` | <span class="sev-high">High</span> | Engineer + Business |
-| 7 | Inspection Compliance | Sumber "waktu selesai" beda (`modifiedat` vs log `enddate`) | <span class="sev-high">High</span> | Business (pilih sumber canonical) |
-| 8 | Inspection Compliance | Tidak ada `TaskPersonalizedId` di `get_assignment` → risiko cartesian join | <span class="sev-high">High</span> | Engineer |
-| 9 | D'Order Result | `MaterialStatus` — tujuan bisnis belum dikonfirmasi | <span class="sev-pending">Pending</span> | Business |
-| 10 | Cross-Cutting & semua view | Filter `isactive` pada `user` tidak konsisten | <span class="sev-medium">Medium</span> | Business (tetapkan kebijakan baku) |
-| 11 | Lead Time | `fullcycle_leadtime_target` sering NULL karena name-matching section type | <span class="sev-medium">Medium</span> | Engineer + Business |
-| 12 | D'Inspect Result | INNER JOIN `damagecodegroup` — silent drop finding | <span class="sev-medium">Medium</span> | Engineer |
-| 13 | D'Order Result | `canactiondigimandelete` dkk dihitung tapi tidak diekspos — dead code? | <span class="sev-medium">Medium</span> | Business + Engineer |
-| 14 | D'Order Result | `poolingstatus` magic string `MOJ`/`MOK` tidak terdokumentasi | <span class="sev-medium">Medium</span> | Business |
-| 15 | D'Order Result (Improvement) | Adopsi kolom `SubmittedBy`/`SubmittedDate` di `dorder` — lihat Chapter 5 | <span class="sev-open">Open</span> | Engineer + Business |
-| *Sisanya* | Semua | Lihat tabel per-halaman di atas (Low severity / sudah confirmed) | <span class="sev-low">Low</span> | — |
+| # | Report | Issue | Severity | Decision Needed From | Jira Ticket |
+|---|--------|-------|:---:|---|---|
+| 1 | Cross-Cutting | Timezone tidak konsisten antar view | <span class="sev-high">High</span> | Engineer + Business (konfirmasi zona waktu site) | [IAMS30-4438](https://bukittechnology.atlassian.net/browse/IAMS30-4438) |
+| 2 | Cross-Cutting | ~~`tenantcode='MKP'` hardcoded di 5 view~~ | <span class="sev-resolved">Confirmed — Not an Issue</span> | — (report saat ini memang khusus tenant MKP, acceptable) | — |
+| 3 | Cross-Cutting | Status resolution silent-drop jika status baru belum ada di config | <span class="sev-high">High</span> | Engineer (tambah fallback/monitoring) | [IAMS30-4439](https://bukittechnology.atlassian.net/browse/IAMS30-4439) |
+| 4 | D'Order Result | `mechanicorderlist` isactive dikomentari, hanya andalkan `correct_status` | <span class="sev-high">High</span> | Engineer | [IAMS30-4440](https://bukittechnology.atlassian.net/browse/IAMS30-4440) |
+| 5 | D'Order Result | SAP MO number prefix `'00'` hardcoded | <span class="sev-high">High</span> | Engineer + Business (konfirmasi format SAP per site) | [IAMS30-4441](https://bukittechnology.atlassian.net/browse/IAMS30-4441) |
+| 6 | Inspection Compliance | Timezone overdue-check beda antara `get_molist` & `get_assignment` | <span class="sev-high">High</span> | Engineer + Business | [IAMS30-4442](https://bukittechnology.atlassian.net/browse/IAMS30-4442) |
+| 7 | Inspection Compliance | Sumber "waktu selesai" beda (`modifiedat` vs log `enddate`) | <span class="sev-high">High</span> | Business (pilih sumber canonical) | [IAMS30-4443](https://bukittechnology.atlassian.net/browse/IAMS30-4443) |
+| 8 | Inspection Compliance | Tidak ada `TaskPersonalizedId` di `get_assignment` → risiko cartesian join | <span class="sev-high">High</span> | Engineer | [IAMS30-4444](https://bukittechnology.atlassian.net/browse/IAMS30-4444) |
+| 9 | D'Order Result | `MaterialStatus` — tujuan bisnis belum dikonfirmasi | <span class="sev-pending">Pending</span> | Business | [IAMS30-4445](https://bukittechnology.atlassian.net/browse/IAMS30-4445) |
+| 10 | Cross-Cutting & semua view | Filter `isactive` pada `user` tidak konsisten | <span class="sev-medium">Medium</span> | Business (tetapkan kebijakan baku) | [IAMS30-4446](https://bukittechnology.atlassian.net/browse/IAMS30-4446) |
+| 11 | Lead Time | `fullcycle_leadtime_target` sering NULL karena name-matching section type | <span class="sev-medium">Medium</span> | Engineer + Business | [IAMS30-4447](https://bukittechnology.atlassian.net/browse/IAMS30-4447) |
+| 12 | D'Inspect Result | INNER JOIN `damagecodegroup` — silent drop finding | <span class="sev-medium">Medium</span> | Engineer | [IAMS30-4448](https://bukittechnology.atlassian.net/browse/IAMS30-4448) |
+| 13 | D'Order Result | `canactiondigimandelete` dkk dihitung tapi tidak diekspos — dead code? | <span class="sev-medium">Medium</span> | Business + Engineer | [IAMS30-4449](https://bukittechnology.atlassian.net/browse/IAMS30-4449) |
+| 14 | D'Order Result | `poolingstatus` magic string `MOJ`/`MOK` tidak terdokumentasi | <span class="sev-medium">Medium</span> | Business | [IAMS30-4450](https://bukittechnology.atlassian.net/browse/IAMS30-4450) |
+| 15 | D'Order Result (Improvement) | Adopsi kolom `SubmittedBy`/`SubmittedDate` di `dorder` — lihat Chapter 5 | <span class="sev-open">Open</span> | Engineer + Business | [IAMS30-4451](https://bukittechnology.atlassian.net/browse/IAMS30-4451) |
+| *Sisanya* | Semua | Lihat tabel per-halaman di atas (Low severity / sudah confirmed) | <span class="sev-low">Low</span> | — | — |
 
 ---
 

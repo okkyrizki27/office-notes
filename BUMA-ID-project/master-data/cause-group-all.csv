@@ -1,0 +1,11 @@
+Code;Name;Description;IsActive;CreatedAt;CreatedBy;ModifiedAt;ModifiedBy
+CG0001;Design Flaws;;1;2025-09-25 19:48:56.660;Manual Migration;;
+CG0002;Electrical Failures;;1;2025-09-25 19:48:56.660;Manual Migration;;
+CG0003;Environmental Factors;;1;2025-09-25 19:48:56.660;Manual Migration;;
+CG0004;Human Factors;;1;2025-09-25 19:48:56.660;Manual Migration;;
+CG0005;Maintenance Issues;;1;2025-09-25 19:48:56.660;Manual Migration;;
+CG0006;Mechanical Failures;;1;2025-09-25 19:48:56.660;Manual Migration;;
+CG0007;Operational Errors;;1;2025-09-25 19:48:56.660;Manual Migration;;
+CG0008;Software/System Errors;;1;2025-09-25 19:48:56.660;Manual Migration;;
+CG0009;Supplier/Part Defects;;1;2025-09-25 19:48:56.660;Manual Migration;;
+CG0010;Wear and Tear;;1;2025-09-25 19:48:56.660;Manual Migration;;
