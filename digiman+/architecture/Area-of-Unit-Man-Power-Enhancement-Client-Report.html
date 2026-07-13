@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Area of Unit &amp; Man Power Enhancement — Digiman+</title>
+<style>
+  @page { size: A4 portrait; margin: 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10.3pt; color: #1a1a1a; margin: 0; padding: 0 40px; line-height: 1.55; }
+
+  .cover {
+    background: linear-gradient(135deg, #1f3a5f, #2c5f8a);
+    color: #fff; padding: 46px 40px; border-radius: 12px; margin: 30px 0 26px;
+    page-break-after: always;
+  }
+  .cover-eyebrow { font-size: 11pt; opacity: 0.8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+  .cover h1 { font-size: 30pt; font-weight: 800; margin: 0 0 10px; line-height: 1.25; color: #FFF8E7; }
+  .cover .subtitle { font-size: 13.5pt; opacity: 0.92; margin-bottom: 30px; }
+  .cover-meta { font-size: 10pt; opacity: 0.8; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 16px; margin-top: 30px; }
+  .cover-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+  .cover-badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 9.5pt; }
+
+  h1 { font-size: 18pt; color: #1f3a5f; border-bottom: 3px solid #1f3a5f; padding-bottom: 8px; margin: 0 0 14px; page-break-before: always; }
+  h1:first-of-type { page-break-before: avoid; }
+  h2 { font-size: 13pt; color: #fff; background: #1f3a5f; padding: 8px 14px; border-radius: 4px; margin: 22px 0 12px; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; color: #1f3a5f; border-left: 4px solid #2c5f8a; padding-left: 10px; margin: 18px 0 8px; page-break-after: avoid; }
+  h4 { font-size: 10.5pt; color: #2c5f8a; margin: 14px 0 6px; page-break-after: avoid; }
+
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0 10px 0; padding-left: 22px; }
+  li { margin: 4px 0; }
+  b, strong { color: #111; }
+  code { background: #f0f2f5; color: #1a1a1a; padding: 1px 6px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9pt; }
+
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9pt; margin: 10px 0 16px; }
+  th { background: #1f3a5f; color: #fff; padding: 7px 9px; text-align: left; font-weight: 600; word-wrap: break-word; }
+  td { padding: 6px 9px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+  tr { page-break-inside: avoid; }
+  tr:nth-child(even) td { background: #f4f7fa; }
+
+  .exec-cards { display: flex; gap: 14px; margin: 18px 0; flex-wrap: wrap; }
+  .exec-card { flex: 1; min-width: 150px; background: #f4f7fa; border-top: 5px solid #2c5f8a; border-radius: 8px; padding: 16px 14px; text-align: center; }
+  .exec-card .num { font-size: 22pt; font-weight: 800; color: #1f3a5f; line-height: 1.1; }
+  .exec-card .label { font-size: 8.5pt; color: #667; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 6px; }
+  .exec-card .sub { font-size: 8pt; color: #999; margin-top: 3px; }
+
+  .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; }
+  .callout.warn { border-left-color: #d68910; background: #fdf3e3; }
+  .callout.decision { border-left-color: #1e8449; background: #eaf6ee; }
+  .callout-label { font-weight: 700; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 4px; }
+  .callout.warn .callout-label { color: #b9770e; }
+  .callout.decision .callout-label { color: #1e8449; }
+
+  .badge { display:inline-block; color:#fff; padding:2px 9px; border-radius:12px; font-size:8pt; font-weight:700; }
+  .badge-decided { background:#1e8449; }
+  .badge-open { background:#7d3c98; }
+  .badge-pending { background:#7f8c8d; }
+
+  .toc { list-style: none; padding-left: 0; }
+  .toc li { margin: 8px 0; font-size: 10.5pt; }
+  .toc .toc-num { color: #2c5f8a; font-weight: 700; margin-right: 8px; }
+  .toc a { color: #1a1a1a; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; color: #1f3a5f; }
+
+  .flow-box { background: #f4f7fa; border: 1px solid #dde4ec; border-radius: 8px; padding: 14px 18px; font-family: Consolas, monospace; font-size: 9pt; white-space: pre-wrap; margin: 10px 0; }
+
+  .footer { margin-top: 34px; font-size: 8.5pt; color: #999; text-align: center; border-top: 1px solid #ddd; padding-top: 10px; }
+  .page-footer-note { font-size: 8pt; color: #aaa; text-align: right; margin-top: -6px; }
+
+  @media print {
+    h2, th, .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<div class="cover">
+  <div class="cover-eyebrow">Digiman+ — Enhancement Proposal</div>
+  <h1>Area of Unit &amp; Man Power Enhancement</h1>
+  <div class="subtitle">Inspection, Order, Digiplan, PM Shutdown &amp; BD Corrective</div>
+  <div class="cover-badges">
+    <span class="cover-badge">📋 Ringkasan Eksekutif</span>
+    <span class="cover-badge">🛠 Detail Teknis</span>
+    <span class="cover-badge">💰 Estimasi Effort &amp; Timeline</span>
+  </div>
+  <div class="cover-meta">
+    Disusun untuk: BUMA ID<br>
+    Tanggal: 10 Juli 2026<br>
+    Status: Draft untuk didiskusikan
+  </div>
+</div>
+
+<!-- ===================== DAFTAR ISI ===================== -->
+<h1>Daftar Isi</h1>
+<ul class="toc">
+  <li><a href="#sec-1"><span class="toc-num">1.</span> Ringkasan Eksekutif</a></li>
+  <li><a href="#sec-2"><span class="toc-num">2.</span> Latar Belakang &amp; Tujuan</a></li>
+  <li><a href="#sec-3"><span class="toc-num">3.</span> Cakupan Perubahan (Overview per Fitur)</a></li>
+  <li><a href="#sec-4"><span class="toc-num">4.</span> Keputusan Desain Kunci</a></li>
+  <li><a href="#sec-5"><span class="toc-num">5.</span> Integrasi dengan SAP</a></li>
+  <li><a href="#sec-6"><span class="toc-num">6.</span> Estimasi Effort &amp; Timeline</a></li>
+  <li><a href="#sec-7"><span class="toc-num">7.</span> Hal yang Masih Perlu Diputuskan</a></li>
+  <li><a href="#sec-8"><span class="toc-num">8.</span> Lampiran — Detail Teknis (Deep Dive)</a></li>
+</ul>
+
+<!-- ===================== 1. RINGKASAN EKSEKUTIF ===================== -->
+<h1 id="sec-1">1. Ringkasan Eksekutif</h1>
+
+<p>Dokumen ini menjelaskan rencana enhancement <b>Area of Unit</b> dan <b>Man Power/Man Hours</b> di Digiman+, yang mencakup 5 fitur: <b>Inspection</b>, <b>Order</b>, <b>Digiplan (Daily Plan)</b>, <b>PM Shutdown</b>, dan <b>BD Corrective</b>. Tujuannya adalah memberi visibilitas perencanaan tenaga kerja (Man Power) dan lokasi pekerjaan (Area of Unit, Component, Sub Component) secara konsisten di seluruh alur kerja — mulai dari inspeksi, pembuatan order, perencanaan harian (Daily Plan), sampai eksekusi di lapangan.</p>
+
+<div class="exec-cards">
+  <div class="exec-card">
+    <div class="num">5</div>
+    <div class="label">Fitur Terdampak</div>
+    <div class="sub">Inspection, Order, Digiplan, PM Shutdown, BD Corrective</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~83</div>
+    <div class="label">Mandays (Tanpa Rollup Penuh)</div>
+    <div class="sub">85 SP · ~2 sprint · tim BUMA ID</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~91</div>
+    <div class="label">Mandays (Dengan Rollup Penuh)</div>
+    <div class="sub">93 SP · ~3 sprint · tim BUMA ID</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">5</div>
+    <div class="label">Keputusan Masih Terbuka</div>
+    <div class="sub">Perlu ditentukan sebelum development final</div>
+  </div>
+</div>
+
+<div class="callout">
+  <div class="callout-label">Inti Perubahan</div>
+  Field <b>Area (Area of Unit)</b> dan <b>Man Power</b> ditambahkan di titik-titik input (Inspection, Additional Order, Digiplan), sementara <b>Man Hours</b> otomatis dihitung (<code>Duration × Man Power</code>). Data ini direncanakan mengalir otomatis dari Order/eMOL → SAP → kembali ke Digiman+ sebagai <b>MO Backlog</b>, sehingga saat user membuat Daily Plan, data-data ini bisa <b>terisi otomatis</b> tanpa input manual ulang.
+</div>
+
+<div class="callout decision">
+  <div class="callout-label">Keputusan yang Sudah Disepakati</div>
+  Nama field <b>"Area"</b> (bukan "Compartment"); Man Power wajib diisi, integer, dan harus lebih dari 0; visibilitas Duration/Man Power/Man Hours ditampilkan di card task PM Shutdown &amp; BD Corrective; 2 skenario mandatory assignment mechanic (umum vs backlog-dengan-referensi-MO) langsung diimplementasikan bersamaan.
+</div>
+
+<div class="callout warn">
+  <div class="callout-label">Yang Masih Perlu Keputusan Client</div>
+  Formula final perhitungan Man Power/Man Hours di level parent task (mengikuti kondisi predecessor/serial/paralel); skema Master Data Area↔Component/Sub-Component (apakah perlu dibedakan per model unit/Asset Model); dan hasil assessment kelayakan pengiriman data ke SAP (dikoordinasikan langsung oleh tim client dengan tim SAP mereka).
+</div>
+
+<!-- ===================== 2. LATAR BELAKANG ===================== -->
+<h1 id="sec-2">2. Latar Belakang &amp; Tujuan</h1>
+
+<p>Saat ini, Digiman+ sudah mendukung pencatatan <b>Component</b> dan <b>Sub Component</b> saat inspeksi, serta <b>Duration</b> untuk merencanakan durasi pekerjaan di Daily Plan (Digiplan). Namun, ada 2 kebutuhan tambahan yang muncul dari diskusi bisnis:</p>
+
+<ol>
+  <li><b>Area of Unit</b> — kebutuhan untuk mencatat lokasi kerusakan/pekerjaan di tingkat yang lebih presisi dari Component/Sub Component saja, dengan mapping M:N (banyak-ke-banyak) antara Area dan kombinasi Component-Sub Component.</li>
+  <li><b>Man Power</b> — kebutuhan mencatat estimasi jumlah tenaga kerja yang dibutuhkan untuk suatu pekerjaan, supaya sistem bisa menghitung <b>Man Hours</b> (total jam-orang) secara otomatis, dan supaya pengawas (SPV) di lapangan bisa membandingkan rencana (plan) dengan assignment mechanic aktual.</li>
+</ol>
+
+<p>Enhancement ini dirancang supaya data ini <b>hanya perlu diinput satu kali</b> (di titik paling awal — Inspection atau Additional Order), lalu mengalir otomatis melalui proses Order → SAP → kembali sebagai backlog di Digiplan, tanpa perlu input ulang manual di setiap tahap.</p>
+
+<h3>Kebutuhan Spesifik di Digiplan (Daily Plan)</h3>
+<p>Digiplan sendiri punya kebutuhan enhancement tersendiri:</p>
+<ul>
+  <li><b>Man Hours belum bisa dihitung sama sekali</b> — Digiplan saat ini sudah punya Duration, tapi belum punya kolom Man Power maupun Man Hours. Kalau Man Power ditambahkan, sistem bisa otomatis menghitung Man Hours (<code>Duration × Man Power</code>) untuk kebutuhan perencanaan harian, bukan cuma dari data yang dibawa Inspection/Order.</li>
+  <li><b>Template Excel upload/download Daily Plan saat ini hanya mendukung kolom tetap</b> (hardcoded) — belum bisa mengakomodasi kolom baru/dinamis seperti Component, Sub Component, Area, Man Power, dan Man Hours. Bagian dari enhancement ini adalah memperluas mekanisme Excel tersebut supaya kolom-kolom baru ini bisa di-download/upload, bukan cuma tampil di layar (grid) Digiplan saja.</li>
+  <li>Kolom Component, Sub Component, Area, Man Power di Digiplan bisa terisi lewat <b>2 cara</b>: (1) <b>otomatis</b> dari data MO Backlog saat task berasal dari Order/SAP, atau (2) <b>manual</b> oleh user lewat dropdown Master Data yang sama, untuk task/sub-task di Daily Plan yang tidak berasal dari MO Backlog sama sekali. Kolom-kolom baru ini perlu ada di Digiplan supaya kedua cara pengisian ini bisa berjalan — bukan cuma untuk menampung hasil auto-fill.</li>
+</ul>
+
+<!-- ===================== 3. CAKUPAN PERUBAHAN ===================== -->
+<h1 id="sec-3">3. Cakupan Perubahan (Overview per Fitur)</h1>
+
+<h2>3.1 Inspection</h2>
+<ul>
+  <li>Saat create <b>finding</b> (temuan) di Inspection, ditambahkan field <b>Area of Unit</b> dan <b>Man Power</b> — melengkapi Component, Sub Component, dan Duration yang sudah ada.</li>
+  <li>Data yang diisi di sini akan <b>otomatis terbawa</b> (bisa tetap diedit) ke Order — lihat 3.2.</li>
+  <li><b>Additional Inspection</b> (inspeksi yang bisa dibuat kapan saja/ad-hoc, berbeda dengan Inspection terjadwal biasa) memakai layar create finding yang <b>sama persis</b> — jadi penambahan Area of Unit &amp; Man Power ini otomatis berlaku juga di Additional Inspection, tanpa effort tambahan terpisah.</li>
+</ul>
+
+<h2>3.2 Order</h2>
+<ul>
+  <li><b>Additional Order</b> (order yang dibuat tanpa berasal dari finding inspeksi) juga mendapat field Area of Unit, Man Power, Component, Sub Component, dan Duration, supaya semua jalur pembuatan order konsisten membawa data ini.</li>
+  <li>Data dari Inspection maupun Additional Order <b>otomatis terbawa</b> (bisa tetap diedit) sampai ke layar edit eMOL dan Order Approval — user tidak perlu input ulang dari nol di setiap tahap.</li>
+  <li>Saat <b>Order Approval</b>, supervisor (SPV) memvalidasi dan bisa mengubah nilai Man Power, Duration, Component, Sub Component, dan Area sebelum data dikirim ke SAP — ini jadi titik pemeriksaan terakhir.</li>
+  <li><b>Master Data baru</b>: mapping antara Area of Unit dan kombinasi Component-Sub Component (banyak-ke-banyak), dikelola oleh admin Head Office lewat halaman Master Data baru — dipakai bersama oleh Inspection dan Order.</li>
+</ul>
+
+<h2>3.3 Digiplan (Daily Plan)</h2>
+<ul>
+  <li>Ditambahkan kolom baru: <b>Component</b>, <b>Sub Component</b>, <b>Area</b>, <b>Man Power</b>, dan <b>Man Hours</b> di grid Daily Plan.</li>
+  <li><b>Man Hours dihitung otomatis</b> (<code>Duration × Man Power</code>) dan tidak bisa diedit manual — read-only, untuk menjaga konsistensi data.</li>
+  <li>Saat user memilih <b>MO Backlog</b> (order yang sudah diproses SAP) untuk dimasukkan ke Daily Plan, field-field di atas <b>terisi otomatis</b> dari data MO Backlog tersebut — tapi tetap bisa diedit user sesuai kondisi lapangan terkini.</li>
+  <li>Template Excel upload/download Daily Plan diperluas untuk mengakomodasi kolom-kolom baru ini.</li>
+</ul>
+
+<p style="color:#888;font-size:9pt;">Keputusan desain untuk PM Shutdown (3.4) dan BD Corrective (3.5) berikut ini identik untuk kedua fitur — keduanya menerima Duration/Man Power/Man Hours dari Digiplan dengan cara yang sama.</p>
+
+<h2>3.4 PM Shutdown</h2>
+<ul>
+  <li>Duration, Man Power, dan Man Hours ditampilkan di dalam <b>card task</b> — supaya pengawas bisa langsung melihat rencana tenaga kerja tanpa perlu buka detail.</li>
+  <li>Assignment mechanic (penugasan teknisi) <b>tidak dibatasi</b> harus sama persis dengan rencana Man Power — boleh lebih atau kurang, tapi sistem akan memberi <b>warning</b> dan mewajibkan user mengisi <b>catatan (notes)</b> kalau ada selisih.</li>
+  <li>Ada <b>2 skenario</b> soal wajib-tidaknya assignment mechanic sebelum task bisa di-<i>finish</i>:
+    <ul>
+      <li>Task umum (tidak terhubung ke Order/MO) — assignment boleh kosong, cukup diberi peringatan.</li>
+      <li>Task backlog dengan referensi MO — assignment <b>wajib</b> minimal 1 mechanic sebelum bisa di-finish.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>3.5 BD Corrective</h2>
+<ul>
+  <li>Duration, Man Power, dan Man Hours ditampilkan di dalam <b>card task</b> — sama seperti PM Shutdown (3.4).</li>
+  <li>Assignment mechanic <b>tidak dibatasi</b> harus sama persis dengan rencana Man Power — warning + catatan wajib kalau ada selisih, sama seperti PM Shutdown.</li>
+  <li>2 skenario mandatory assignment yang sama (umum vs backlog-dengan-referensi-MO) berlaku identik di BD Corrective.</li>
+</ul>
+
+<!-- ===================== 4. KEPUTUSAN DESAIN KUNCI ===================== -->
+<h1 id="sec-4">4. Keputusan Desain Kunci</h1>
+
+<table>
+<thead><tr><th style="width:28%">Topik</th><th style="width:14%">Status</th><th>Keputusan</th></tr></thead>
+<tbody>
+<tr><td>Penamaan field</td><td><span class="badge badge-decided">Disepakati</span></td><td>Menggunakan nama <b>"Area"</b> (merujuk ke Area of Unit), bukan "Compartment" (istilah lama).</td></tr>
+<tr><td>Validasi Man Power</td><td><span class="badge badge-decided">Disepakati</span></td><td>Wajib diisi, harus lebih besar dari 0, dan harus bilangan bulat (integer) — berlaku konsisten di semua titik input.</td></tr>
+<tr><td>Cara pengisian Area/Component/Sub Component</td><td><span class="badge badge-decided">Disepakati</span></td><td>Dropdown dari Master Data (bukan input bebas), dengan urutan pemilihan: Component → Sub Component → Area — konsisten di Inspection maupun Digiplan.</td></tr>
+<tr><td>Excel template</td><td><span class="badge badge-decided">Disepakati</span></td><td>Kolom Area/Component/Sub Component di Excel berupa kolom teks biasa (bukan dropdown Excel) untuk versi awal; validasi kombinasi dilakukan saat file di-upload — kombinasi yang tidak sesuai Master Data akan ditolak dengan pesan peringatan yang jelas.</td></tr>
+<tr><td>Auto-fill dari MO Backlog</td><td><span class="badge badge-decided">Disepakati</span></td><td>Nilai yang terisi otomatis dari MO Backlog tetap <b>bisa diedit</b> user (bukan terkunci) — dianggap sebagai rencana awal, bukan keputusan final.</td></tr>
+<tr><td>Arah aliran data Digiplan ↔ Order</td><td><span class="badge badge-decided">Disepakati</span></td><td>Digiplan <b>tidak perlu integrasi langsung</b> ke Order — data cukup mengalir lewat jalur yang sudah ada (Order → SAP → MO Backlog), sehingga tidak menambah kompleksitas sistem.</td></tr>
+<tr><td>Perubahan nilai di Digiplan</td><td><span class="badge badge-decided">Disepakati</span></td><td>Kalau user mengubah nilai (Component/Area/Man Power/dst) di Digiplan, perubahan itu <b>tidak dikirim balik</b> ke Order/eMOL/SAP — murni satu arah untuk kebutuhan perencanaan lokal.</td></tr>
+<tr><td>Formula rollup Man Power/Man Hours di parent task</td><td><span class="badge badge-open">Terbuka</span></td><td>Perlu finalisasi formula (lihat Bagian 7).</td></tr>
+<tr><td>Skema Master Data Area (per Asset Model atau tidak)</td><td><span class="badge badge-open">Terbuka</span></td><td>Perlu keputusan client (lihat Bagian 7).</td></tr>
+</tbody>
+</table>
+
+<!-- ===================== 5. INTEGRASI SAP ===================== -->
+<h1 id="sec-5">5. Integrasi dengan SAP</h1>
+
+<p>Salah satu bagian penting dari enhancement ini adalah memastikan data <b>Component, Sub Component, Area, Duration, dan Man Power</b> ikut terkirim ke SAP saat Order dibuat — bukan cuma disimpan lokal di Digiman+.</p>
+
+<h3>5.1 Kondisi Saat Ini</h3>
+<p>Component dan Sub Component sudah tersimpan di tabel penampung sinkronisasi (<code>PoolingMOItem</code>), tetapi <b>belum ada mapping</b>-nya untuk benar-benar dikirim ke SAP lewat pemanggilan BAPI. Area, Duration, dan Man Power juga belum ada sama sekali di jalur ini.</p>
+
+<h3>5.2 Manfaat Kalau Assessment Berhasil</h3>
+<p>Kalau kelima data ini berhasil dikirim ke SAP saat Order dibuat, maka saat data itu <b>kembali ke Digiman+ sebagai MO Backlog</b>, kelima field tersebut ikut kembali — sehingga saat user membuat Daily Plan dan memilih MO Backlog, semua field ini <b>langsung terisi otomatis</b>, tanpa perlu input manual lagi.</p>
+
+<h3>5.3 Siapa yang Mengerjakan Assessment Ini</h3>
+<div class="callout">
+  Assessment kelayakan teknis pengiriman data ke SAP (misalnya apakah perlu custom field tambahan di SAP, atau bisa memanfaatkan field yang sudah ada) akan dikoordinasikan langsung oleh <b>tim client dengan tim SAP internal mereka</b> — bukan bagian dari effort tim development Digiman+ yang diestimasi di Bagian 6. Estimasi effort di Bagian 6 hanya mencakup sisi Digiman+ (menyiapkan data untuk dikirim, dan menerima data saat kembali sebagai MO Backlog).
+</div>
+
+<!-- ===================== 6. ESTIMASI EFFORT ===================== -->
+<h1 id="sec-6">6. Estimasi Effort &amp; Timeline</h1>
+
+<p>Estimasi berikut dihitung berdasarkan velocity riil tim BUMA ID (data historis Jira): Story Point dikalibrasi ke skala Fibonacci standar tim (<code>1, 2, 3, 5, 8</code> — 1 angka pasti per komponen kerja, bukan range), lalu dikonversi ke mandays memakai rasio <b>~0.98 hari kerja (manday) per Story Point</b>, tervalidasi dari throughput 5 sprint terakhir — basis waktu yang sama dengan estimasi jumlah sprint di 6.3, supaya kedua perhitungan konsisten.</p>
+
+<h3>6.1 Ringkasan per Fitur</h3>
+<table>
+<thead><tr><th>Fitur</th><th style="width:12%">SP</th><th style="width:14%">Mandays</th></tr></thead>
+<tbody>
+<tr><td>Inspection, Additional Order, Order Approval, Master Data, integrasi teknis SAP (sisi Digiman+)</td><td>33</td><td><b>~32</b></td></tr>
+<tr><td>Digiplan — Man Power/Man Hours + Component/Sub Component/Area (skenario parent dikosongkan dulu)</td><td>40</td><td><b>~39</b></td></tr>
+<tr><td>PM Shutdown &amp; BD Corrective — visibility card, assignment mechanic</td><td>12</td><td><b>~12</b></td></tr>
+</tbody>
+</table>
+
+<h3>6.2 Total — 2 Skenario Rollup Man Power/Man Hours di Parent Task</h3>
+<p>Ada 1 keputusan yang mempengaruhi total effort secara signifikan: bagaimana Man Power/Man Hours dihitung di level <i>parent task</i> (task yang punya sub-task) — lihat detail di Bagian 7.1.</p>
+
+<table>
+<thead><tr><th>Skenario</th><th style="width:16%">Total SP</th><th style="width:18%">Total Mandays</th></tr></thead>
+<tbody>
+<tr><td><b>Skenario A</b> — parent task dikosongkan dulu (interim), formula final di-assess belakangan</td><td>85</td><td><b>~83 mandays</b></td></tr>
+<tr><td><b>Skenario B</b> — langsung implementasi formula rollup penuh (memanfaatkan data predecessor/serial/paralel yang sudah ada di sistem)</td><td>93</td><td><b>~91 mandays</b></td></tr>
+</tbody>
+</table>
+
+<div class="callout decision">
+  <div class="callout-label">Rekomendasi</div>
+  Selisih antara kedua skenario relatif kecil (8 SP / ~8 mandays), karena data pendukung (relasi antar-task, tipe predecessor/serial/paralel) <b>sudah tersedia</b> di sistem — bukan perlu dibangun dari awal. Skenario B (langsung implementasi penuh) cukup layak dipertimbangkan untuk rilis pertama, tidak harus ditunda ke fase terpisah.
+</div>
+
+<h3>6.3 Estimasi Kebutuhan Sprint</h3>
+<p>Rata-rata velocity 5 sprint terakhir tim BUMA ID: <b>62.4 SP/sprint</b> (kapasitas penuh). Karena tim juga menangani <b>support issue Production</b> di sela sprint (pola yang konsisten terlihat di data historis), kapasitas yang didedikasikan murni untuk enhancement ini diasumsikan <b>70%</b> — sisanya <b>30%</b> untuk production support. Kapasitas efektif: <b>~43.7 SP/sprint</b>.</p>
+
+<table>
+<thead><tr><th>Skenario</th><th style="width:16%">Total SP</th><th style="width:22%">Kebutuhan Sprint</th></tr></thead>
+<tbody>
+<tr><td>Skenario A (Tanpa logic penuh)</td><td>85</td><td><b>2 sprint</b></td></tr>
+<tr><td>Skenario B (Dengan logic penuh)</td><td>93</td><td><b>3 sprint</b> (2 sprint hanya cukup ~87 SP, sisa ~6 SP masuk sprint ke-3)</td></tr>
+</tbody>
+</table>
+
+<div class="callout warn">
+  <div class="callout-label">Pertimbangan Timeline</div>
+  Kalau target rilis ingin tetap di <b>2 sprint</b>, Skenario A (parent dikosongkan dulu) lebih realistis — Skenario B melewati kapasitas 2 sprint meski selisihnya kecil (~6 SP saja masuk ke sprint ke-3).
+</div>
+
+<p style="font-size:8.5pt;color:#888;">Catatan: estimasi di atas belum termasuk waktu review/QA terpisah, belum termasuk effort assessment/pengiriman data ke SAP (Bagian 5.3) yang dikerjakan tim client sendiri, dan mengasumsikan alokasi 70/30 konsisten sepanjang durasi pengerjaan (bisa berubah tergantung prioritas production issue yang muncul).</p>
+
+<!-- ===================== 7. YANG PERLU DIPUTUSKAN ===================== -->
+<h1 id="sec-7">7. Hal yang Masih Perlu Diputuskan</h1>
+
+<h3>7.1 Formula Rollup Man Power/Man Hours di Level Parent Task</h3>
+<p>Sistem Digiplan sudah punya data hubungan antar-task (predecessor, serial, paralel). Yang perlu diputuskan business adalah <b>rumus perhitungannya</b> — misalnya, apakah task yang berjalan serial dijumlahkan Man Power/Man Hours-nya, sedangkan yang paralel diambil yang terbesar (mengikuti pola yang sudah ada di kolom Duration), atau ada aturan lain. Sampai formula ini diputuskan, opsi sementara adalah mengosongkan nilai di level parent (Skenario A di Bagian 6.2).</p>
+
+<h3>7.2 Skema Master Data Area of Unit</h3>
+<p>Master Data Component-Sub Component saat ini sudah dikelompokkan per model unit/Asset Model (misalnya model unit A dan B punya kombinasi Component-Sub Component yang berbeda). Yang perlu diputuskan: apakah mapping <b>Area</b> yang baru ini juga perlu dibedakan per model unit, atau berlaku sama untuk semua model unit? Ini memengaruhi struktur data Master Data yang akan dibangun.</p>
+
+<h3>7.3 Assessment Integrasi ke SAP</h3>
+<p>Seperti dijelaskan di Bagian 5.3, ini dikoordinasikan langsung oleh tim client dengan tim SAP mereka. Hasilnya akan menentukan apakah pengiriman Area/Duration/Man Power ke SAP membutuhkan pengembangan tambahan di sisi SAP (custom field) atau bisa memanfaatkan field yang sudah tersedia.</p>
+
+<h3>7.4 Detail Kriteria MO Backlog</h3>
+<p>Saat ini hanya sebagian jenis Order (dengan Order Type dan PM Activity Type tertentu) yang ditarik kembali ke Digiman+ sebagai MO Backlog. Kriteria ini bersifat konfigurasi per client, dan detail nilainya untuk BUMA ID perlu dikonfirmasi/didefinisikan.</p>
+
+<h3>7.5 Item Teknis Minor Lainnya</h3>
+<ul>
+  <li>Apakah validasi selisih Man Power vs assignment mechanic dihitung real-time saat assign, atau baru divalidasi saat user menekan "Finish"?</li>
+  <li>Di mana catatan (notes) alasan selisih assignment disimpan — field terpisah atau menyatu dengan catatan task yang sudah ada?</li>
+</ul>
+
+<!-- ===================== 8. LAMPIRAN ===================== -->
+<h1 id="sec-8">8. Lampiran — Detail Teknis (Deep Dive)</h1>
+<p style="color:#888;font-size:9pt;">Bagian ini untuk pembaca yang ingin memahami detail teknis lebih dalam. Boleh dilewati kalau cukup dengan ringkasan di Bagian 1–7.</p>
+
+<h2>8.1 Alur Data End-to-End</h2>
+<div class="flow-box">1. User melakukan Inspection (input finding: Component, Sub Component, Area, Duration, Man Power)
+   — atau membuat Additional Order (field yang sama, tanpa proses inspeksi)
+2. Data mengalir ke eMOL (Order line item) — nilai otomatis terbawa, tetap bisa diedit
+3. User submit Order → masuk ke Approver (SPV)
+4. SPV validasi/edit Man Power, Duration, Component, Sub Component, Area → approve
+5. Setelah approve, data disiapkan (termasuk 5 field di atas) untuk dikirim ke SAP
+6. SAP memproses & membuat Maintenance Order (MO)
+7. MO yang sudah diproses SAP ditarik kembali ke Digiman+ sebagai "MO Backlog"
+   (khusus Order Type & PM Activity Type tertentu, sesuai konfigurasi per client)
+8. MO Backlog dieksekusi lewat salah satu dari:
+   - Ditambahkan ke sub-task Daily Plan (Digiplan) → dieksekusi di PM Shutdown atau BD Corrective
+   - Dieksekusi langsung saat Inspection (untuk pekerjaan ringan/cepat)
+9. Setelah eksekusi selesai, Digiman+ mengirim sinyal penyelesaian (TECO) ke SAP</div>
+
+<h2>8.2 Skema Data Baru/Terdampak (Ringkas)</h2>
+<table>
+<thead><tr><th style="width:22%">Tabel</th><th style="width:20%">Service</th><th>Field Terkait</th></tr></thead>
+<tbody>
+<tr><td><code>MechanicOrderList</code></td><td>maintenance-order</td><td>Menyimpan Order Type (<code>CostTypeCode</code>) per eMOL, penanda tipe Inspection vs Additional, dan flag <code>NoPartsRequired</code> (declare eMOL tidak butuh material).</td></tr>
+<tr><td><code>MechanicOrderSummary</code></td><td>maintenance-order</td><td>Header Order — menyimpan info asset &amp; Activity Type (khusus Additional Order).</td></tr>
+<tr><td><code>PoolingMOItem</code> / <code>SAPMOSyncOrder</code></td><td>maintenance-order</td><td>Tabel penampung data sebelum dikirim ke SAP — perlu diperluas untuk menampung Area, Duration, Man Power.</td></tr>
+<tr><td><code>DPColumn</code> / <code>DPValue</code></td><td>dplan</td><td>Mekanisme kolom dinamis Digiplan — dasar penambahan kolom Component/Sub Component/Area/Man Power/Man Hours.</td></tr>
+<tr><td><code>DPPredecessor</code></td><td>dplan</td><td>Menyimpan relasi antar-task (predecessor, tipe dependency, lag) — dasar untuk formula rollup Man Power/Man Hours di parent task (lihat 7.1).</td></tr>
+<tr><td>Master Data mapping Area ↔ Component-Sub Component (baru)</td><td>services-asset</td><td>Dikembangkan di service Asset, konsisten dengan lokasi master data Component-Sub Component existing yang sudah ada di service yang sama.</td></tr>
+</tbody>
+</table>
+
+<h2>8.3 Kompleksitas M:N pada Master Data Area</h2>
+<p>1 kombinasi Component-Sub Component bisa terpetakan ke beberapa Area, dan 1 Area bisa berlaku untuk beberapa kombinasi Component-Sub Component (relasi banyak-ke-banyak, bukan hierarki sederhana). Ini berarti saat data MO Backlog kembali ke Digiman+, nilai <b>Area tidak bisa ditebak ulang</b> dari Component/Sub Component saja — harus dikirim &amp; diterima sebagai field tersendiri yang eksplisit.</p>
+
+<h2>8.4 Detail Tabel Estimasi Effort per Fitur</h2>
+<p style="color:#888;font-size:9pt;">Rincian baris-per-baris yang menyusun angka ringkas di Bagian 6. SP dikalibrasi ke 1 angka Fibonacci pasti per baris (bukan range) — lihat metodologi di 8.5. Mandays = SP × 0.98 (basis 5 sprint terakhir, konsisten dengan basis velocity sprint).</p>
+
+<h3>8.4.1 Inspection, Order &amp; Master Data</h3>
+<table>
+<thead><tr><th style="width:34%">Komponen</th><th style="width:10%">SP</th><th style="width:12%">Mandays</th><th>Catatan</th></tr></thead>
+<tbody>
+<tr><td>Master Data UI baru (service Asset): mapping Area ↔ Component-Sub Component (M:N)</td><td>5</td><td>4.9</td><td>CRUD + validasi M:N; bisa naik ke 8 SP kalau ternyata perlu dibedakan per model unit/Asset Model — lihat Bagian 7.2</td></tr>
+<tr><td>Permission code baru untuk maintain Master Data (admin Head Office)</td><td>1</td><td>1.0</td><td>Setup permission code + assign ke role</td></tr>
+<tr><td>Inspection &amp; Additional Inspection: tambah field Area + Man Power di create finding</td><td>2</td><td>2.0</td><td>Component/Sub Component sudah ada, tinggal extend +2 field &amp; cascading ke Area — 1 form yang sama berlaku untuk keduanya, tidak perlu effort terpisah</td></tr>
+<tr><td>Additional Order: tambah field Component, Sub Component, Area, Duration, Man Power di create screen</td><td>3</td><td>2.9</td><td>Field baru semua di layar ini + cascading dropdown + validasi</td></tr>
+<tr><td>Edit eMOL: carry-forward nilai dari Finding/Additional Order (auto-fill, tetap editable)</td><td>2</td><td>2.0</td><td>Passing value ke layar edit eMOL, bukan input ulang</td></tr>
+<tr><td>Order Approval: tambah validasi &amp; edit Man Power, Duration, Component, Sub Component, Area</td><td>3</td><td>2.9</td><td>UI baru di layar approval + reuse validasi yang sama</td></tr>
+<tr><td>Tabel penampung sinkronisasi SAP: tambah kolom Area, Duration, Man Power</td><td>3</td><td>2.9</td><td>Component/Sub Component sudah ada di tabel ini, tinggal extend</td></tr>
+<tr><td>Mapping BAPI: kirim Component, Sub Component, Area, Duration, Man Power ke SAP</td><td colspan="2" style="text-align:center;color:#888;">Belum bisa diestimasi</td><td>Tergantung hasil assessment client dengan tim SAP mereka (lihat Bagian 5.3 &amp; 7.3) — di luar effort tim development Digiman+</td></tr>
+<tr><td>MO Backlog inbound: parse balik Component, Sub Component, Area, Duration, Man Power dari SAP</td><td>3</td><td>2.9</td><td>Extend parsing/mapping saat pull MO Backlog</td></tr>
+<tr><td>MO Backlog filter jadi konfigurasi per-client (bukan hardcode)</td><td>3</td><td>2.9</td><td>Refactor filter Order Type/PM Activity Type jadi config per tenant</td></tr>
+<tr><td>Testing end-to-end (Finding/Additional Order → eMOL → Approval → SAP → MO Backlog → Digiplan)</td><td>8</td><td>7.8</td><td>Banyak titik integrasi lintas service, perlu test tiap checkpoint + regresi</td></tr>
+<tr><td><b>Subtotal (di luar mapping BAPI)</b></td><td><b>33</b></td><td><b>~32</b></td><td></td></tr>
+</tbody>
+</table>
+
+<h3>8.4.2 Digiplan (Daily Plan)</h3>
+<table>
+<thead><tr><th style="width:34%">Komponen</th><th style="width:10%">SP</th><th style="width:12%">Mandays</th><th>Catatan</th></tr></thead>
+<tbody>
+<tr><td>Template Config UI: guardrail Man Power &amp; Man Hours tidak bisa di-disable/dihapus</td><td>2</td><td>2.0</td><td>Kompleksitas Kecil–Sedang</td></tr>
+<tr><td>Grid UI: cell Man Hours read-only (tidak bisa diedit langsung)</td><td>2</td><td>2.0</td><td>Kompleksitas Kecil–Sedang</td></tr>
+<tr><td>Grid: edit Duration/Man Power → trigger recalculate &amp; save Man Hours</td><td>3</td><td>2.9</td><td>Kompleksitas Sedang</td></tr>
+<tr><td>Excel export Man Power &amp; Man Hours</td><td>2</td><td>2.0</td><td>Kompleksitas Kecil–Sedang</td></tr>
+<tr><td>Excel import: parse &amp; validasi Man Power, upsert ke database</td><td>3</td><td>2.9</td><td>Kompleksitas Sedang</td></tr>
+<tr><td>Excel import: hitung &amp; upsert Man Hours setelah Man Power tersimpan</td><td>3</td><td>2.9</td><td>Kompleksitas Sedang</td></tr>
+<tr><td>Auto-recalculate saat struktur task berubah (tambah/hapus/pindah task)</td><td>3</td><td>2.9</td><td>Kompleksitas Sedang</td></tr>
+<tr><td>Testing Man Power/Man Hours (grid, excel, hierarki parent-child, bulk)</td><td>5</td><td>4.9</td><td>Kompleksitas Sedang–Besar</td></tr>
+<tr><td><b>Subtotal Man Power/Man Hours (baseline)</b></td><td><b>23</b></td><td><b>~23</b></td><td></td></tr>
+<tr><td>Assessment/finalisasi formula rollup predecessor/serial/paralel (Bagian 7.1)</td><td>3</td><td>2.9</td><td>Analisa terpisah dari implementasi — diperlukan di kedua skenario (A maupun B)</td></tr>
+<tr><td>Implementasi rollup penuh predecessor/serial/paralel (hanya Skenario B)</td><td>8</td><td>7.8</td><td>Traversal graf relasi antar-task + formula rollup + integrasi ke service kalkulasi existing + edge case + testing</td></tr>
+<tr><td>Kolom baru Component, Sub Component, Area — DPColumn, dropdown grid</td><td>1+3</td><td>3.9</td><td>Custom column biasa (bukan mandatory)</td></tr>
+<tr><td>Auto-fill dari MO Backlog + Excel export/import + testing Component/Sub Component/Area</td><td>1+3+3</td><td>6.9</td><td>Termasuk validasi kombinasi saat upload Excel</td></tr>
+<tr><td><b>Subtotal Component/Sub Component/Area</b></td><td><b>14</b></td><td><b>~14</b></td><td></td></tr>
+<tr><td><b>Total Skenario A ("Tanpa" rollup penuh)</b></td><td><b>40</b></td><td><b>~39</b></td><td></td></tr>
+<tr><td><b>Total Skenario B ("Dengan" rollup penuh)</b></td><td><b>48</b></td><td><b>~47</b></td><td></td></tr>
+</tbody>
+</table>
+
+<h3>8.4.3 PM Shutdown &amp; BD Corrective</h3>
+<table>
+<thead><tr><th style="width:34%">Komponen</th><th style="width:10%">SP</th><th style="width:12%">Mandays</th><th>Catatan</th></tr></thead>
+<tbody>
+<tr><td>Card task: tampilkan Duration, Man Power, Man Hours</td><td>1</td><td>1.0</td><td>Read-only display, data sudah tersedia dari Digiplan</td></tr>
+<tr><td>Assignment mechanic: hitung selisih vs Man Power plan, tampilkan warning</td><td>3</td><td>2.9</td><td>Perlu logic compare assigned count vs plan</td></tr>
+<tr><td>Assignment mechanic: wajib isi notes kalau ada selisih</td><td>2</td><td>2.0</td><td>Field notes + validasi wajib-isi kondisional</td></tr>
+<tr><td>2 skenario mandatory assignment (umum vs backlog-dengan-referensi-MO)</td><td>3</td><td>2.9</td><td>Conditional validation berdasarkan ada/tidaknya referensi MO di task — client sudah konfirmasi langsung implementasi 2 skenario sekaligus (Bagian 7.5)</td></tr>
+<tr><td>Testing (card visibility, warning selisih, notes wajib, 2 skenario mandatory)</td><td>3</td><td>2.9</td><td></td></tr>
+<tr><td><b>Subtotal</b></td><td><b>12</b></td><td><b>~12</b></td><td></td></tr>
+</tbody>
+</table>
+
+<h2>8.5 Metodologi Estimasi SP &amp; Mandays</h2>
+
+<h4>Kalibrasi SP ke Skala Fibonacci</h4>
+<p>Setiap komponen kerja di atas dikalibrasi ke 1 angka pasti dari skala Fibonacci standar tim BUMA ID (<code>1, 2, 3, 5, 8</code>), memakai konvensi: Kecil→1, Kecil–Sedang→2, Sedang→3, Sedang–Besar→5, Besar→8. Sebagai konteks pembanding kompleksitas, berikut baseline cycle-time riil tim BUMA ID (rata-rata waktu To Do → DEV DONE, 5 sprint closed terakhir):</p>
+<table>
+<thead><tr><th>Story Point</th><th>Baseline Tim BUMA ID (hari kerja)</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>1.09</td></tr>
+<tr><td>2</td><td>2.36</td></tr>
+<tr><td>3</td><td>8.25 <span style="color:#d68910;">⚠ anomali, kemungkinan sample kecil</span></td></tr>
+<tr><td>5</td><td>9.76</td></tr>
+<tr><td>8</td><td>21.63</td></tr>
+</tbody>
+</table>
+<p style="font-size:9pt;color:#888;">Catatan: baseline ini mengukur cycle time (elapsed calendar days, termasuk waktu tunggu/context-switching) — bukan effort murni, sehingga <b>tidak dipakai langsung sebagai mandays</b> (lihat metodologi mandays di bawah), hanya sebagai konteks pembanding relatif.</p>
+
+<h4>Rasio Mandays/SP (Basis Throughput)</h4>
+<p style="font-size:9pt;color:#888;">Dihitung dari 5 sprint terakhir — basis waktu yang sama dengan velocity sprint di bawah, supaya kedua perhitungan (mandays dan jumlah sprint) konsisten.</p>
+<table>
+<thead><tr><th>Sprint</th><th style="width:16%">Story Points Selesai</th><th style="width:16%">Hari Kerja</th></tr></thead>
+<tbody>
+<tr><td>Release 3.1.0 (Sprint 2)</td><td>73 SP</td><td>17 hari</td></tr>
+<tr><td>Release 4.0.0 - S1</td><td>35 SP</td><td>15 hari</td></tr>
+<tr><td>Release 4.0.0 - S2</td><td>63 SP</td><td>10 hari</td></tr>
+<tr><td>Release 4.0.0 - S3</td><td>60 SP</td><td>9 hari</td></tr>
+<tr><td>4.1.0 - Improve and Fix</td><td>81 SP</td><td>10 hari</td></tr>
+<tr><td><b>Total</b></td><td><b>312 SP</b></td><td><b>61 hari</b></td></tr>
+</tbody>
+</table>
+<p>Perhitungan: 312 SP ÷ (5 developer × 61 hari = 305 person-days) = ~1.02 SP per person-day → <b>~0.98 mandays per SP</b>. Rasio ini yang dipakai konsisten di semua estimasi mandays pada dokumen ini.</p>
+
+<h4>Estimasi Kebutuhan Sprint (70% Dedicated, 30% Production Support)</h4>
+<p>Rata-rata velocity 5 sprint terakhir: <b>62.4 SP/sprint</b> (kapasitas penuh). Dengan alokasi 70% untuk enhancement ini (30% sisanya untuk production support): kapasitas efektif <b>~43.7 SP/sprint</b>. Skenario A (85 SP) ≈ <b>2 sprint</b>; Skenario B (93 SP) ≈ <b>3 sprint</b>.</p>
+
+<div class="footer">
+  Dokumen ini disusun berdasarkan diskusi teknis internal dan data historis Jira tim BUMA ID. Estimasi bersifat kasar (rough order of magnitude) dan perlu divalidasi lebih lanjut oleh tim engineering yang memegang codebase terkait sebelum dijadikan komitmen final.<br>
+  Digiman+ — 10 Juli 2026
+</div>
+
+</body>
+</html>

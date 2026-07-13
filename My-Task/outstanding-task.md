@@ -4,9 +4,9 @@
 - [ ] `P1` Assessment via Nexus *(Due Date: 03 Jun 2026)*
 - [ ] `P1` Create Timeline Service Sheet for BUMA ID
 - [ ] `P1` Create template untuk isi bank task dan lain-lain
-- [ ] `P1` Export data damage code, cause code, action remedy dari PRD; ask notification field dari MKP SAP team
-- [ ] `P1` Test in UAT for IIR Form
-- [ ] `P1` Provide data structure of IIR form to BUMA ID
+- [ ] `P1` RepairDuration di Digiman Transaction Dashboard
+- [ ] `P1` Change flowchart MKP
+- [ ] `P1` Assess PM Activity Type enhancement in Order Creation
 - [ ] `P2` Follow up to Ko Herianto terkait view untuk details of Intervention
 - [~] `P2` Compare data master dan transaksi EHMS dengan data master Digiman+ *(menunggu diskusi dengan Soraya di hari Kamis, 21 Mei 2026)*
 - [ ] `P2` Confirmation to MKP perlakuan terhadap order yang gagal karena over budget — reject or pending, once budget release sync again to SAP
@@ -59,3 +59,7 @@
 - [x] `P1` How to show second and third approval in the Digiman Transaction Dashboard — Duplicate, sudah tercover di Epic [IAMS30-4437](https://bukittechnology.atlassian.net/browse/IAMS30-4437) (lihat ticket [IAMS30-4451](https://bukittechnology.atlassian.net/browse/IAMS30-4451) & desain multi-level approval Chapter 5 gap-analysis.md) *(Done: 06 Jul 2026)*
 - [x] `P1` Create process flow of Digiman+ Form request Uda Sunardi *(Done: 06 Jul 2026)*
 - [x] `P1` Check berapa lama data digiplan stay di in list breakdown and outstanding administration — [IAMS30-4419](https://bukittechnology.atlassian.net/browse/IAMS30-4419) *(Done: 06 Jul 2026)*
+- [x] `P1` Export data damage code, cause code, action remedy dari PRD; ask notification field dari MKP SAP team — master data tersimpan di `BUMA-ID-project/master-data/` *(Done: 08 Jul 2026)*
+- [x] `P1` Test in UAT for IIR Form *(Done: 13 Jul 2026)*
+- [x] `P1` Provide data structure of IIR form to BUMA ID *(Done: 13 Jul 2026)*
+- [x] `P1` Assess MP di Inspection juga di Approval Inspection *(Done: 13 Jul 2026)*

@@ -18,7 +18,7 @@ Form
  ├── FormTab
  ├── FormAssetAssignment   ← khusus FT_MaintenanceForm
  ├── FormSiteAssignment        ← tabel kosong, belum dipakai
- └── FormPSAssignment
+ └── FormPSAssignment          ← ⚠ kemungkinan deprecated, lihat catatan di bawah
 ```
 
 Tabel assignment (form di-assign ke mana):
@@ -26,7 +26,7 @@ Tabel assignment (form di-assign ke mana):
 |-------|-------|
 | `FormAssetAssignment` | Form di-assign ke asset tertentu (khusus `FT_MaintenanceForm`) |
 | `FormSiteAssignment` | Form di-assign ke site tertentu — *tabel kosong, belum dipakai* |
-| `FormPSAssignment` | Form di-assign ke Planning Schedule / PM Shutdown |
+| `FormPSAssignment` | Form di-assign ke Planning Schedule / PM Shutdown — ⚠ *kemungkinan deprecated* |
 
 ### Schema Tabel `FormPSAssignment`
 
@@ -38,6 +38,8 @@ IsActive
 CreatedAt, CreatedBy
 ModifiedAt, ModifiedBy
 ```
+
+> **⚠ Flag — kemungkinan tidak dipakai lagi.** [PRD PM Shutdown Phase 1](../../roadmap/phase1-service-package/PRD-PM-Shutdown-Phase1.html) (section T1 — Perubahan Data Model) memperkenalkan tabel baru `PlanForm` di `DPlanDB` (service `dplan`) sebagai mekanisme form assignment ke Plan — form di-assign Planner per plan selama status DRAFT, lalu di-resolve ke `FormSubmission`/`Task` di `maintenance-execution` saat plan SUBMIT (via event `PlanSubmitted`). Data model baru ini sama sekali tidak mereferensikan `FormPSAssignment`. Perlu dikonfirmasi ke tim apakah `FormPSAssignment` resmi digantikan oleh alur `PlanForm`, atau masih dipakai untuk kasus lain di luar scope Phase 1 ini.
 
 Tabel Element registry: `GroupElement`, `Element` (lihat section [GroupElement](#groupelement) dan [Element](#element))
 

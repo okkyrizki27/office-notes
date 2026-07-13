@@ -1,0 +1,265 @@
+{
+  "dateFrom": "2026-07-01T00:00:00Z",
+  "dateTo": "2026-07-07T23:59:59Z",
+  "totalRecords": 2,
+  "page": 1,
+  "pageSize": 20,
+  "hasMore": false,
+  "submissions": [
+    {
+      "formSubmissionId": "4b604512-b409-4a19-ba79-9ac5ab68e16c",
+      "formCode": "FORM394",
+      "formVersion": 6,
+      "formName": "IIR-Grader",
+      "siteCode": "LAT",
+      "equipmentNumber": "HDCT73112",
+      "submittedBy": "2009OBH.supervisor01@protonmail.com",
+      "submittedAt": "2026-07-07T11:47:06.163933Z",
+      "syncAt": "2026-07-07T11:47:09.884210Z",
+      "tabs": [
+        {
+          "title": "General",
+          "sections": [
+            {
+              "title": "Personnel Information",
+              "answers": [
+                { "label": "Inspector Name", "value": "2009OBH.supervisor01", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "label": "Date of Inspection", "value": "2026-07-07T18:45:30.339044", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "Asset Information",
+              "answers": [
+                { "label": "Site", "value": "LAT", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "label": "Mode Unit", "value": "OB HAULER", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "label": "Kode Unit", "value": "HDCT73112", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "label": "Current SMU", "value": "57780", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "label": "Photo Machine SMU", "value": "122362d1-5230-4d2a-9883-cdb57eb97820", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [ { "url": "<resolved dari TaskPersonalized.MachineSMUAddress via ReferenceId=122362d1-5230-4d2a-9883-cdb57eb97820>" } ] }
+              ]
+            },
+            {
+              "title": null,
+              "answers": [
+                { "label": "Foto Kondisi Fisik Equipment", "value": null, "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [
+                    { "label": "Foto Tampak Depan", "url": "<resolved blob URL, NOT device path>" },
+                    { "label": "Foto Tampak Samping Kanan", "url": "<resolved blob URL>" },
+                    { "label": "Foto Tampak Samping Kiri", "url": "<resolved blob URL>" },
+                    { "label": "Foto Tampak Belakang", "url": "<resolved blob URL>" },
+                    { "label": "Foto Serial Number", "url": "<resolved blob URL>" }
+                  ] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Inspection",
+          "sections": [
+            {
+              "title": "PENAMPILAN UMUM (GENERAL APPEARANCE)",
+              "answers": [
+                { "number": 1, "taskCode": "Task1252", "label": "Radiator Grill / Front Grill", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 2, "taskCode": "Task1119", "label": "Bumpers / Counter Weight / Guard", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 3, "taskCode": "Task1174", "label": "Fuel Tank / Cap / Breather", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 4, "taskCode": "Task1100", "label": "Battery Box / Cover", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 5, "taskCode": "Task1215", "label": "Main Frame / Car Body", "value": "Not Ok", "remark": "ada kerusakan kali ya", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 6, "taskCode": "Task1014", "label": "Cat Walk", "value": "Ok", "remark": "Ada beberapa", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [ { "url": "<resolved blob URL for 1ccac17f-...>" }, { "url": "<resolved blob URL for 8ffc591c-...>" } ] },
+                { "number": 7, "taskCode": "Task1033", "label": "Hand Grips & Rails", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 8, "taskCode": "Task1072", "label": "Steps / Ladders", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 9, "taskCode": "Task1154", "label": "Engine Hood / Doors / Covers", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 10, "taskCode": "Task1178", "label": "General Cleanliness", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "PRODUK KESELAMATAN (SAFETY ITEMS)",
+              "answers": [
+                { "number": 11, "taskCode": "Task1061", "label": "Safety Decals In Place", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 12, "taskCode": "Task1025", "label": "Fire Suppression System", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 13, "taskCode": "Task1035", "label": "Horn", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 14, "taskCode": "Task1259", "label": "ROPS & Certification", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 15, "taskCode": "Task1062", "label": "Seat Belt", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 16, "taskCode": "Task1007", "label": "Back-Up Alarm", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 17, "taskCode": "Task1031", "label": "Glass / Mirrors", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 18, "taskCode": "Task1101", "label": "Beacon Lamp / Rotary Lamp", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 19, "taskCode": "Task1150", "label": "Emergency Stop", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 20, "taskCode": "Task1090", "label": "Access Step / Anti-Slip Plate", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "KABIN, RUANG OPERATOR (CABIN, OPERATOR STATION)",
+              "answers": [
+                { "number": 21, "taskCode": "Task1017", "label": "Dash Console", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 22, "taskCode": "Task1177", "label": "Gauges / Monitor Working ", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 23, "taskCode": "Task1074", "label": "Switches", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 24, "taskCode": "Task1085", "label": "Windshield Wipers", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 25, "taskCode": "Task1093", "label": "Air Conditioner / Blower", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 26, "taskCode": "Task1039", "label": "Interior Lights", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 27, "taskCode": "Task1261", "label": "Seat / Arm Rest / Adjustments", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 28, "taskCode": "Task1026", "label": "Floor Boards", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 29, "taskCode": "Task1018", "label": "Dashboard Panel / Warning", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 30, "taskCode": "Task1020", "label": "Door Latches", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 31, "taskCode": "Task1287", "label": "Steering Wheel / Hoist lever / Retarder", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "KONDISI ENGINE (ENGINE CONDITION)",
+              "answers": [
+                { "number": 32, "taskCode": "Task1155", "label": "Engine Oil Leaking", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 33, "taskCode": "Task1327", "label": "Water Pump / Cooling Leak", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 34, "taskCode": "Task1251", "label": "Pump & Fuel Injectors", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 35, "taskCode": "Task1092", "label": "Air Cleaners / Dust Indicator", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 36, "taskCode": "Task1023", "label": "Exhaust / Muffler", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 37, "taskCode": "Task1010", "label": "Belt / Pulleys", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 38, "taskCode": "Task1022", "label": "Engine Start", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 39, "taskCode": "Task1053", "label": "Radiator", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 40, "taskCode": "Task1016", "label": "Coolers", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 41, "taskCode": "Task1158", "label": "Fan & Pulley Bearing", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 42, "taskCode": "Task1153", "label": "Engine Damper", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 43, "taskCode": "Task1319", "label": "Turbo Charger", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "SISTEM ELEKTRIK (ELECTRICAL SYSTEM)",
+              "answers": [
+                { "number": 44, "taskCode": "Task1067", "label": "Starter Motor", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 45, "taskCode": "Task1006", "label": "Alternator", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 46, "taskCode": "Task1008", "label": "Batteries / Cables / Clamps", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 47, "taskCode": "Task1256", "label": "Rellay / Fuse ", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 48, "taskCode": "Task1175", "label": "Fuse", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 49, "taskCode": "Task1335", "label": "Wiring Harness ", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 50, "taskCode": "Task1213", "label": "Lotto Box / Battery Isolator", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 51, "taskCode": "Task1338", "label": "Work Lamp / Head Lamp / Rear Lamp", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 52, "taskCode": "Task1262", "label": "Sensor / Switch Connectors", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "TRANSMISI (TRANSMISSION)",
+              "answers": [
+                { "number": 53, "taskCode": "Task1078", "label": "Transmission", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 54, "taskCode": "Task1077", "label": "Torque Converter", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 55, "taskCode": "Task1324", "label": "Uni'S Drive Line", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 56, "taskCode": "Task1057", "label": "Retarder", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 57, "taskCode": "Task1079", "label": "Transmission Pump", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 58, "taskCode": "Task1132", "label": "Cooler & Lines", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 59, "taskCode": "Task1339", "label": "Abnormal Noise / Vibration", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "STEERING",
+              "answers": [
+                { "number": 60, "taskCode": "Task1278", "label": "Steering Cylinder RH", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 61, "taskCode": "Task1277", "label": "Steering Cylinder LH", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 62, "taskCode": "Task1284", "label": "Steering Pump", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 63, "taskCode": "Task1195", "label": "Hyd Motor Circle ", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 64, "taskCode": "Task1129", "label": "Circle Drive Box", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 65, "taskCode": "Task1279", "label": "Steering Function Test", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "BRAKES",
+              "answers": [
+                { "number": 67, "taskCode": "Task1114", "label": "Brake RH Centre", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 68, "taskCode": "Task1111", "label": "Brake LH Centre", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 69, "taskCode": "Task1115", "label": "Brake RH Rear", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 70, "taskCode": "Task1112", "label": "Brake LH Rear", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 71, "taskCode": "Task1333", "label": "Wheel Bearing RH Front", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 72, "taskCode": "Task1331", "label": "Wheel Bearing LH Front", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 73, "taskCode": "Task1113", "label": "Brake Lines / Hose Leak", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 74, "taskCode": "Task1043", "label": "Master Cylinder", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 75, "taskCode": "Task1109", "label": "Brake Chamber", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 76, "taskCode": "Task1046", "label": "Parking Brake", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 77, "taskCode": "Task1064", "label": "Service Brake", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 78, "taskCode": "Task1116", "label": "Brake Slack Adj", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 79, "taskCode": "Task1149", "label": "Emergency Brake", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 80, "taskCode": "Task1117", "label": "Brake Valve / Accumulator", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 81, "taskCode": "Task1110", "label": "Brake Function Test", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "GARDA BELAKANG / REAR AXLE ",
+              "answers": [
+                { "number": 82, "taskCode": "Task1084", "label": "Wheel Lugs, Rims & Nuts", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 83, "taskCode": "Task1055", "label": "Rear Axle", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 84, "taskCode": "Task813", "label": "Final Drive RH", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 85, "taskCode": "Task814", "label": "Final Drive LH", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 86, "taskCode": "Task1019", "label": "Differential", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 87, "taskCode": "Task1088", "label": "Abnormal Noise / Heat ", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 88, "taskCode": "Task1340", "label": "Pin & Bushing", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "SISTEM HIDROLIK/GREASE (HYDRAULICS/GREASE SYST)",
+              "answers": [
+                { "number": 89, "taskCode": "Task1209", "label": "Lift Cylinder RH", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 90, "taskCode": "Task1208", "label": "Lift Cylinder LH", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 91, "taskCode": "Task1203", "label": "Implement Pump", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 92, "taskCode": "Task1199", "label": "Hyd Tank ", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 93, "taskCode": "Task1185", "label": "Hose Line  Hyd", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 94, "taskCode": "Task1188", "label": "Hyd Cyl Artic Rh", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 95, "taskCode": "Task1187", "label": "Hyd Cyl Artic Lh", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 96, "taskCode": "Task1190", "label": "Hyd Cyl Blade Lift Rh", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 97, "taskCode": "Task1189", "label": "Hyd Cyl Blade Lift Lh", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 98, "taskCode": "Task1191", "label": "Hyd Cyl Blade Tilt", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 99, "taskCode": "Task1192", "label": "Hyd Cyl Centreshift", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 100, "taskCode": "Task1193", "label": "Hyd Cyl Sideshift", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 101, "taskCode": "Task1181", "label": "Grease System (Auto/Man)", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "TYRES",
+              "answers": [
+                { "number": 102, "taskCode": "Task1237", "label": "Pos 1", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 103, "taskCode": "Task1241", "label": "Pos 2", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 104, "taskCode": "Task1242", "label": "Pos 3", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 105, "taskCode": "Task1243", "label": "Pos 4", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 106, "taskCode": "Task1244", "label": "Pos 5", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 107, "taskCode": "Task1245", "label": "Pos 6", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "ATTACHMENT",
+              "answers": [
+                { "number": 108, "taskCode": "Task1103", "label": "Blade", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 109, "taskCode": "Task1133", "label": "Cutting Edge", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 110, "taskCode": "Task1257", "label": "Ripper ", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 111, "taskCode": "Task1236", "label": "Point Ripper", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 112, "taskCode": "Task1263", "label": "Shank Ripper ", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "number": 113, "taskCode": "Task977", "label": "Pin & Bushing dari Keausan (Pins & Bushing Worn Out)", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "DAFTAR PART / COMPONENT HILANG (MISSING PART / COMPONENT LIST)",
+              "answers": [
+                { "taskCode": "ba26dba8-ac99-4b84-9417-14cc92639198", "label": "LIST PART / KOMPONEN YANG HILANG DAN RUSAK BESERTA KETERANGANNYA (MISSING PART / COMPONENT LIST WITH REMARK)", "value": "engine, final drive, shock breaker", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "RESUME FINAL INSPECTION",
+              "answers": [
+                { "taskCode": "86b644c3-c174-456f-b2e6-915333515080", "label": "Apakah unit dapat start / running?", "value": "Yes", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "taskCode": "04c47bb3-3139-4eda-a726-2bcdbd9aa86d", "label": "Input Comments (If \"No\")", "value": "no issue", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "taskCode": "dabbf7fe-7e41-4bbe-bc71-46fc89b35eff", "label": "Apakah unit lengkap / utuh?", "value": "Yes", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "taskCode": "3673e326-7e33-44e8-80b1-4e2cd5db22e3", "label": "Input Comments (If \"No\")", "value": "nothing", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "taskCode": "2c542e2f-22ba-4d00-b990-0be8eba1c7e3", "label": "Apakah unit beroperasi sesuai kondisi?", "value": "Yes", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "taskCode": "ba38032b-dd62-42ee-9c75-b59fb63dd24d", "label": "Input Comments (If \"No\")", "value": "yes mantap", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            },
+            {
+              "title": "Tanda Tangan Inspector",
+              "answers": [
+                {
+                  "taskCode": null,
+                  "label": "Reviewed and Signed By",
+                  "value": "data:image/png;base64,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",
+                  "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com",
+                  "photos": []
+                },
+                { "taskCode": null, "label": "Print Name", "value": "bobon setyono", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+                { "taskCode": null, "label": "Date", "value": "2026-07-07T00:00:00", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

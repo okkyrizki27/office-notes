@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>IIR Form Submission API — Integration Guide</title>
+<style>
+  @page { size: A4 portrait; margin: 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10.3pt; color: #1a1a1a; margin: 0; padding: 0 40px; line-height: 1.55; }
+
+  .cover {
+    background: linear-gradient(135deg, #1f3a5f, #2c5f8a);
+    color: #fff; padding: 46px 40px; border-radius: 12px; margin: 30px 0 26px;
+    page-break-after: always;
+  }
+  .cover-eyebrow { font-size: 11pt; opacity: 0.8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+  .cover h1 { font-size: 28pt; font-weight: 800; margin: 0 0 10px; line-height: 1.25; color: #FFF8E7; }
+  .cover .subtitle { font-size: 13pt; opacity: 0.92; margin-bottom: 30px; }
+  .cover-meta { font-size: 10pt; opacity: 0.85; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 16px; margin-top: 30px; }
+  .cover-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+  .cover-badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 9.5pt; }
+  .cover-warn { margin-top: 22px; background: rgba(214,137,16,0.25); border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; padding: 12px 16px; font-size: 9.5pt; }
+
+  h1 { font-size: 18pt; color: #1f3a5f; border-bottom: 3px solid #1f3a5f; padding-bottom: 8px; margin: 0 0 14px; page-break-before: always; }
+  h1:first-of-type { page-break-before: avoid; }
+  h2 { font-size: 13pt; color: #fff; background: #1f3a5f; padding: 8px 14px; border-radius: 4px; margin: 22px 0 12px; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; color: #1f3a5f; border-left: 4px solid #2c5f8a; padding-left: 10px; margin: 18px 0 8px; page-break-after: avoid; }
+  h4 { font-size: 10.5pt; color: #2c5f8a; margin: 14px 0 6px; page-break-after: avoid; }
+
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0 10px 0; padding-left: 22px; }
+  li { margin: 4px 0; }
+  b, strong { color: #111; }
+  code { background: #f0f2f5; color: #1a1a1a; padding: 1px 6px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9pt; }
+
+  pre { background: #1e2530; color: #e8eaed; padding: 14px 16px; border-radius: 8px; font-family: Consolas, monospace; font-size: 8.7pt; line-height: 1.5; overflow-x: auto; margin: 10px 0 16px; page-break-inside: avoid; }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .pre-label { font-size: 8pt; color: #667; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin: 12px 0 -6px; }
+
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9pt; margin: 10px 0 16px; }
+  th { background: #1f3a5f; color: #fff; padding: 7px 9px; text-align: left; font-weight: 600; word-wrap: break-word; }
+  td { padding: 6px 9px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+  tr { page-break-inside: avoid; }
+  tr:nth-child(even) td { background: #f4f7fa; }
+  td code, th code { white-space: nowrap; }
+
+  .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; }
+  .callout.warn { border-left-color: #d68910; background: #fdf3e3; }
+  .callout.decision { border-left-color: #1e8449; background: #eaf6ee; }
+  .callout-label { font-weight: 700; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 4px; }
+  .callout.warn .callout-label { color: #b9770e; }
+  .callout.decision .callout-label { color: #1e8449; }
+
+  .endpoint { display: flex; align-items: center; gap: 10px; margin: 16px 0 4px; }
+  .method { display: inline-block; background: #1e8449; color: #fff; font-weight: 800; font-size: 9.5pt; padding: 4px 12px; border-radius: 4px; letter-spacing: 0.5px; }
+  .path { font-family: Consolas, monospace; font-size: 10.5pt; color: #1f3a5f; font-weight: 700; }
+
+  .req { color: #c0392b; font-weight: 700; }
+  .opt { color: #7f8c8d; }
+
+  .badge { display:inline-block; color:#fff; padding:2px 9px; border-radius:12px; font-size:8pt; font-weight:700; }
+  .badge-draft { background:#7f8c8d; }
+
+  .toc { list-style: none; padding-left: 0; }
+  .toc li { margin: 8px 0; font-size: 10.5pt; }
+  .toc .toc-num { color: #2c5f8a; font-weight: 700; margin-right: 8px; }
+  .toc a { color: #1a1a1a; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; color: #1f3a5f; }
+
+  .footer { margin-top: 34px; font-size: 8.5pt; color: #999; text-align: center; border-top: 1px solid #ddd; padding-top: 10px; }
+
+  @media print {
+    h2, th, .cover, pre { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<div class="cover">
+  <div class="cover-eyebrow">Digiman+ — API Integration Guide</div>
+  <h1>IIR Form Submission API</h1>
+  <div class="subtitle">REST API untuk menarik data submission form Inspection (IIR) dari Digiman+ ke sistem eksternal</div>
+  <div class="cover-badges">
+    <span class="cover-badge">🔑 Autentikasi</span>
+    <span class="cover-badge">📥 Endpoints &amp; Schema</span>
+    <span class="cover-badge">⚠️ Error Handling</span>
+    <span class="cover-badge">✅ Best Practices</span>
+  </div>
+  <div class="cover-meta">
+    Disusun untuk: Tim Technical — Sistem Eksternal<br>
+    Versi Dokumen: Draft v0.1<br>
+    Tanggal: 13 Juli 2026
+  </div>
+  <div class="cover-warn">
+    <b>⚠ Status: Draft.</b> API ini belum live — dokumen ini dibagikan lebih awal supaya tim technical bisa mulai menyiapkan sisi integrasi. Detail non-fungsional (base URL final, kredensial, rate limit) akan dikonfirmasi terpisah sebelum go-live, dan skema kecil masih mungkin berubah sebelum rilis final.
+  </div>
+</div>
+
+<!-- ===================== DAFTAR ISI ===================== -->
+<h1>Daftar Isi</h1>
+<ul class="toc">
+  <li><a href="#sec-1"><span class="toc-num">1.</span> Overview</a></li>
+  <li><a href="#sec-2"><span class="toc-num">2.</span> Autentikasi</a></li>
+  <li><a href="#sec-3"><span class="toc-num">3.</span> Endpoints</a></li>
+  <li><a href="#sec-4"><span class="toc-num">4.</span> Response Data Model</a></li>
+  <li><a href="#sec-5"><span class="toc-num">5.</span> Pagination</a></li>
+  <li><a href="#sec-6"><span class="toc-num">6.</span> Filtering &amp; Panduan Polling</a></li>
+  <li><a href="#sec-7"><span class="toc-num">7.</span> Rate Limiting</a></li>
+  <li><a href="#sec-8"><span class="toc-num">8.</span> Error Handling</a></li>
+  <li><a href="#sec-9"><span class="toc-num">9.</span> Best Practices Integrasi</a></li>
+  <li><a href="#sec-10"><span class="toc-num">10.</span> Versioning &amp; Change Policy</a></li>
+</ul>
+
+<!-- ===================== 1. OVERVIEW ===================== -->
+<h1 id="sec-1">1. Overview</h1>
+
+<p>API ini menyediakan akses <b>read-only</b> ke data hasil pengisian form <b>IIR (Inspection Report)</b> di Digiman+, model aksesnya adalah <b>pull/polling</b> — sistem eksternal yang menarik data secara berkala (bukan webhook/push dari Digiman+).</p>
+
+<p>Setiap submission mencakup metadata (site, equipment, waktu submit) dan seluruh jawaban form (termasuk foto, terstruktur per tab &amp; section).</p>
+
+<h3>Base URL</h3>
+<pre><code>https://{host}/api/v1</code></pre>
+<p><span class="opt">Placeholder — domain final (staging/production) akan diinformasikan terpisah sebelum go-live.</span></p>
+
+<!-- ===================== 2. AUTENTIKASI ===================== -->
+<h1 id="sec-2">2. Autentikasi</h1>
+
+<p>Autentikasi pakai <b>Client ID + Secret Key</b>, di-exchange ke <b>Bearer token</b> lewat OAuth2 Client Credentials Grant — bukan mengirim Client ID/Secret langsung di setiap request data.</p>
+
+<h3>2.1 Exchange Token</h3>
+<div class="pre-label">Request</div>
+<pre><code>POST /oauth/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&amp;client_id={CLIENT_ID}&amp;client_secret={CLIENT_SECRET}</code></pre>
+
+<div class="pre-label">Response</div>
+<pre><code>{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}</code></pre>
+
+<h3>2.2 Pakai Token</h3>
+<p>Sertakan token di header <code>Authorization</code> pada setiap request ke endpoint data:</p>
+<pre><code>Authorization: Bearer {access_token}</code></pre>
+
+<div class="callout">
+  <div class="callout-label">Penting</div>
+  Token punya masa berlaku terbatas (<code>expires_in</code>, contoh: 1 jam). Setelah expired, lakukan exchange ulang untuk dapat token baru — <b>jangan</b> simpan/pakai ulang <code>client_secret</code> di request data.
+</div>
+
+<h3>2.3 Scope Akses</h3>
+<p>Client ID yang valid otomatis punya akses ke <b>semua site</b> — tidak ada pembatasan akses per site. Parameter <code>siteCode</code>/<code>equipmentNumber</code> pada request murni untuk menyaring hasil pencarian, bukan kontrol keamanan.</p>
+
+<!-- ===================== 3. ENDPOINTS ===================== -->
+<h1 id="sec-3">3. Endpoints</h1>
+
+<h2>3.1 List IIR Form Submissions</h2>
+<div class="endpoint"><span class="method">GET</span><span class="path">/iir-form-submissions</span></div>
+<p>Endpoint utama untuk <b>polling berkala</b> — ambil daftar submission dalam rentang tanggal tertentu, dengan pagination.</p>
+
+<h3>Query Parameters</h3>
+<table>
+<tr><th style="width:20%">Parameter</th><th style="width:12%">Tipe</th><th style="width:10%">Wajib</th><th>Keterangan</th></tr>
+<tr><td><code>dateFrom</code></td><td>string (ISO 8601)</td><td class="req">Ya</td><td>Batas awal rentang tanggal (UTC), contoh: <code>2026-07-01T00:00:00Z</code></td></tr>
+<tr><td><code>dateTo</code></td><td>string (ISO 8601)</td><td class="req">Ya</td><td>Batas akhir rentang tanggal (UTC). <b>Maksimal 7 hari</b> dari <code>dateFrom</code></td></tr>
+<tr><td><code>siteCode</code></td><td>string</td><td class="opt">Tidak</td><td>Filter berdasarkan kode site</td></tr>
+<tr><td><code>equipmentNumber</code></td><td>string</td><td class="opt">Tidak</td><td>Filter berdasarkan nomor unit/equipment</td></tr>
+<tr><td><code>page</code></td><td>integer</td><td class="opt">Tidak</td><td>Default <code>1</code></td></tr>
+<tr><td><code>pageSize</code></td><td>integer</td><td class="opt">Tidak</td><td>Default <code>20</code>, maksimal <code>100</code></td></tr>
+</table>
+
+<div class="pre-label">Contoh Request</div>
+<pre><code>GET /api/v1/iir-form-submissions?dateFrom=2026-07-01T00:00:00Z&amp;dateTo=2026-07-07T23:59:59Z&amp;siteCode=LAT&amp;page=1&amp;pageSize=20
+Authorization: Bearer {access_token}</code></pre>
+
+<div class="pre-label">Contoh Response — 200 OK</div>
+<pre><code>{
+  "dateFrom": "2026-07-01T00:00:00Z",
+  "dateTo": "2026-07-07T23:59:59Z",
+  "totalRecords": 42,
+  "page": 1,
+  "pageSize": 20,
+  "hasMore": true,
+  "submissions": [
+    {
+      "formSubmissionId": "4b604512-b409-4a19-ba79-9ac5ab68e16c",
+      "formCode": "FORM394",
+      "formVersion": 6,
+      "formName": "IIR-Grader",
+      "siteCode": "LAT",
+      "equipmentNumber": "HDCT73112",
+      "submittedBy": "2009OBH.supervisor01@protonmail.com",
+      "submittedAt": "2026-07-07T11:47:06.163933Z",
+      "syncAt": "2026-07-07T11:47:09.884210Z",
+      "tabs": [ "... lihat struktur lengkap di Response Data Model" ]
+    }
+    // ... submission lain di halaman ini
+  ]
+}</code></pre>
+
+<h3>Response Headers</h3>
+<table>
+<tr><th style="width:30%">Header</th><th>Keterangan</th></tr>
+<tr><td><code>X-RateLimit-Limit</code></td><td>Batas request per menit untuk Client ID ini</td></tr>
+<tr><td><code>X-RateLimit-Remaining</code></td><td>Sisa kuota request pada window berjalan</td></tr>
+<tr><td><code>X-RateLimit-Reset</code></td><td>Unix timestamp kapan window rate limit reset</td></tr>
+</table>
+
+<h2>3.2 Get Submission by ID</h2>
+<div class="endpoint"><span class="method">GET</span><span class="path">/iir-form-submissions/{formSubmissionId}</span></div>
+<p>Ambil <b>1 submission spesifik</b> secara lengkap. Peruntukannya beda dari endpoint list — dipakai untuk re-fetch detail setelah dapat <code>formSubmissionId</code> dari hasil list (mis. retry granular kalau 1 submission gagal diproses di sisi sistem eksternal), atau lookup manual — <b>bukan</b> untuk polling berkala.</p>
+
+<h3>Path Parameter</h3>
+<table>
+<tr><th style="width:25%">Parameter</th><th>Keterangan</th></tr>
+<tr><td><code>formSubmissionId</code></td><td>GUID submission, didapat dari hasil endpoint list (3.1)</td></tr>
+</table>
+
+<div class="pre-label">Contoh Request</div>
+<pre><code>GET /api/v1/iir-form-submissions/4b604512-b409-4a19-ba79-9ac5ab68e16c
+Authorization: Bearer {access_token}</code></pre>
+
+<div class="pre-label">Contoh Response — 200 OK</div>
+<pre><code>{
+  "formSubmissionId": "4b604512-b409-4a19-ba79-9ac5ab68e16c",
+  "formCode": "FORM394",
+  "formVersion": 6,
+  "formName": "IIR-Grader",
+  "siteCode": "LAT",
+  "equipmentNumber": "HDCT73112",
+  "submittedBy": "2009OBH.supervisor01@protonmail.com",
+  "submittedAt": "2026-07-07T11:47:06.163933Z",
+  "syncAt": "2026-07-07T11:47:09.884210Z",
+  "tabs": [ "... lihat struktur lengkap di Response Data Model" ]
+}</code></pre>
+<p><span class="opt">Catatan: response endpoint ini adalah 1 objek submission langsung (bukan dibungkus envelope <code>submissions[]</code> seperti endpoint list).</span></p>
+
+<!-- ===================== 4. RESPONSE DATA MODEL ===================== -->
+<h1 id="sec-4">4. Response Data Model</h1>
+
+<p>Struktur lengkap response (baik dari endpoint list maupun single-fetch):</p>
+
+<pre><code>{
+  dateFrom, dateTo,              // hanya di endpoint list — echo balik parameter request
+  totalRecords, page, pageSize, hasMore,   // hanya di endpoint list
+  submissions: [                 // hanya di endpoint list — endpoint single-fetch return submission langsung
+    {
+      formSubmissionId, formCode, formVersion, formName,
+      siteCode, equipmentNumber,
+      submittedBy, submittedAt, syncAt,
+      tabs: [
+        {
+          title,
+          sections: [
+            {
+              title,
+              answers: [
+                { taskCode?, label, value, lastUpdatedBy, photos: [{ url }], number?, remark? }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}</code></pre>
+
+<h3>4.1 Envelope (Endpoint List)</h3>
+<table>
+<tr><th style="width:22%">Field</th><th style="width:14%">Tipe</th><th>Keterangan</th></tr>
+<tr><td><code>dateFrom</code> / <code>dateTo</code></td><td>string</td><td>Echo balik parameter request</td></tr>
+<tr><td><code>totalRecords</code></td><td>integer</td><td>Total submission yang match filter (lintas semua halaman)</td></tr>
+<tr><td><code>page</code> / <code>pageSize</code></td><td>integer</td><td>Echo balik parameter pagination</td></tr>
+<tr><td><code>hasMore</code></td><td>boolean</td><td><code>true</code> kalau masih ada halaman berikutnya</td></tr>
+<tr><td><code>submissions</code></td><td>array</td><td>Daftar objek submission — lihat 4.2</td></tr>
+</table>
+
+<h3>4.2 Objek Submission</h3>
+<table>
+<tr><th style="width:20%">Field</th><th style="width:12%">Tipe</th><th style="width:10%">Nullable</th><th>Keterangan</th></tr>
+<tr><td><code>formSubmissionId</code></td><td>string (GUID)</td><td>Tidak</td><td>ID unik submission</td></tr>
+<tr><td><code>formCode</code></td><td>string</td><td>Tidak</td><td>Kode form, contoh: <code>FORM394</code></td></tr>
+<tr><td><code>formVersion</code></td><td>integer</td><td>Tidak</td><td>Versi template form yang dipakai saat submission dibuat</td></tr>
+<tr><td><code>formName</code></td><td>string</td><td>Tidak</td><td>Nama form, contoh: <code>IIR-Grader</code></td></tr>
+<tr><td><code>siteCode</code></td><td>string</td><td>Tidak</td><td>Kode site tempat equipment berada</td></tr>
+<tr><td><code>equipmentNumber</code></td><td>string</td><td>Tidak</td><td>Nomor unit/equipment</td></tr>
+<tr><td><code>submittedBy</code></td><td>string</td><td>Tidak</td><td>Email inspector yang submit</td></tr>
+<tr><td><code>submittedAt</code></td><td>string (ISO 8601)</td><td>Tidak</td><td>Waktu form diselesaikan di device — lihat catatan di [Filtering &amp; Panduan Polling](#sec-6)</td></tr>
+<tr><td><code>syncAt</code></td><td>string (ISO 8601)</td><td>Tidak</td><td>Waktu data tersedia di server — <b>ini yang dipakai untuk filter <code>dateFrom</code>/<code>dateTo</code></b></td></tr>
+<tr><td><code>tabs</code></td><td>array</td><td>Tidak</td><td>Daftar tab form (umumnya "General" dan "Inspection") — lihat 4.3</td></tr>
+</table>
+
+<h3>4.3 Objek Tab &amp; Section</h3>
+<table>
+<tr><th style="width:20%">Field</th><th style="width:12%">Tipe</th><th style="width:10%">Nullable</th><th>Keterangan</th></tr>
+<tr><td><code>tabs[].title</code></td><td>string</td><td>Tidak</td><td>Nama tab, contoh: <code>"General"</code>, <code>"Inspection"</code></td></tr>
+<tr><td><code>tabs[].sections</code></td><td>array</td><td>Tidak</td><td>Daftar section dalam tab tersebut</td></tr>
+<tr><td><code>sections[].title</code></td><td>string</td><td><b>Ya</b></td><td>Nama section. <code>null</code> kalau section tidak berjudul</td></tr>
+<tr><td><code>sections[].answers</code></td><td>array</td><td>Tidak</td><td>Daftar jawaban dalam section — lihat 4.4</td></tr>
+</table>
+
+<h3>4.4 Objek Answer</h3>
+<table>
+<tr><th style="width:20%">Field</th><th style="width:12%">Tipe</th><th style="width:10%">Nullable</th><th>Keterangan</th></tr>
+<tr><td><code>number</code></td><td>integer</td><td><b>Ya</b></td><td>Nomor urut task. Hanya ada di tab "Inspection"; <code>null</code>/tidak ada di tab "General"</td></tr>
+<tr><td><code>taskCode</code></td><td>string</td><td><b>Ya</b></td><td>Business code task, contoh: <code>"Task1252"</code>. Hanya ada di tab "Inspection"; tidak ada di tab "General"</td></tr>
+<tr><td><code>label</code></td><td>string</td><td>Tidak</td><td>Deskripsi/pertanyaan task</td></tr>
+<tr><td><code>value</code></td><td>string</td><td><b>Ya</b></td><td>Isi jawaban. Bentuknya bervariasi tergantung tipe pertanyaan — lihat catatan di bawah</td></tr>
+<tr><td><code>remark</code></td><td>string</td><td class="opt">—</td><td>Catatan tambahan dari inspector (biasanya string kosong kalau tidak diisi)</td></tr>
+<tr><td><code>lastUpdatedBy</code></td><td>string</td><td>Tidak</td><td>Email user yang terakhir mengisi/mengubah jawaban ini</td></tr>
+<tr><td><code>photos</code></td><td>array</td><td>Tidak</td><td>Daftar foto terlampir — selalu array (bisa kosong <code>[]</code>). Lihat 4.5</td></tr>
+</table>
+
+<div class="callout">
+  <div class="callout-label">Catatan bentuk <code>value</code></div>
+  <ul>
+    <li><b>Jawaban teks/pilihan biasa</b> (mis. hasil pemeriksaan "Ok"/"Not Ok", teks bebas) → string biasa</li>
+    <li><b>Jawaban foto tunggal</b> (satu foto per pertanyaan) → <code>value</code> berisi identifier internal foto tersebut (bisa diabaikan — pakai <code>photos[].url</code> untuk link foto aktualnya)</li>
+    <li><b>Jawaban multi-foto</b> (beberapa foto per pertanyaan) → <code>value</code> = <code>null</code>, semua foto ada di <code>photos[]</code></li>
+    <li><b>Jawaban tanda tangan</b> → <code>value</code> berisi gambar dalam format <code>data:image/png;base64,...</code> langsung (bukan URL) — bisa langsung dipakai sebagai <code>src</code> elemen <code>&lt;img&gt;</code></li>
+  </ul>
+</div>
+
+<h3>4.5 Objek Photo</h3>
+<table>
+<tr><th style="width:20%">Field</th><th style="width:12%">Tipe</th><th style="width:10%">Nullable</th><th>Keterangan</th></tr>
+<tr><td><code>label</code></td><td>string</td><td class="opt">—</td><td>Label foto (mis. "Foto Tampak Depan"). Tidak selalu ada, tergantung tipe elemen</td></tr>
+<tr><td><code>url</code></td><td>string</td><td><b>Ya</b></td><td>URL blob foto yang bisa diakses langsung. <code>null</code> kalau foto gagal di-resolve di sisi server — lihat catatan di bawah</td></tr>
+</table>
+
+<div class="callout warn">
+  <div class="callout-label">Wajib di-handle</div>
+  Kalau <code>photos[].url</code> bernilai <code>null</code>, artinya foto tersebut ada tapi gagal di-resolve saat request diproses. Jangan asumsikan selalu berisi URL valid — tampilkan placeholder/skip, jangan sampai integrasi gagal total karena satu foto <code>null</code>.
+</div>
+
+<h3>4.6 Contoh Lengkap</h3>
+<div class="pre-label">Tab "General" — 2 answer, salah satunya multi-foto (PHOTOLIST)</div>
+<pre><code>{
+  "title": "General",
+  "sections": [
+    {
+      "title": "Personnel Information",
+      "answers": [
+        { "label": "Inspector Name", "value": "2009OBH.supervisor01", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+      ]
+    },
+    {
+      "title": null,
+      "answers": [
+        {
+          "label": "Foto Kondisi Fisik Equipment",
+          "value": null,
+          "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com",
+          "photos": [
+            { "label": "Foto Tampak Depan", "url": "https://.../blob/abc123.jpg" },
+            { "label": "Foto Tampak Samping Kanan", "url": "https://.../blob/def456.jpg" }
+          ]
+        }
+      ]
+    }
+  ]
+}</code></pre>
+
+<div class="pre-label">Tab "Inspection" — task row bernomor, salah satunya ada foto lampiran</div>
+<pre><code>{
+  "title": "Inspection",
+  "sections": [
+    {
+      "title": "PENAMPILAN UMUM (GENERAL APPEARANCE)",
+      "answers": [
+        { "number": 1, "taskCode": "Task1252", "label": "Radiator Grill / Front Grill", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+        { "number": 4, "taskCode": "Task1100", "label": "Battery Box / Cover", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
+        { "number": 6, "taskCode": "Task1014", "label": "Cat Walk", "value": "Ok", "remark": "Ada beberapa", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com",
+          "photos": [
+            { "url": "https://.../blob/1ccac17f.jpg" },
+            { "url": "https://.../blob/8ffc591c.jpg" }
+          ]
+        }
+      ]
+    }
+  ]
+}</code></pre>
+
+<!-- ===================== 5. PAGINATION ===================== -->
+<h1 id="sec-5">5. Pagination</h1>
+
+<p>Endpoint list (3.1) selalu dipaginasi. Default <code>pageSize</code> adalah <b>20</b>, maksimal <b>100</b>.</p>
+
+<p>Loop paginasi standar:</p>
+<pre><code>page = 1
+loop:
+  response = GET /iir-form-submissions?dateFrom=...&dateTo=...&page={page}&pageSize=100
+  process(response.submissions)
+  if response.hasMore == false:
+    break
+  page += 1</code></pre>
+
+<p><code>totalRecords</code> merepresentasikan total submission yang match filter di <b>semua halaman</b>, bukan cuma halaman berjalan.</p>
+
+<!-- ===================== 6. FILTERING & POLLING ===================== -->
+<h1 id="sec-6">6. Filtering &amp; Panduan Polling</h1>
+
+<h3>6.1 Rentang Tanggal — Maksimal 7 Hari</h3>
+<p><code>dateFrom</code>/<code>dateTo</code> wajib diisi, dan jarak antara keduanya <b>maksimal 7 hari</b>. Kalau butuh rentang lebih panjang, pecah jadi beberapa request berurutan.</p>
+
+<h3>6.2 <code>submittedAt</code> vs <code>syncAt</code> — Kenapa Bisa Beda</h3>
+<p>Digiman+ mendukung pengisian form <b>secara offline</b> di lapangan. Karena itu ada 2 timestamp dengan makna berbeda:</p>
+<ul>
+  <li><code>submittedAt</code> — waktu inspector menyelesaikan form <b>di device</b>. Bisa terjadi saat device offline.</li>
+  <li><code>syncAt</code> — waktu data tersebut <b>benar-benar tersedia di server</b> (setelah device online dan sync). Bisa lebih lambat dari <code>submittedAt</code> — kadang beda beberapa menit, kadang beda beberapa hari kalau device lama offline.</li>
+</ul>
+
+<div class="callout decision">
+  <div class="callout-label">Implikasi Penting</div>
+  Filter <code>dateFrom</code>/<code>dateTo</code> pada endpoint list <b>berdasarkan <code>syncAt</code>, bukan <code>submittedAt</code></b>. Jadi wajar kalau suatu submission dengan <code>submittedAt</code> beberapa hari yang lalu baru muncul di hasil polling hari ini — itu karena device-nya baru online dan sync hari ini. Desain ini memastikan sistem eksternal <b>tidak pernah kehilangan data</b> akibat keterlambatan sync, asalkan window polling mencakup waktu <code>syncAt</code>-nya.
+</div>
+
+<p><b>Rekomendasi polling:</b> jalankan polling secara berurutan tanpa celah (mis. window kemarin berakhir jam 23:59:59, window hari ini mulai jam 00:00:00) — cukup andalkan <code>syncAt</code>, tidak perlu overlap manual di sisi sistem eksternal.</p>
+
+<h3>6.3 Filter Site &amp; Equipment</h3>
+<p><code>siteCode</code> dan <code>equipmentNumber</code> bersifat opsional dan bisa dikombinasikan dengan filter tanggal. Kedua field ini juga selalu muncul di response (lihat 4.2) sehingga caller bisa mengelompokkan hasil per site/equipment tanpa perlu filter di request.</p>
+
+<!-- ===================== 7. RATE LIMITING ===================== -->
+<h1 id="sec-7">7. Rate Limiting</h1>
+
+<p>Rate limit berlaku <b>per Client ID</b> (bukan per IP):</p>
+
+<table>
+<tr><th style="width:30%">Window</th><th>Limit</th></tr>
+<tr><td>Per menit</td><td>30 request</td></tr>
+<tr><td>Per hari</td><td>2.500 request</td></tr>
+</table>
+
+<p>Limit ini cukup longgar untuk pola polling berkala maupun paginasi banyak halaman — kira-kira 1 request tiap 2 detik.</p>
+
+<h3>Saat Limit Terlampaui</h3>
+<pre><code>HTTP/1.1 429 Too Many Requests
+Retry-After: 12
+
+{
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Rate limit exceeded, retry after 12 seconds",
+    "details": null
+  }
+}</code></pre>
+
+<p>Gunakan header <code>Retry-After</code> (dalam detik) untuk menentukan kapan retry, dan monitor header <code>X-RateLimit-Remaining</code> di setiap response supaya bisa self-throttle sebelum kena limit.</p>
+
+<!-- ===================== 8. ERROR HANDLING ===================== -->
+<h1 id="sec-8">8. Error Handling</h1>
+
+<p>Semua error mengikuti format envelope yang sama:</p>
+
+<pre><code>{
+  "error": {
+    "code": "DATE_RANGE_TOO_LARGE",
+    "message": "Date range exceeds maximum of 7 days",
+    "details": null
+  }
+}</code></pre>
+
+<p><code>code</code> adalah string machine-readable — gunakan ini untuk branching logic, jangan parsing <code>message</code> (yang human-readable dan bisa berubah). <code>details</code> nullable, dipakai untuk kasus validasi dengan lebih dari satu field bermasalah (array of <code>{field, reason}</code>).</p>
+
+<table>
+<tr><th style="width:14%">HTTP Status</th><th style="width:28%"><code>code</code></th><th>Kapan Terjadi</th></tr>
+<tr><td>400</td><td><code>INVALID_REQUEST</code></td><td>Parameter malformed (mis. format tanggal salah)</td></tr>
+<tr><td>400</td><td><code>DATE_RANGE_TOO_LARGE</code></td><td><code>dateTo - dateFrom</code> lebih dari 7 hari</td></tr>
+<tr><td>400</td><td><code>INVALID_PAGE_SIZE</code></td><td><code>pageSize</code> lebih dari 100</td></tr>
+<tr><td>401</td><td><code>UNAUTHORIZED</code></td><td>Token tidak ada / invalid / expired</td></tr>
+<tr><td>403</td><td><code>FORBIDDEN</code></td><td>Client valid tapi tidak punya akses ke resource yang diminta</td></tr>
+<tr><td>404</td><td><code>NOT_FOUND</code></td><td>(single-fetch) <code>formSubmissionId</code> tidak ditemukan</td></tr>
+<tr><td>429</td><td><code>RATE_LIMITED</code></td><td>Lihat [Rate Limiting](#sec-7)</td></tr>
+<tr><td>500</td><td><code>INTERNAL_ERROR</code></td><td>Unexpected server error</td></tr>
+</table>
+
+<!-- ===================== 9. BEST PRACTICES ===================== -->
+<h1 id="sec-9">9. Best Practices Integrasi</h1>
+
+<ul>
+  <li><b>Selalu loop sampai <code>hasMore: false</code></b> — jangan asumsikan semua data selalu muat di 1 halaman.</li>
+  <li><b>Handle <code>photos[].url: null</code> dengan graceful</b> — jangan sampai 1 foto gagal resolve membuat seluruh proses integrasi gagal.</li>
+  <li><b>Simpan <code>formSubmissionId</code> + <code>syncAt</code> sebagai watermark</b> untuk tracking data yang sudah diproses, memudahkan dedup kalau ada request yang di-retry.</li>
+  <li><b>GET bersifat idempotent</b> — aman untuk retry otomatis kalau request gagal karena masalah jaringan (bukan karena error 4xx).</li>
+  <li><b>Terapkan exponential backoff</b> saat menerima <code>429</code>, hormati header <code>Retry-After</code>.</li>
+  <li><b>Gunakan endpoint single-fetch (3.2) untuk retry granular</b> — kalau 1 submission gagal diproses dari hasil polling, tidak perlu re-poll seluruh rentang tanggal, cukup fetch ulang submission tersebut by ID.</li>
+</ul>
+
+<!-- ===================== 10. VERSIONING ===================== -->
+<h1 id="sec-10">10. Versioning &amp; Change Policy</h1>
+
+<p>Versi API ada di URL path (<code>/api/v1/...</code>). Kebijakan perubahan:</p>
+
+<ul>
+  <li><b>Breaking change</b> (hapus/rename field, ubah tipe data, ubah semantik filter) → rilis versi baru (<code>/v2</code>), versi lama tetap berjalan selama masa transisi</li>
+  <li><b>Non-breaking change</b> (tambah field baru yang opsional, tambah endpoint baru) → tidak mengubah versi, aman untuk konsumen existing</li>
+  <li><b>Masa transisi/deprecation</b> — versi lama tidak langsung dimatikan; notifikasi dan window waktu akan diberikan sebelum versi lama disunset</li>
+</ul>
+
+<div class="callout warn">
+  <div class="callout-label">Draft v0.1</div>
+  Dokumen ini adalah draft awal untuk persiapan integrasi. Base URL final, kredensial akses, dan konfirmasi jadwal go-live akan dikomunikasikan terpisah. Kalau ada pertanyaan atau kebutuhan spesifik dari sisi integrasi kalian, silakan sampaikan sebelum development dimulai.
+</div>
+
+<div class="footer">
+  IIR Form Submission API — Integration Guide · Draft v0.1 · 13 Juli 2026 · Digiman+
+</div>
+
+</body>
+</html>
