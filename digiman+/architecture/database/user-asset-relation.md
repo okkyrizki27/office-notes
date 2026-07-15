@@ -10,6 +10,8 @@ Dokumen ini menjelaskan relasi antar entitas lintas database yang menentukan bag
 | `user` | cst-shared-sqldb-user | Data user, employment profile |
 | `asset` | cst-iams-sqldb-services-asset | Data asset/equipment, model, component |
 
+> ⚠️ Skema real `usermanagement.sql` ([`user-management-schema.md`](user-management-schema.md)) — auth/access-control (login, device, grup, permission, role) — **tidak punya tabel `UserEmploymentProfile`**. Kemungkinan `usermanagement` adalah DB terpisah dari `cst-shared-sqldb-user` di atas, bukan alias yang sama. Relasi User→OrganizationUnit di bawah ini (via `UserEmploymentProfile`) belum terverifikasi terhadap skema real manapun — perlu diklarifikasi ke tim codebase.
+
 > Notasi: `db.table.column` — contoh: `asset.Asset.AssetModelCode` berarti DB asset, tabel Asset, kolom AssetModelCode.
 
 ---

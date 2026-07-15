@@ -378,6 +378,7 @@ CreatedBy, ModifiedBy   varchar(200), null
 CreatedAt, ModifiedAt   datetime, null
 ```
 *(PK constraint `PK_TempFeature`.)*
+> **Cross-reference (belum dikonfirmasi)**: `PermissionCode` kemungkinan merujuk ke `usermanagement.UserPermission.PermissionCode` (lihat [`user-management-schema.md`](user-management-schema.md)), yang bersifat hierarkis lewat `ParentPermissionCode`. Relasi lintas-DB ini belum pernah didokumentasikan sebelumnya.
 
 ### `WOGenerationConfig`
 ```
