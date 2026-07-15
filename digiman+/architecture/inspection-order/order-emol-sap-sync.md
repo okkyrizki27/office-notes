@@ -6,7 +6,7 @@
 
 **Feature:** Inspection & Order (Digiman+)
 **Services terlibat:** `maintenance-execution` (Inspection, PM Shutdown, BD Corrective), `maintenance-order` (Order/eMOL, SAP sync middleware)
-**Related doc:** [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md), [../dplan/digital-planning.md](../dplan/digital-planning.md), [../pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md](../pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md), [../database/sap-material-integration.md](../database/sap-material-integration.md) *(arah integrasi sebaliknya — SAP → Digiman+ material master, bukan flow ini)*
+**Related doc:** [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md), [maintenance-activity-type-enhancement.md](maintenance-activity-type-enhancement.md) *(enhancement yang men-supersede Bagian 4.2 di bawah — lihat catatan di bagian tsb)*, [../dplan/digital-planning.md](../dplan/digital-planning.md), [../pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md](../pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md), [../database/sap-material-integration.md](../database/sap-material-integration.md) *(arah integrasi sebaliknya — SAP → Digiman+ material master, bukan flow ini)*
 
 ---
 
@@ -92,6 +92,31 @@ IsActive
 CreatedBy, CreatedAt
 ModifiedBy, ModifiedAt
 ```
+> ✅ Struktur di atas **dikonfirmasi cocok dengan skema real** (screenshot table structure, 15 Jul 2026) — beda dari 3.1 (`MechanicOrderSummary`) yang masih document-derived, belum di-screenshot-verify.
+
+### 3.3 `maintenance-order.MechanicOrderDetail` (detail defect per eMOL — struktur real, dikonfirmasi 15 Jul 2026)
+
+Direferensikan lewat `LEFT JOIN MechanicOrderDetail mod ON mol.Id = mod.MechanicOrderListId` di query build `PoolingMOItem` (Bagian 5.2), tapi belum pernah didokumentasikan skemanya sampai sekarang.
+
+```
+Id                       ← PK, bigint
+MechanicOrderListId       ← FK ke MechanicOrderList (nullable di skema real — longgar, bukan strict NOT NULL)
+ComponentCode
+SubComponentCode
+OtherSubComponentName     ← "Other, please specify" kalau SubComponent tidak ada di dropdown
+DamageCode
+CauseCode
+RatingCode                 ← ikut ter-copy dari sumbernya (lihat catatan di bawah), tidak berarti aktif dipakai di UI Order
+ActionRemedyCode
+PriorityCode
+DefectNotes
+RepairDuration             ← float — field "How Long Will This Defect Repair Take?" (Duration)
+RepairInstruction          ← ikut ter-copy dari sumbernya (lihat catatan di bawah), tidak berarti aktif dipakai di UI Order
+IsActive
+CreatedAt, CreatedBy
+ModifiedAt, ModifiedBy
+```
+> **Konfirmasi pasti (15 Jul 2026)**: tabel ini adalah snapshot-copy dari `maintenance-execution.TaskPersonalizedFinding` ("Finding") saat eMOL dibuat — dikonfirmasi lewat perbandingan skema real, kolomnya **hampir identik**: `ComponentCode`/`SubComponentCode`/`OtherSubComponentName`/`DamageCode`/`CauseCode`/`RatingCode`/`ActionRemedyCode`/`PriorityCode`/`DefectNotes`/`RepairDuration`/`RepairInstruction` sama persis di kedua tabel (lihat [maintenance-activity-type-enhancement.md](maintenance-activity-type-enhancement.md) 2.9 untuk skema `TaskPersonalizedFinding` lengkap). Bukan live-query ke Finding tiap dibutuhkan — meski `insert list` query 5.2 sendiri menunjukkan sebagian value datang lewat `VALUES` clause dari BE saat proses copy itu terjadi (lihat catatan di 5.2). Field `IsImmediateExecutable`/`DeleteNotes` ada di `TaskPersonalizedFinding` tapi **tidak** ikut ter-copy ke sini.
 
 ---
 
@@ -102,6 +127,9 @@ ModifiedBy, ModifiedAt
 - Karena disimpan di `MechanicOrderList` (level eMOL/finding, bukan di `MechanicOrderSummary`/header), **tiap eMOL di bawah Order/Inspection yang sama bisa punya Order Type berbeda-beda** satu sama lain — tidak seragam di level header.
 
 ### 4.2 `PMActType` (Activity Type)
+
+> ⚠️ **Bagian ini mendokumentasikan kondisi SAAT INI (sebelum enhancement).** Sourcing `PMActType` yang campuran per tipe eMOL di bawah ini teridentifikasi sebagai **konflasi dua konsep bisnis berbeda** (jenis pekerjaan eksekusi vs klasifikasi order berdasarkan severity finding) — sedang di-redesign, lihat [maintenance-activity-type-enhancement.md](maintenance-activity-type-enhancement.md) untuk model baru (generic naming "Maintenance Activity Type", seragam per-eMOL untuk kedua tipe, wajib isi manual tanpa default).
+
 Sourcing-nya **berbeda tergantung tipe eMOL**:
 
 | Tipe eMOL | Sumber `PMActType` |
@@ -390,7 +418,6 @@ MO Backlog bisa dieksekusi lewat **3 jalur**:
 ## 10. Open Items / Belum Jelas
 
 - **Asal kolom `PoolingMOItem.NotifId`** — dipakai di insert `SAPMOSyncOrder.ParentNotifId` (5.4), tapi tidak terlihat di list kolom insert `PoolingMOItem` (5.2). Belum dikonfirmasi apakah ada default/trigger, atau kolom lain yang belum ter-cover di dokumentasi step 5.2.
-- **Fungsi `MechanicOrderEvidence` di query 5.5** — di-LEFT JOIN tapi tidak muncul di kolom SELECT manapun. Query kemungkinan terpotong saat di-share; belum diasumsikan fungsinya.
 - **Gate konsistensi Material (5.5) tanpa notifikasi error** — baris dengan Material setengah-isi (`MaterialNumber` tanpa `MaterialQuantity` atau sebaliknya) diam-diam tidak pernah ter-sync ke SAP. Perlu dikonfirmasi ke tim technical apakah ada validasi FE/BE lain yang mencegah state ini terjadi di awal (saat submit eMOL), atau ini gap yang perlu ditindaklanjuti.
 - **`DamageGroup`/`DamageCode` untuk Additional Order** — contoh payload (6.1) menunjukkan field ini terisi meski tanpa finding (`TaskPersonalizedFindingId: null`). Sudah dikonfirmasi (lihat [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) 2.3) bahwa Additional Order akan punya input manual untuk Component/Sub Component/Area/Duration/Man Power juga — konsisten dengan observasi ini.
 - **Gap: `Component`/`Sub Component` belum dikirim ke SAP** — kedua field ini sudah ikut tersimpan di `PoolingMOItem` (5.2) dan payload (6.1), tapi **belum ada mapping-nya ke BAPI** (`GI_HEADER`/`GI_OPER`/`GI_COMP`, Bagian 6.2) — sehingga saat ini tidak benar-benar terkirim ke SAP saat create Order. `Area`, `Duration`, `Man Power` juga belum ada sama sekali di `PoolingMOItem`/payload/mapping BAPI. Ini persis scope assessment integrasi SAP (PIC Faiza) di [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) 2.5 — tujuannya supaya kelima field ini (Component, Sub Component, Area, Duration, Man Power — versi **plan**, bukan actual) terkirim ke SAP saat create Order, sehingga saat MO kembali sebagai MO Backlog (Bagian 9), field-field itu bisa auto-fill di Digiplan saat user memilih MO Backlog.
@@ -398,11 +425,18 @@ MO Backlog bisa dieksekusi lewat **3 jalur**:
 - **Struktur data TECO (9.3)** — payload/mapping BAPI untuk kirim TECO ke SAP belum didokumentasikan (baru diketahui bahwa proses ini terjadi setelah eksekusi MO Backlog selesai).
 - **Teknis "tambah MO Backlog ke sub-task Digiplan" (9.2)** — mekanisme detail bagaimana MO Backlog menjadi baris/task di `DPTask` belum dibahas.
 - **Verifikasi mekanisme sync status cancel MO (9.4)** — perlu dicek ke codebase/engineer `maintenance-order`/`dplan` apakah benar ada mekanisme yang menghapus/update MO Backlog di Digiman+ saat MO terkait di-cancel di SAP. Disebutkan tapi belum solid dikonfirmasi.
+- **Redesign sourcing `PMActType`/Activity Type (4.2)** — sudah ada rencana enhancement, lihat [maintenance-activity-type-enhancement.md](maintenance-activity-type-enhancement.md): generic naming ("Maintenance Activity Type"), seragam per-eMOL (bukan campuran WO-derived/header-level), opsi dependent terhadap Order Type lewat mapping M:N baru. Belum divalidasi ke tim technical.
+- **`PoolingMOItem` skema real (15 Jul 2026) ternyata sudah punya `HourMeter`, `InspectorCode`, `InspectorName`** — field ini tidak disebut di query 5.2 yang didokumentasikan di atas, berarti dokumentasi query 5.2 di bagian ini tidak lengkap/terpotong. Belum dikonfirmasi cara populate-nya hari ini. Lihat [maintenance-order-schema.md](../database/maintenance-order-schema.md) dan [maintenance-activity-type-enhancement.md](maintenance-activity-type-enhancement.md) 2.9.
+- **`SAPMOSyncOrder` skema real jauh lebih kaya dari yang didokumentasikan di 5.4** — ada field `PlanDuration`, `Cost`, `Downtime`, `HM`, `Warranty`, `NextPSDate`, `ObjectPart`/`ObjectPartDesc`, `InspectionType`, `ModelUnit`, `UnitCode`, `NotifNo`/`NotifType` yang tidak disebut di dokumentasi query 5.4. **Diklarifikasi (15 Jul 2026)**: row-nya tetap dibuat lebih dulu sebagai placeholder (sesuai 5.4), tapi kolom-kolom ini ikut **di-update belakangan** setelah integrasi ke SAP selesai — sama pola dengan `MONo`/`SAPStatus`/`SAPText`/`AttachmentUrl`/`IsDigimanProcessed` yang sudah terdokumentasi, cuma jumlah kolomnya lebih banyak dari yang disebut di 5.4. Karena update-nya terjadi setelah BAPI call, bukan bagian proses build payload sebelum-nya, jadi terpisah dari flow `PoolingMOItem`/5.2 yang sudah didokumentasikan. Lihat [maintenance-order-schema.md](../database/maintenance-order-schema.md).
+- ~~`MOOpen`/`StageMOOpen`~~ — **dikonfirmasi (15 Jul 2026)**: sumber data MO Backlog (Bagian 9) dari SAP.
 
 ---
 
 ## 11. Referensi
 - [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md)
+- [maintenance-activity-type-enhancement.md](maintenance-activity-type-enhancement.md) — redesign sourcing PM Activity Type, superseded Bagian 4.2
+- [../database/maintenance-execution-schema.md](../database/maintenance-execution-schema.md) — DDL real lengkap `maintenance-execution`
+- [../database/maintenance-order-schema.md](../database/maintenance-order-schema.md) — DDL real lengkap `maintenance-order`
 - [../dplan/digital-planning.md](../dplan/digital-planning.md) — mekanisme Digiplan, "Add Backlog dari SAP" (current state)
 - [../pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md](../pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md) — eksekusi task (termasuk MO Backlog) di PM Shutdown/BD Corrective
 - [../database/sap-material-integration.md](../database/sap-material-integration.md) — arah integrasi SAP → Digiman+ (material master), kebalikan dari flow ini

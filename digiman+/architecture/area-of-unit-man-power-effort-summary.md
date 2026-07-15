@@ -15,6 +15,8 @@ Dokumen ini merangkum total estimasi effort dari inisiatif **Area of Unit & Man 
 | [pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md](pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md) | PM Shutdown, BD Corrective | Visibility Duration/Man Power/Man Hours di card task, assignment mechanic |
 | [inspection-order/order-emol-sap-sync.md](inspection-order/order-emol-sap-sync.md) | `maintenance-order`, SAP middleware | Referensi teknis (bukan dokumen enhancement) — schema & flow existing yang jadi dasar assessment SAP |
 
+> **Belum termasuk di rekap ini**: [inspection-order/maintenance-activity-type-enhancement.md](inspection-order/maintenance-activity-type-enhancement.md) — enhancement terpisah (redesign sourcing PM/Maintenance Activity Type), menyentuh layar sama persis dengan `area-of-unit-man-power-enhancement.md` (Additional Order screen 1 & 2). Belum ada estimasi SP/mandays untuk enhancement ini.
+
 ---
 
 ## Metodologi Estimasi SP & Mandays (Tim BUMA ID)
