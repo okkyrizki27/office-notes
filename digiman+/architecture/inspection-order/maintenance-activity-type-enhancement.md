@@ -332,21 +332,19 @@ Developer men-share daftar endpoint `Services.iAMS.MaintenanceOrder` yang handle
 | Endpoint | Call | Temuan |
 |---|---|---|
 | `GET /api/mol/{molId}/order-detail` | `GetTaskPersonalizedFindingByListId` | **Dikonfirmasi**: data finding yang diambil live call ini **sudah ada** di `MechanicOrderDetail` (snapshot-copy dari `TaskPersonalizedFinding`, lihat 2.9). Live call ini redundan. **Rekomendasi**: endpoint baca langsung dari `MechanicOrderDetail`, hapus dependency ke `MaintenanceExecAPI.GetTaskPersonalizedFindingByListId` di handler ini — mengurangi 1 cross-service call yang tidak perlu. |
+| `.../offline/dropdown/assetnumber`, `.../offline/dropdown/assetmodel` | `GetWorkOrderAsync` | **Dikonfirmasi (15 Jul 2026)**: `AssetNumber`/`AssetModelCode`/`AssetModelName` **sudah ada** di `MechanicOrderSummary` (copy dari `WorkOrder` saat Order dibuat — existing behavior, lihat 2.10). Live call ke `GetWorkOrderAsync` redundan. **Rekomendasi**: endpoint baca dari `MechanicOrderSummary`, bukan live call. |
+
+**`IsImmediateExecutable`/`DeleteNotes` — dikonfirmasi (15 Jul 2026), bukan gap** (relevan untuk rekomendasi `order-detail` di atas):
+- **`IsImmediateExecutable = True` → finding tidak perlu di-copy ke Order sama sekali.** Ini bukan cuma soal 2 kolom yang tidak ikut ter-copy — kalau finding-nya immediately-executable, **tidak ada eMOL/Order yang dibuat untuk finding tsb**. Konsisten dengan business rule report [`inspection-result.md`](../../report/transaction-report/inspection-result.md) (`isimmediateexecutable=1` = defect sudah diperbaiki langsung saat inspeksi, quick fix). Lihat kualifikasi trigger di 2.9.
+- **`DeleteNotes` tidak perlu di-copy** — `MechanicOrderList` **sudah punya kolom `DeleteReason` sendiri** (level Order/eMOL, independen — lihat 2.4). `TaskPersonalizedFinding.DeleteNotes` melacak deletion event Finding (beda entity, beda lifecycle), tidak relevan disalin ke Order.
+
+Rekomendasi hapus live call di `order-detail` **berlaku tanpa syarat** — kedua field ini memang tidak pernah jadi bagian data Order. Kedua baris di tabel D di atas **opportunity terpisah**, bukan wajib dikerjakan bareng enhancement Activity Type, tapi dicatat di sini karena ditemukan lewat audit yang sama.
 
 **E. Keputusan: ganti ke snapshot Order DB, rekomendasi API baru** *(diputuskan 15 Jul 2026)*
 
 | Endpoint | Call | Keputusan |
 |---|---|---|
-| `POST /api/inspection/approval/approve` | `GetWorkOrderByIdAsync` | **Logic diubah**: baca dari snapshot `MechanicOrderSummary`/`MechanicOrderList` (field baru, 2.9) — tidak perlu lagi call `maintenance-execution`. **Rekomendasi: buat API baru**, bukan ubah endpoint existing in-place — konsisten prinsip additive/backward-compat (2.9), supaya app version lama yang mungkin masih panggil endpoint existing tidak break. **⚠️ Perlu dicek developer**: endpoint ini juga melibatkan **service bus** (integrasi async, belum diketahui detailnya) — belum jelas apakah service bus itu juga bergantung ke data WorkOrder live dari `maintenance-execution`. Jangan diasumsikan aman sampai dikonfirmasi developer. |
-
-**`IsImmediateExecutable`/`DeleteNotes` — dikonfirmasi (15 Jul 2026), bukan gap**:
-- **`IsImmediateExecutable = True` → finding tidak perlu di-copy ke Order sama sekali.** Ini bukan cuma soal 2 kolom yang tidak ikut ter-copy — kalau finding-nya immediately-executable, **tidak ada eMOL/Order yang dibuat untuk finding tsb**. Konsisten dengan business rule report [`inspection-result.md`](../../report/transaction-report/inspection-result.md) (`isimmediateexecutable=1` = defect sudah diperbaiki langsung saat inspeksi, quick fix). Lihat kualifikasi trigger di 2.9.
-- **`DeleteNotes` tidak perlu di-copy** — `MechanicOrderList` **sudah punya kolom `DeleteReason` sendiri** (level Order/eMOL, independen — lihat 2.4). `TaskPersonalizedFinding.DeleteNotes` melacak deletion event Finding (beda entity, beda lifecycle), tidak relevan disalin ke Order.
-
-Rekomendasi hapus live call di `order-detail` **berlaku tanpa syarat** — kedua field ini memang tidak pernah jadi bagian data Order.
-| `.../offline/dropdown/assetnumber`, `.../offline/dropdown/assetmodel` | `GetWorkOrderAsync` | **Dikonfirmasi (15 Jul 2026)**: `AssetNumber`/`AssetModelCode`/`AssetModelName` **sudah ada** di `MechanicOrderSummary` (copy dari `WorkOrder` saat Order dibuat — existing behavior, lihat 2.10). Live call ke `GetWorkOrderAsync` redundan. **Rekomendasi**: endpoint baca dari `MechanicOrderSummary`, bukan live call. |
-
-> Kedua baris di atas **opportunity terpisah**, bukan wajib dikerjakan bareng enhancement Activity Type, tapi dicatat di sini karena ditemukan lewat audit yang sama.
+| `POST /api/inspection/approval/approve` | `GetWorkOrderByIdAsync` | **Logic diubah**: baca dari snapshot `MechanicOrderSummary`/`MechanicOrderList` (field baru, 2.9) — tidak perlu lagi call `maintenance-execution`. **Rekomendasi: buat API baru**, bukan ubah endpoint existing in-place — konsisten prinsip additive/backward-compat (2.9), supaya app version lama yang mungkin masih panggil endpoint existing tidak break. **⚠️ Perlu dicek developer**: endpoint ini juga melibatkan **service bus** (integrasi async, belum diketahui detailnya) — belum jelas apakah service bus itu juga bergantung ke data WorkOrder live dari `maintenance-execution`. Jangan diasumsikan aman sampai dikonfirmasi developer.
 
 **Method `IMaintenanceExecAPI` yang belum dipanggil di endpoint manapun saat ini** (dicatat developer, informational): `GetWorkOrderDescriptionAsync`, `GetFindingByParam`, `GetTaskPersonalizedEvidenceByFindingIdsAsync`.
 
@@ -401,6 +399,7 @@ Screen 2 Additional Order saat ini melabeli tiap block eMOL sebagai **"Material 
 ---
 
 ## 6. Referensi
+- [maintenance-activity-type-effort-summary.md](maintenance-activity-type-effort-summary.md) — estimasi SP/mandays/sprint (baseline tim BUMA ID), ditambahkan 16 Jul 2026
 - [order-emol-sap-sync.md](order-emol-sap-sync.md) — schema & flow existing, Bagian 4.2 jadi titik awal enhancement ini
 - [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) — enhancement lain di layar yang sama, prinsip "by value bukan by ID" yang diikuti di Bagian 2.4
 - [area-of-unit-man-power-effort-summary.md](../area-of-unit-man-power-effort-summary.md) — effort summary lintas fitur inisiatif lain (belum mencakup enhancement ini)
