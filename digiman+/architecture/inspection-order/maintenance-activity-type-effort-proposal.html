@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Enhancement Maintenance Activity Type &amp; Integrasi Inspection → Order</title>
+<style>
+  @page { size: A4 portrait; margin: 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11.3pt; color: #1a1a1a; margin: 0; padding: 0 40px; line-height: 1.68; }
+
+  /* ---- Simple document cover (bukan gradient) ---- */
+  .cover { padding: 120px 0 40px; page-break-after: always; }
+  .cover-eyebrow { font-size: 11pt; font-weight: 700; color: #2c5f8a; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+  .cover h1 { font-size: 28pt; font-weight: 800; margin: 0 0 16px; line-height: 1.35; color: #1f3a5f; border: none; padding: 0; }
+  .cover .subtitle { font-size: 13.5pt; color: #556; margin-bottom: 32px; line-height: 1.5; }
+  .cover-meta { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
+  .cover-meta td { padding: 11px 14px; border: 1px solid #dde4ec; font-size: 10.5pt; line-height: 1.5; }
+  .cover-meta td:first-child { width: 32%; color: #667; background: #f7f9fb; }
+  .status-pill { display: inline-block; background: #eaf2fa; color: #1f3a5f; font-weight: 700; font-size: 9.5pt; letter-spacing: 0.4px; padding: 8px 18px; border-radius: 20px; border: 1px solid #cfe0f0; }
+
+  h1 { font-size: 19pt; color: #1f3a5f; border-bottom: 3px solid #1f3a5f; padding-bottom: 10px; margin: 0 0 18px; page-break-before: always; }
+  h1:first-of-type { page-break-before: avoid; }
+  h2 { font-size: 14pt; color: #1f3a5f; margin: 26px 0 13px; page-break-after: avoid; }
+  h3 { font-size: 12.5pt; color: #2c5f8a; margin: 22px 0 11px; page-break-after: avoid; }
+
+  p { margin: 9px 0; }
+  ul, ol { margin: 9px 0 13px 0; padding-left: 24px; }
+  li { margin: 6px 0; }
+  b, strong { color: #111; }
+  code { background: #f0f2f5; color: #1a1a1a; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9.8pt; }
+
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9.6pt; margin: 12px 0 20px; line-height: 1.45; }
+  th { background: #1f3a5f; color: #fff; padding: 9px 10px; text-align: left; font-weight: 600; word-wrap: break-word; }
+  td { padding: 8px 10px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+  tr { page-break-inside: avoid; }
+  tr:nth-child(even) td { background: #f4f7fa; }
+
+  .exec-cards { display: flex; gap: 14px; margin: 22px 0; flex-wrap: wrap; }
+  .exec-card { flex: 1; min-width: 145px; background: #f4f7fa; border-top: 5px solid #2c5f8a; border-radius: 8px; padding: 18px 14px; text-align: center; }
+  .exec-card .num { font-size: 22pt; font-weight: 800; color: #1f3a5f; line-height: 1.15; }
+  .exec-card .label { font-size: 8.8pt; color: #667; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 7px; }
+  .exec-card .sub { font-size: 8.6pt; color: #999; margin-top: 4px; line-height: 1.4; }
+
+  .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 15px 19px; border-radius: 0 6px 6px 0; margin: 16px 0; line-height: 1.55; }
+  .callout.warn { border-left-color: #d68910; background: #fdf3e3; }
+  .callout.decision { border-left-color: #1e8449; background: #eaf6ee; }
+  .callout-label { font-weight: 700; font-size: 9.6pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 6px; }
+  .callout.warn .callout-label { color: #b9770e; }
+  .callout.decision .callout-label { color: #1e8449; }
+
+  .scope-grid { display: flex; gap: 18px; margin: 16px 0; }
+  .scope-col { flex: 1; border-radius: 8px; padding: 16px 18px; }
+  .scope-col.yes { background: #eaf6ee; border: 1px solid #cdeada; }
+  .scope-col.no { background: #f7f7f7; border: 1px solid #e2e2e2; }
+  .scope-col h4 { margin: 0 0 10px; font-size: 10.8pt; }
+  .scope-col.yes h4 { color: #1e8449; }
+  .scope-col.no h4 { color: #888; }
+  .scope-col ul { margin: 0; padding-left: 20px; }
+  .scope-col li { font-size: 9.7pt; margin: 7px 0; line-height: 1.45; }
+
+  .badge { display:inline-block; color:#fff; padding:4px 11px; border-radius:12px; font-size:8.3pt; font-weight:700; letter-spacing:0.3px; }
+  .badge-recommended { background:#1e8449; }
+  .badge-alt { background:#7f8c8d; }
+
+  .footer { margin-top: 34px; font-size: 9.2pt; color: #999; text-align: center; border-top: 1px solid #ddd; padding-top: 12px; line-height: 1.5; }
+
+  @media print {
+    h2, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .exec-card, .callout, .scope-col, .badge, .status-pill, .cover-meta td:first-child { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<div class="cover">
+  <div class="cover-eyebrow">Digiman+ · Proposal Effort Estimasi</div>
+  <h1>Enhancement Maintenance Activity Type<br>&amp; Integrasi Inspection → Order</h1>
+  <div class="subtitle">Estimasi effort untuk pengajuan prioritas &amp; alokasi sumber daya ke Management</div>
+  <table class="cover-meta">
+    <tr><td>Tanggal</td><td>17 Juli 2026</td></tr>
+    <tr><td>Produk</td><td>Digiman+</td></tr>
+    <tr><td>Modul terdampak</td><td>Additional Order, Inspection → Order (eMOL), SAP Sync, Workflow Approval, Digiman Transaction Report</td></tr>
+    <tr><td>Disiapkan oleh</td><td>Okky Rizki R — Bukit Technology</td></tr>
+    <tr><td>Dokumen sumber</td><td>maintenance-activity-type-enhancement.md, maintenance-activity-type-effort-summary.md</td></tr>
+  </table>
+  <span class="status-pill">DRAFT — UNTUK REVIEW MANAGEMENT</span>
+</div>
+
+<!-- ===================== 1. RINGKASAN EKSEKUTIF ===================== -->
+<h1>1. Ringkasan Eksekutif</h1>
+
+<p><b>Enhancement ini menghentikan kegagalan integrasi create MO ke SAP yang sedang terjadi di server Production</b> — akibat kombinasi Order Type + PM Activity Type yang salah-derive dan ditolak (reject) oleh SAP/BAPI (detail di Bagian 2.1). Solusinya sekaligus menggeneralisasi <i>PM Activity Type</i> (saat ini spesifik-SAP) menjadi <b>Maintenance Activity Type</b> yang dapat dikonfigurasi per Order Type, dan merapikan integrasi data antara Inspection dan Order agar tidak lagi bergantung pada pemanggilan antar-service secara langsung (live call) di titik-titik yang seharusnya cukup memakai data yang sudah tersimpan — <b>termasuk merapikan referensi approval workflow (<code>WorkflowTransaction</code>) ke Order</b>. Hasilnya: kegagalan integrasi di server Production berhenti, proses bisnis lebih fleksibel, dan sistem lebih robust/tidak mudah gagal karena dependency service lain.</p>
+
+<div class="exec-cards">
+  <div class="exec-card">
+    <div class="num">48 SP</div>
+    <div class="label">Total Effort</div>
+    <div class="sub">20 komponen kerja</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~56</div>
+    <div class="label">Estimasi Mandays</div>
+    <div class="sub">dengan tim BUMA ID existing</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~2 sprint</div>
+    <div class="label">Durasi — Tim Existing</div>
+    <div class="sub">~4 minggu — sedikit melebihi kapasitas 1 sprint (110%)</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~10–12<br>minggu</div>
+    <div class="label">Durasi — Tim Baru</div>
+    <div class="sub">jika dikerjakan tim terpisah (baru) — 5–6 sprint</div>
+  </div>
+</div>
+
+
+<div class="callout decision">
+  <div class="callout-label">Rekomendasi Singkat</div>
+  Kerjakan pakai <b>tim BUMA ID yang sudah berjalan saat ini</b> — 6 orang (2 Backend, 1 Frontend Web, 1 Frontend Mobile, 2 QA), dengan throughput rata-rata ~43.7 SP per sprint (2 minggu, berdasarkan data 5 sprint terakhir). Beban kerja enhancement ini (48 SP) kini <b>sedikit melebihi kapasitas 1 sprint penuh</b> (110%) — realistisnya butuh 1 sprint penuh ditambah beberapa hari di awal sprint berikutnya untuk merampungkan sisa pekerjaan, direncanakan sebagai <b>~2 sprint</b>. Karena tim sudah menguasai sistem ini sepenuhnya, tidak ada waktu yang terbuang untuk belajar dari nol.
+  <p style="margin-top:8px;">Sebagai perbandingan: kalau pekerjaan yang <i>persis sama</i> ini dikerjakan tim baru yang dibentuk khusus — hanya 4 orang (1 BE, 1 FE Web, 1 FE Mobile, 1 QA) — waktunya bisa <b>5–6 kali lebih lama (10–12 minggu)</b>. Backend jadi bottleneck tunggal (~65% dari total SP), sehingga jumlah staf Frontend/QA tidak banyak mempengaruhi durasi total.</p>
+</div>
+
+<div class="callout warn">
+  <div class="callout-label">Trade-off yang perlu disadari</div>
+  Opsi tim existing bukan tanpa biaya. Enhancement ini akan mengisi <b>~2 sprint</b> dari roadmap tim BUMA ID berikutnya. Ini bukan kapasitas kosong yang dipakai, melainkan dialihkan dari komitmen roadmap lain yang sudah direncanakan.
+</div>
+
+<!-- ===================== 2. LATAR BELAKANG ===================== -->
+<h1>2. Latar Belakang &amp; Tujuan Bisnis</h1>
+
+<h3>2.1 Masalah Saat Ini</h3>
+
+<div class="callout warn">
+  <div class="callout-label">⚠️ Root cause: kegagalan integrasi di server Production, bukan sekadar isu desain</div>
+  Untuk eMOL tipe Inspection, <code>PM Activity Type</code> saat ini <b>auto-derive</b> dari jenis pekerjaan eksekusi (<code>WorkOrder.MaintenanceCategoryCode</code>) — padahal seharusnya ditentukan dari severity/kriteria temuan (<i>finding</i>) di titik Order dibuat, dua konsep bisnis yang independen. Akibat salah-derive ini, kombinasi <b>Order Type + PM Activity Type</b> yang terkirim ke SAP bisa jadi <b>kombinasi yang tidak valid</b> — <b>SAP/BAPI menolak (reject) kombinasi tsb, sehingga integrasi create MO ke SAP gagal</b>. Ini <b>bukan cuma masalah fleksibilitas/desain</b> — ini <b>motivasi bisnis utama</b> enhancement ini: menghentikan kegagalan integrasi yang sedang terjadi di server Production.
+</div>
+
+<p>Percampuran dua konsep bisnis ini (jenis job eksekusi vs keputusan Activity Type di titik Order) juga membuat proses sulit dikonfigurasi berbeda per Order Type. Masalah tambahan: untuk eMOL tipe Additional, <code>PM Activity Type</code> disimpan di level header, sementara untuk tipe Inspection levelnya per-Work Order — grain yang tidak konsisten dengan Order Type yang selalu per-eMOL. Istilah <code>PM Activity Type</code> sendiri juga terlalu SAP-minded untuk client non-SAP ke depan.</p>
+<p>Selain itu, beberapa titik integrasi antara data Inspection dan Order saat ini masih melakukan pemanggilan langsung (live call) ke service lain (<code>maintenance-execution</code>) setiap kali data dibutuhkan — termasuk pada endpoint yang datanya sebenarnya sudah tersimpan (snapshot) di database Order. Pola ini menambah dependency runtime yang tidak perlu dan berisiko terhadap keandalan sistem. <b>Pembahasan lanjutan juga menemukan masalah serupa di sisi approval workflow</b>: referensi antara Order dan proses persetujuannya (<code>WorkflowTransaction</code>) ternyata tidak konsisten tergantung asal Order-nya (Inspection vs Additional Order) — potensi risiko keandalan yang sama, di titik yang berbeda.</p>
+
+<h3>2.2 Solusi yang Diusulkan</h3>
+<ul>
+  <li><b>Generalisasi Activity Type</b> — master data baru <code>Maintenance Activity Type</code> yang independen dari SAP, dipetakan secara many-to-many terhadap Order Type sehingga dapat dikonfigurasi sesuai kebutuhan tiap jenis Order.</li>
+  <li><b>Snapshot-at-creation</b> — data relevan (Work Order, Inspector, Hour Meter, dll.) disalin ke database Order pada saat Order dibuat, bukan dipanggil ulang ke <code>maintenance-execution</code> setiap dibutuhkan. Pola ini konsisten dengan mekanisme snapshot yang sudah berjalan hari ini untuk data lain (Finding, Evidence).</li>
+  <li><b>Pembersihan endpoint redundan</b> — beberapa endpoint API yang saat ini masih live-call ke service lain padahal datanya sudah tersedia di database Order akan disederhanakan untuk membaca dari snapshot tersebut.</li>
+  <li><b>Standardisasi referensi approval workflow</b> — referensi antara Order dan <code>WorkflowTransaction</code> disatukan ke satu kolom identitas yang konsisten (<code>MechanicOrderSummaryId</code>), dengan mekanisme transisi supaya proses approval yang sedang berjalan atas data lama tidak terganggu.</li>
+</ul>
+
+<h3>2.3 Manfaat Bisnis</h3>
+<ul>
+  <li>Konfigurasi Activity Type yang fleksibel per Order Type, tanpa hardcode/asumsi dari jenis job eksekusi.</li>
+  <li>Sistem lebih robust — mengurangi titik kegagalan runtime akibat dependency antar-service, termasuk di alur approval.</li>
+  <li>Fondasi data yang lebih konsisten untuk kebutuhan integrasi SAP dan pelaporan ke depan.</li>
+</ul>
+
+<!-- ===================== 3. RUANG LINGKUP ===================== -->
+<h1>3. Ruang Lingkup</h1>
+
+<div class="scope-grid">
+  <div class="scope-col yes">
+    <h4>✓ Termasuk dalam Estimasi</h4>
+    <ul>
+      <li>Master data baru <code>Maintenance Activity Type</code> (CRUD) + mapping M:N ke Order Type</li>
+      <li>Permission untuk maintain kedua master data</li>
+      <li>Mekanisme data seeder awal</li>
+      <li>Perubahan 4 layar: Additional Order (Screen 1 &amp; 2), Order Details (dari Inspection), Order Approval</li>
+      <li>Extend proses submit Inspection ("Sign and Finish") — snapshot data Work Order/Inspector/Hour Meter ke Order</li>
+      <li>Resolusi nama Inspector dari kode</li>
+      <li>Pembersihan 2 endpoint redundan (live call → snapshot)</li>
+      <li>Endpoint baru untuk proses approve (baca snapshot, bukan live call)</li>
+      <li>Deprecate 1 endpoint dropdown yang sudah tidak terpakai</li>
+      <li>Testing end-to-end (create → approve → SAP sync + regresi)</li>
+      <li>Standardisasi referensi <code>WorkflowTransaction</code> ke Order + penyesuaian 3 endpoint approval untuk mendukung data lama selama transisi</li>
+      <li>Dampak ke Digiman Transaction Report — kolom <code>Maint. Act. Type</code> baru di halaman D'Order Result &amp; Ordering Compliance + update dataset Power BI</li>
+    </ul>
+  </div>
+  <div class="scope-col no">
+    <h4>✗ Di Luar Estimasi</h4>
+    <ul>
+      <li><b>Mekanisme deteksi "submit mechanic terakhir"</b> (trigger approval workflow) — perlu validasi ulang ke engineer, berpotensi butuh cross-service call baru. Bisa kecil (tambah 1 filter) atau besar (bangun mekanisme baru).</li>
+      <li>Simplifikasi query report yang saat ini menangani 2 jalur data (Inspection/Additional Order) sekaligus — <b>sengaja dibiarkan seperti sekarang</b>, bukan disederhanakan, supaya data lama tetap terbaca dengan benar.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout">
+  <div class="callout-label">Catatan</div>
+  Item "mekanisme deteksi submit terakhir" di atas berpotensi menambah effort di luar 48 SP yang diestimasi pada dokumen ini. Angka final akan diperbarui setelah item tersebut selesai diinvestigasi.
+</div>
+
+<!-- ===================== 4. METODOLOGI ===================== -->
+<h1>4. Metodologi Estimasi</h1>
+<p>Estimasi memakai baseline data historis riil tim BUMA ID (5 sprint terakhir), metodologi yang sama dengan estimasi effort enhancement Digiman+ lainnya — bukan angka perkiraan kualitatif.</p>
+
+<h3>4.1 Kalibrasi Story Point</h3>
+<table>
+  <tr><th>Label Kompleksitas</th><th>Story Point</th></tr>
+  <tr><td>Kecil</td><td>1</td></tr>
+  <tr><td>Kecil–Sedang</td><td>2</td></tr>
+  <tr><td>Sedang</td><td>3</td></tr>
+  <tr><td>Sedang–Besar</td><td>5</td></tr>
+  <tr><td>Besar</td><td>8</td></tr>
+</table>
+
+<h3>4.2 Konversi ke Mandays &amp; Kapasitas Sprint</h3>
+<ul>
+  <li><b>Mandays = SP × ~1.17</b> — rasio throughput riil tim BUMA ID: 312 SP diselesaikan dalam 366 person-days (6 orang × 61 hari kerja, basis 5 sprint terakhir).</li>
+  <li><b>Kapasitas efektif sprint = ~43.7 SP/sprint</b> — 70% dari rata-rata velocity riil (62.4 SP/sprint); 30% sisanya dialokasikan untuk production support di luar sprint enhancement.</li>
+</ul>
+
+<!-- ===================== 5. RINCIAN ESTIMASI ===================== -->
+<h1>5. Rincian Estimasi Effort</h1>
+<table>
+  <tr><th style="width:34%;">Komponen</th><th style="width:6%;">SP</th><th style="width:9%;">Mandays</th><th>Catatan</th></tr>
+  <tr><td>Master Data UI baru: Maintenance Activity Type (CRUD)</td><td>3</td><td>3.5</td><td>CRUD standar + validasi</td></tr>
+  <tr><td>Master Data UI baru: mapping M:N Order Type ↔ Activity Type</td><td>5</td><td>5.9</td><td>Pola sama dengan enhancement Area/Man Power</td></tr>
+  <tr><td>Permission code baru</td><td>1</td><td>1.2</td><td>Setup permission + assign role</td></tr>
+  <tr><td>Data seeder Maintenance Activity Type</td><td>2</td><td>2.3</td><td>Mekanisme seeder; isi data dari tim Product</td></tr>
+  <tr><td>Additional Order Screen 1: hapus field Activity Type lama</td><td>1</td><td>1.2</td><td>Remove field dari UI</td></tr>
+  <tr><td>Additional Order Screen 2: dropdown Maintenance Activity Type baru</td><td>2</td><td>2.3</td><td>Dependent ke Order Type + validasi wajib</td></tr>
+  <tr><td>Screen Order Details (dari Inspection): dropdown yang sama</td><td>1</td><td>1.2</td><td>Reuse komponen, screen berbeda</td></tr>
+  <tr><td>Order Approval: edit Maintenance Activity Type</td><td>1</td><td>1.2</td><td>Reuse validasi &amp; dropdown</td></tr>
+  <tr><td>Kolom baru pada tabel eMOL (migration + wiring)</td><td>1</td><td>1.2</td><td>Populate saat submit (Inspection &amp; Additional)</td></tr>
+  <tr><td>Populate data tambahan ke staging SAP (kolom existing yang belum aktif)</td><td>2</td><td>2.3</td><td>Aktivasi kolom yang sudah ada, bukan untuk SAP</td></tr>
+  <tr><td>Extend proses submit Inspection ("Sign and Finish")</td><td>5</td><td>5.9</td><td>Snapshot Work Order/Inspector/Hour Meter + migration 2 tabel</td></tr>
+  <tr><td>Resolusi nama Inspector dari kode</td><td>2</td><td>2.3</td><td>Lookup master data User saat submit</td></tr>
+  <tr><td>Endpoint order-detail: hapus live call, baca snapshot</td><td>1</td><td>1.2</td><td>Cleanup redundant call</td></tr>
+  <tr><td>Endpoint dropdown asset: hapus live call, baca snapshot</td><td>1</td><td>1.2</td><td>Cleanup redundant call</td></tr>
+  <tr><td>Endpoint approve: API baru baca snapshot Order</td><td>3</td><td>3.5</td><td>Endpoint baru, backward-compatible; mekanisme publish SAP (service bus) dikonfirmasi murni outbound existing, tidak ada dependency baru</td></tr>
+  <tr><td>Deprecate endpoint dropdown lama yang tidak terpakai</td><td>1</td><td>1.2</td><td>Verifikasi consumer + cleanup</td></tr>
+  <tr><td>Standardisasi referensi approval workflow ke Order (<code>ReferenceTransactionId</code>) + dual-lookup transisi di 3 endpoint approval</td><td>5</td><td>5.9</td><td>Titik pembuatan (trigger submit mechanic terakhir) + get approval list/detail + endpoint approve. Dual-lookup sementara sampai data lama tidak ada yang menggantung — penghapusannya jadi pending item rilis berikutnya, di luar SP ini</td></tr>
+  <tr><td>Testing end-to-end (create → approve → SAP sync + regresi)</td><td>8</td><td>9.4</td><td>Banyak titik integrasi</td></tr>
+  <tr><td>Digiman Transaction Report: tambah kolom Maint. Act. Type ke view Synapse</td><td>1</td><td>1.2</td><td>Passthrough dari kolom baru, sejajar pola kolom MOType yang sudah ada</td></tr>
+  <tr><td>Update dataset/report Power BI — tampilkan kolom Maint. Act. Type</td><td>2</td><td>2.3</td><td>Reference class: preseden serupa (IAMS30-3946) sempat <i>reopened</i> 1x pasca-rilis, pertimbangkan buffer stabilisasi</td></tr>
+  <tr><td><b>Total</b></td><td><b>48</b></td><td><b>~56</b></td><td><b>Angka pasti (hasil kalibrasi Fibonacci per baris)</b></td></tr>
+</table>
+<p style="font-size:9.6pt;color:#667;line-height:1.5;">Estimasi berdasarkan desain arsitektur hasil diskusi teknis, tanpa akses langsung ke source code — perlu divalidasi oleh engineer yang memegang codebase <code>maintenance-order</code>/<code>maintenance-execution</code>. Item dengan ketidakpastian terbesar: mapping M:N master data (5 SP), extend proses submit Inspection (5 SP), standardisasi referensi approval workflow (5 SP), dan testing end-to-end (8 SP) — total 23 dari 48 SP.</p>
+
+<!-- ===================== 6. SKENARIO ===================== -->
+<h1>6. Skenario Pengerjaan &amp; Timeline</h1>
+<p>Tiga skenario dipertimbangkan untuk mengerjakan scope 48 SP di atas:</p>
+
+<table>
+  <tr><th style="width:22%;">Skenario</th><th style="width:34%;">Komposisi Tim</th><th style="width:12%;">Mandays</th><th>Durasi</th></tr>
+  <tr>
+    <td><span class="badge badge-recommended">Direkomendasikan</span><br><b>Tim BUMA ID (existing)</b></td>
+    <td>6 orang — 2 Backend, 1 Frontend Web, 1 Frontend Mobile, 2 QA (tim yang sudah berjalan &amp; berpengalaman di codebase ini)</td>
+    <td>~56</td>
+    <td><b>~2 sprint</b> (~4 minggu — sedikit melebihi kapasitas 1 sprint penuh, 110%)</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-alt">Alternatif</span><br><b>Tim Baru — dengan Knowledge Transfer</b></td>
+    <td>4 orang baru (1 BE, 1 FE Web, 1 FE Mobile, 1 QA) — tim scrum terpisah, mendapat pendampingan KT dari tim existing</td>
+    <td>~59</td>
+    <td><b>~5 sprint</b> (~10 minggu)</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-alt">Alternatif</span><br><b>Tim Baru — tanpa Knowledge Transfer</b></td>
+    <td>4 orang baru, idem, tanpa pendampingan khusus</td>
+    <td>~69</td>
+    <td><b>~6 sprint</b> (~12 minggu)</td>
+  </tr>
+</table>
+
+<h3>6.1 Mengapa Tim Baru Butuh Lebih Lama</h3>
+<p>Tim BUMA ID existing sudah punya konteks penuh atas domain &amp; codebase, sehingga estimasi sprint-nya memakai kapasitas riil tim (data historis 5 sprint terakhir). Tim baru belum punya data historis serupa — velocity-nya harus diasumsikan jauh lebih rendah karena proses pembelajaran domain dan codebase dari nol (0.7–0.81 SP/hari/orang, dibanding ~0.85 SP/hari/orang tim existing yang sudah matang).</p>
+<p>Pada skenario tim baru, <b>Backend menjadi bottleneck tunggal</b> — 31 dari 48 SP (~65%) adalah pekerjaan Backend, sementara Frontend Web + Mobile hanya 9 SP gabungan dan selalu selesai lebih dulu. QA baru bisa memulai testing end-to-end setelah seluruh pekerjaan Backend (termasuk standardisasi referensi approval workflow yang baru) tuntas. Artinya durasi total skenario ini murni ditentukan oleh kapasitas Backend, terlepas dari berapa banyak staf Frontend/QA yang dialokasikan.</p>
+
+<!-- ===================== 7. ASUMSI & RISIKO ===================== -->
+<h1>7. Asumsi &amp; Risiko</h1>
+<ul>
+  <li><b>Opportunity cost roadmap</b> — memilih tim BUMA ID existing berarti menggeser <b>~2 sprint (~4 minggu)</b> pekerjaan roadmap product yang sudah disepakati.</li>
+  <li>Estimasi berbasis desain arsitektur dari diskusi teknis internal, <b>belum divalidasi terhadap source code</b> secara langsung oleh engineer.</li>
+  <li><b>Mekanisme deteksi "submit mechanic terakhir"</b> (trigger approval workflow) belum divalidasi ke engineer — berpotensi menambah effort di luar 48 SP, terutama kalau ternyata butuh cross-service call baru ke <code>maintenance-execution</code>.</li>
+  <li><b>Dual-lookup transisi</b> di 3 endpoint approval (untuk mendukung data lama selama masa peralihan) perlu dimonitor pasca-rilis dan dihapus di rilis berikutnya setelah tidak ada lagi approval lama yang menggantung — kalau tidak dimonitor, jadi technical debt yang menumpuk.</li>
+  <li>Asumsi pembagian layar Web vs Mobile pada skenario tim baru belum dikonfirmasi ke komposisi tim aktual — bila berbeda, breakdown per-role perlu disesuaikan.</li>
+  <li>Skenario tim baru mengasumsikan tidak ada gangguan/konteks-switch lain selama pengerjaan; realitanya bisa lebih lama bila tim baru juga menangani inisiatif lain secara paralel.</li>
+</ul>
+
+<!-- ===================== 8. REKOMENDASI ===================== -->
+<h1>8. Rekomendasi</h1>
+
+<div class="callout decision">
+  <b>Rekomendasi utama:</b> kerjakan menggunakan tim BUMA ID yang sudah berjalan, dijadwalkan dalam <b>~2 sprint (~4 minggu)</b> — dengan catatan penting: scope enhancement ini <b>sedikit melebihi kapasitas 1 sprint penuh</b>, sehingga secara praktis akan menggeser mundur ~2 sprint pekerjaan roadmap product yang sudah disepakati. Ini trade-off roadmap yang perlu diperhitungkan secara sadar, bukan cuma keputusan teknis.
+  <p style="margin-top:8px;">Membentuk tim baru khusus (skenario alternatif) adalah cara untuk menghindari trade-off di atas — roadmap tim BUMA ID sama sekali tidak terganggu. Konsekuensinya: waktu penyelesaian pekerjaan yang <i>persis sama</i> bisa <b>5–6 kali lebih lama (sekitar 10–12 minggu, dibanding 4 minggu)</b>, karena tim baru perlu waktu mempelajari sistem ini terlebih dahulu sebelum bisa bekerja secepat tim yang sudah berpengalaman.</p>
+  <p style="margin-top:8px;"><b>Langkah selanjutnya:</b> (1) validasi estimasi ke engineer pemegang codebase maintenance-order/maintenance-execution — termasuk validasi mekanisme deteksi "submit mechanic terakhir" yang masih open item; (2) tentukan item roadmap mana yang digeser bila memilih opsi tim existing; (3) jadwalkan monitoring &amp; sunset dual-lookup transisi approval workflow pasca-rilis.</p>
+</div>
+
+<div class="footer">
+  Dokumen ini dihasilkan dari analisis desain arsitektur internal Digiman+ (dokumen sumber: <i>maintenance-activity-type-enhancement.md</i> &amp; <i>maintenance-activity-type-effort-summary.md</i>). Angka estimasi bersifat sementara dan dapat berubah setelah validasi engineer.
+</div>
+
+</body>
+</html>

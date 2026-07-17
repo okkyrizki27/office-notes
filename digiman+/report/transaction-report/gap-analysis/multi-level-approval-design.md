@@ -73,14 +73,16 @@ Ganti kolom approval single-level (`ApprovalName`, `ApprovalDateUTC`, `ModifiedU
 | `ApprovalApprovedLevel` | Jumlah step yang sudah `Approved` | `SUM(CASE WHEN Status='Approved' THEN 1 ELSE 0 END)` |
 | `ApprovalCurrentLevel` | Level yang sedang pending | `WorkflowTransaction.CurrentWorkflowStepId → WorkflowStep.StepOrder` — **langsung dari header**, tidak perlu aggregasi `MIN(StepOrder)` dari step |
 | `ApprovalCurrentLevelName` | Nama level yang sedang pending (role, bukan nama orang — lihat catatan di bawah) | `WorkflowTransaction.CurrentWorkflowStepId → WorkflowStep.Name` |
-| `FinalApprovedBy` | Nama approver level terakhir, **hanya terisi jika semua level Approved** (header Complete) | `ModifiedBy` step dengan `StepOrder` tertinggi, `Status='Approved'` |
-| `FinalApprovedDate` | Tanggal approval level terakhir | `ModifiedAt` step tersebut |
+| `FinalApprovedBy` | Nama approver level terakhir, **hanya terisi jika semua level Approved** (header Complete) | ⚠️ **Belum final** — sebelumnya `ModifiedBy` step dengan `StepOrder` tertinggi. Perlu pindah ke `WorkflowHistory` (join `WorkflowTransactionStepId` step tersebut), tapi kalau `MinApprover>1` ada >1 nama — belum diputuskan ambil yang mana (lihat Bagian 6) |
+| `FinalApprovedDate` | Tanggal approval level terakhir | ⚠️ Sama seperti `FinalApprovedBy` — mengikuti keputusan sumber & agregasi yang sama |
 | `SubmittedBy` *(opsional — untuk didiskusikan)* | Siapa yang submit Order ini | `CreatedBy` dari step `StepOrder=0` ("User Submit") |
 | `SubmittedDate` *(opsional — untuk didiskusikan)* | Kapan Order disubmit | `CreatedAt` dari step `StepOrder=0` — **bukan** `ModifiedAt`, karena step Submit tidak mengalami transisi status lanjutan, jadi yang relevan adalah kapan baris itu dibuat |
 
 > **Disederhanakan:** `WorkflowTransaction` header punya kolom `CurrentWorkflowStepId` yang menunjuk langsung ke level yang sedang pending — `ApprovalCurrentLevel`/`ApprovalCurrentLevelName` tinggal join sekali ke `WorkflowStep`, tidak perlu hitung `MIN(StepOrder) WHERE Status='In Progress'` dari `WorkflowTransactionStep` seperti rencana awal. `ApprovalTotalLevel` dan `ApprovalApprovedLevel` tetap perlu aggregasi dari `WorkflowTransactionStep` karena header tidak menyimpan keduanya.
 
-> **Confirmed:** Siapa yang approve diambil langsung dari `ModifiedBy` (nama) dan `ModifiedAt` (tanggal) di `WorkflowTransactionStep` — cukup untuk `ApprovedBy`/`ApprovedDate` di view detail maupun `FinalApprovedBy`/`FinalApprovedDate` di `dorder`. Saat status masih `In Progress`, `ModifiedBy` **masih NULL** — kolom ini hanya terisi begitu step benar-benar `Approved`.
+> **⚠️ Koreksi (16 Jul 2026) — sebelumnya ditandai "Confirmed", sekarang dibuka lagi:** desain awal mengambil siapa yang approve langsung dari `ModifiedBy` (nama) dan `ModifiedAt` (tanggal) di `WorkflowTransactionStep`. Ini **cukup untuk kasus `MinApprover=1`**, tapi **tidak lengkap untuk `MinApprover>1`** — `WorkflowTransactionStep` tetap 1 baris per level, jadi `ModifiedBy` cuma bisa nyimpan 1 nama meski butuh N orang approve di level itu. Sumber yang benar untuk siapa-approve adalah **`WorkflowHistory`** (lihat [`workflow-schema.md`](../../../architecture/database/workflow-schema.md#workflowhistory)) — join lewat `WorkflowTransactionStepId`, filter kemungkinan `ActionType = 'Approve'` (nilai real belum dikonfirmasi ke engineer). Detail dampak & open question baru: lihat Bagian 6.
+>
+> Saat status masih `In Progress`, belum ada baris `WorkflowHistory` untuk aksi approve level tersebut (kolom terisi begitu step benar-benar `Approved`).
 >
 > **Target approver di level pending sengaja tidak ditampilkan** — bukan keterbatasan data, tapi keputusan bisnis: satu level bisa punya lebih dari satu user yang eligible untuk approve (selaras dengan `MinApprover` di master `WorkflowStep`), jadi tidak ada satu "nama target" yang representatif untuk ditampilkan. `ApprovalCurrentLevelName` cukup menampilkan nama **level/role** (misal "SPV Approval"), bukan nama orang.
 >
@@ -114,8 +116,8 @@ View ini menjawab itu dengan grain **per Order per level** — satu Order dengan
 | `ApprovalLevel` | `WorkflowStep.StepOrder` |
 | `ApprovalLevelName` | `WorkflowStep.Name` |
 | `StepStatus` | `Submitted` / `In Progress` / `Approved` |
-| `ApprovedBy` | `ModifiedBy` → lookup nama, hanya terisi saat `Approved` |
-| `ApprovedDate` | `ModifiedAt`, hanya terisi saat `Approved` |
+| `ApprovedBy` | ⚠️ **Belum final** — sebelumnya `ModifiedBy` (1 nama). Perlu pindah ke `WorkflowHistory` join `WorkflowTransactionStepId`. Kalau `MinApprover>1` dan ada >1 approver aktual, **grain baris ini sendiri kena dampak** — lihat Bagian 6 |
+| `ApprovedDate` | ⚠️ Sama seperti `ApprovedBy` — mengikuti keputusan sumber & grain yang sama |
 | `IsCurrentStep` | `1` jika ini level `In Progress` dengan `StepOrder` terkecil di antara yang `In Progress` untuk Order tsb |
 
 PBI bisa drill-through dari satu eMOL di `dorder` → Order-nya → lihat seluruh approval chain di view ini (cocok untuk halaman "Ordering Compliance" yang memang berfokus ke status approval, bukan ke detail material).
@@ -187,7 +189,9 @@ current_level as (
 ## 6. Asumsi yang Perlu Diverifikasi ke Engineer
 
 - ~~PK header `WorkflowTransaction`~~ — **Resolved.** `Id`, dikonfirmasi dari schema lengkap (lihat [architecture/workflow.md](../../../architecture/workflow.md)).
-- ~~`MinApprover` di master `WorkflowStep` belum ditangani~~ — **Resolved.** Aturan otorisasi level-aplikasi, tidak mengubah cara `step_summary` menghitung (tetap satu baris step per level). Lihat detail di `architecture/workflow.md`.
+- **`MinApprover` di master `WorkflowStep` — dibuka lagi (16 Jul 2026), sebelumnya sempat ditandai Resolved.** Resolusi lama ("tidak mengubah cara `step_summary` menghitung, tetap satu baris step per level") ternyata cuma menjawab soal **penghitungan total/approved level** — belum menjawab soal **identitas approver** saat `MinApprover>1`. Sekarang diketahui `WorkflowTransactionStep.ModifiedBy` cuma nyimpan 1 nama per baris/level, padahal `WorkflowTransactionStep` sendiri tetap 1 baris per level terlepas dari `MinApprover`-nya berapa — jadi kalau butuh N orang approve di 1 level, nama approver ke-2 dst **tidak tertampung** di `ModifiedBy`. Sumber yang benar: `WorkflowHistory` (lihat [`workflow-schema.md`](../../../architecture/database/workflow-schema.md#workflowhistory)), yang berpotensi punya >1 baris per `WorkflowTransactionStepId`. **Belum diputuskan** (sengaja tidak dibahas sekarang, lihat 2 open question baru di bawah):
+  1. Apakah view Bagian 4B ("audit trail per Order per Step") grain-nya berubah jadi **per Order per Step per aksi-approve** (1 level dengan 2 approver = 2 baris), atau tetap 1 baris per level dengan approver **di-concat**?
+  2. Untuk field single-value di Bagian 4A (`FinalApprovedBy`/`FinalApprovedDate`) — kalau level terakhir punya >1 approver, ambil approver **pertama**, **terakhir**, atau **concat semua nama**?
 - ~~Kode `TransactionType` untuk Order approval belum diketahui~~ — **Resolved.** `'Mechanic Order'`. Sudah dimasukkan ke filter CTE `workflowtransaction` di Bagian 5. **Catatan implementasi:** join existing di SQL production (`mol.workorderid = wft1.referencetransactionid`) saat ini belum memfilter `TransactionType` — perlu ditambahkan saat perubahan ini diimplementasikan, bukan cuma untuk fitur baru tapi juga memperbaiki risk di logic yang sudah ada.
 - ~~Perilaku `CurrentWorkflowStepId` saat Complete~~ — **Resolved.** Kembali NULL. CTE `current_level` di Bagian 5 sudah memanfaatkan ini (INNER JOIN otomatis tidak match untuk Order yang sudah selesai, tanpa perlu CASE WHEN tambahan).
 - ~~Step `StepOrder=0` ("User Submit") di audit trail~~ — **Decided.** View detail (`order_approval_detail`) hanya berisi level approval (`StepOrder ≥ 1`), step Submit dikeluarkan.
@@ -197,4 +201,6 @@ current_level as (
 
 ## 7. Status
 
-Seluruh asumsi teknis di Bagian 6 sudah resolved. Satu open question tersisa — adopsi `SubmittedBy`/`SubmittedDate` — sengaja dibawa ke diskusi dengan tim engineer, bukan diputuskan di dokumen ini. Belum ada perubahan yang dibuat ke `vw_report_iams_f_am_digiman_dorder.sql` — menunggu hasil diskusi tersebut sebelum implementasi final.
+**Direvisi 16 Jul 2026** — sempat ditulis "seluruh asumsi teknis sudah resolved", tapi setelah DDL real `workflow` ditemukan ([`workflow-schema.md`](../../../architecture/database/workflow-schema.md)), item `MinApprover` di Bagian 6 dibuka lagi: sumber data approver (`ApprovedBy`/`FinalApprovedBy`) perlu pindah dari `WorkflowTransactionStep.ModifiedBy` ke `WorkflowHistory`, dengan 2 keputusan desain (grain Bagian 4B, dan agregasi field single-value Bagian 4A) yang **sengaja belum dibahas/diputuskan** — akan dibahas lain waktu.
+
+Open question lama (adopsi `SubmittedBy`/`SubmittedDate`) masih berlaku juga — dibawa ke diskusi dengan tim engineer, bukan diputuskan di dokumen ini. Belum ada perubahan yang dibuat ke `vw_report_iams_f_am_digiman_dorder.sql` — menunggu hasil diskusi (baik soal `SubmittedBy`/`SubmittedDate` maupun soal sumber data approver di atas) sebelum implementasi final.

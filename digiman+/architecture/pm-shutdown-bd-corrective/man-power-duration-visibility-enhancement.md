@@ -1,6 +1,6 @@
 # Enhancement: Visibility Duration/Man Power/Man Hours & Assignment Mechanic — PM Shutdown & BD Corrective
 
-*Last updated: 2026-07-10*
+*Last updated: 2026-07-16*
 
 ---
 
@@ -68,6 +68,7 @@ Alasan pembedaan: assignment ke mechanic di mobile app saat ini memang tidak sel
 
 - Detail teknis flag "selisih Man Power vs assignment" — apakah dihitung real-time saat assign, atau divalidasi saat finish task.
 - UI/UX detail warning + notes (2.2) — apakah notes ini disimpan sebagai field terpisah atau masuk ke existing notes/remark task.
+- **Impact ke Digiman Transaction Report — dibahas next phase** *(dicatat 16 Jul 2026, sama seperti catatan di [area-of-unit-man-power-enhancement.md](../inspection-order/area-of-unit-man-power-enhancement.md) Bagian 4)* — Duration/Man Power/Man Hours belum punya tempat di report existing. Belum dianalisa apakah selisih assignment vs plan (2.2) atau assignment mechanic (2.3) perlu tercermin di reporting — sengaja ditunda, bukan bagian dari scope/estimasi Bagian 3 saat ini.
 
 ---
 

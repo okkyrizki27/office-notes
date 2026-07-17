@@ -217,6 +217,8 @@ CreatedAt, CreatedBy   datetime/varchar(200), not null
 ModifiedAt, ModifiedBy datetime/varchar(200), null
 ```
 > **Sudah didokumentasikan** di [`user-asset-relation.md`](user-asset-relation.md) dan [`new-model-checklist.md`](new-model-checklist.md) — join chain via `AssetModelMappingCode` terkonfirmasi persis. **Temuan baru**: kolom **`RatingCategoryCode`** — tiap kombinasi Model-Component-SubComponent punya `RatingCategory` sendiri, kemungkinan menentukan pilihan `Rating` mana yang tampil saat inspeksi untuk kombinasi tersebut (lihat `Rating`/`RatingCategory` di atas). Belum pernah disinggung di dokumen manapun — relevan untuk narasi cascading dropdown di [`area-of-unit-man-power-enhancement.md`](../inspection-order/area-of-unit-man-power-enhancement.md) 2.2/2.4 kalau Rating juga ikut ditentukan oleh kombinasi ini.
+>
+> **📋 Planned change (belum ada di DDL real di atas — masih desain, 16 Jul 2026)**: enhancement Area of Unit akan menambah kolom **`AreaCode`** (nullable, FK ke tabel master `Area` baru) di tabel ini — lihat [`area-of-unit-man-power-enhancement.md`](../inspection-order/area-of-unit-man-power-enhancement.md) 2.2. Keputusan desain: 1 kolom langsung di sini (1:N per baris), bukan tabel junction M:N terpisah, berdasarkan asumsi 1 kombinasi Model+Component+SubComponent maksimal 1 Area — asumsi ini masih perlu divalidasi (lihat open item di dokumen tsb Bagian 4) sebelum migrasi dijalankan.
 
 ---
 
@@ -304,7 +306,7 @@ Sama pola outbox dengan `maintenance-order.TopicPublishLog`/`maintenance-executi
 ## Observasi Belum Dibahas
 - **`Asset.SectionTypeCode`** — kemungkinan koreksi ke [`user-asset-relation.md`](user-asset-relation.md) poin 3, lihat catatan di bawah tabel `Asset` di atas. Perlu diverifikasi ke engineer sebelum dokumen lama diedit.
 - **`ModelComponentSubComponent.RatingCategoryCode`** — field baru, belum dibahas relasinya ke narasi Rating saat inspeksi/finding. Relevan untuk enhancement Area of Unit.
-- **`AssetModelMapping` 5 dimensi** (bukan cuma `AssetModelCode`) — relevan untuk keputusan scoping mapping Area baru, lihat open item Bagian 4 [`area-of-unit-man-power-enhancement.md`](../inspection-order/area-of-unit-man-power-enhancement.md).
+- **`AssetModelMapping` 5 dimensi** (bukan cuma `AssetModelCode`) — dipakai sebagai dasar keputusan scoping mapping Area baru (✅ resolved 16 Jul 2026: Area di-scope per baris `ModelComponentSubComponent`, bukan generik), lihat [`area-of-unit-man-power-enhancement.md`](../inspection-order/area-of-unit-man-power-enhancement.md) 2.2.
 - **`ClientAssetMapping`** — tabel baru yang belum pernah dibahas, tidak punya `TenantCode` meski namanya menyiratkan konsep per-client. Perlu klarifikasi mekanisme isolasi datanya.
 - **`AssetSection`** — belum jelas beda konsepnya dari `tenant.SectionType`; nama mirip tapi living di DB berbeda.
 - **`Priority.Group`** (bagian dari PK komposit) — signifikansinya belum jelas (per-tenant/per-module/lainnya).

@@ -46,6 +46,19 @@ Urutan mengikuti dependency chain: Tenant → Asset → User.
     ```
   - Jika belum: tambahkan record untuk setiap kombinasi Component + SubComponent
 
+### Area of Unit Mapping *(ditambahkan 16 Jul 2026 — lihat [`area-of-unit-man-power-enhancement.md`](../inspection-order/area-of-unit-man-power-enhancement.md) 2.2)*
+- [ ] `asset.Area` — Area yang relevan untuk model ini sudah ada di master
+- [ ] `asset.ModelComponentSubComponent.AreaCode` — setiap baris mapping Component+SubComponent milik model ini sudah di-assign `AreaCode`-nya
+  - Verifikasi:
+    ```sql
+    SELECT b.AssetModelCode, a.ComponentCode, a.SubComponentCode, a.AreaCode
+    FROM ModelComponentSubComponent a
+    JOIN AssetModelMapping b ON a.AssetModelMappingCode = b.Code
+    WHERE b.AssetModelCode = '<model_code>'
+    ```
+  - Jika `AreaCode` NULL untuk sebagian/semua baris: lengkapi lewat Master Data UI (assign Area per baris) — **1 baris = maksimal 1 Area** (bukan M:N, lihat catatan desain di dokumen enhancement)
+  - Catatan: Area di-assign **per baris per model** — tidak otomatis ke-reuse dari model lain meski Component+SubComponent-nya sama (lihat konsekuensi maintenance data di dokumen enhancement)
+
 ### Damage Code Mapping
 - [ ] `asset.DamageCode` — damage code yang relevan sudah ada di master
 - [ ] `asset.SubComponentDamage` — setiap SubComponent sudah di-mapping ke DamageCode yang sesuai
@@ -107,17 +120,19 @@ Urutan mengikuti dependency chain: Tenant → Asset → User.
 [5] asset.Component              → master component tersedia
 [6] asset.SubComponent           → master subcomponent tersedia
 [7] asset.ModelComponentSubComponent → mapping model ke component & subcomponent
-[8] asset.DamageCode             → master damage code tersedia
-[9] asset.SubComponentDamage     → mapping subcomponent ke damage code
-[10] asset.Asset                 → AssetModelCode terisi benar
-[11] user.UserEmploymentProfile  → SectionId sesuai OrganizationUnit
-[12] Permission Code             → user di-assign ke permission code yang sesuai
-[13] Group BUMA ID Inspector     → user muncul di list assign to inspection
-[14] Group BUMA ID Approver      → approver mendapatkan data approval di Workflow
+[8] asset.Area                   → master Area tersedia (baru, 16 Jul 2026)
+[9] asset.ModelComponentSubComponent.AreaCode → Area di-assign per baris mapping (baru, 16 Jul 2026)
+[10] asset.DamageCode            → master damage code tersedia
+[11] asset.SubComponentDamage    → mapping subcomponent ke damage code
+[12] asset.Asset                 → AssetModelCode terisi benar
+[13] user.UserEmploymentProfile  → SectionId sesuai OrganizationUnit
+[14] Permission Code             → user di-assign ke permission code yang sesuai
+[15] Group BUMA ID Inspector     → user muncul di list assign to inspection
+[16] Group BUMA ID Approver      → approver mendapatkan data approval di Workflow
 ```
 
 Jika salah satu step terlewat, user tidak akan bisa melihat data asset/component/damage untuk model tersebut, atau tidak muncul di list yang seharusnya.
 
 ---
 
-*Last updated: 2026-06-26*
+*Last updated: 2026-07-16*

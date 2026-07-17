@@ -1,6 +1,6 @@
 # Order & eMOL — Data Flow, Schema, dan SAP Sync
 
-*Last updated: 2026-07-10*
+*Last updated: 2026-07-17*
 
 ---
 
@@ -197,9 +197,11 @@ Insert (jika belum ada) menggunakan `OUTPUT Inserted.PoolingId`:
 --   LEFT JOIN #MaterialTemp mt ON (match Number+Description+BatchCode+Ranking)
 ```
 
-Kolom target `PoolingMOItem` (dari insert list): `MODetailMaterialId`, `MOType` (dari `mol.CostTypeCode`), `MONo` (NULL saat insert), `PMActType` (`@MaintenanceCategoryCode`), `SupervisorId`, `Equipment`, `BasicStartDate` (dari `mol.EDD`), `MaterialNumber`, `MaterialQuantity`, `Batch`, `Plant`, `MOCreatedBy`, `MOAttachment`, `EMOLNumber` (dari `mol.Number`), `Component`/`DamageGroup`/`SubComponent`/`DamageCode`/`MODescription`/`Notes` (dari `dmol`, hanya kalau `Mols.Count > 0` — di-passing dari BE lewat VALUES clause, bukan hasil join langsung ke tabel finding), `SiteId`, `SLoc` (dari `#MaterialTemp.StorageLocation`), `IsActive`, `CreatedUtcDate`, `ModifiedUtcDate`.
+Kolom target `PoolingMOItem` (dari insert list): `MODetailMaterialId`, `MOType` (dari `mol.CostTypeCode`), `MONo` (NULL saat insert), `PMActType` (`@MaintenanceCategoryCode`), `SupervisorId`, `Equipment`, `BasicStartDate` (dari `mol.EDD`), `MaterialNumber`, `MaterialQuantity`, `Batch`, `Plant`, `MOCreatedBy`, `MOAttachment`, `EMOLNumber` (dari `mol.Number`), `Component`/`DamageGroup`/`SubComponent`/`DamageCode`/`MODescription`/`Notes` (dari `dmol`, hanya kalau `Mols.Count > 0` — di-passing dari BE lewat VALUES clause), `SiteId`, `SLoc` (dari `#MaterialTemp.StorageLocation`), `IsActive`, `CreatedUtcDate`, `ModifiedUtcDate`.
 
 **Poin penting:**
+- **Sumber `Component`/`SubComponent`/`DamageCode`/`DamageGroup` (dikonfirmasi 16 Jul 2026)**: nilai yang di-passing BE lewat VALUES clause (`dmol`) di atas **selalu berasal dari `MechanicOrderDetail`** (Order DB, `maintenance-order`) untuk **semua** tipe eMOL — **termasuk yang sumbernya Inspection**. Tidak ada call ke `maintenance-execution`/`TaskPersonalizedFinding` di titik ini, walau data aslinya (untuk Inspection) memang berasal dari situ — karena sudah di-snapshot ke `MechanicOrderDetail` saat eMOL dibuat (lihat [maintenance-activity-type-enhancement.md](maintenance-activity-type-enhancement.md) 2.9). Ini konsisten dengan & memperkuat prinsip snapshot-at-creation yang sama dipakai di seluruh enhancement itu.
+  - **Presisi bahasa (16 Jul 2026)**: ini soal data "sampai ke `PoolingMOItem`", **bukan** berarti "sampai ke SAP" — beda hal. Berdasarkan mapping BAPI yang sudah terkonfirmasi (6.2), kolom `Component`/`SubComponent`/`DamageCode`/`DamageGroup` **juga tidak** ada di mapping `GI_HEADER`/`GI_OPER`/`GI_COMP` — cuma `MODescription`/`MoDescriptionLong` (teks hasil komposisi, bisa menyisipkan info Damage sebagai teks bebas — lihat contoh payload 6.1) yang benar-benar sampai ke SAP lewat `SHORT_TEXT`/`LONG_TEXT`. Jangan disamakan "sudah di `PoolingMOItem`" dengan "sudah dikirim ke SAP" — tidak semua kolom di tabel staging ini ikut ke payload BAPI.
 - **Material `LEFT JOIN`** — eMOL tanpa material (`NoPartsRequired=1`) tetap dapat 1 row di `PoolingMOItem`, dengan field material-nya NULL. Ini mengakomodasi kasus "declare tidak butuh material" (4.3).
 - **`PoolingMOItem` sudah punya kolom `Component`/`SubComponent`/`DamageGroup`/`DamageCode`** hari ini — relevan untuk assessment enhancement **Area of Unit** (lihat [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) 2.5): kalau `Area` ditambahkan, tabel ini & alur insert-nya perlu kolom baru juga.
 - `MOType` di `PoolingMOItem` diisi dari `mol.CostTypeCode` (Order Type per-eMOL, lihat 4.1). `PMActType` di sini diisi dari parameter `@MaintenanceCategoryCode` yang di-resolve BE sebelumnya sesuai logic Bagian 4.2.
@@ -383,6 +385,8 @@ Beda fungsi dari `TopicPublishLog` (antrian pesan yang mau dikirim/outbox) — `
 | `GR_RCPT` | `moCreatedBy` (NIK) |
 | `REQUIREMENT_QUANTITY` | `materialQuantity` |
 
+> ✅ **Dikonfirmasi ulang (16 Jul 2026)**: mapping di atas cocok dengan tabel mapping BAPI real yang di-share user (GI_HEADER/GI_OPER/GI_COMP). **Tegas dikonfirmasi tidak ada `HourMeter`/`Inspector`/`EquipmentModel`/`MoDescriptionLong`/`AttachmentUrl` di mapping BAPI ini** — field-field itu ada di `TopicPublishLog.MessagePayload` (6.1, payload message bus, superset) tapi middleware **cuma mapping subset field di atas** ke BAPI SAP. Field lain di luar mapping ini kemungkinan dipakai konsumen lain dari topic yang sama (bukan SAP), atau memang extra/tidak terpakai — di luar scope dokumen ini untuk dipastikan.
+
 ---
 
 ## 9. MO Backlog — Inbound Flow (SAP → Digiman+)
@@ -391,8 +395,9 @@ Setelah MO diproses di SAP (Bagian 5–6), data MO tersebut **masuk kembali ke D
 
 ### 9.1 Filter MO Backlog
 - Secara teknis **semua MO SAP bisa saja diambil** ke Digiman+, tapi **saat ini sengaja difilter**: hanya MO dengan **Order Type tertentu** dan **PM Activity Type tertentu** yang masuk sebagai MO Backlog.
-- **Filter ini bersifat konfigurasi per client** *(dikonfirmasi 10 Jul 2026)* — Order Type dan PM Activity Type yang jadi kriteria filter **bisa berbeda antar client/tenant** (tergantung konvensi Order Type/PM Activity Type di SAP masing-masing client), sehingga **tidak boleh di-hardcode** secara global. Harus disimpan sebagai konfigurasi per-tenant.
-- *(Detail nilai Order Type/PM Activity Type spesifik untuk tiap client — belum didokumentasikan, lihat Bagian 10 Open Items.)*
+- **Filter ini bersifat konfigurasi per client** *(dikonfirmasi 10 Jul 2026)* — Order Type dan PM Activity Type yang jadi kriteria filter **bisa berbeda antar client/tenant** (tergantung konvensi Order Type/PM Activity Type di SAP masing-masing client), sehingga **tidak boleh di-hardcode** secara global.
+- **⚠️ Arah berubah (17 Jul 2026)** — sempat direncanakan filter ini disimpan sebagai **konfigurasi di sisi Digiman+** (lihat effort item terkait di [area-of-unit-man-power-enhancement.md](../area-of-unit-man-power-enhancement.md)). **Keputusan baru: bukan lagi item dev Digiman+.** Tanggung jawab filtering dipindah ke **sisi tenant/middleware** — client yang menentukan MO mana yang dikirim ke Digiman+ lewat konfigurasi middleware/SAP mereka sendiri, bukan Digiman+ yang filter dari MO yang sudah diterima. Alasan: fleksibilitas per client tanpa Digiman+ perlu bangun & maintain config UI/logic filter. Konsekuensi: bagian "harus disimpan sebagai konfigurasi per-tenant" di poin sebelumnya **sudah tidak berlaku** — Digiman+ ke depannya tinggal terima & proses apapun yang dikirim middleware.
+- *(Detail nilai Order Type/PM Activity Type spesifik untuk tiap client — jadi kurang relevan didokumentasikan di sisi Digiman+ setelah keputusan di atas, karena pengaturannya pindah ke middleware/tenant. Lihat Bagian 10 Open Items untuk status lama.)*
 - Ini konsisten dengan catatan "Add Backlog dari SAP" di [digital-planning.md](../dplan/digital-planning.md) — Digiplan mengambil data backlog full dari SAP (bukan dari Order Digiman+ langsung), dan scope-nya saat ini juga terbatas ke order type tertentu dengan PM Activity Backlog (per konfigurasi masing-masing client).
 
 ### 9.2 Cara MO Backlog Dieksekusi
@@ -421,7 +426,7 @@ MO Backlog bisa dieksekusi lewat **3 jalur**:
 - **Gate konsistensi Material (5.5) tanpa notifikasi error** — baris dengan Material setengah-isi (`MaterialNumber` tanpa `MaterialQuantity` atau sebaliknya) diam-diam tidak pernah ter-sync ke SAP. Perlu dikonfirmasi ke tim technical apakah ada validasi FE/BE lain yang mencegah state ini terjadi di awal (saat submit eMOL), atau ini gap yang perlu ditindaklanjuti.
 - **`DamageGroup`/`DamageCode` untuk Additional Order** — contoh payload (6.1) menunjukkan field ini terisi meski tanpa finding (`TaskPersonalizedFindingId: null`). Sudah dikonfirmasi (lihat [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) 2.3) bahwa Additional Order akan punya input manual untuk Component/Sub Component/Area/Duration/Man Power juga — konsisten dengan observasi ini.
 - **Gap: `Component`/`Sub Component` belum dikirim ke SAP** — kedua field ini sudah ikut tersimpan di `PoolingMOItem` (5.2) dan payload (6.1), tapi **belum ada mapping-nya ke BAPI** (`GI_HEADER`/`GI_OPER`/`GI_COMP`, Bagian 6.2) — sehingga saat ini tidak benar-benar terkirim ke SAP saat create Order. `Area`, `Duration`, `Man Power` juga belum ada sama sekali di `PoolingMOItem`/payload/mapping BAPI. Ini persis scope assessment integrasi SAP (PIC Faiza) di [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) 2.5 — tujuannya supaya kelima field ini (Component, Sub Component, Area, Duration, Man Power — versi **plan**, bukan actual) terkirim ke SAP saat create Order, sehingga saat MO kembali sebagai MO Backlog (Bagian 9), field-field itu bisa auto-fill di Digiplan saat user memilih MO Backlog.
-- **Detail filter MO Backlog (9.1)** — Order Type dan PM Activity Type spesifik mana saja yang jadi kriteria filter belum didokumentasikan per client (baru diketahui bahwa filter itu ada dan bersifat konfigurasi per client, belum detail nilainya/struktur konfigurasinya).
+- ~~Detail filter MO Backlog (9.1) — Order Type dan PM Activity Type spesifik mana saja yang jadi kriteria filter, belum didokumentasikan per client~~ — **jadi kurang relevan (17 Jul 2026)**: setelah keputusan filtering pindah ke sisi tenant/middleware (9.1), Digiman+ tidak lagi perlu tahu/simpan detail nilai kriteria ini — itu jadi urusan konfigurasi middleware masing-masing client, di luar Digiman+.
 - **Struktur data TECO (9.3)** — payload/mapping BAPI untuk kirim TECO ke SAP belum didokumentasikan (baru diketahui bahwa proses ini terjadi setelah eksekusi MO Backlog selesai).
 - **Teknis "tambah MO Backlog ke sub-task Digiplan" (9.2)** — mekanisme detail bagaimana MO Backlog menjadi baris/task di `DPTask` belum dibahas.
 - **Verifikasi mekanisme sync status cancel MO (9.4)** — perlu dicek ke codebase/engineer `maintenance-order`/`dplan` apakah benar ada mekanisme yang menghapus/update MO Backlog di Digiman+ saat MO terkait di-cancel di SAP. Disebutkan tapi belum solid dikonfirmasi.

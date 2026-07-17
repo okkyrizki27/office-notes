@@ -6,6 +6,8 @@ Report transaksi Digiman yang terdiri dari 5 halaman. Semua view dibuat di schem
 
 **Improvement Design — Multi-Level Approval:** [gap-analysis/multi-level-approval-design.md](gap-analysis/multi-level-approval-design.md) — desain perubahan D'Order Result & Ordering Compliance untuk mendukung approval berjenjang (`WorkflowTransactionStep` + `WorkflowStep`).
 
+**Planned Enhancement — Maintenance Activity Type:** [../architecture/inspection-order/maintenance-activity-type-enhancement.md](../architecture/inspection-order/maintenance-activity-type-enhancement.md) (Bagian 2.12) — menambah kolom baru **`Maint. Act. Type`** ke D'Order Result & Ordering Compliance (`vw_report_iams_f_am_digiman_dorder`), belum live. Report lain yang query `mkp_maintenance_order` (mis. `vw_report_iams_get_molist`, INSPECTION COMPLIANCE) berpotensi ikut terdampak tapi belum dianalisa.
+
 ---
 
 ## Mapping Report → View
@@ -17,6 +19,21 @@ Report transaksi Digiman yang terdiri dari 5 halaman. Semua view dibuat di schem
 | INSPECTION COMPLIANCE | `am.vw_report_iams_get_molist` + `am.vw_report_iams_get_assignment` | [molist](vw_report_iams_get_molist.sql) · [assignment](vw_report_iams_get_assignment.sql) | [doc](inspection-compliance.md) |
 | ORDERING COMPLIANCE | `am.vw_report_iams_f_am_digiman_dorder` | sama dengan D'ORDER RESULT | [doc](order-result-compliance.md) |
 | LEAD TIME REPORT | `am.vw_report_iams_f_am_digiman_leadtime` | [vw_report_iams_f_am_digiman_leadtime.sql](vw_report_iams_f_am_digiman_leadtime.sql) | [doc](leadtime-report.md) |
+
+---
+
+## Data Sync Schedule
+
+Jadwal sinkronisasi data yang mendasari kesegaran (freshness) seluruh view report di atas. Sumber: [IAMS30-2754](https://bukittechnology.atlassian.net/browse/IAMS30-2754) (Task, Status: Done, updated 2025-10-29).
+
+| # | Tahap | Deskripsi | Jadwal (WIB) |
+|---|-------|-----------|--------------|
+| 1 | Digiman (Datalake BUMA) & Digiman+ → Synapse Server BUMA ID | Sync data database ke Synapse Server BUMA ID | 04:30, 10:30, 15:30 |
+| 2 | Digiman lama: Synapse Server BTech ← Synapse Server BUMA ID | Khusus Digiman lama — Synapse Server BTech menarik hasil olahan dari Synapse Server BUMA ID | 06:30, 12:30, 17:30 |
+| 3 | PBI Refresh | Refresh dataset Power BI | 07:00, 13:00, 18:00 |
+| 4 | WICOPE Backlog sync | Sync data WICOPE Backlog dari Datalake BUMA | 06:30, 12:30, 17:30 |
+
+Urutan tahap 1 → (2, khusus Digiman lama) → 3 berjalan berantai per slot waktu (mis. slot pagi: 04:30 → 06:30 → 07:00). Data di report Digiman+ paling baru mencerminkan kondisi sampai dengan jadwal sync tahap 1 pada slot terakhir sebelum PBI Refresh.
 
 ---
 

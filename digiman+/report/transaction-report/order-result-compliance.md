@@ -9,6 +9,12 @@ Apa status spare part order (eMOL) yang dibuat dari temuan inspeksi maupun addit
 
 ---
 
+## Planned Changes
+
+- **`Maint. Act. Type` (baru, belum live)** — direncanakan lewat [maintenance-activity-type-enhancement.md](../../architecture/inspection-order/maintenance-activity-type-enhancement.md) (Bagian 2.12). Sumber: `mechanicorderlist.maintenanceactivitytypecode` (kolom baru di source table, ditambahkan enhancement yang sama). Posisi output direncanakan sejajar `MOType` (grup "eMOL & Material" di bawah). Belum ada di `vw_report_iams_f_am_digiman_dorder.sql` saat ini — rilis mengikuti timeline enhancement Activity Type secara keseluruhan.
+
+---
+
 ## Data Sources
 
 | Source | Table/Path | Filter |
