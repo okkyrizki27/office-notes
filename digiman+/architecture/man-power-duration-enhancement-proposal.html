@@ -99,30 +99,31 @@
 
 <div class="exec-cards">
   <div class="exec-card">
-    <div class="num">~49 SP</div>
-    <div class="label">Skenario "Tanpa" Rollup Penuh</div>
-    <div class="sub">~58 mandays · ~2 sprint · parent Man Power dikosongkan dulu</div>
+    <div class="num">~59–67<br>SP</div>
+    <div class="label">Total Effort</div>
+    <div class="sub">"Tanpa" rollup 59 · "Dengan" rollup 67 (termasuk report/Power BI)</div>
   </div>
   <div class="exec-card">
-    <div class="num">~57 SP</div>
-    <div class="label">Skenario "Dengan" Rollup Penuh</div>
-    <div class="sub">~67 mandays · ~2 sprint · rollup predecessor/serial/paralel sejak rilis pertama</div>
+    <div class="num">~69–78</div>
+    <div class="label">Estimasi Mandays</div>
+    <div class="sub">dengan tim BUMA ID existing</div>
   </div>
   <div class="exec-card">
     <div class="num">~2 sprint</div>
     <div class="label">Durasi — Tim BUMA ID</div>
-    <div class="sub">Kedua skenario sama-sama masuk 2 sprint</div>
+    <div class="sub">kedua skenario rollup sama-sama masuk 2 sprint</div>
   </div>
   <div class="exec-card">
-    <div class="num">~9.75 SP</div>
-    <div class="label">Track Terpisah — DE/DA</div>
-    <div class="sub">Dampak report/Power BI, di luar SP tim BUMA ID — Bagian 5.4</div>
+    <div class="num">~5–7<br>sprint</div>
+    <div class="label">Durasi — Tim Baru</div>
+    <div class="sub">jika dikerjakan tim terpisah (baru) yang belum kenal codebase</div>
   </div>
 </div>
 
 <div class="callout decision">
   <div class="callout-label">Rekomendasi Singkat</div>
   Pilih skenario <b>"Dengan" rollup penuh (57 SP)</b> — karena tabel <code>DPPredecessor</code> (relasi predecessor/serial/paralel antar-task) <b>sudah ada</b> di sistem, selisih effort ke skenario "Tanpa" cuma <b>8 SP (~9 mandays)</b>, dan <b>tidak menambah durasi sprint sama sekali</b> — kedua skenario sama-sama landing di ~2 sprint dengan kapasitas efektif 43.7 SP/sprint. Tidak ada alasan kuat untuk menunda formula rollup ke fase terpisah.
+  <p style="margin-top:8px;">Semua angka di atas memakai <b>tim BUMA ID existing</b>. Kalau pekerjaan yang <i>persis sama</i> dikerjakan <b>tim baru terpisah</b> — 4 orang (1 BE, 1 FE Web, 1 FE Mobile, 1 QA) yang belum mengenal codebase — waktunya bisa <b>~3 kali lebih lama (~5–7 sprint, dibanding ~2 sprint tim BUMA ID)</b>, dengan Backend sebagai bottleneck tunggal (~57–63% total SP). Detail 3 skenario tim di Bagian 6.</p>
 </div>
 
 <div class="callout info">
@@ -170,7 +171,7 @@
       <li>PM Shutdown &amp; BD Corrective — visibility Duration/Man Power/Man Hours di card task</li>
       <li>PM Shutdown &amp; BD Corrective — assignment mechanic vs plan: warning saat Finish Execution (bukan real-time), field <code>ManPowerVarianceReason</code> wajib diisi per leaf task kalau ada selisih (dengan opsi UX "Apply to All")</li>
       <li>PM Shutdown &amp; BD Corrective — 2 skenario mandatory assignment (umum vs backlog-dengan-referensi-MO)</li>
-      <li>Digiman Transaction Report — kolom <b>Man Power, Duration, Man Hours</b> baru di D'Inspect Result &amp; D'Order Result/Ordering Compliance + update dataset Power BI <i>(dikerjakan role DE/DA, track terpisah — Bagian 5.4)</i></li>
+      <li>Digiman Transaction Report — kolom <b>Man Power, Duration, Man Hours</b> baru di D'Inspect Result &amp; D'Order Result/Ordering Compliance + update dataset Power BI <i>(dikerjakan role DE/DA, jalan paralel — termasuk di total effort, Bagian 5.4)</i></li>
       <li>Testing end-to-end (porsi Man Power/Duration dari alur bersama)</li>
     </ul>
   </div>
@@ -259,46 +260,85 @@
 </table>
 
 <div class="callout decision">
-  <div class="callout-label">Total Tim BUMA ID (Bagian 5.1 + 5.2 + 5.3)</div>
-  <b>Skenario "Tanpa"</b>: 12.2 + 26 + 11 = <b>49.2 SP ≈ ~57.6 mandays</b> — 49.2 ÷ 43.7 SP/sprint = 1.13 → <b>2 sprint</b>.<br>
-  <b>Skenario "Dengan"</b>: 12.2 + 34 + 11 = <b>57.2 SP ≈ ~66.9 mandays</b> — 57.2 ÷ 43.7 SP/sprint = 1.31 → <b>2 sprint</b> (sama, kapasitas sprint ke-2 masih longgar).
+  <div class="callout-label">Total Effort (Bagian 5.1 + 5.2 + 5.3 + 5.4)</div>
+  <b>Skenario "Tanpa"</b>: dev (12.2 + 26 + 11 = 49.2) + report/PBI 9.75 = <b>58.95 SP ≈ ~69 mandays</b>.<br>
+  <b>Skenario "Dengan"</b>: dev (12.2 + 34 + 11 = 57.2) + report/PBI 9.75 = <b>66.95 SP ≈ ~78 mandays</b>.<br>
+  Durasi tim BUMA ID ditentukan porsi dev: "Tanpa" 49.2 ÷ 43.7 = 1.13 → <b>2 sprint</b>; "Dengan" 57.2 ÷ 43.7 = 1.31 → <b>2 sprint</b> (sama). Report/Power BI (9.75 SP) dikerjakan resource DE/DA <b>berjalan paralel</b> — muat di dalam durasi 2 sprint, tidak menambah sprint.
 </div>
 
-<h3>5.4 Track Terpisah — Dampak Report &amp; Power BI (Role DE/DA)</h3>
-<p>BUMA ID roster (6 orang: 2 BE, 1 FE Web, 1 FE Mobile, 2 QA) <b>tidak punya role DE/DA</b>. Pekerjaan ini dikerjakan role <b>Data Engineer</b> &amp; <b>Data Analyst</b> yang terpisah dari tim BUMA ID (secara riil di project ini: Varian Aditya Iryanto/DE, Herianto Salim/DA) — <b>tidak memperebutkan kapasitas 43.7 SP/sprint</b> di atas, kemungkinan bisa jalan paralel.</p>
+<h3>5.4 Dampak Report &amp; Power BI (Digiman Transaction Report)</h3>
+<p>Bagian ini <b>termasuk dalam total scope di atas</b> (bukan track terpisah). Pekerjaannya menyentuh SQL view Synapse (<b>Data Engineer</b>) &amp; dataset Power BI (<b>Data Analyst</b>) — role yang tidak ada di roster BUMA ID (6 orang), secara riil di project ini Varian Aditya Iryanto/DE &amp; Herianto Salim/DA. Karena dikerjakan resource DE/DA yang berbeda dari tim dev, <b>berjalan paralel</b> dengan pengembangan dan muat di dalam durasi dev — sehingga <b>tidak menambah jumlah sprint</b>, meski SP-nya (9.75, porsi 3 kolom Man Power/Duration/Man Hours) tetap dihitung ke total effort.</p>
 <table>
   <tr><th style="width:40%;">Komponen</th><th style="width:6%;">SP</th><th style="width:9%;">Mandays</th><th>Catatan</th></tr>
   <tr><td><span class="badge badge-track">DE</span> D'Inspect Result — tambah kolom Man Power/Duration/Man Hours ke <code>vw_report_iams_inspection_results</code></td><td>1.5</td><td>1.8</td><td><i>Split proporsional</i> dari baris gabungan 2 SP (4 kolom: Area/Man Power/Duration/Man Hours) — porsi 3 dari 4 kolom</td></tr>
   <tr><td><span class="badge badge-track">DE</span> D'Order Result &amp; Ordering Compliance — tambah kolom Man Power/Duration/Man Hours ke <code>vw_report_iams_f_am_digiman_dorder</code></td><td>2.25</td><td>2.6</td><td><i>Split proporsional</i> dari baris gabungan 3 SP — porsi 3 dari 4 kolom; reference class riil: IAMS30-3946 (Varian/DE, 3 SP, scope serupa)</td></tr>
   <tr><td><span class="badge badge-track">DA</span> Update dataset/report Power BI — tampilkan kolom Man Power/Duration/Man Hours (2 halaman)</td><td>6</td><td>7</td><td><i>Split proporsional</i> dari baris gabungan 8 SP — porsi 3 dari 4 kolom; reference class riil: IAMS30-3950 + IAMS30-3980 (Herianto/DA); ada preseden bug reopen pasca-rilis di fitur sejenis (IAMS30-4012/4013/4015) — pertimbangkan buffer stabilisasi</td></tr>
-  <tr><td><b>Subtotal DE/DA</b></td><td><b>9.75</b></td><td><b>~11.4</b></td><td>Mandays masih placeholder (rasio BUMA ID 1.17) — throughput riil DE/DA belum bisa dihitung dari histori Jira (resolusi batch-close)</td></tr>
+  <tr><td><b>Subtotal Report/Power BI</b> <i>(termasuk di total effort 59/67 SP)</i></td><td><b>9.75</b></td><td><b>~11.4</b></td><td>Mandays masih placeholder (rasio BUMA ID 1.17) — throughput riil DE/DA belum bisa dihitung dari histori Jira (resolusi batch-close). Dikerjakan paralel oleh DE/DA, tidak menambah durasi sprint dev.</td></tr>
 </table>
 
 <!-- ===================== 6. SKENARIO & TIMELINE ===================== -->
 <h1>6. Skenario Pengerjaan &amp; Timeline</h1>
+<p>Ada 2 sumbu keputusan yang saling terpisah: <b>skenario rollup</b> ("Tanpa" 49.2 SP vs "Dengan" 57.2 SP) dan <b>komposisi tim</b> (tim BUMA ID existing vs tim baru terpisah).</p>
 
+<h3>6.1 Tim BUMA ID (existing) — direkomendasikan</h3>
 <table>
-  <tr><th style="width:22%;">Skenario</th><th style="width:14%;">Total SP</th><th style="width:16%;">Mandays</th><th>Durasi</th></tr>
+  <tr><th style="width:22%;">Skenario Rollup</th><th style="width:14%;">SP dev</th><th style="width:16%;">Durasi (dev)</th><th>Total effort (dev + report/PBI paralel)</th></tr>
   <tr>
     <td><b>"Tanpa" rollup penuh</b><br>parent Man Power/Man Hours dikosongkan dulu (interim)</td>
     <td>49.2</td>
-    <td>~57.6</td>
     <td><b>~2 sprint</b></td>
+    <td>58.95 SP ≈ ~69 mandays</td>
   </tr>
   <tr>
     <td><span class="badge badge-recommended">Direkomendasikan</span><br><b>"Dengan" rollup penuh</b><br>predecessor/serial/paralel sejak rilis pertama</td>
     <td>57.2</td>
-    <td>~66.9</td>
     <td><b>~2 sprint</b> (sama)</td>
+    <td>66.95 SP ≈ ~78 mandays</td>
   </tr>
 </table>
+<p style="font-size:9.6pt;color:#667;line-height:1.5;">Durasi sprint ditentukan porsi dev (49.2/57.2 SP ÷ 43.7 SP/sprint). Report/Power BI (9.75 SP, Bagian 5.4) sudah termasuk di kolom "Total effort" dan berjalan paralel oleh DE/DA — muat di dalam 2 sprint, tidak menambah durasi.</p>
 
 <div class="callout decision">
   <div class="callout-label">Kenapa "Dengan" direkomendasikan</div>
   Selisih 8 SP (~9 mandays) antara kedua skenario <b>tidak mengubah jumlah sprint</b> — keduanya landing di ~2 sprint dengan kapasitas efektif 43.7 SP/sprint (49.2 SP dan 57.2 SP sama-sama di bawah 2× kapasitas, 87.4 SP). Selisih ini jauh lebih kecil dari perkiraan awal karena data model dependency (<code>DPPredecessor</code>) sudah ada, bukan perlu dibangun dari nol. Menunda ke fase terpisah tidak menghemat sprint, cuma menunda fitur.
 </div>
 
-<p><b>Track terpisah — DE/DA</b> (dampak report, Bagian 5.4): 9.75 SP / ~11.4 mandays, di luar tabel sprint BUMA ID di atas — karena bukan kapasitas 43.7 SP/sprint yang sama, durasi track ini belum bisa dihitung dengan metodologi sprint yang sama.</p>
+<h3>6.2 Skenario Tim Baru Terpisah</h3>
+<p>Alternatif tanpa membebani roadmap tim BUMA ID: tim scrum baru <b>4 orang</b> (1 BE, 1 FE Web, 1 FE Mobile, 1 QA), semuanya baru di codebase &amp; domain ini. Velocity diasumsikan lebih rendah — <b>0.7 SP/hari/orang tanpa KT</b>, <b>0.81 SP/hari/orang dengan Knowledge Transfer</b> (dibanding ~0.85 tim existing yang matang). Durasi dihitung dari <b>critical path Backend + QA</b> (lihat 6.3), bukan throughput tim.</p>
+<table>
+  <tr><th style="width:28%;">Skenario Rollup</th><th style="width:12%;">Critical Path (BE+QA)</th><th style="width:30%;">Tim Baru — dengan KT</th><th>Tim Baru — tanpa KT</th></tr>
+  <tr>
+    <td><b>"Tanpa" rollup penuh</b> (49.2 SP)</td>
+    <td>40.2 SP</td>
+    <td><b>~5 sprint</b> (~50 hari kerja · ~61 mandays)</td>
+    <td><b>~6 sprint</b> (~57 hari kerja · ~70 mandays)</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-recommended">Direkomendasikan</span> <b>"Dengan" rollup penuh</b> (57.2 SP)</td>
+    <td>48.2 SP</td>
+    <td><b>~6 sprint</b> (~60 hari kerja · ~71 mandays)</td>
+    <td><b>~7 sprint</b> (~69 hari kerja · ~82 mandays)</td>
+  </tr>
+</table>
+<p style="font-size:9.6pt;color:#667;line-height:1.5;">Berbeda dari tim BUMA ID, di skenario tim baru <b>selisih rollup "Tanpa" vs "Dengan" (8 SP BE) menambah ~1 sprint</b> — karena 8 SP itu murni Backend dan Backend adalah bottleneck (lihat 6.3), tambahannya langsung memperpanjang critical path, tidak terserap kapasitas paralel seperti di tim BUMA ID.</p>
+
+<h3>6.3 Mengapa Tim Baru Butuh Lebih Lama</h3>
+<p>Tim BUMA ID existing sudah punya konteks penuh atas domain &amp; codebase, sehingga estimasi sprint-nya memakai kapasitas riil tim (data historis 5 sprint terakhir, seluruh anggota bekerja paralel). Tim baru belum punya data historis serupa — velocity-nya harus diasumsikan lebih rendah karena pembelajaran domain &amp; codebase dari nol. Estimasi dipetakan ke role, dan <b>Backend jadi bottleneck tunggal</b>:</p>
+<table>
+  <tr><th style="width:20%;">Role</th><th style="width:22%;">SP (Tanpa / Dengan)</th><th>Cakupan pekerjaan</th></tr>
+  <tr><td><b>Backend</b></td><td>~28.2 / ~36.2 (~57–63%)</td><td>Carry-forward eMOL, validasi Order Approval, <code>PoolingMOItem</code>, MO Backlog inbound, seluruh kalkulasi Digiplan (recalculate Man Hours, Excel import/export, auto-recalculate struktur, assessment + implementasi rollup), validasi selisih assignment &amp; 2 skenario mandatory PM/BD</td></tr>
+  <tr><td>FE Web</td><td>~5</td><td>Guardrail Template Config &amp; grid read-only Man Hours Digiplan, edit Man Power/Duration di Order Approval</td></tr>
+  <tr><td>FE Mobile</td><td>~4</td><td>Field Man Power/Duration di Inspection &amp; Additional Order, card visibility + field variance reason PM/BD</td></tr>
+  <tr><td>QA</td><td>~12</td><td>Testing end-to-end (porsi Man Power/Duration) + testing Digiplan + testing PM/BD</td></tr>
+</table>
+<p>FE Web + Mobile hanya ~9 SP gabungan dan <b>selalu selesai lebih dulu</b> dari Backend, lalu menganggur menunggu. QA baru bisa mulai testing end-to-end setelah pekerjaan Backend tuntas. Durasi total = <b>Backend + QA berurutan</b>, terlepas dari jumlah staf FE/QA — menambah <b>BE ke-2</b> jauh lebih efektif memangkas durasi daripada menambah FE/QA. Inilah kenapa skenario rollup penuh ("Dengan", +8 SP BE) menambah 1 sprint di tim baru padahal <i>tidak</i> menambah sprint di tim BUMA ID. Report/Power BI (9.75 SP) <b>tidak termasuk breakdown role di atas</b> — dikerjakan resource DE/DA secara paralel, muat di dalam durasi dev tim baru sehingga tidak menambah critical path.</p>
+
+<div class="callout info">
+  <div class="callout-label">Kalau kedua proposal dikerjakan 1 tim baru sekaligus</div>
+  Angka 5–7 sprint di atas adalah untuk proposal Man Power <b>berdiri sendiri</b>. Kalau digabung dengan "Area of Unit, Component &amp; Sub Component" dan dikerjakan <b>satu tim baru yang sama</b> (rekomendasi penjadwalan — banyak layar/endpoint identik), total gabungannya <b>~9–11 sprint</b> tergantung skenario rollup (bukan penjumlahan kaku sprint tiap proposal — mengerjakan bersamaan menghindari pembulatan batas sprint ganda &amp; re-touch layar yang sama). Detail perhitungan gabungan ada di dokumen <i>area-of-unit-man-power-effort-summary.md</i> (bagian "Skenario Alternatif: Tim Baru Terpisah").
+</div>
+
+<p><b>Report &amp; Power BI</b> (Bagian 5.4): 9.75 SP / ~11.4 mandays <b>sudah termasuk di total effort</b> (Bagian 5.1–5.4, bukan track terpisah). Dikerjakan resource DE/DA (Data Engineer/Analyst) yang berbeda dari tim dev — berjalan paralel dan muat di dalam durasi dev di semua skenario tim, sehingga <b>tidak menambah jumlah sprint</b>.</p>
 
 <!-- ===================== 7. ASUMSI & RISIKO ===================== -->
 <h1>7. Asumsi &amp; Risiko</h1>
@@ -309,6 +349,7 @@
   <li><b>Split effort baris shared</b> (Bagian 4.3, 5.1, 5.4) berpotensi under/over-estimate tergantung apakah proposal Area of Unit dikerjakan bersamaan atau tidak — lihat keterbatasan metode di Bagian 4.3.</li>
   <li><b>Preseden bug reopen pasca-rilis</b> untuk perubahan report/PBI sejenis (IAMS30-4012/4013/4015) — pola nyata yang sudah terjadi 2× untuk perubahan serupa di view yang sama, pertimbangkan buffer stabilisasi pasca-rilis di luar estimasi ini.</li>
   <li>DE/DA mandays masih pakai rasio placeholder BUMA ID (1.17) — throughput riil individu belum bisa dihitung dari histori Jira mereka.</li>
+  <li><b>Skenario tim baru (Bagian 6.2–6.3)</b> memakai asumsi velocity 0.7–0.81 SP/hari/orang dan pembagian layar Web vs Mobile per role yang <b>belum dikonfirmasi ke komposisi tim aktual</b> — kalau berbeda, breakdown per-role &amp; critical path perlu disesuaikan. Skenario ini juga mengasumsikan tim baru tidak menangani inisiatif lain paralel; realitanya bisa lebih lama bila ada konteks-switch.</li>
   <li>Estimasi berdasarkan deskripsi arsitektur dari pemilik produk, tanpa akses langsung ke source code — perlu divalidasi oleh engineer yang memegang codebase <code>maintenance-execution</code>, <code>maintenance-order</code>, dan <code>dplan</code>.</li>
 </ul>
 
@@ -317,6 +358,7 @@
 
 <div class="callout decision">
   <b>Rekomendasi utama:</b> kerjakan skenario <b>"Dengan" rollup penuh</b> (57.2 SP) menggunakan tim BUMA ID yang sudah berjalan, dijadwalkan dalam <b>~2 sprint</b> — tidak ada trade-off durasi dibanding skenario "Tanpa", jadi tidak perlu ditunda ke fase terpisah.
+  <p style="margin-top:8px;">Membentuk <b>tim baru khusus</b> (skenario alternatif, Bagian 6.2) adalah cara menghindari beban ke roadmap tim BUMA ID — tapi konsekuensinya penyelesaian pekerjaan yang <i>persis sama</i> bisa <b>~3 kali lebih lama (~6 sprint untuk skenario "Dengan" dengan KT, ~7 sprint tanpa KT — dibanding ~2 sprint)</b>, karena tim baru perlu waktu mempelajari sistem lebih dulu dan Backend jadi bottleneck tunggal. Di tim baru, memilih "Dengan" rollup juga menambah ~1 sprint (bukan gratis seperti di tim BUMA ID).</p>
   <p style="margin-top:8px;"><b>Kalau proposal "Area of Unit, Component &amp; Sub Component" juga disetujui</b>, sangat direkomendasikan menjadwalkan keduanya di <b>sprint yang sama</b> — banyak layar &amp; endpoint yang identik (Inspection, Additional Order, Edit eMOL, <code>PoolingMOItem</code>/payload, MO Backlog inbound, testing e2e), sehingga mengerjakan bersamaan menghindari re-touch layar yang sama 2× di sprint terpisah dan estimasi split effort di Bagian 4.3/5.1/5.4 jadi paling akurat (rekonsiliasi penuh ke total gabungan 91 SP untuk skenario "Dengan").</p>
   <p style="margin-top:8px;"><b>Langkah selanjutnya:</b> (1) finalisasi rumus rollup predecessor/serial/paralel bersama business saat assessment berjalan; (2) validasi estimasi ke engineer pemegang codebase terkait; (3) putuskan penjadwalan bersama/terpisah dengan proposal Area of Unit.</p>
 </div>

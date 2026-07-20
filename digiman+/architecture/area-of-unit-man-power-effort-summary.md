@@ -207,22 +207,22 @@ Setelah dikalibrasi per-baris ke Fibonacci lalu dijumlahkan (bottom-up), totalny
 | 3 | man-power-duration-visibility-enhancement.md | Visibility card task, assignment mechanic warning/notes, 2 skenario mandatory (PM Shutdown/BD Corrective) | **11** | **~13** |
 | — | Mapping BAPI ke SAP (bagian dari #1, assessment tim client dengan SAP mereka) | Kirim Component/Sub Component/Area/Duration/Man Power lewat BAPI | **Belum bisa diestimasi** | **Belum bisa diestimasi** |
 
-**Catatan penting**: baris **1-DE/DA (10 SP/~12 mandays) sengaja dipisah** dari baris #1 dan **tidak masuk** ke "Total Estimasi 2 Skenario"/"Estimasi Jumlah Sprint" di bawah — karena DE/DA bukan bagian dari 6 orang tim BUMA ID (lihat catatan role di tabel atas), effort ini **tidak memperebutkan kapasitas 43.7 SP/sprint** BUMA ID dan kemungkinan jalan paralel di jalur/timeline sendiri, bukan menambah sprint count BUMA ID secara langsung.
+**Catatan penting (revisi 20 Jul 2026 — DE/DA tidak lagi dibuat track terpisah, per arahan user)**: baris **1-DE/DA (13 SP / ~15 mandays)** sekarang **dihitung masuk ke total effort** (bukan lagi track terpisah, pola sama dengan [inspection-order/maintenance-activity-type-effort-summary.md](inspection-order/maintenance-activity-type-effort-summary.md)). Tapi pekerjaannya dikerjakan resource DE/DA (Varian/Herianto) yang **berbeda dari 6 orang tim BUMA ID** — jadi **berjalan paralel** dengan dev dan muat di dalam durasi dev, **tidak menambah sprint count**. Karena itu: **total effort headline** sudah termasuk 13 SP report (96/104 SP di bawah), sementara **jumlah sprint** tetap dihitung dari SP **dev** (83/91) yang memperebutkan kapasitas 43.7 SP/sprint.
 
-### Total Estimasi — 2 Skenario (di luar mapping BAPI ke SAP, di luar 1-DE/DA)
+### Total Estimasi — 2 Skenario (termasuk dampak report DE/DA, di luar mapping BAPI ke SAP)
 
-*(Permintaan client: perbandingan effort dengan vs tanpa logic predecessor/serial/paralel di rollup parent Man Power/Man Hours. Hanya menghitung SP yang memperebutkan kapasitas sprint tim BUMA ID — lihat catatan di atas soal 1-DE/DA.)*
+*(Permintaan client: perbandingan effort dengan vs tanpa logic predecessor/serial/paralel di rollup parent Man Power/Man Hours. Total effort termasuk dampak report DE/DA — SP-nya masuk total, tapi karena dikerjakan resource DE/DA secara paralel, tidak menambah sprint; lihat Estimasi Jumlah Sprint.)*
 
-| Skenario | Total SP | **Total Mandays** |
-|---|---|---|
-| **Tanpa** logic penuh — parent Man Power/Man Hours dikosongkan dulu (1 + 2a + 3) | **83 SP** | **~97 mandays** |
-| **Dengan** logic penuh predecessor/serial/paralel (1 + 2a + 2b + 3) | **91 SP** | **~106 mandays** |
+| Skenario | SP dev (1/2a/2b/3) | + Report DE/DA | **Total SP** | **Total Mandays** |
+|---|---|---|---|---|
+| **Tanpa** logic penuh — parent Man Power/Man Hours dikosongkan dulu (1 + 2a + 3) | 83 | 13 | **96 SP** | **~112 mandays** |
+| **Dengan** logic penuh predecessor/serial/paralel (1 + 2a + 2b + 3) | 91 | 13 | **104 SP** | **~122 mandays** |
 
 **Selisih: 8 SP (~9 mandays)** kalau business memilih implementasi logic predecessor/serial/paralel penuh sejak rilis pertama, dibanding opsi interim (parent kosong dulu, bisa direvisit belakangan). Selisih ini jauh lebih kecil dari perkiraan awal karena data model dependency (`DPPredecessor` — `FromTask`/`ToTask`/`Type`/`Lag`) sudah ada, bukan perlu dibangun dari nol — sehingga opsi "Dengan" logic penuh cukup layak dipertimbangkan untuk rilis pertama sekalian.
 
 Asumsi: 1 developer per work-item, dikerjakan berurutan — bisa lebih cepat kalau dikerjakan paralel oleh beberapa developer lintas service, belum termasuk waktu review/QA terpisah. Mandays dihitung dengan rasio tim BUMA ID (~1.17 mandays/SP, basis 5 sprint, 6 orang termasuk QA) — kalau dikerjakan tim lain dengan velocity berbeda, rasio ini perlu disesuaikan.
 
-### Estimasi Jumlah Sprint
+### Estimasi Jumlah Sprint — Tim BUMA ID (baseline)
 
 *(Permintaan client: berapa sprint dibutuhkan berdasarkan rata-rata kecepatan 5 sprint terakhir tim BUMA ID.)*
 
@@ -232,14 +232,69 @@ Karena tim juga menangani **support issue Production** di sela sprint (pola yang
 
 **Kapasitas efektif = 62.4 × 70% = ~43.7 SP/sprint**
 
-| Skenario | Total SP | ÷ Kapasitas Efektif (43.7 SP/sprint) | Kebutuhan Sprint |
+*(Jumlah sprint dihitung dari **SP dev** — 83/91 — bukan total SP, karena report/PBI DE/DA berjalan paralel di resource terpisah dan tidak memperebutkan kapasitas 43.7 SP/sprint tim dev. Total effort termasuk report = 96/104 SP, lihat kolom di Total Estimasi.)*
+
+| Skenario | SP dev | ÷ Kapasitas Efektif (43.7 SP/sprint) | Kebutuhan Sprint |
 |---|---|---|---|
 | **Tanpa** logic penuh | 83 SP | 83 ÷ 43.7 = 1.90 | **2 sprint** |
 | **Dengan** logic penuh | 91 SP | 91 ÷ 43.7 = 2.08 | **3 sprint** (2 sprint hanya cukup ~87.4 SP, sisa ~3.6 SP masuk ke sprint ke-3) |
 
 *Catatan: ini asumsi kasar mengabaikan panjang sprint yang sebenarnya bervariasi (9–17 hari kerja per sprint pada data historis) dan mengasumsikan alokasi 70/30 konsisten sepanjang durasi pengerjaan. Angka riil bisa berubah tergantung prioritas production issue yang muncul saat itu.*
 
-**Track terpisah — DE/DA (dampak report, 2.7)**: 13 SP / ~15 mandays *(SP dari reference class Jira riil — Varian/Herianto Salim; mandays masih placeholder rasio BUMA ID, lihat catatan role)*, **di luar** tabel sprint BUMA ID di atas. Karena bukan kapasitas 43.7 SP/sprint yang sama, jumlah sprint/durasi track ini belum bisa dihitung dengan metodologi yang sama — histori `resolutiondate` Varian/Herianto di Jira banyak mengelompok di tanggal yang sama (batch-close), jadi throughput SP/hari riil mereka belum bisa dihitung tanpa analisis changelog/transisi status lebih dalam.
+**Report & Power BI — DE/DA (dampak report, 2.7)**: 13 SP / ~15 mandays *(SP dari reference class Jira riil — Varian/Herianto Salim; mandays masih placeholder rasio BUMA ID, lihat catatan role)*, **sudah termasuk di total effort** (96/104 SP) tapi dikerjakan resource DE/DA yang berbeda dari tim dev — **berjalan paralel** dan muat di dalam durasi sprint dev, jadi **tidak menambah jumlah sprint**. Durasi absolut track DE/DA sendiri belum bisa dihitung dengan metodologi sprint yang sama — histori `resolutiondate` Varian/Herianto di Jira banyak mengelompok di tanggal yang sama (batch-close), jadi throughput SP/hari riil mereka belum bisa dihitung tanpa analisis changelog/transisi status lebih dalam.
+
+---
+
+### Skenario Alternatif: Tim Baru Terpisah ("BUMA ID Modified")
+
+*(20 Jul 2026 — permintaan: hitung juga effort kalau dikerjakan **tim baru terpisah**, pola sama dengan skenario "BUMA ID Modified" di [inspection-order/maintenance-activity-type-effort-summary.md](inspection-order/maintenance-activity-type-effort-summary.md). Ini **bukan** penambahan orang ke tim BUMA ID — ini tim Scrum lain yang berdiri sendiri, sprint & kapasitas independen. Terdiri dari **1 BE, 1 FE Web, 1 FE Mobile, 1 QA** — 4 orang, semuanya baru di codebase & domain ini. Report/PBI DE/DA (13 SP, Varian/Herianto) **sudah termasuk di total effort** tapi dikerjakan resource DE/DA terpisah yang **berjalan paralel** — jadi tidak masuk 4 orang tim baru ini & tidak masuk critical path di bawah (muat di dalam durasi dev), sama seperti skenario baseline. Mapping BAPI juga tetap di luar, belum bisa diestimasi.)*
+
+**Kenapa cara hitungnya beda dari baseline**: skenario BUMA ID baseline pakai **kapasitas SP/sprint riil tim** (43.7 SP/sprint — data historis yang sudah mencakup semua orang bekerja paralel), jadi tidak perlu breakdown role/dependency. Tim baru **belum punya data historis**, jadi jumlah sprint dihitung dari **critical path per-role** (BE jadi bottleneck) — pendekatan bottom-up yang sama persis dengan maint activity type.
+
+#### Breakdown SP per role
+
+Setiap baris effort di dokumen ini dipetakan ke role pakai asumsi platform yang sama dengan maint activity type: **Master Data admin & Order Approval = Web; layar Inspection / Additional Order / eMOL & card execution mechanic = Mobile; schema/API/migration/SAP-sync/kalkulasi/Excel = BE; testing = QA.** Digiplan diasumsikan seluruhnya Web (grid + Excel, tidak ada layar mobile).
+
+| Sumber | BE | FE Web | FE Mobile | QA | Total |
+|---|---|---|---|---|---|
+| #1 Area of Unit core (32 SP) | 17.5 | 4.5 | 2 | 8 | 32 |
+| #2a Digiplan "Tanpa" logic penuh (40 SP) | 25 | 7 | 0 | 8 | 40 |
+| #3 PM Shutdown & BD Corrective (11 SP) | 6 | 0 | 2 | 3 | 11 |
+| **Subtotal "Tanpa" logic penuh (83 SP)** | **48.5** | **11.5** | **4** | **19** | **83** |
+| #2b Tambahan "Dengan" logic penuh predecessor/serial/paralel (+8 SP) | +8 | 0 | 0 | 0 | +8 |
+| **Subtotal "Dengan" logic penuh (91 SP)** | **56.5** | **11.5** | **4** | **19** | **91** |
+
+> Asumsi platform (Web vs Mobile) belum dikonfirmasi ke tim aktual — kalau ternyata beda, breakdown per role perlu disesuaikan. Baris "campur" (field UI + logic backend) dipecah proporsional; angka pecahan (mis. 17.5) berasal dari split baris Master Data schema-vs-UI — pola sama dengan maint activity type. **Report/PBI DE/DA (13 SP) tidak masuk breakdown role ini** — sudah termasuk di total effort tapi dikerjakan resource DE/DA paralel (di luar 4 orang tim baru), jadi tidak menambah critical path. Tambahan "Dengan" logic penuh (2b, +8 SP) murni kerja BE (traversal graph `DPPredecessor` + formula rollup), tidak menyentuh FE/QA di luar regresi yang sudah tercakup baris QA.
+
+#### Velocity: 2 skenario (tanpa vs dengan Knowledge Transfer)
+
+Sama persis dengan asumsi di [inspection-order/maintenance-activity-type-effort-summary.md](inspection-order/maintenance-activity-type-effort-summary.md): tim yang benar-benar baru di domain & codebase ini tidak bisa langsung secepat tim BUMA ID veteran (~0.85 SP/person-day riil).
+
+| | Tanpa KT | Dengan KT |
+|---|---|---|
+| Velocity | **0.7 SP/hari/orang** (asumsi) | **0.81 SP/hari/orang** — menutup 75% jarak dari 0.7 menuju ceiling riil BUMA ID (0.85): `0.7 + 0.75 × (0.85 − 0.7) ≈ 0.81` |
+
+#### Critical path & jumlah sprint
+
+Critical path = **BE + QA** (serial), karena FE (Web 11.5 + Mobile 4 = 15.5 SP gabungan) jauh lebih kecil dari BE (48.5–56.5 SP) → FE selalu selesai duluan lalu menganggur menunggu BE, tidak menambah durasi. QA baru bisa mulai penuh setelah BE selesai (butuh endpoint, SAP-sync, & integrasi lintas service kelar untuk test e2e). Sprint = 10 hari kerja / 2 minggu, dibulatkan ke atas.
+
+| Skenario Logic | Team | Critical Path (BE+QA) | ÷ Velocity → Hari | Sprint | Total Mandays (SP ÷ velocity) |
+|---|---|---|---|---|---|
+| **Tanpa** (83 SP) | Modified — dengan KT | 48.5 + 19 = 67.5 SP | ÷ 0.81 = 83.3 hari | **~9 sprint** | ~103 |
+| **Tanpa** (83 SP) | Modified — tanpa KT | 67.5 SP | ÷ 0.7 = 96.4 hari | **~10 sprint** | ~119 |
+| **Dengan** (91 SP) | Modified — dengan KT | 56.5 + 19 = 75.5 SP | ÷ 0.81 = 93.3 hari | **~10 sprint** | ~112 |
+| **Dengan** (91 SP) | Modified — tanpa KT | 75.5 SP | ÷ 0.7 = 107.9 hari | **~11 sprint** | ~130 |
+
+#### Perbandingan lintas tim (konsolidasi)
+
+| Skenario Logic | SP dev | BUMA ID baseline (43.7 SP/sprint, tim 6 orang) | Modified — dengan KT | Modified — tanpa KT |
+|---|---|---|---|---|
+| **Tanpa** logic penuh | 83 | **2 sprint** | **~9 sprint** | **~10 sprint** |
+| **Dengan** logic penuh | 91 | **3 sprint** | **~10 sprint** | **~11 sprint** |
+
+*(SP dev; report/PBI DE/DA 13 SP paralel, tidak masuk critical path — total effort 96/104 SP. Sprint tim baru tidak berubah oleh fold ini.)*
+
+**Temuan penting** (senada tapi lebih tajam dari maint activity type): BE mendominasi **~58–62% total SP** (48.5/83 sampai 56.5/91), jadi **1 BE tunggal di tim baru adalah bottleneck mutlak** — FE Web+Mobile (15.5 SP gabungan) selalu selesai jauh sebelum BE dan sebagian besar durasi menganggur. Menambah **BE ke-2** akan memangkas critical path jauh lebih efektif daripada menambah FE/QA. **KT menghemat ~1 sprint** di kedua skenario logic (Tanpa: 10→9; Dengan: 11→10). Gap besar vs BUMA ID baseline (2–3 sprint) wajar dan bukan kontradiksi: baseline pakai throughput 6 orang paralel yang riil-terukur, sedangkan tim baru dihitung dari critical path 1 BE + 1 QA serial dengan velocity per-orang yang lebih rendah — persis dinamika yang sama seperti di maint activity type, hanya berlipat karena inisiatif ini ~2× lebih besar (83–91 SP vs 48 SP).
 
 ---
 
