@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>End of Sprint — S2 IAMS — BUMA ID Team</title>
+<style>
+  @page { size: A4 portrait; margin: 14mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+          font-size: 10pt; color: #24272a; line-height: 1.5;
+          padding: 0 250px; background: #f6f7f6; }
+
+  .report-header { background: linear-gradient(135deg, #2A5F14, #1C3F0D);
+    color: #fff; padding: 30px 34px; border-radius: 14px; margin: 24px 0 18px;
+    box-shadow: 0 6px 20px -8px rgba(0,0,0,0.25); }
+  .report-header h1 { font-size: 20pt; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
+  .report-header .sprint-name { font-size: 13pt; font-weight: 500; opacity: 0.92; margin-bottom: 6px; }
+  .report-header .meta { font-size: 8.5pt; opacity: 0.7; letter-spacing: 0.2px; }
+
+  .stats-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .stat-card { flex: 1; min-width: 96px; background: #fff; border: 1px solid #e9ebe9;
+    border-radius: 12px; padding: 16px 12px; text-align: center; border-top: 3px solid #2A5F14; }
+  .stat-num { font-size: 22pt; font-weight: 700; color: #1C3F0D; line-height: 1; letter-spacing: -0.4px; }
+  .stat-sp  { font-size: 8.5pt; color: #9b9f9b; margin: 4px 0; }
+  .stat-label { font-size: 7.5pt; color: #8a8e8a; text-transform: uppercase; font-weight: 600;
+    letter-spacing: 0.6px; margin-top: 6px; }
+
+  .section { background: #fff; border: 1px solid #e9ebe9; border-radius: 14px; padding: 22px 26px;
+    margin-bottom: 16px; }
+  .section-title { font-size: 12pt; font-weight: 700; color: #1c1e1c;
+    border-left: 3px solid #2A5F14; padding-left: 12px; margin-bottom: 16px; }
+
+  .completion-wrap { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+  .arc-item { text-align: center; }
+  .arc-label { font-size: 9pt; color: #666; font-weight: 600; margin-top: 6px; }
+  .day-bar-wrap { flex: 1; min-width: 180px; }
+  .day-bar-label { font-size: 9pt; color: #666; margin-bottom: 6px; }
+  .day-bar { background: #eef0ee; border-radius: 8px; height: 18px; overflow: hidden; }
+  .day-bar-fill { height: 100%;
+    background: linear-gradient(90deg, #2A5F14, #1C3F0D);
+    border-radius: 8px; }
+  .day-bar-pct { font-size: 8.5pt; color: #9b9f9b; margin-top: 4px; text-align: right; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: 8px; }
+  th { background: #2A5F14; color: #fff; padding: 8px 10px;
+    text-align: left; font-weight: 600; font-size: 8.5pt; letter-spacing: 0.2px; }
+  th:first-child { border-top-left-radius: 8px; }
+  th:last-child { border-top-right-radius: 8px; }
+  td { padding: 7px 10px; border-bottom: 1px solid #f0f1ef; vertical-align: top; }
+  tr:nth-child(even) td { background: #DFE7DC44; }
+  tr:hover td { background: #DFE7DC; }
+  a { color: #1C3F0D; text-decoration: none; font-weight: 600; }
+  .delay-badge { color: #c0392b; font-weight: 700; }
+  .empty-td { text-align: center; color: #bbb; font-style: italic; padding: 16px; }
+  .current-row td { background: #DFE7DC; font-weight: bold; }
+  .empty-note { color: #bbb; font-style: italic; font-size: 9.5pt; padding: 8px 0; }
+
+  .champion-box { border: 1px solid; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+  .champion-header { color: #fff; padding: 10px 18px; font-size: 11pt;
+    font-weight: 700; letter-spacing: 0.8px; }
+  .champion-content { padding: 16px 18px; }
+  .champion-main { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .crown { font-size: 26pt; line-height: 1; }
+  .champion-name { font-size: 15pt; font-weight: 700; flex: 1; }
+  .champion-badge { color: #fff; padding: 4px 14px; border-radius: 20px;
+    font-size: 9.5pt; font-weight: 700; white-space: nowrap; }
+  .leaderboard { display: flex; flex-direction: column; gap: 5px; }
+  .lb-item { display: flex; align-items: center; gap: 10px; padding: 7px 12px;
+    background: #f8f9f8; border-radius: 8px; font-size: 9.5pt; }
+  .lb-name { flex: 1; font-weight: 600; }
+  .lb-count { color: #c0392b; font-weight: 700; }
+
+  .lb-cards { display: flex; flex-direction: column; gap: 8px; }
+  .lb-card { display: flex; align-items: center; gap: 14px; padding: 11px 16px;
+    border-radius: 10px; background: #fafbfa; border: 1px solid #f0f1ef; }
+  .lb-rank { font-size: 15pt; width: 36px; text-align: center; }
+  .lb-person { flex: 1; font-size: 10.5pt; font-weight: 600; }
+  .lb-sp { font-size: 13pt; font-weight: 700; }
+
+  .footer { text-align: center; font-size: 8pt; color: #c5c8c5; margin: 22px 0 16px;
+    padding-top: 14px; border-top: 1px solid #eee; }
+  @media print {
+    body { padding: 0 20px; background: #fff; }
+    .report-header, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <h1>End of Sprint Report</h1>
+  <div class="sprint-name">S2 IAMS</div>
+  <div class="meta">BUMA ID Team &nbsp;·&nbsp; 2026-06-25 → 2026-07-08 &nbsp;·&nbsp; Generated: 20 July 2026 13:24:58</div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-num">60</div>
+    <div class="stat-sp">78 SP</div>
+    <div class="stat-label">Total</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#2A5F14;">44</div>
+    <div class="stat-sp">46 SP</div>
+    <div class="stat-label">Done</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#e67e22;">16</div>
+    <div class="stat-sp">32 SP</div>
+    <div class="stat-label">Outstanding</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#c0392b;">5</div>
+    <div class="stat-sp">&nbsp;</div>
+    <div class="stat-label">Reopened</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#c0392b;">12</div>
+    <div class="stat-sp">&nbsp;</div>
+    <div class="stat-label">Delayed Dev</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:#e67e22;">5</div>
+    <div class="stat-sp">&nbsp;</div>
+    <div class="stat-label">Delayed QA</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">📊 Completion Rate</div>
+  <div class="completion-wrap">
+    <div class="arc-item">
+      <svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="40" fill="none" stroke="#eef0ee" stroke-width="9"/><circle cx="55" cy="55" r="40" fill="none" stroke="#2A5F14" stroke-width="9" stroke-dasharray="184.3 67.0" stroke-dashoffset="62.8" stroke-linecap="round"/><text x="55" y="61" text-anchor="middle" font-size="17" font-weight="bold" fill="#2A5F14">73%</text></svg>
+      <div class="arc-label">Tickets</div>
+    </div>
+    <div class="arc-item">
+      <svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="40" fill="none" stroke="#eef0ee" stroke-width="9"/><circle cx="55" cy="55" r="40" fill="none" stroke="#1C3F0D" stroke-width="9" stroke-dasharray="148.2 103.1" stroke-dashoffset="62.8" stroke-linecap="round"/><text x="55" y="61" text-anchor="middle" font-size="17" font-weight="bold" fill="#1C3F0D">59%</text></svg>
+      <div class="arc-label">Story Points</div>
+    </div>
+    <div class="day-bar-wrap">
+      <div class="day-bar-label">⏱ Sprint Day Progress: <b>10 / 10 hari kerja</b></div>
+      <div class="day-bar"><div class="day-bar-fill" style="width:100%"></div></div>
+      <div class="day-bar-pct">100% hari sprint telah dilalui</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">⏳ Outstanding Tickets <span style="font-weight:400;font-size:10pt;">(16 ticket)</span></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Status</th><th>Assignee</th><th>SP</th><th>Priority</th></tr></thead>
+  <tbody><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4284">IAMS30-4284</a></td><td>[Mobile] PM Shutdown Component List Tidak Lengkap</td><td>In Progress</td><td>nurrahman hadi</td><td>-</td><td>High</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4388">IAMS30-4388</a></td><td>[Web] Order Approval - Approval Unit2 IPR ini masuk ke approver ADT</td><td>To Do</td><td>Riki Ahmad Fadilah</td><td>-</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4280">IAMS30-4280</a></td><td>[BE] SiteShift — Create Table and Initial Seed from Tenant DB</td><td>DEV DONE</td><td>Riki Ahmad Fadilah</td><td>2</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4282">IAMS30-4282</a></td><td>[BE] SiteShift — Manual Re-sync from Tenant DB (Admin Trigger)</td><td>DEV DONE</td><td>Riki Ahmad Fadilah</td><td>3</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4281">IAMS30-4281</a></td><td>[BE] SiteShift — Extend Offline Sync: Include SiteShift Data for Mobil...</td><td>DEV DONE</td><td>Riki Ahmad Fadilah</td><td>3</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4266">IAMS30-4266</a></td><td>[BE] Form Package — Plan Submit: Outbox Pattern + PlanSubmitted Event ...</td><td>QA TEST</td><td>Riki Ahmad Fadilah</td><td>5</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4053">IAMS30-4053</a></td><td>[AutoCreate] Refinement auto create Plan for Unschedule Breakdown</td><td>DEV DONE</td><td>Riki Ahmad Fadilah</td><td>3</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4270">IAMS30-4270</a></td><td>[FE] Form Bundle — Choose Form: Step 2 Stepper in Create Plan Modal de...</td><td>QA TEST</td><td>dimas.wahyu</td><td>2</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4189">IAMS30-4189</a></td><td>[BE] Generate PDF for General Form Submission</td><td>DEV DONE</td><td>Dian Heryana</td><td>3</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4268">IAMS30-4268</a></td><td>[BE] Form Package — Extend Get Work Card Detail (Offline Mode): Includ...</td><td>QA TEST</td><td>Dian Heryana</td><td>2</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4267">IAMS30-4267</a></td><td>[BE] Form Package — Extend Get Work Card Detail (Online): Include Pack...</td><td>In Progress</td><td>Dian Heryana</td><td>2</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4273">IAMS30-4273</a></td><td>[MOBILE] Form Package — Tab Form: Form List, Summary Bar, Status, and ...</td><td>In Progress</td><td>nurrahman hadi</td><td>5</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4283">IAMS30-4283</a></td><td>[Mobile] PM Shutdown - Damage Code Tidak Menampilkan Seluruh Data Saat...</td><td>To Do</td><td>nurrahman hadi</td><td>-</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4265">IAMS30-4265</a></td><td>[BE] Form Package — Get Form List by Equipment Model and Service Type</td><td>DEV DONE</td><td>Riki Ahmad Fadilah</td><td>2</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4498">IAMS30-4498</a></td><td>[iamsmobile] Native Crash (SIGSEGV) di libflutter.so - Platform Thread...</td><td>DEV DONE</td><td>nurrahman hadi</td><td>-</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4500">IAMS30-4500</a></td><td>[iamsmobile] ANR - Main thread blocked pada native mutex (NonPI::Mutex...</td><td>To Do</td><td>Unassigned</td><td>-</td><td>Medium</td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">🔁 Reopened Tickets <span style="font-weight:400;font-size:10pt;">(5 ticket)</span></div>
+  <div class="champion-box" style="border-color:#2A5F14;"><div class="champion-header" style="background:#2A5F14;">🏆 CHAMPION</div><div class="champion-content"><div class="champion-main"><span class="crown">👑</span><span class="champion-name">Dian Heryana</span><span class="champion-badge" style="background:#2A5F14;">2 tickets</span></div><div class="leaderboard"><div class="lb-item">🥈&nbsp;<span class="lb-name">v-darwin.samalo</span><span class="lb-count">2 tickets</span></div><div class="lb-item">🥉&nbsp;<span class="lb-name">Riki Ahmad Fadilah</span><span class="lb-count">1 ticket</span></div></div></div></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Status</th><th>Assignee</th><th>Reopen</th><th>Last Reopen</th><th>Priority</th></tr></thead>
+  <tbody><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4075">IAMS30-4075</a></td><td>[BE] Inspection Monitoring - Generate Multi-Assignee PDF Report</td><td>Done</td><td>Dian Heryana</td><td>1</td><td>2026-07-01</td><td>Highest</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4267">IAMS30-4267</a></td><td>[BE] Form Package — Extend Get Work Card Detail (Online): Include Pack...</td><td>In Progress</td><td>Dian Heryana</td><td>1</td><td>2026-07-06</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4265">IAMS30-4265</a></td><td>[BE] Form Package — Get Form List by Equipment Model and Service Type</td><td>DEV DONE</td><td>Riki Ahmad Fadilah</td><td>1</td><td>2026-07-02</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3480">IAMS30-3480</a></td><td>(MKP) [Mobile] Additional Inspection - Terdapat error ketika input Evi...</td><td>Done</td><td>v-darwin.samalo</td><td>1</td><td>2026-03-04</td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-3508">IAMS30-3508</a></td><td>(MKP) [Mobile] Additional Inspection - Terdapat error dalam pembuatan ...</td><td>Done</td><td>v-darwin.samalo</td><td>1</td><td>2026-03-03</td><td>Medium</td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">📈 Velocity Trend</div>
+  <table><thead><tr><th>#</th><th>Sprint</th><th>Completed SP</th></tr></thead>
+  <tbody><tr><td>S1</td><td>Release 3.1.0 (Sprint 2)</td><td><b>73 SP</b></td></tr><tr><td>S2</td><td>Release 4.0.0 - S1</td><td><b>17 SP</b></td></tr><tr><td>S3</td><td>Release 4.0.0 - S2</td><td><b>34 SP</b></td></tr><tr><td>S4</td><td>Release 4.0.0 - S3</td><td><b>60 SP</b></td></tr><tr><td>S5</td><td>4.1.0 - Improve and Fix</td><td><b>81 SP</b></td></tr><tr class="current-row"><td>S6</td><td>S2 IAMS &nbsp;<b>← current</b></td><td><b>46 SP</b></td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">🏅 Dev Leaderboard — Story Points Completed</div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Ticket yang mencapai DEV DONE dalam rentang sprint ini dan status akhir QA PASSED / Done.</p>
+  <div class="lb-cards"><div class="lb-card" style="border-left:4px solid #2A5F14;"><span class="lb-rank">🥇</span><span class="lb-person">Riki Ahmad Fadilah</span><span class="lb-sp" style="color:#2A5F14;">12 SP</span></div><div class="lb-card" style="border-left:4px solid #2A5F14;"><span class="lb-rank">🥈</span><span class="lb-person">dimas.wahyu</span><span class="lb-sp" style="color:#2A5F14;">9 SP</span></div><div class="lb-card" style="border-left:4px solid #2A5F14;"><span class="lb-rank">🥉</span><span class="lb-person">Dian Heryana</span><span class="lb-sp" style="color:#2A5F14;">8 SP</span></div><div class="lb-card" style="border-left:4px solid #2A5F14;"><span class="lb-rank">#4</span><span class="lb-person">nurrahman hadi</span><span class="lb-sp" style="color:#2A5F14;">0 SP</span></div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">🏅 QA Leaderboard — Story Points Completed</div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Ticket yang mencapai QA PASSED dalam rentang sprint ini dan status akhir QA PASSED / Done.</p>
+  <div class="lb-cards"><div class="lb-card" style="border-left:4px solid #1C3F0D;"><span class="lb-rank">🥇</span><span class="lb-person">Gita Riskayanti</span><span class="lb-sp" style="color:#1C3F0D;">16 SP</span></div><div class="lb-card" style="border-left:4px solid #1C3F0D;"><span class="lb-rank">🥈</span><span class="lb-person">Muhammad Zaqi Ghifari</span><span class="lb-sp" style="color:#1C3F0D;">9 SP</span></div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">🐛 Dev Leaderboard — Bug Fixed</div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Ticket bertipe Bug yang mencapai DEV DONE dalam rentang sprint ini dan status akhir QA PASSED / Done. Dihitung per ticket karena Bug tidak punya SP.</p>
+  <div class="lb-cards"><div class="lb-card" style="border-left:4px solid #2A5F14;"><span class="lb-rank">🥇</span><span class="lb-person">nurrahman hadi</span><span class="lb-sp" style="color:#2A5F14;">3 bugs</span></div><div class="lb-card" style="border-left:4px solid #2A5F14;"><span class="lb-rank">🥈</span><span class="lb-person">Dian Heryana</span><span class="lb-sp" style="color:#2A5F14;">2 bugs</span></div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">🐛 QA Leaderboard — Bug Verified</div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Ticket bertipe Bug yang mencapai QA PASSED dalam rentang sprint ini dan status akhir QA PASSED / Done. Dihitung per ticket karena Bug tidak punya SP.</p>
+  <div class="lb-cards"><div class="lb-card" style="border-left:4px solid #1C3F0D;"><span class="lb-rank">🥇</span><span class="lb-person">Muhammad Zaqi Ghifari</span><span class="lb-sp" style="color:#1C3F0D;">3 bugs</span></div><div class="lb-card" style="border-left:4px solid #1C3F0D;"><span class="lb-rank">🥈</span><span class="lb-person">Gita Riskayanti</span><span class="lb-sp" style="color:#1C3F0D;">2 bugs</span></div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">🔴 Delayed Tickets — Developer <span style="font-weight:400;font-size:10pt;">(12 ticket)</span></div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Total waktu In Progress vs baseline rata-rata per SP dari 5 sprint closed terakhir.</p>
+  <div class="champion-box" style="border-color:#2A5F14;"><div class="champion-header" style="background:#2A5F14;">🏆 CHAMPION</div><div class="champion-content"><div class="champion-main"><span class="crown">👑</span><span class="champion-name">dimas.wahyu</span><span class="champion-badge" style="background:#2A5F14;">5 tickets</span></div><div class="leaderboard"><div class="lb-item">🥈&nbsp;<span class="lb-name">Dian Heryana</span><span class="lb-count">4 tickets</span></div><div class="lb-item">🥉&nbsp;<span class="lb-name">Riki Ahmad Fadilah</span><span class="lb-count">3 tickets</span></div></div></div></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Assignee</th><th>SP</th><th>Actual (hari)</th><th>Baseline (hari)</th><th>Delay</th><th>Priority</th></tr></thead><tbody><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4267">IAMS30-4267</a></td><td>[BE] Form Package — Extend Get Work Card Detail (Online): Include...</td><td>Dian Heryana</td><td>2</td><td>11.9</td><td>0.9</td><td><span class="delay-badge">+11.0</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4188">IAMS30-4188</a></td><td>[MOBILE] Add Print PDF Trigger on View History Detail Page Genera...</td><td>dimas.wahyu</td><td>2</td><td>10.1</td><td>0.9</td><td><span class="delay-badge">+9.2</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4270">IAMS30-4270</a></td><td>[FE] Form Bundle — Choose Form: Step 2 Stepper in Create Plan Mod...</td><td>dimas.wahyu</td><td>2</td><td>4.4</td><td>0.9</td><td><span class="delay-badge">+3.5</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4265">IAMS30-4265</a></td><td>[BE] Form Package — Get Form List by Equipment Model and Service ...</td><td>Riki Ahmad Fadilah</td><td>2</td><td>4.3</td><td>0.9</td><td><span class="delay-badge">+3.4</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4266">IAMS30-4266</a></td><td>[BE] Form Package — Plan Submit: Outbox Pattern + PlanSubmitted E...</td><td>Riki Ahmad Fadilah</td><td>5</td><td>5.4</td><td>2.8</td><td><span class="delay-badge">+2.6</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4272">IAMS30-4272</a></td><td>[FE] Form Package — Extend Create Plan: Include Forms Array in Re...</td><td>dimas.wahyu</td><td>2</td><td>3.2</td><td>0.9</td><td><span class="delay-badge">+2.3</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4189">IAMS30-4189</a></td><td>[BE] Generate PDF for General Form Submission</td><td>Dian Heryana</td><td>3</td><td>4.4</td><td>2.4</td><td><span class="delay-badge">+2.1</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4075">IAMS30-4075</a></td><td>[BE] Inspection Monitoring - Generate Multi-Assignee PDF Report</td><td>Dian Heryana</td><td>3</td><td>4.2</td><td>2.4</td><td><span class="delay-badge">+1.9</span></td><td>Highest</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4076">IAMS30-4076</a></td><td>[FE] Inspection Monitoring - Download PDF Button on Detail Page</td><td>dimas.wahyu</td><td>1</td><td>3.0</td><td>1.4</td><td><span class="delay-badge">+1.6</span></td><td>Highest</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4271">IAMS30-4271</a></td><td>[FE] Form Bundle — Fetch Form List on Enter Step 2 (Choose Form)</td><td>dimas.wahyu</td><td>5</td><td>4.1</td><td>2.8</td><td><span class="delay-badge">+1.3</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4268">IAMS30-4268</a></td><td>[BE] Form Package — Extend Get Work Card Detail (Offline Mode): I...</td><td>Dian Heryana</td><td>2</td><td>2.2</td><td>0.9</td><td><span class="delay-badge">+1.3</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4280">IAMS30-4280</a></td><td>[BE] SiteShift — Create Table and Initial Seed from Tenant DB</td><td>Riki Ahmad Fadilah</td><td>2</td><td>2.0</td><td>0.9</td><td><span class="delay-badge">+1.1</span></td><td>Medium</td></tr></tbody></table>
+</div>
+
+<div class="section">
+  <div class="section-title">🟠 Delayed Tickets — QA <span style="font-weight:400;font-size:10pt;">(5 ticket)</span></div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Total waktu QA TEST vs baseline rata-rata per SP dari 5 sprint closed terakhir.</p>
+  <div class="champion-box" style="border-color:#2A5F14;"><div class="champion-header" style="background:#2A5F14;">🏆 CHAMPION</div><div class="champion-content"><div class="champion-main"><span class="crown">👑</span><span class="champion-name">Muhammad Zaqi Ghifari</span><span class="champion-badge" style="background:#2A5F14;">4 tickets</span></div><div class="leaderboard"><div class="lb-item">🥈&nbsp;<span class="lb-name">Gita Riskayanti</span><span class="lb-count">1 ticket</span></div></div></div></div>
+  <table><thead><tr><th>Key</th><th>Summary</th><th>Assignee</th><th>SP</th><th>Actual (hari)</th><th>Baseline (hari)</th><th>Delay</th><th>Priority</th></tr></thead><tbody><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4268">IAMS30-4268</a></td><td>[BE] Form Package — Extend Get Work Card Detail (Offline Mode): I...</td><td>Gita Riskayanti</td><td>2</td><td>9.0</td><td>0.3</td><td><span class="delay-badge">+8.7</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4321">IAMS30-4321</a></td><td>[BE] Form Package — Modify TaskPersonalizedLog: Add 6 Snapshot Co...</td><td>Muhammad Zaqi Ghifari</td><td>1</td><td>1.8</td><td>0.4</td><td><span class="delay-badge">+1.4</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4198">IAMS30-4198</a></td><td>[PRD Issue] Perbaikan data Asset Number kosong di SQL DB untuk WI...</td><td>Muhammad Zaqi Ghifari</td><td>2</td><td>1.5</td><td>0.3</td><td><span class="delay-badge">+1.2</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4272">IAMS30-4272</a></td><td>[FE] Form Package — Extend Create Plan: Include Forms Array in Re...</td><td>Muhammad Zaqi Ghifari</td><td>2</td><td>0.9</td><td>0.3</td><td><span class="delay-badge">+0.5</span></td><td>Medium</td></tr><tr><td><a href="https://bukittechnology.atlassian.net/browse/IAMS30-4270">IAMS30-4270</a></td><td>[FE] Form Bundle — Choose Form: Step 2 Stepper in Create Plan Mod...</td><td>Muhammad Zaqi Ghifari</td><td>2</td><td>0.3</td><td>0.3</td><td><span class="delay-badge">+0.0</span></td><td>Medium</td></tr></tbody></table>
+</div>
+
+<div class="footer">Auto-generated by end_of_sprint_report.py — 20 July 2026 13:24:58</div>
+</body>
+</html>

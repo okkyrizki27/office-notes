@@ -2,7 +2,7 @@
 End of Sprint Report
 Run: python end_of_sprint_report.py [team] [sprint_name]
   team        : "buma" or "mkp" (default: buma)
-  sprint_name : partial sprint name to match (default: active now)
+  sprint_name : S2 IAMS (default: active now)
 
 Output: EOS_<Team>_<SprintName>_<date>.html / .pdf
 """
@@ -25,15 +25,15 @@ TESTER_FIELD = "customfield_10438"
 
 QA_TEAMS = {
     "BUMA ID Team": ["Gita Riskayanti", "Muhammad Zaqi Ghifari"],
-    "MKP Team":     ["Andrian Sebayang", "Muhammad Zul Fikar", "Gita Riskayanti"],
+    "MKP Team":     ["Andrian Sebayang", "Muhammad Zul Fikar", "Gita Riskayanti", "Anjany Risqiati"],
 }
 
 TEAM_COLORS = {
     "BUMA ID Team": {
-        "primary": "#8FAD82",
-        "light":   "#EEF4EB",
-        "dark":    "#5C7A52",
-        "text":    "#3A5233",
+        "primary": "#2A5F14",
+        "light":   "#DFE7DC",
+        "dark":    "#1C3F0D",
+        "text":    "#132B09",
     },
     "MKP Team": {
         "primary": "#7BA3C0",
@@ -180,6 +180,9 @@ def last_reopen_date(issue):
 def is_qa_ticket(summary):
     return any(kw in summary.lower() for kw in QA_KEYWORDS)
 
+def is_bug(fields):
+    return (fields.get("issuetype") or {}).get("name") == "Bug"
+
 def get_qa_tester(issue, team_name):
     f            = issue["fields"]
     summary      = f.get("summary", "")
@@ -199,7 +202,7 @@ def get_qa_tester(issue, team_name):
 
 # ── FETCH ─────────────────────────────────────────────────────────────────────
 def fetch_sprint_issues(sprint_id):
-    fields = f"status,customfield_10016,summary,assignee,priority,created,{TESTER_FIELD}"
+    fields = f"status,customfield_10016,summary,assignee,priority,created,issuetype,{TESTER_FIELD}"
     issues, start_at = [], 0
     while True:
         url = (f"{BASE_URL}/rest/agile/1.0/sprint/{sprint_id}/issue"
@@ -251,16 +254,26 @@ def build_dev_qa_baseline(sprints):
     return dev_bl, qa_bl
 
 def build_velocity_history(sprints):
-    result = []
-    for s in sprints:
-        issues  = fetch_sprint_issues(s["id"])
-        done_sp = sum((sp(i["fields"]) or 0) for i in issues
-                      if i["fields"]["status"]["name"] in DONE_STATUSES)
-        result.append((s["name"], done_sp))
-    return result
+    # A ticket can be tagged in multiple sprints (Jira carries incomplete
+    # tickets forward when a sprint closes). Credit it only to the last
+    # (most recent) sprint it belongs to, so its SP isn't double-counted.
+    done_sp_by_id = {}
+    claimed = set()
+    for s in reversed(sprints):
+        done_sp = 0.0
+        for issue in fetch_sprint_issues(s["id"]):
+            key = issue["key"]
+            if key in claimed:
+                continue
+            claimed.add(key)
+            if issue["fields"]["status"]["name"] in DONE_STATUSES:
+                done_sp += sp(issue["fields"]) or 0
+        done_sp_by_id[s["id"]] = done_sp
+    return [(s["name"], done_sp_by_id[s["id"]]) for s in sprints]
 
 # ── LEADERBOARDS ──────────────────────────────────────────────────────────────
-def build_dev_leaderboard(issues, sprint_start_dt, sprint_end_dt, team_name):
+def build_dev_leaderboard(issues, sprint_start_dt, sprint_end_dt, team_name,
+                           issue_filter=lambda f: True, value_fn=lambda f: sp(f) or 0):
     if not (sprint_start_dt and sprint_end_dt):
         return []
     qa_team = QA_TEAMS.get(team_name, [])
@@ -269,18 +282,21 @@ def build_dev_leaderboard(issues, sprint_start_dt, sprint_end_dt, team_name):
         f = issue["fields"]
         if (f.get("status") or {}).get("name", "") not in DONE_STATUSES:
             continue
+        if not issue_filter(f):
+            continue
         assignee = (f.get("assignee") or {}).get("displayName", "Unassigned")
         if assignee in qa_team:
             continue
-        sp_val = sp(f) or 0
+        value = value_fn(f)
         for created, _, to_s in status_transitions(issue):
             if to_s == DEV_DONE_STATUS:
                 if sprint_start_dt <= parse_dt(created).date() <= sprint_end_dt:
-                    lb[assignee] += sp_val
+                    lb[assignee] += value
                     break
     return sorted(lb.items(), key=lambda x: -x[1])
 
-def build_qa_leaderboard(issues, sprint_start_dt, sprint_end_dt, team_name):
+def build_qa_leaderboard(issues, sprint_start_dt, sprint_end_dt, team_name,
+                          issue_filter=lambda f: True, value_fn=lambda f: sp(f) or 0):
     if not (sprint_start_dt and sprint_end_dt):
         return []
     lb = defaultdict(float)
@@ -288,12 +304,14 @@ def build_qa_leaderboard(issues, sprint_start_dt, sprint_end_dt, team_name):
         f = issue["fields"]
         if (f.get("status") or {}).get("name", "") not in DONE_STATUSES:
             continue
-        sp_val = sp(f) or 0
+        if not issue_filter(f):
+            continue
+        value  = value_fn(f)
         tester = get_qa_tester(issue, team_name)
         for created, _, to_s in status_transitions(issue):
             if to_s == QA_PASSED_STATUS:
                 if sprint_start_dt <= parse_dt(created).date() <= sprint_end_dt:
-                    lb[tester] += sp_val
+                    lb[tester] += value
                     break
     # Sort: real QA first, QA Samaran last
     real_qa = sorted(((k, v) for k, v in lb.items() if k != "QA Samaran"), key=lambda x: -x[1])
@@ -308,7 +326,7 @@ def progress_arc_svg(pct, color, size=110):
     circ = 2 * 3.14159 * r
     dash = circ * pct / 100
     return (f'<svg width="{size}" height="{size}" viewBox="0 0 {size} {size}">'
-            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="#e8e8e8" stroke-width="9"/>'
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="#eef0ee" stroke-width="9"/>'
             f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{color}" stroke-width="9"'
             f' stroke-dasharray="{dash:.1f} {circ-dash:.1f}"'
             f' stroke-dashoffset="{circ*0.25:.1f}" stroke-linecap="round"/>'
@@ -341,7 +359,7 @@ def champion_box(rows, assignee_key, color, label="ticket"):
             f'{champ_cnt} {label}{"s" if champ_cnt > 1 else ""}</span>'
             f'</div><div class="leaderboard">{lb_html}</div></div></div>')
 
-def leaderboard_cards(data, color):
+def leaderboard_cards(data, color, fmt=lambda v: f"{v:.0f} SP"):
     if not data:
         return '<p class="empty-note">Belum ada data. 🦗</p>'
     medals = ["🥇", "🥈", "🥉"]
@@ -349,9 +367,12 @@ def leaderboard_cards(data, color):
         f'<div class="lb-card" style="border-left:4px solid {color};">'
         f'<span class="lb-rank">{medals[i] if i < 3 else f"#{i+1}"}</span>'
         f'<span class="lb-person">{html_lib.escape(name)}</span>'
-        f'<span class="lb-sp" style="color:{color};">{val:.0f} SP</span></div>'
+        f'<span class="lb-sp" style="color:{color};">{fmt(val)}</span></div>'
         for i, (name, val) in enumerate(data)
     )
+
+def bug_count_fmt(v):
+    return f"{v:.0f} bug{'s' if v != 1 else ''}"
 
 # ── GENERATE HTML ─────────────────────────────────────────────────────────────
 def generate_html(team_name, sprint_obj, issues, dev_bl, qa_bl, velocity_history):
@@ -420,6 +441,12 @@ def generate_html(team_name, sprint_obj, issues, dev_bl, qa_bl, velocity_history
     # Leaderboards
     dev_lb = build_dev_leaderboard(issues, sprint_start_dt, sprint_end_dt, team_name)
     qa_lb  = build_qa_leaderboard(issues, sprint_start_dt, sprint_end_dt, team_name)
+
+    # Bug tickets carry no SP, so rank by ticket count instead
+    bug_dev_lb = build_dev_leaderboard(issues, sprint_start_dt, sprint_end_dt, team_name,
+                                        issue_filter=is_bug, value_fn=lambda f: 1)
+    bug_qa_lb  = build_qa_leaderboard(issues, sprint_start_dt, sprint_end_dt, team_name,
+                                       issue_filter=is_bug, value_fn=lambda f: 1)
 
     # Delayed
     qa_team     = QA_TEAMS.get(team_name, [])
@@ -508,79 +535,81 @@ def generate_html(team_name, sprint_obj, issues, dev_bl, qa_bl, velocity_history
 <meta charset="UTF-8">
 <title>End of Sprint — {sprint_name_safe} — {team_name}</title>
 <style>
-  @page {{ size: A4 portrait; margin: 12mm; }}
+  @page {{ size: A4 portrait; margin: 14mm; }}
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{ font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #1a1a1a;
-          padding: 0 260px; background: #f5f6f5; }}
+  body {{ font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+          font-size: 10pt; color: #24272a; line-height: 1.5;
+          padding: 0 250px; background: #f6f7f6; }}
 
   .report-header {{ background: linear-gradient(135deg, {color["primary"]}, {color["dark"]});
-    color: #fff; padding: 28px 32px; border-radius: 10px; margin: 20px 0 16px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.15); }}
-  .report-header h1 {{ font-size: 22pt; font-weight: 800; margin-bottom: 5px; }}
-  .report-header .sprint-name {{ font-size: 14pt; opacity: 0.9; margin-bottom: 4px; }}
-  .report-header .meta {{ font-size: 9pt; opacity: 0.75; }}
+    color: #fff; padding: 30px 34px; border-radius: 14px; margin: 24px 0 18px;
+    box-shadow: 0 6px 20px -8px rgba(0,0,0,0.25); }}
+  .report-header h1 {{ font-size: 20pt; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }}
+  .report-header .sprint-name {{ font-size: 13pt; font-weight: 500; opacity: 0.92; margin-bottom: 6px; }}
+  .report-header .meta {{ font-size: 8.5pt; opacity: 0.7; letter-spacing: 0.2px; }}
 
-  .stats-row {{ display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }}
-  .stat-card {{ flex: 1; min-width: 90px; background: #fff; border-radius: 10px;
-    padding: 14px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-    text-align: center; border-top: 5px solid {color["primary"]}; }}
-  .stat-num {{ font-size: 24pt; font-weight: 800; color: {color["dark"]}; line-height: 1; }}
-  .stat-sp  {{ font-size: 9pt; color: #aaa; margin: 3px 0; }}
-  .stat-label {{ font-size: 8pt; color: #888; text-transform: uppercase;
-    letter-spacing: 0.5px; margin-top: 5px; }}
+  .stats-row {{ display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }}
+  .stat-card {{ flex: 1; min-width: 96px; background: #fff; border: 1px solid #e9ebe9;
+    border-radius: 12px; padding: 16px 12px; text-align: center; border-top: 3px solid {color["primary"]}; }}
+  .stat-num {{ font-size: 22pt; font-weight: 700; color: {color["dark"]}; line-height: 1; letter-spacing: -0.4px; }}
+  .stat-sp  {{ font-size: 8.5pt; color: #9b9f9b; margin: 4px 0; }}
+  .stat-label {{ font-size: 7.5pt; color: #8a8e8a; text-transform: uppercase; font-weight: 600;
+    letter-spacing: 0.6px; margin-top: 6px; }}
 
-  .section {{ background: #fff; border-radius: 10px; padding: 20px 24px;
-    margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }}
-  .section-title {{ font-size: 13pt; font-weight: 700; color: {color["dark"]};
-    border-left: 5px solid {color["primary"]}; padding-left: 12px; margin-bottom: 14px; }}
+  .section {{ background: #fff; border: 1px solid #e9ebe9; border-radius: 14px; padding: 22px 26px;
+    margin-bottom: 16px; }}
+  .section-title {{ font-size: 12pt; font-weight: 700; color: #1c1e1c;
+    border-left: 3px solid {color["primary"]}; padding-left: 12px; margin-bottom: 16px; }}
 
   .completion-wrap {{ display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }}
   .arc-item {{ text-align: center; }}
-  .arc-label {{ font-size: 9.5pt; color: #555; font-weight: 600; margin-top: 5px; }}
+  .arc-label {{ font-size: 9pt; color: #666; font-weight: 600; margin-top: 6px; }}
   .day-bar-wrap {{ flex: 1; min-width: 180px; }}
-  .day-bar-label {{ font-size: 9pt; color: #666; margin-bottom: 5px; }}
-  .day-bar {{ background: #e8e8e8; border-radius: 8px; height: 20px; overflow: hidden; }}
+  .day-bar-label {{ font-size: 9pt; color: #666; margin-bottom: 6px; }}
+  .day-bar {{ background: #eef0ee; border-radius: 8px; height: 18px; overflow: hidden; }}
   .day-bar-fill {{ height: 100%;
     background: linear-gradient(90deg, {color["primary"]}, {color["dark"]});
     border-radius: 8px; }}
-  .day-bar-pct {{ font-size: 9pt; color: #aaa; margin-top: 3px; text-align: right; }}
+  .day-bar-pct {{ font-size: 8.5pt; color: #9b9f9b; margin-top: 4px; text-align: right; }}
 
-  table {{ width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: 6px; }}
-  th {{ background: {color["primary"]}; color: #fff; padding: 7px 10px;
-    text-align: left; font-weight: 600; }}
-  td {{ padding: 6px 10px; border-bottom: 1px solid #eee; vertical-align: top; }}
-  tr:nth-child(even) td {{ background: {color["light"]}; }}
-  tr:hover td {{ background: #e4ede0; }}
+  table {{ width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: 8px; }}
+  th {{ background: {color["primary"]}; color: #fff; padding: 8px 10px;
+    text-align: left; font-weight: 600; font-size: 8.5pt; letter-spacing: 0.2px; }}
+  th:first-child {{ border-top-left-radius: 8px; }}
+  th:last-child {{ border-top-right-radius: 8px; }}
+  td {{ padding: 7px 10px; border-bottom: 1px solid #f0f1ef; vertical-align: top; }}
+  tr:nth-child(even) td {{ background: {color["light"]}44; }}
+  tr:hover td {{ background: {color["light"]}; }}
   a {{ color: {color["dark"]}; text-decoration: none; font-weight: 600; }}
-  .delay-badge {{ color: #c0392b; font-weight: 800; }}
-  .empty-td {{ text-align: center; color: #bbb; font-style: italic; padding: 14px; }}
+  .delay-badge {{ color: #c0392b; font-weight: 700; }}
+  .empty-td {{ text-align: center; color: #bbb; font-style: italic; padding: 16px; }}
   .current-row td {{ background: {color["light"]}; font-weight: bold; }}
   .empty-note {{ color: #bbb; font-style: italic; font-size: 9.5pt; padding: 8px 0; }}
 
-  .champion-box {{ border: 2px solid; border-radius: 10px; overflow: hidden; margin-bottom: 14px; }}
-  .champion-header {{ color: #fff; padding: 10px 18px; font-size: 12pt;
-    font-weight: 800; letter-spacing: 1px; }}
+  .champion-box {{ border: 1px solid; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }}
+  .champion-header {{ color: #fff; padding: 10px 18px; font-size: 11pt;
+    font-weight: 700; letter-spacing: 0.8px; }}
   .champion-content {{ padding: 16px 18px; }}
   .champion-main {{ display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }}
-  .crown {{ font-size: 28pt; line-height: 1; }}
-  .champion-name {{ font-size: 16pt; font-weight: 800; flex: 1; }}
+  .crown {{ font-size: 26pt; line-height: 1; }}
+  .champion-name {{ font-size: 15pt; font-weight: 700; flex: 1; }}
   .champion-badge {{ color: #fff; padding: 4px 14px; border-radius: 20px;
-    font-size: 10pt; font-weight: 700; white-space: nowrap; }}
+    font-size: 9.5pt; font-weight: 700; white-space: nowrap; }}
   .leaderboard {{ display: flex; flex-direction: column; gap: 5px; }}
-  .lb-item {{ display: flex; align-items: center; gap: 10px; padding: 6px 12px;
-    background: #f5f5f5; border-radius: 6px; font-size: 9.5pt; }}
+  .lb-item {{ display: flex; align-items: center; gap: 10px; padding: 7px 12px;
+    background: #f8f9f8; border-radius: 8px; font-size: 9.5pt; }}
   .lb-name {{ flex: 1; font-weight: 600; }}
   .lb-count {{ color: #c0392b; font-weight: 700; }}
 
   .lb-cards {{ display: flex; flex-direction: column; gap: 8px; }}
-  .lb-card {{ display: flex; align-items: center; gap: 14px; padding: 10px 16px;
-    border-radius: 8px; background: #f9f9f9; }}
-  .lb-rank {{ font-size: 16pt; width: 36px; text-align: center; }}
-  .lb-person {{ flex: 1; font-size: 11pt; font-weight: 600; }}
-  .lb-sp {{ font-size: 14pt; font-weight: 800; }}
+  .lb-card {{ display: flex; align-items: center; gap: 14px; padding: 11px 16px;
+    border-radius: 10px; background: #fafbfa; border: 1px solid #f0f1ef; }}
+  .lb-rank {{ font-size: 15pt; width: 36px; text-align: center; }}
+  .lb-person {{ flex: 1; font-size: 10.5pt; font-weight: 600; }}
+  .lb-sp {{ font-size: 13pt; font-weight: 700; }}
 
-  .footer {{ text-align: center; font-size: 8pt; color: #ccc; margin: 20px 0 16px;
-    padding-top: 12px; border-top: 1px solid #eee; }}
+  .footer {{ text-align: center; font-size: 8pt; color: #c5c8c5; margin: 22px 0 16px;
+    padding-top: 14px; border-top: 1px solid #eee; }}
   @media print {{
     body {{ padding: 0 20px; background: #fff; }}
     .report-header, th {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
@@ -602,7 +631,7 @@ def generate_html(team_name, sprint_obj, issues, dev_bl, qa_bl, velocity_history
     <div class="stat-label">Total</div>
   </div>
   <div class="stat-card">
-    <div class="stat-num" style="color:#27ae60;">{done_t}</div>
+    <div class="stat-num" style="color:{color["primary"]};">{done_t}</div>
     <div class="stat-sp">{done_sp_val:.0f} SP</div>
     <div class="stat-label">Done</div>
   </div>
@@ -679,6 +708,18 @@ def generate_html(team_name, sprint_obj, issues, dev_bl, qa_bl, velocity_history
 </div>
 
 <div class="section">
+  <div class="section-title">🐛 Dev Leaderboard — Bug Fixed</div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Ticket bertipe Bug yang mencapai DEV DONE dalam rentang sprint ini dan status akhir QA PASSED / Done. Dihitung per ticket karena Bug tidak punya SP.</p>
+  <div class="lb-cards">{leaderboard_cards(bug_dev_lb, color["primary"], fmt=bug_count_fmt)}</div>
+</div>
+
+<div class="section">
+  <div class="section-title">🐛 QA Leaderboard — Bug Verified</div>
+  <p style="font-size:9pt;color:#999;margin-bottom:12px;">Ticket bertipe Bug yang mencapai QA PASSED dalam rentang sprint ini dan status akhir QA PASSED / Done. Dihitung per ticket karena Bug tidak punya SP.</p>
+  <div class="lb-cards">{leaderboard_cards(bug_qa_lb, color["dark"], fmt=bug_count_fmt)}</div>
+</div>
+
+<div class="section">
   <div class="section-title">🔴 Delayed Tickets — Developer <span style="font-weight:400;font-size:10pt;">({len(dev_delayed)} ticket)</span></div>
   <p style="font-size:9pt;color:#999;margin-bottom:12px;">Total waktu In Progress vs baseline rata-rata per SP dari {BASELINE_SPRINT_COUNT} sprint closed terakhir.</p>
   {champion_box(dev_delayed, "assignee", color["primary"])}
@@ -688,7 +729,7 @@ def generate_html(team_name, sprint_obj, issues, dev_bl, qa_bl, velocity_history
 <div class="section">
   <div class="section-title">🟠 Delayed Tickets — QA <span style="font-weight:400;font-size:10pt;">({len(qa_delayed)} ticket)</span></div>
   <p style="font-size:9pt;color:#999;margin-bottom:12px;">Total waktu QA TEST vs baseline rata-rata per SP dari {BASELINE_SPRINT_COUNT} sprint closed terakhir.</p>
-  {champion_box([r for r in qa_delayed if r.get("is_qa_team")], "assignee", color["dark"])}
+  {champion_box([r for r in qa_delayed if r.get("is_qa_team")], "assignee", color["primary"])}
   <table><thead>{d_header}</thead><tbody>{delayed_rows(qa_delayed)}</tbody></table>
 </div>
 
