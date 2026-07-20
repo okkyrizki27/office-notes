@@ -8,6 +8,8 @@ Report transaksi Digiman yang terdiri dari 5 halaman. Semua view dibuat di schem
 
 **Planned Enhancement — Maintenance Activity Type:** [../architecture/inspection-order/maintenance-activity-type-enhancement.md](../architecture/inspection-order/maintenance-activity-type-enhancement.md) (Bagian 2.12) — menambah kolom baru **`Maint. Act. Type`** ke D'Order Result & Ordering Compliance (`vw_report_iams_f_am_digiman_dorder`), belum live. Report lain yang query `mkp_maintenance_order` (mis. `vw_report_iams_get_molist`, INSPECTION COMPLIANCE) berpotensi ikut terdampak tapi belum dianalisa.
 
+**Planned Enhancement — Area of Unit & Man Power:** [../architecture/inspection-order/area-of-unit-man-power-enhancement.md](../architecture/inspection-order/area-of-unit-man-power-enhancement.md) (Bagian 2.7) — menambah 4 kolom baru **`Area`, `Man Power`, `Duration`, `Man Hours`** ke D'Inspect Result & D'Order Result/Ordering Compliance, belum live. Data Digiplan/PM Shutdown/BD Corrective (`dplan`/`DPlanDB`) **tidak** terdampak — schema `dplan` tidak disentuh view manapun di report ini.
+
 ---
 
 ## Mapping Report → View

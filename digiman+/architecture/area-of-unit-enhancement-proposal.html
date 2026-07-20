@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Enhancement Area of Unit, Component &amp; Sub Component</title>
+<style>
+  @page { size: A4 portrait; margin: 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11.3pt; color: #1a1a1a; margin: 0; padding: 0 40px; line-height: 1.68; }
+
+  .cover { padding: 120px 0 40px; page-break-after: always; }
+  .cover-eyebrow { font-size: 11pt; font-weight: 700; color: #2c5f8a; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+  .cover h1 { font-size: 28pt; font-weight: 800; margin: 0 0 16px; line-height: 1.35; color: #1f3a5f; border: none; padding: 0; }
+  .cover .subtitle { font-size: 13.5pt; color: #556; margin-bottom: 32px; line-height: 1.5; }
+  .cover-meta { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
+  .cover-meta td { padding: 11px 14px; border: 1px solid #dde4ec; font-size: 10.5pt; line-height: 1.5; }
+  .cover-meta td:first-child { width: 32%; color: #667; background: #f7f9fb; }
+  .status-pill { display: inline-block; background: #eaf2fa; color: #1f3a5f; font-weight: 700; font-size: 9.5pt; letter-spacing: 0.4px; padding: 8px 18px; border-radius: 20px; border: 1px solid #cfe0f0; }
+  .companion-pill { display: inline-block; margin-left: 10px; background: #f7f0fa; color: #6c3483; font-weight: 700; font-size: 9.5pt; letter-spacing: 0.2px; padding: 8px 18px; border-radius: 20px; border: 1px solid #e5cdf0; }
+
+  h1 { font-size: 19pt; color: #1f3a5f; border-bottom: 3px solid #1f3a5f; padding-bottom: 10px; margin: 0 0 18px; page-break-before: always; }
+  h1:first-of-type { page-break-before: avoid; }
+  h2 { font-size: 14pt; color: #1f3a5f; margin: 26px 0 13px; page-break-after: avoid; }
+  h3 { font-size: 12.5pt; color: #2c5f8a; margin: 22px 0 11px; page-break-after: avoid; }
+
+  p { margin: 9px 0; }
+  ul, ol { margin: 9px 0 13px 0; padding-left: 24px; }
+  li { margin: 6px 0; }
+  b, strong { color: #111; }
+  code { background: #f0f2f5; color: #1a1a1a; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9.8pt; }
+
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9.6pt; margin: 12px 0 20px; line-height: 1.45; }
+  th { background: #1f3a5f; color: #fff; padding: 9px 10px; text-align: left; font-weight: 600; word-wrap: break-word; }
+  td { padding: 8px 10px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+  tr { page-break-inside: avoid; }
+  tr:nth-child(even) td { background: #f4f7fa; }
+
+  .exec-cards { display: flex; gap: 14px; margin: 22px 0; flex-wrap: wrap; }
+  .exec-card { flex: 1; min-width: 145px; background: #f4f7fa; border-top: 5px solid #2c5f8a; border-radius: 8px; padding: 18px 14px; text-align: center; }
+  .exec-card .num { font-size: 22pt; font-weight: 800; color: #1f3a5f; line-height: 1.15; }
+  .exec-card .label { font-size: 8.8pt; color: #667; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 7px; }
+  .exec-card .sub { font-size: 8.6pt; color: #999; margin-top: 4px; line-height: 1.4; }
+
+  .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 15px 19px; border-radius: 0 6px 6px 0; margin: 16px 0; line-height: 1.55; }
+  .callout.warn { border-left-color: #d68910; background: #fdf3e3; }
+  .callout.decision { border-left-color: #1e8449; background: #eaf6ee; }
+  .callout.info { border-left-color: #6c3483; background: #f7f0fa; }
+  .callout-label { font-weight: 700; font-size: 9.6pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 6px; }
+  .callout.warn .callout-label { color: #b9770e; }
+  .callout.decision .callout-label { color: #1e8449; }
+  .callout.info .callout-label { color: #6c3483; }
+
+  .scope-grid { display: flex; gap: 18px; margin: 16px 0; }
+  .scope-col { flex: 1; border-radius: 8px; padding: 16px 18px; }
+  .scope-col.yes { background: #eaf6ee; border: 1px solid #cdeada; }
+  .scope-col.no { background: #f7f7f7; border: 1px solid #e2e2e2; }
+  .scope-col h4 { margin: 0 0 10px; font-size: 10.8pt; }
+  .scope-col.yes h4 { color: #1e8449; }
+  .scope-col.no h4 { color: #888; }
+  .scope-col ul { margin: 0; padding-left: 20px; }
+  .scope-col li { font-size: 9.7pt; margin: 7px 0; line-height: 1.45; }
+
+  .badge { display:inline-block; color:#fff; padding:4px 11px; border-radius:12px; font-size:8.3pt; font-weight:700; letter-spacing:0.3px; }
+  .badge-recommended { background:#1e8449; }
+  .badge-alt { background:#7f8c8d; }
+  .badge-track { background:#6c3483; }
+
+  .footer { margin-top: 34px; font-size: 9.2pt; color: #999; text-align: center; border-top: 1px solid #ddd; padding-top: 12px; line-height: 1.5; }
+
+  @media print {
+    h2, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .exec-card, .callout, .scope-col, .badge, .status-pill, .companion-pill, .cover-meta td:first-child { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<div class="cover">
+  <div class="cover-eyebrow">Digiman+ · Proposal Effort Estimasi · 1 dari 2</div>
+  <h1>Enhancement Area of Unit,<br>Component &amp; Sub Component</h1>
+  <div class="subtitle">Estimasi effort untuk pengajuan prioritas &amp; alokasi sumber daya ke Management</div>
+  <table class="cover-meta">
+    <tr><td>Tanggal</td><td>20 Juli 2026</td></tr>
+    <tr><td>Produk</td><td>Digiman+</td></tr>
+    <tr><td>Modul terdampak</td><td>Master Data (Equipment Mapping), Inspection, Additional Order, Digiplan, Digiman Transaction Report</td></tr>
+    <tr><td>Disiapkan oleh</td><td>Okky Rizki R — Bukit Technology</td></tr>
+    <tr><td>Dokumen sumber</td><td>area-of-unit-man-power-enhancement.md, man-power-man-hours-excel-enhancement.md, area-of-unit-man-power-effort-summary.md</td></tr>
+  </table>
+  <span class="status-pill">DRAFT — UNTUK REVIEW MANAGEMENT</span>
+  <span class="companion-pill">↔ Proposal terpisah: Man Power, Duration &amp; Man Hours</span>
+</div>
+
+<!-- ===================== 1. RINGKASAN EKSEKUTIF ===================== -->
+<h1>1. Ringkasan Eksekutif</h1>
+
+<p>Enhancement ini menambahkan konsep <b>Area of Unit</b> — pengelompokan lokasi kerja yang lebih besar/coarse-grained dibanding Component/Sub Component (mis. Area "Engine Compartment" menaungi banyak Component di dalamnya) — dan melengkapi <b>Component &amp; Sub Component</b> agar tersedia konsisten di semua jalur pembuatan order, bukan cuma Inspection. Saat ini, Component/Sub Component sudah bisa dicatat saat Inspection, tapi <b>belum ada sama sekali</b> di layar Additional Order, dan konsep Area belum ada di mana pun. Hasilnya: SPV &amp; planner bisa melihat/memfilter pekerjaan per Area di Digiplan, dan laporan management (Digiman Transaction Report) bisa breakdown pekerjaan berdasarkan lokasi.</p>
+
+<div class="exec-cards">
+  <div class="exec-card">
+    <div class="num">~34 SP</div>
+    <div class="label">Total Effort — Tim BUMA ID</div>
+    <div class="sub">Master Data, Inspection, Additional Order, Digiplan</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~40</div>
+    <div class="label">Estimasi Mandays</div>
+    <div class="sub">tim BUMA ID existing</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~1 sprint</div>
+    <div class="label">Durasi — Tim BUMA ID</div>
+    <div class="sub">33.8 SP ÷ 43.7 SP/sprint kapasitas efektif</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~3.25 SP</div>
+    <div class="label">Track Terpisah — DE/DA</div>
+    <div class="sub">Dampak report/Power BI, di luar 34 SP di atas — lihat Bagian 5.4</div>
+  </div>
+</div>
+
+<div class="callout decision">
+  <div class="callout-label">Rekomendasi Singkat</div>
+  Kerjakan pakai <b>tim BUMA ID existing</b> — beban kerja (~34 SP) cukup ringan, sekitar <b>77% dari kapasitas 1 sprint</b> (43.7 SP), jadi realistis selesai dalam <b>1 sprint</b>. Dependency utama: enhance Master Data "Equipment Mapping" (Bagian 5.1) perlu selesai lebih dulu sebelum kolom Area di Digiplan bisa dikembangkan penuh (lihat Bagian 7).
+</div>
+
+<div class="callout info">
+  <div class="callout-label">Proposal ini terkait erat dengan proposal "Man Power, Duration &amp; Man Hours"</div>
+  Kedua proposal berasal dari 1 inisiatif bisnis yang sama (meeting 10 Jul 2026) dan <b>menyentuh layar &amp; endpoint yang identik</b> — Inspection, Additional Order, Edit eMOL, <code>PoolingMOItem</code>/payload SAP, MO Backlog inbound, dan testing end-to-end. Dokumen ini sengaja dipisah supaya Management bisa menyetujui/memprioritaskan topik Area secara independen dari topik Man Power — tapi kalau <b>kedua proposal disetujui</b>, sangat direkomendasikan dikerjakan <b>dalam sprint yang sama</b>, supaya layar yang sama tidak disentuh dua kali di sprint berbeda. Detail metodologi split effort di Bagian 4.3.
+</div>
+
+<!-- ===================== 2. LATAR BELAKANG ===================== -->
+<h1>2. Latar Belakang &amp; Tujuan Bisnis</h1>
+
+<h3>2.1 Konsep Area of Unit</h3>
+<p>Area of Unit adalah level pengelompokan lokasi kerja yang <b>lebih besar/coarse-grained</b> dibanding Component/Sub Component — 1 Area lazimnya mencakup banyak kombinasi Component-Sub Component (dikonfirmasi ke business, 14 Jul 2026). Setelah dianalisis lebih dalam bersama fakta bahwa Component-Sub Component sudah ter-mapping ke Asset Model, relasinya final: <b>1 kombinasi Model+Component+Sub Component = maksimal 1 Area</b> (1:N, bukan M:N) — <b>sudah divalidasi ke data real/mechanical SME</b> (20 Jul 2026). Justifikasinya: 1 part fisik hanya berada di 1 lokasi; kalau Model diabaikan barulah part yang sama <i>terlihat</i> bisa di beberapa Area (mis. "Filter" ada di Area "Engine Bay" pada truck model A, tapi "Rear Compartment" pada model B) — begitu Model dipin, Area-nya cuma 1.</p>
+
+<h3>2.2 Kondisi Saat Ini</h3>
+<ul>
+  <li><b>Component &amp; Sub Component sudah ada</b> di layar create finding Inspection (dan otomatis berlaku juga di Additional Inspection, karena layarnya sama persis) — cascading 2 level dari Master Data yang sudah ada &amp; live di service <code>services-asset</code> ("Equipment Mapping").</li>
+  <li><b>Additional Order belum punya field ini sama sekali</b> — Additional Order adalah layar/jalur pembuatan order yang berbeda dari Inspection (order tanpa berasal dari finding), sehingga tanpa enhancement ini, order yang berasal dari Additional Order akan selalu kosong untuk Component/Sub Component/Area.</li>
+  <li><b>Area belum ada konsepnya sama sekali</b> di sistem — belum ada master data, belum ada mapping ke Component/Sub Component.</li>
+  <li>Master Data untuk assign Component+Sub Component ke suatu Model sudah live di layar <b>"Equipment Mapping"</b> (`Equipment Management → Equipment Mapping`, service <code>services-asset</code>) — modal <b>"Add New Component"</b> di layar ini yang akan diperluas untuk assign Area juga (Bagian 5.1).</li>
+</ul>
+
+<h3>2.3 Manfaat Bisnis</h3>
+<ul>
+  <li>Planner &amp; SPV bisa melihat dan memfilter pekerjaan per Area di Digiplan (Daily Plan) — berguna untuk plan yang mencakup banyak lokasi kerja sekaligus.</li>
+  <li>Component &amp; Sub Component tersedia konsisten di semua jalur pembuatan order (Inspection <i>maupun</i> Additional Order), bukan cuma satu jalur.</li>
+  <li>Laporan management (Digiman Transaction Report) bisa breakdown hasil inspeksi/order berdasarkan Area of Unit.</li>
+  <li>Data disimpan <b>by value/snapshot</b> (bukan reference ke Master Data) di titik transaksi — perubahan Master Data di kemudian hari tidak membuat data historis jadi stale/orphan.</li>
+</ul>
+
+<!-- ===================== 3. RUANG LINGKUP ===================== -->
+<h1>3. Ruang Lingkup</h1>
+
+<div class="scope-grid">
+  <div class="scope-col yes">
+    <h4>✓ Termasuk dalam Estimasi</h4>
+    <ul>
+      <li>Master data baru <b>Area</b> (Code/Name) — CRUD standalone</li>
+      <li>Enhance layar existing <b>"Equipment Mapping"</b> (modal "Add New Component"): tambah field <code>AreaCode</code> (posisi field pertama, search-in-dropdown)</li>
+      <li><b>Edit action</b> baru di list Equipment Mapping — assign/ubah Area untuk row existing</li>
+      <li>Data migration (BE) — backfill <code>AreaCode</code> ke row <code>ModelComponentSubComponent</code> existing</li>
+      <li>Permission code baru untuk maintain Master Data (admin HO)</li>
+      <li>Inspection/Additional Inspection — <i>backend saja</i>: derive &amp; snapshot <code>AreaCode</code>+<code>AreaName</code> dari Component+Sub Component yang dipilih (Area tidak muncul sebagai field UI di layar ini)</li>
+      <li>Additional Order — field baru <b>Component, Sub Component</b> (cascading 2 level, layar ini belum punya field ini sama sekali)</li>
+      <li>Edit eMOL — carry-forward Component/Sub Component (auto-fill dari Finding/Additional Order)</li>
+      <li><code>PoolingMOItem</code>/payload — tambah kolom <code>Area</code> (Component/Sub Component sudah ada di tabel ini)</li>
+      <li>MO Backlog inbound — parse balik Component/Sub Component/Area dari response SAP</li>
+      <li>Digiplan — kolom baru <b>Component, Sub Component, Area</b> (dropdown cascading Area→Component→Sub Component, auto-fill dari MO Backlog, Excel export/import + validasi kombinasi terhadap Master Data)</li>
+      <li>Digiman Transaction Report — kolom <b>Area</b> baru di D'Inspect Result &amp; D'Order Result/Ordering Compliance + update dataset Power BI <i>(dikerjakan role DE/DA, track terpisah — Bagian 5.4)</i></li>
+      <li>Testing end-to-end (porsi Area dari alur bersama)</li>
+    </ul>
+  </div>
+  <div class="scope-col no">
+    <h4>✗ Di Luar Estimasi</h4>
+    <ul>
+      <li><b>Mapping BAPI ke SAP</b> — assessment kelayakan teknis dikoordinasikan langsung oleh client (PIC: Faiza) dengan tim SAP internal mereka, bukan bagian dari effort tim Digiman+.</li>
+      <li>Component/Sub Component <b>tidak</b> ditambahkan sebagai field yang bisa diedit di Order Approval — behavior existing (tidak bisa diedit di titik ini) tetap dipertahankan, bukan perubahan baru.</li>
+      <li>Topik <b>Man Power, Duration, Man Hours</b> (termasuk visibility card &amp; assignment mechanic di PM Shutdown/BD Corrective) — lihat proposal terpisah.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout">
+  <div class="callout-label">Catatan</div>
+  Skema mapping Area sudah <b>final secara desain</b> (1 kolom <code>AreaCode</code> di <code>ModelComponentSubComponent</code>, bukan tabel junction M:N) dan asumsi 1:N-nya sudah divalidasi ke data real/mechanical SME — bukan lagi sumber ketidakpastian besar seperti sempat diasumsikan sebelumnya.
+</div>
+
+<!-- ===================== 4. METODOLOGI ===================== -->
+<h1>4. Metodologi Estimasi</h1>
+<p>Estimasi memakai baseline data historis riil tim BUMA ID (5 sprint terakhir), metodologi yang sama dengan estimasi effort enhancement Digiman+ lainnya — bukan angka perkiraan kualitatif.</p>
+
+<h3>4.1 Kalibrasi Story Point</h3>
+<table>
+  <tr><th>Label Kompleksitas</th><th>Story Point</th></tr>
+  <tr><td>Kecil</td><td>1</td></tr>
+  <tr><td>Kecil–Sedang</td><td>2</td></tr>
+  <tr><td>Sedang</td><td>3</td></tr>
+  <tr><td>Sedang–Besar</td><td>5</td></tr>
+  <tr><td>Besar</td><td>8</td></tr>
+</table>
+
+<h3>4.2 Konversi ke Mandays &amp; Kapasitas Sprint</h3>
+<ul>
+  <li><b>Mandays = SP × ~1.17</b> — rasio throughput riil tim BUMA ID: 312 SP diselesaikan dalam 366 person-days (6 orang × 61 hari kerja, basis 5 sprint terakhir).</li>
+  <li><b>Kapasitas efektif sprint = ~43.7 SP/sprint</b> — 70% dari rata-rata velocity riil (62.4 SP/sprint); 30% sisanya dialokasikan untuk production support di luar sprint enhancement.</li>
+</ul>
+
+<h3>4.3 Metodologi Split Effort — Baris yang Sama Menyentuh 2 Topik</h3>
+<p>Inisiatif Area &amp; Man Power awalnya diestimasi sebagai <b>1 dokumen gabungan</b> (total 45 SP untuk Inspection/Order/Master Data/Report, di luar Digiplan &amp; PM Shutdown/BD Corrective yang sudah bawaannya terpisah bersih per topik). Beberapa baris di dalamnya menggabungkan pekerjaan Area <i>dan</i> Man Power/Duration dalam 1 baris yang sama (mis. "Additional Order: field Component, Sub Component, Duration, Man Power" — 2 SP). Untuk membagi ke 2 proposal terpisah ini, baris-baris tersebut <b>dipecah proporsional berdasarkan jumlah field yang disentuh per topik</b> (bukan estimasi ulang dari nol) — contoh: baris 2 SP di atas menyentuh 4 field (2 Area: Component+Sub Component, 2 Man Power: Duration+Man Power) → dipecah 1 SP Area + 1 SP Man Power.</p>
+<p>Hasil pemecahan ini <b>rekonsiliasi penuh</b> ke total dokumen sumber: 33.8 SP (proposal ini) + porsi Man Power di baris yang sama (lihat proposal terpisah) = 45.8 SP ≈ total gabungan asli 45 SP (selisih kecil murni pembulatan).</p>
+<div class="callout warn">
+  <div class="callout-label">Keterbatasan metode split ini</div>
+  Split proporsional ini paling akurat untuk baris yang murni penambahan field independen (mis. field Man Power di form tidak butuh field Area untuk berfungsi). Untuk baris <b>testing end-to-end</b> (dipecah rata 50/50, 4 SP/4 SP) dan <b>dampak ke report/CTE SQL</b>, biaya sebagian bersifat "fixed per-touchpoint" — menyentuh 1 CTE/endpoint yang sama untuk nambah 1 kolom vs 4 kolom tidak selalu linear 1/4 biayanya. Kalau <b>hanya proposal ini yang disetujui</b> (Man Power <i>tidak</i> jalan), estimasi baris-baris shared tersebut <b>bisa jadi under-estimate</b> dibanding kalau dikerjakan benar-benar berdiri sendiri — sebaliknya kalau <b>kedua proposal jalan bersamaan</b>, totalnya konsisten dengan estimasi gabungan awal (83–91 SP, tergantung skenario Man Power).
+</div>
+
+<!-- ===================== 5. RINCIAN ESTIMASI ===================== -->
+<h1>5. Rincian Estimasi Effort</h1>
+
+<h3>5.1 Master Data &amp; Equipment Mapping</h3>
+<table>
+  <tr><th style="width:40%;">Komponen</th><th style="width:6%;">SP</th><th style="width:9%;">Mandays</th><th>Catatan</th></tr>
+  <tr><td>Master data <code>Area</code> (Code/Name): UI maintain baru (CRUD standalone)</td><td>3</td><td>3.5</td><td>Terpisah dari modal assign — layar untuk mendefinisikan daftar Area itu sendiri, pola sama dengan Master Data UI <code>MaintenanceActivityType</code></td></tr>
+  <tr><td>Enhance modal "Add New Component" (Equipment Mapping): tambah field <code>AreaCode</code></td><td>2</td><td>2.3</td><td>Bukan UI baru — modal &amp; list-nya sudah ada, tinggal 1 field dropdown Area (posisi pertama) + wiring simpan</td></tr>
+  <tr><td>Equipment Mapping: tambah <b>Edit action</b> baru (assign/ubah Area di row existing)</td><td>2</td><td>2.3</td><td>List saat ini cuma punya Action View/Delete</td></tr>
+  <tr><td>Data migration awal (BE): backfill <code>AreaCode</code> ke row <code>ModelComponentSubComponent</code> existing</td><td>2</td><td>2.3</td><td>Volume row existing besar (mis. 81 row untuk 1 kombinasi Model saja) — isi data disiapkan tim Product/HO, effort ini murni mekanisme migrasi</td></tr>
+  <tr><td>Permission code baru untuk maintain Master Data (admin HO)</td><td>1</td><td>1.2</td><td>Setup permission code + assign ke role</td></tr>
+  <tr><td><b>Subtotal</b></td><td><b>10</b></td><td><b>~11.6</b></td><td></td></tr>
+</table>
+
+<h3>5.2 Inspection, Additional Order, Edit eMOL &amp; Sinkronisasi SAP</h3>
+<table>
+  <tr><th style="width:40%;">Komponen</th><th style="width:6%;">SP</th><th style="width:9%;">Mandays</th><th>Catatan</th></tr>
+  <tr><td>Inspection &amp; Additional Inspection: backend derive + simpan snapshot <code>AreaCode</code>/<code>AreaName</code></td><td>1</td><td>1.2</td><td><i>Split dari baris gabungan 2 SP</i> ("+field Man Power +logic backend lookup Area") — porsi Area saja; Area tidak muncul sebagai field UI</td></tr>
+  <tr><td>Additional Order: field baru Component, Sub Component (cascading 2 level)</td><td>1</td><td>1.2</td><td><i>Split dari baris gabungan 2 SP</i> ("field Component, Sub Component, Duration, Man Power") — porsi Component/Sub Component</td></tr>
+  <tr><td>Edit eMOL: carry-forward Component/Sub Component (auto-fill, tetap editable)</td><td>1</td><td>1.2</td><td><i>Split dari baris gabungan 2 SP</i> (carry-forward ke-4 field) — porsi Component/Sub Component</td></tr>
+  <tr><td><code>PoolingMOItem</code>/payload: tambah kolom <code>Area</code></td><td>1</td><td>1.2</td><td><i>Split dari baris gabungan 3 SP</i> (Area+Duration+Man Power) — Component/Sub Component sudah ada di tabel ini</td></tr>
+  <tr><td>MO Backlog inbound: parse balik Component, Sub Component, Area dari response SAP</td><td>1.8</td><td>2.1</td><td><i>Split dari baris gabungan 3 SP</i> (5 field: Component/Sub Component/Area vs Duration/Man Power) — porsi 3 dari 5 field</td></tr>
+  <tr><td>Mapping BAPI: kirim Component, Sub Component, Area ke SAP</td><td colspan="2" style="text-align:center;color:#888;">Belum bisa diestimasi</td><td>Tergantung hasil assessment client dengan tim SAP mereka (PIC: Faiza) — di luar effort tim development Digiman+</td></tr>
+  <tr><td>Testing end-to-end (porsi Area dari alur Finding/Additional Order → eMOL → SAP → MO Backlog → Digiplan)</td><td>4</td><td>4.7</td><td><i>Split 50/50 dari baris gabungan 8 SP</i> — lihat keterbatasan metode di Bagian 4.3</td></tr>
+  <tr><td><b>Subtotal</b></td><td><b>9.8</b></td><td><b>~11.4</b></td><td></td></tr>
+</table>
+
+<h3>5.3 Digiplan — Kolom Component, Sub Component, Area</h3>
+<table>
+  <tr><th style="width:40%;">Komponen</th><th style="width:6%;">SP</th><th style="width:9%;">Mandays</th><th>Catatan</th></tr>
+  <tr><td><code>DPColumn</code>: tambah 3 kolom baru (Component, Sub Component, Area) sebagai custom column</td><td>1</td><td>1.2</td><td>Custom column biasa (bukan mandatory seperti Man Power/Man Hours)</td></tr>
+  <tr><td>Grid UI: 3 dropdown baru dengan cascading Area→Component→Sub Component dari Master Data</td><td>3</td><td>3.5</td><td>Fetch dari API Master Data (Bagian 5.1); dependency: Master Data UI perlu selesai lebih dulu</td></tr>
+  <tr><td>Auto-fill saat user pilih MO Backlog: isi Component/Sub Component/Area</td><td>3</td><td>3.5</td><td>Termasuk graceful handling kalau kolom tidak ada di Plan</td></tr>
+  <tr><td>Excel export: tampilkan 3 kolom baru</td><td>1</td><td>1.2</td><td>Kolom text biasa (bukan dropdown Excel)</td></tr>
+  <tr><td>Excel import: parse &amp; validasi kombinasi terhadap Master Data (reject + warning kalau tidak match)</td><td>3</td><td>3.5</td><td>Baris ditolak dengan warning jelas kalau kombinasi tidak valid</td></tr>
+  <tr><td>Testing (grid, excel, MO Backlog auto-fill, graceful-handling kolom hilang)</td><td>3</td><td>3.5</td><td></td></tr>
+  <tr><td><b>Subtotal</b></td><td><b>14</b></td><td><b>~16.4</b></td><td></td></tr>
+</table>
+
+<div class="callout decision">
+  <div class="callout-label">Total Tim BUMA ID (Bagian 5.1 + 5.2 + 5.3)</div>
+  <b>33.8 SP ≈ ~39.5 mandays</b> — 33.8 ÷ 43.7 SP/sprint kapasitas efektif = 0.77 → dibulatkan <b>1 sprint</b>.
+</div>
+
+<h3>5.4 Track Terpisah — Dampak Report &amp; Power BI (Role DE/DA)</h3>
+<p>BUMA ID roster (6 orang: 2 BE, 1 FE Web, 1 FE Mobile, 2 QA) <b>tidak punya role DE/DA</b>. Pekerjaan ini dikerjakan role <b>Data Engineer</b> &amp; <b>Data Analyst</b> yang terpisah dari tim BUMA ID (secara riil di project ini: Varian Aditya Iryanto/DE, Herianto Salim/DA) — <b>tidak memperebutkan kapasitas 43.7 SP/sprint</b> di atas, kemungkinan bisa jalan paralel.</p>
+<table>
+  <tr><th style="width:40%;">Komponen</th><th style="width:6%;">SP</th><th style="width:9%;">Mandays</th><th>Catatan</th></tr>
+  <tr><td><span class="badge badge-track">DE</span> D'Inspect Result — tambah kolom Area ke <code>vw_report_iams_inspection_results</code></td><td>0.5</td><td>0.6</td><td><i>Split proporsional</i> dari baris gabungan 2 SP (4 kolom: Area/Man Power/Duration/Man Hours) — porsi 1 dari 4 kolom</td></tr>
+  <tr><td><span class="badge badge-track">DE</span> D'Order Result &amp; Ordering Compliance — tambah kolom Area ke <code>vw_report_iams_f_am_digiman_dorder</code></td><td>0.75</td><td>0.9</td><td><i>Split proporsional</i> dari baris gabungan 3 SP — porsi 1 dari 4 kolom; reference class riil: IAMS30-3946 (Varian/DE, 3 SP, scope serupa)</td></tr>
+  <tr><td><span class="badge badge-track">DA</span> Update dataset/report Power BI — tampilkan kolom Area (2 halaman)</td><td>2</td><td>2.3</td><td><i>Split proporsional</i> dari baris gabungan 8 SP — porsi 1 dari 4 kolom; reference class riil: IAMS30-3950 + IAMS30-3980 (Herianto/DA)</td></tr>
+  <tr><td><b>Subtotal DE/DA</b></td><td><b>3.25</b></td><td><b>~3.8</b></td><td>Mandays masih placeholder (rasio BUMA ID 1.17) — throughput riil DE/DA belum bisa dihitung dari histori Jira (resolusi batch-close)</td></tr>
+</table>
+<p style="font-size:9.6pt;color:#667;line-height:1.5;">Split 1-dari-4-kolom di atas adalah pendekatan paling kasar di seluruh dokumen ini — kalau proposal Man Power/Duration/Man Hours <b>tidak</b> berjalan bersamaan, DE/DA kemungkinan tetap perlu menyentuh CTE/dataset yang sama untuk kolom Area saja, dengan overhead touchpoint yang tidak jauh berbeda dari mengerjakan ke-4 kolom sekaligus.</p>
+
+<!-- ===================== 6. TIMELINE ===================== -->
+<h1>6. Timeline &amp; Dependency</h1>
+<table>
+  <tr><th style="width:30%;">Track</th><th style="width:14%;">SP</th><th style="width:16%;">Mandays</th><th>Durasi</th></tr>
+  <tr><td><b>Tim BUMA ID</b> (Bagian 5.1–5.3)</td><td>33.8</td><td>~39.5</td><td><b>~1 sprint</b> (77% dari kapasitas efektif 43.7 SP/sprint)</td></tr>
+  <tr><td><b>Track DE/DA</b> (Bagian 5.4)</td><td>3.25</td><td>~3.8</td><td>Di luar sprint BUMA ID — jalan paralel, durasi belum bisa dihitung dengan metodologi sprint yang sama (lihat catatan mandays placeholder)</td></tr>
+</table>
+
+<div class="callout warn">
+  <div class="callout-label">Dependency urutan pengembangan</div>
+  Kolom Area di Digiplan (5.3) diisi lewat dropdown dari Master Data mapping (5.1) — Master Data (Equipment Mapping enhance + Area master CRUD) perlu <b>selesai/tersedia lebih dulu</b> sebelum kolom Digiplan bisa dikembangkan penuh. Inspection/Additional Order/Approval tidak punya dependency yang sama (Area di situ murni backend lookup) — bisa dikembangkan independen, asalkan kolom <code>AreaCode</code> di <code>ModelComponentSubComponent</code> sudah ada meski datanya belum lengkap terisi.
+</div>
+
+<!-- ===================== 7. ASUMSI & RISIKO ===================== -->
+<h1>7. Asumsi &amp; Risiko</h1>
+<ul>
+  <li><b>Blast radius regression testing</b> — kolom <code>AreaCode</code> ditambahkan ke <code>ModelComponentSubComponent</code>, tabel foundational yang sudah dipakai fitur lain (Rating, Damage Mapping). Menambah kolom nullable aman untuk data existing, tapi regression scope-nya lebih lebar dari tabel baru terisolasi.</li>
+  <li><b>Konsekuensi maintenance data</b> — admin HO harus define Area <i>per baris</i> <code>ModelComponentSubComponent</code> (per Model) — kalau 10 Model berbeda punya Component+Sub Component yang sama, Area untuk tiap Model perlu diisi terpisah, tidak otomatis ke-reuse lintas Model. Sudah ditambahkan sebagai 1 step baru ke checklist onboarding Model baru.</li>
+  <li><b>Mapping BAPI ke SAP</b> (di luar estimasi ini) — feasibility &amp; effort di sisi SAP belum diketahui sampai assessment client (Faiza) dengan tim SAP mereka selesai.</li>
+  <li><b>Split effort baris shared</b> (Bagian 4.3, 5.2, 5.4) berpotensi under/over-estimate tergantung apakah proposal Man Power/Duration/Man Hours dikerjakan bersamaan atau tidak — lihat keterbatasan metode di Bagian 4.3.</li>
+  <li>DE/DA mandays masih pakai rasio placeholder BUMA ID (1.17) — throughput riil individu belum bisa dihitung dari histori Jira mereka.</li>
+  <li>Estimasi berdasarkan deskripsi arsitektur dari pemilik produk, tanpa akses langsung ke source code — perlu divalidasi oleh engineer yang memegang codebase <code>services-asset</code>, <code>maintenance-execution</code>, <code>maintenance-order</code>, dan <code>dplan</code>.</li>
+</ul>
+
+<!-- ===================== 8. REKOMENDASI ===================== -->
+<h1>8. Rekomendasi</h1>
+
+<div class="callout decision">
+  <b>Rekomendasi utama:</b> kerjakan menggunakan tim BUMA ID yang sudah berjalan, dijadwalkan dalam <b>~1 sprint</b> — beban kerja relatif ringan (77% kapasitas 1 sprint). Mulai dari Master Data &amp; Equipment Mapping (Bagian 5.1) lebih dulu karena jadi dependency untuk kolom Area di Digiplan.
+  <p style="margin-top:8px;"><b>Kalau proposal "Man Power, Duration &amp; Man Hours" juga disetujui</b>, sangat direkomendasikan menjadwalkan keduanya di <b>sprint yang sama</b> — banyak layar &amp; endpoint yang identik (Inspection, Additional Order, Edit eMOL, <code>PoolingMOItem</code>/payload, MO Backlog inbound, testing e2e), sehingga mengerjakan bersamaan menghindari re-touch layar yang sama 2× di sprint terpisah dan estimasi split effort di Bagian 4.3/5.2/5.4 jadi paling akurat (rekonsiliasi penuh ke total gabungan 83–91 SP).</p>
+  <p style="margin-top:8px;"><b>Langkah selanjutnya:</b> (1) konfirmasi daftar Area yang valid ke tim Product/HO sebelum data migration backfill dijalankan; (2) validasi estimasi ke engineer pemegang codebase terkait; (3) putuskan penjadwalan bersama/terpisah dengan proposal Man Power.</p>
+</div>
+
+<div class="footer">
+  Dokumen ini dihasilkan dari analisis desain arsitektur internal Digiman+ (dokumen sumber: <i>area-of-unit-man-power-enhancement.md</i>, <i>man-power-man-hours-excel-enhancement.md</i>, <i>area-of-unit-man-power-effort-summary.md</i>). Angka estimasi bersifat sementara dan dapat berubah setelah validasi engineer. Menggantikan proposal gabungan sebelumnya (Area-of-Unit-Man-Power-Enhancement-Client-Report, 10 Jul 2026).
+</div>
+
+</body>
+</html>

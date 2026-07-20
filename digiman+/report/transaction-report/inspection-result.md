@@ -9,6 +9,18 @@ Apa saja temuan defect/kerusakan dari hasil inspeksi unit yang sudah diselesaika
 
 ---
 
+## Planned Changes
+
+- **`Area`, `Man Power`, `Duration`, `Man Hours` (baru, belum live)** — direncanakan lewat [area-of-unit-man-power-enhancement.md](../../architecture/inspection-order/area-of-unit-man-power-enhancement.md) (Bagian 2.7), grup output "Component & Finding" (sejajar `ComponentName`/`SubComponentName`). Sumber: `Area`/`Man Power` dari kolom baru (belum ada saat ini); `Duration` dari kolom **existing** `repairduration` (sudah ada di DB, cuma belum pernah di-`SELECT` ke view ini); `Man Hours` **murni derived** (`Duration × Man Power`, dihitung di view, tidak ada kolom fisik). **Cakupan cuma dari jalur Inspection** (view ini filter `typecode='Inspection'`) — Area/Man Power dari Additional Order tidak akan muncul di sini (Additional Order tidak punya `WorkOrder`), tapi muncul di [D'ORDER RESULT & ORDERING COMPLIANCE](order-result-compliance.md). View ini lebih simpel dari `vw_report_iams_f_am_digiman_dorder` karena cuma 1 jalur sumber (tidak perlu `COALESCE` 2 sumber).
+  - **✅ `taskpersonalizedfinding` menyimpan `AreaName` langsung (diputuskan 20 Jul 2026)** — bukan cuma `AreaCode`. Konsisten dengan prinsip snapshot "by value" di [area-of-unit-man-power-enhancement.md](../../architecture/inspection-order/area-of-unit-man-power-enhancement.md) 2.2 — jadi **tidak perlu CTE/join master data `area` baru** di view ini, tinggal `SELECT` nama langsung dari tabel transaksi.
+  - **Titik perubahan di SQL** (referensi untuk dev, bukan implementasi final):
+    1. CTE `taskpersonalizedfinding` (baris ~75–98) — tambah `areaname`, `manpower`, `repairduration` ke SELECT list & schema `openrowset`.
+    2. Inner SELECT (baris ~301–339) — tambah `tpf.areaname as Area`, `tpf.manpower as [Man Power]`, `tpf.repairduration as Duration`, `tpf.repairduration * tpf.manpower as [Man Hours]`.
+    3. Outer `CAST` SELECT (baris ~260–298) — tambah `cast([Area] ...)`, `cast([Man Power] as int)`, `cast([Duration] as float)`, `cast([Man Hours] as float)`.
+  - Belum ada di `vw_report_iams_inspection_results.sql` saat ini — rilis mengikuti timeline enhancement Area of Unit & Man Power.
+
+---
+
 ## Data Sources
 
 | Source | Table/Path | Filter |
