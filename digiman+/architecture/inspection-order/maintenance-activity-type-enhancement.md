@@ -9,7 +9,7 @@
 
 > **Scope dokumen ini (dikonfirmasi 15 Jul 2026)**: sengaja digabung jadi **satu dokumen**, dua tujuan sekaligus — (1) redesign sourcing PM Activity Type → "Maintenance Activity Type" (Bagian 2.1–2.8), dan (2) **merapikan integrasi Inspection→Order secara umum** (Bagian 2.9: relasi `WorkOrder`/`TaskPersonalized`↔`MechanicOrderSummary`/`MechanicOrderList`, hapus ketergantungan cross-service call yang tidak perlu). Kedua tujuan ini saling terkait erat (ditemukan saat menganalisa yang pertama), jadi tidak dipisah jadi dokumen lain.
 
-> Dokumen ini hasil **diskusi desain internal** (14–15 Jul 2026), bukan hasil meeting business yang sudah final seperti [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md). Beberapa keputusan di sini (skema, penamaan) sudah cukup matang untuk didokumentasikan, tapi **belum divalidasi ke tim technical/engineer** yang pegang codebase `maintenance-order`, dan **belum dikonfirmasi ke business/client** — lihat Bagian 5 Open Items.
+> Dokumen ini berawal dari **diskusi desain internal** (14–15 Jul 2026), dan **sudah dikonfirmasi ke business/client (21 Jul 2026)** — statusnya sekarang setara dengan [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md). Keputusan di sini (skema, penamaan) sudah disepakati dari sisi business, tapi **belum divalidasi ke tim technical/engineer** yang pegang codebase `maintenance-order` — lihat Bagian 5 Open Items.
 
 ---
 

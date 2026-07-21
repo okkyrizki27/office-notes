@@ -2,17 +2,15 @@
 
 Dokumen ini mendefinisikan logic pengambilan data workcard list di Digiman+ untuk **PM Shutdown** dan **BD Corrective**.
 
-*Last updated: 2026-07-03*
+*Last updated: 2026-07-21*
 
 ---
 
 ## Status Dokumen
 
-> ⚠️ **Dokumen ini mencerminkan kondisi yang diusulkan (proposed improvement), bukan kondisi yang sudah berjalan di production.**
+> ✅ **Rencana perbaikan di dokumen ini sudah dikonfirmasi/disetujui stakeholder** — Uda Sunardi menyetujui via email pada **2026-07-06 10:45**, setelah proposal terkirim 2026-07-03. Ref: [IAMS30-4419](https://bukittechnology.atlassian.net/browse/IAMS30-4419)
 >
-> Seluruh konten di bawah — kecuali section [Data Scope (Permission-based)](#data-scope-permission-based) — adalah **rencana perbaikan** yang masih memerlukan:
-> 1. **Konfirmasi user/stakeholder** — menunggu persetujuan dari Uda Sunardi (email terkirim 2026-07-03). Ref: [IAMS30-4419](https://bukittechnology.atlassian.net/browse/IAMS30-4419)
-> 2. **Implementasi di code** — belum diimplementasi. Ticket: [IAMS30-4420](https://bukittechnology.atlassian.net/browse/IAMS30-4420), [IAMS30-4421](https://bukittechnology.atlassian.net/browse/IAMS30-4421), [IAMS30-4422](https://bukittechnology.atlassian.net/browse/IAMS30-4422), [IAMS30-4423](https://bukittechnology.atlassian.net/browse/IAMS30-4423)
+> Seluruh konten di bawah — kecuali section [Data Scope (Permission-based)](#data-scope-permission-based), yang sudah mencerminkan kondisi production saat ini — merupakan desain yang **disetujui tapi belum diimplementasi di code**. Ticket: [IAMS30-4420](https://bukittechnology.atlassian.net/browse/IAMS30-4420), [IAMS30-4421](https://bukittechnology.atlassian.net/browse/IAMS30-4421), [IAMS30-4422](https://bukittechnology.atlassian.net/browse/IAMS30-4422), [IAMS30-4423](https://bukittechnology.atlassian.net/browse/IAMS30-4423)
 
 ---
 
