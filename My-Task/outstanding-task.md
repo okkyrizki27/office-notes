@@ -1,12 +1,12 @@
 # Outstanding Task
 
-- [ ] `P1` Plan to execute data config
+- [~] `P1` Plan to execute data config
 - [ ] `P1` Assessment via Nexus *(Due Date: 03 Jun 2026)*
 - [ ] `P1` Create Timeline Service Sheet for BUMA ID
 - [ ] `P1` Create template untuk isi bank task dan lain-lain
 - [ ] `P1` RepairDuration di Digiman Transaction Dashboard
 - [ ] `P1` Change flowchart MKP
-- [ ] `P1` Assess PM Activity Type enhancement in Order Creation
+- [ ] `P1` Provide user dan data untuk demo CERIA untuk hands-on
 - [ ] `P2` Follow up to Ko Herianto terkait view untuk details of Intervention
 - [~] `P2` Compare data master dan transaksi EHMS dengan data master Digiman+ *(menunggu diskusi dengan Soraya di hari Kamis, 21 Mei 2026)*
 - [ ] `P2` Confirmation to MKP perlakuan terhadap order yang gagal karena over budget — reject or pending, once budget release sync again to SAP
@@ -63,3 +63,4 @@
 - [x] `P1` Test in UAT for IIR Form *(Done: 13 Jul 2026)*
 - [x] `P1` Provide data structure of IIR form to BUMA ID *(Done: 13 Jul 2026)*
 - [x] `P1` Assess MP di Inspection juga di Approval Inspection *(Done: 13 Jul 2026)*
+- [x] `P1` Assess PM Activity Type enhancement in Order Creation *(Done: 21 Jul 2026)*

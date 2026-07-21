@@ -1,4 +1,4 @@
-# Meeting Notes — MKP - Digiman+ Implementation Strategy
+# Meeting Notes — MKP - Digiman+ Implementation Strategy (Internal BTECH)
 
 **Date:** 18 May 2026  
 **Topic:** MKP - Digiman+ Implementation Strategy  
