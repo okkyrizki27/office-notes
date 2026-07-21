@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Enhancement Storage Location &amp; Planner Group</title>
+<style>
+  @page { size: A4 portrait; margin: 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11.3pt; color: #1a1a1a; margin: 0; padding: 0 40px; line-height: 1.68; }
+
+  .cover { padding: 120px 0 40px; page-break-after: always; }
+  .cover-eyebrow { font-size: 11pt; font-weight: 700; color: #2c5f8a; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+  .cover h1 { font-size: 28pt; font-weight: 800; margin: 0 0 16px; line-height: 1.35; color: #1f3a5f; border: none; padding: 0; }
+  .cover .subtitle { font-size: 13.5pt; color: #556; margin-bottom: 32px; line-height: 1.5; }
+  .cover-meta { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
+  .cover-meta td { padding: 11px 14px; border: 1px solid #dde4ec; font-size: 10.5pt; line-height: 1.5; }
+  .cover-meta td:first-child { width: 32%; color: #667; background: #f7f9fb; }
+  .status-pill { display: inline-block; background: #eaf2fa; color: #1f3a5f; font-weight: 700; font-size: 9.5pt; letter-spacing: 0.4px; padding: 8px 18px; border-radius: 20px; border: 1px solid #cfe0f0; }
+
+  h1 { font-size: 19pt; color: #1f3a5f; border-bottom: 3px solid #1f3a5f; padding-bottom: 10px; margin: 0 0 18px; page-break-before: always; }
+  h1:first-of-type { page-break-before: avoid; }
+  h2 { font-size: 14pt; color: #1f3a5f; margin: 26px 0 13px; page-break-after: avoid; }
+  h3 { font-size: 12.5pt; color: #2c5f8a; margin: 22px 0 11px; page-break-after: avoid; }
+
+  p { margin: 9px 0; }
+  ul, ol { margin: 9px 0 13px 0; padding-left: 24px; }
+  li { margin: 6px 0; }
+  b, strong { color: #111; }
+  code { background: #f0f2f5; color: #1a1a1a; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9.8pt; }
+
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9.6pt; margin: 12px 0 20px; line-height: 1.45; }
+  th { background: #1f3a5f; color: #fff; padding: 9px 10px; text-align: left; font-weight: 600; word-wrap: break-word; }
+  td { padding: 8px 10px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+  tr { page-break-inside: avoid; }
+  tr:nth-child(even) td { background: #f4f7fa; }
+  .total-row td { background: #eaf2fa !important; font-weight: 700; border-top: 2px solid #1f3a5f; }
+
+  .exec-cards { display: flex; gap: 14px; margin: 22px 0; flex-wrap: wrap; }
+  .exec-card { flex: 1; min-width: 145px; background: #f4f7fa; border-top: 5px solid #2c5f8a; border-radius: 8px; padding: 18px 14px; text-align: center; }
+  .exec-card .num { font-size: 22pt; font-weight: 800; color: #1f3a5f; line-height: 1.15; }
+  .exec-card .label { font-size: 8.8pt; color: #667; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 7px; }
+  .exec-card .sub { font-size: 8.6pt; color: #999; margin-top: 4px; line-height: 1.4; }
+
+  .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 15px 19px; border-radius: 0 6px 6px 0; margin: 16px 0; line-height: 1.55; }
+  .callout.warn { border-left-color: #d68910; background: #fdf3e3; }
+  .callout.decision { border-left-color: #1e8449; background: #eaf6ee; }
+  .callout-label { font-weight: 700; font-size: 9.6pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 6px; }
+  .callout.warn .callout-label { color: #b9770e; }
+  .callout.decision .callout-label { color: #1e8449; }
+
+  .scope-grid { display: flex; gap: 18px; margin: 16px 0; }
+  .scope-col { flex: 1; border-radius: 8px; padding: 16px 18px; }
+  .scope-col.yes { background: #eaf6ee; border: 1px solid #cdeada; }
+  .scope-col.no { background: #f7f7f7; border: 1px solid #e2e2e2; }
+  .scope-col h4 { margin: 0 0 10px; font-size: 10.8pt; }
+  .scope-col.yes h4 { color: #1e8449; }
+  .scope-col.no h4 { color: #888; }
+  .scope-col ul { margin: 0; padding-left: 20px; }
+  .scope-col li { font-size: 9.7pt; margin: 7px 0; line-height: 1.45; }
+
+  .opt-grid { display: flex; gap: 18px; margin: 16px 0; }
+  .opt-col { flex: 1; border-radius: 8px; padding: 16px 18px; background: #f7f9fb; border: 1px solid #dde4ec; }
+  .opt-col h4 { margin: 0 0 8px; font-size: 11pt; color: #1f3a5f; }
+  .opt-col .opt-sp { font-size: 15pt; font-weight: 800; color: #2c5f8a; margin: 2px 0 8px; }
+  .opt-col.zero .opt-sp { color: #1e8449; }
+  .opt-col ul { margin: 0; padding-left: 18px; }
+  .opt-col li { font-size: 9.5pt; margin: 6px 0; line-height: 1.45; }
+
+  .badge { display:inline-block; color:#fff; padding:4px 11px; border-radius:12px; font-size:8.3pt; font-weight:700; letter-spacing:0.3px; }
+  .badge-recommended { background:#1e8449; }
+  .badge-alt { background:#7f8c8d; }
+
+  .footer { margin-top: 34px; font-size: 9.2pt; color: #999; text-align: center; border-top: 1px solid #ddd; padding-top: 12px; line-height: 1.5; }
+
+  @media print {
+    h2, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .exec-card, .callout, .scope-col, .opt-col, .badge, .status-pill, .cover-meta td:first-child, .total-row td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<div class="cover">
+  <div class="cover-eyebrow">Digiman+ · Proposal Effort Estimasi</div>
+  <h1>Enhancement Storage Location<br>&amp; Planner Group</h1>
+  <div class="subtitle">Dua enhancement kecil di alur Order, dibundel jadi satu rilis — estimasi effort untuk pengajuan prioritas &amp; alokasi sumber daya ke Management</div>
+  <table class="cover-meta">
+    <tr><td>Tanggal</td><td>21 Juli 2026</td></tr>
+    <tr><td>Produk</td><td>Digiman+</td></tr>
+    <tr><td>Modul terdampak</td><td>Create Order (material picker), Order Approval, Master Data, SAP Sync (outbound)</td></tr>
+    <tr><td>Client</td><td>MKP — kedua enhancement (Storage Location diimplementasi tanpa toggle per-tenant, berlaku semua tenant)</td></tr>
+    <tr><td>Disiapkan oleh</td><td>Okky Rizki R — Bukit Technology</td></tr>
+    <tr><td>Dokumen sumber</td><td>storage-location-planner-group-enhancement.md, storage-location-planner-group-effort-summary.md</td></tr>
+  </table>
+  <span class="status-pill">DRAFT — UNTUK REVIEW MANAGEMENT</span>
+</div>
+
+<!-- ===================== 1. RINGKASAN EKSEKUTIF ===================== -->
+<h1>1. Ringkasan Eksekutif</h1>
+
+<p>Dokumen ini merangkum estimasi effort untuk <b>dua enhancement kecil</b> di alur Order Digiman+ — <b>keduanya berasal dari request client MKP</b> — yang <b>sengaja dibundel menjadi satu rilis</b> karena masing-masing di bawah kapasitas satu sprint:</p>
+<ul>
+  <li><b>Storage Location pada Create Order</b> — saat ini mekanik memilih material tanpa tahu material itu akan diambil dari <i>Storage Location</i> (Sloc) yang mana, dan pilihan Sloc tidak tersimpan di transaksi. Enhancement ini menampilkan &amp; menyimpan Sloc yang dipilih, sekaligus memperbaiki potensi pengiriman Sloc yang keliru ke SAP. Diimplementasi <b>tanpa toggle per-tenant</b> sehingga berlaku untuk semua tenant.</li>
+  <li><b>Planner Group pada Order Approval</b> — permintaan client <b>MKP</b>: field <i>Planner Group</i> perlu terisi saat create Maintenance Order ke SAP, sementara Digiman+ saat ini belum mengirimnya sama sekali. Disiapkan <b>2 opsi</b> (lihat Bagian 5).</li>
+</ul>
+
+<div class="exec-cards">
+  <div class="exec-card">
+    <div class="num">23 SP</div>
+    <div class="label">Total Effort</div>
+    <div class="sub">Storage Location 9 + Planner Group Opsi 2 14</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~27</div>
+    <div class="label">Estimasi Mandays</div>
+    <div class="sub">dengan tim BUMA ID existing</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~1 sprint</div>
+    <div class="label">Durasi — Tim Existing</div>
+    <div class="sub">muat nyaman (~53% kapasitas 1 sprint)</div>
+  </div>
+  <div class="exec-card">
+    <div class="num">~3 sprint</div>
+    <div class="label">Durasi — Tim Baru</div>
+    <div class="sub">jika dikerjakan tim terpisah yang belum kenal codebase</div>
+  </div>
+</div>
+
+<div class="callout decision">
+  <div class="callout-label">Rekomendasi Singkat</div>
+  Kerjakan pakai <b>tim BUMA ID yang sudah berjalan</b> — 6 orang (2 Backend, 1 Frontend Web, 1 Frontend Mobile, 2 QA), throughput ~43.7 SP/sprint (data 5 sprint terakhir). Beban gabungan (23 SP) <b>muat nyaman dalam 1 sprint</b> (~53% kapasitas), menyisakan ruang untuk pekerjaan roadmap lain di sprint yang sama.
+</div>
+
+<div class="callout">
+  <div class="callout-label">Catatan keputusan — Planner Group 2 opsi</div>
+  Angka <b>23 SP</b> di atas mengasumsikan Planner Group memakai <b>Opsi 2</b> (input eksplisit di Digiman+). Jika client MKP memilih <b>Opsi 1</b> (auto-derive dari Equipment di sisi SAP), effort Digiman+ untuk Planner Group menjadi <b>0 SP</b> — sehingga total gabungan turun menjadi <b>hanya 9 SP</b> (Storage Location saja). Keputusan Opsi 1 vs Opsi 2 menunggu konfirmasi tim SAP MKP.
+</div>
+
+<!-- ===================== 2. LATAR BELAKANG ===================== -->
+<h1>2. Latar Belakang &amp; Tujuan Bisnis</h1>
+
+<h3>2.1 Storage Location — Mekanik Tidak Tahu Sloc, &amp; Sloc Keliru Bisa Terkirim ke SAP</h3>
+<div class="callout warn">
+  <div class="callout-label">⚠️ Masalah data yang berjalan hari ini</div>
+  Satu material bisa tersedia di <b>banyak Storage Location</b> (9–11 Sloc per material). Di layar pilih material ("Add Part"), material yang sama <b>muncul berkali-kali</b> — tetapi <b>Sloc tidak dilabeli</b>, sehingga card tampak identik dan mekanik <b>tidak tahu memilih material dari Sloc yang mana</b>. Selain itu, pilihan Sloc <b>tidak tersimpan di transaksi</b>; Sloc baru ditentukan otomatis belakangan saat pengiriman ke SAP — dan karena satu material punya banyak Sloc, penentuan otomatis ini <b>ambigu dan berpotensi mengirim Sloc yang keliru</b> ke SAP.
+</div>
+<p>Data Sloc-nya sendiri <b>sudah lengkap</b> di Digiman+ (tersinkron dari SAP). Jadi ini murni soal <b>menampilkan</b> Sloc supaya mekanik bisa memilih dengan sadar, <b>menyimpan</b> pilihannya, dan <b>memakai</b> pilihan itu saat kirim ke SAP — tidak perlu integrasi/master data baru.</p>
+
+<h3>2.2 Planner Group — Field Wajib SAP yang Belum Dikirim Digiman+</h3>
+<p>Client <b>MKP</b> meminta agar field <b>Planner Group</b> terisi saat create Maintenance Order (MO) ke SAP. Hasil review menunjukkan Digiman+ <b>sama sekali belum mengirim</b> field ini. Di SAP, Planner Group standarnya <i>auto-derive</i> dari Equipment dan tetap bisa di-override manual. Ada dua kebutuhan bisnis MKP terkait: Planner Group tertentu (mis. <code>K01</code> milik dispatcher) punya aturan khusus, dan satu planner bisa memiliki lebih dari satu Planner Group.</p>
+
+<h3>2.3 Manfaat Bisnis</h3>
+<ul>
+  <li><b>Akurasi data material ke SAP</b> — Sloc yang dikirim adalah yang benar-benar dipilih mekanik, bukan hasil tebakan otomatis yang ambigu.</li>
+  <li><b>Kejelasan bagi mekanik</b> — bisa membedakan material per Sloc (mana yang ada stok, di gudang mana) saat memilih part.</li>
+  <li><b>Kelengkapan MO ke SAP</b> — Planner Group terisi sesuai kebutuhan MKP, tanpa mengganggu tenant lain (fitur toggle per-tenant).</li>
+</ul>
+
+<!-- ===================== 3. RUANG LINGKUP ===================== -->
+<h1>3. Ruang Lingkup</h1>
+
+<div class="scope-grid">
+  <div class="scope-col yes">
+    <h4>✓ Termasuk dalam Estimasi</h4>
+    <ul>
+      <li><b>Storage Location:</b> endpoint material list membawa field Sloc; labeli Sloc di tiap card + selection membawa Sloc terpilih (2 layar create order); kolom Sloc baru di transaksi material + simpan pilihan; kirim Sloc tersimpan ke SAP (ganti penentuan otomatis).</li>
+      <li><b>Planner Group (Opsi 2):</b> master data Planner Group baru (per Site, maintain manual); permission; toggle on/off per tenant; dropdown mandatory di Order Approval + validasi; endpoint dropdown difilter per Site; simpan &amp; publish field ke payload outbound.</li>
+      <li>Testing end-to-end untuk kedua enhancement + regresi.</li>
+    </ul>
+  </div>
+  <div class="scope-col no">
+    <h4>✗ Di Luar Estimasi</h4>
+    <ul>
+      <li><b>Mapping BAPI ke SAP</b> (agar <code>PlannerGroup</code> sampai ke field SAP aktual) — tanggung jawab <b>middleware</b>, belum bisa diestimasi dari sisi Digiman+.</li>
+      <li><b>Planner Group Opsi 1</b> (auto-derive di SAP) — <b>0 SP</b> di Digiman+; alternatif dari Opsi 2, bukan tambahan.</li>
+      <li>Enforcement aturan <code>K01</code> tidak boleh pakai material — tetap lewat <b>SOP manual</b>, bukan dibangun di sistem.</li>
+      <li>Sinkronisasi ulang data Sloc dari SAP — <b>tidak perlu</b>, data sudah lengkap di Digiman+.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===================== 4. METODOLOGI ===================== -->
+<h1>4. Metodologi Estimasi</h1>
+<p>Estimasi memakai baseline data historis riil tim BUMA ID (5 sprint terakhir) — metodologi yang sama dengan estimasi effort enhancement Digiman+ lainnya.</p>
+
+<h3>4.1 Kalibrasi Story Point</h3>
+<table>
+  <tr><th>Label Kompleksitas</th><th>Story Point</th></tr>
+  <tr><td>Kecil</td><td>1</td></tr>
+  <tr><td>Kecil–Sedang</td><td>2</td></tr>
+  <tr><td>Sedang</td><td>3</td></tr>
+  <tr><td>Sedang–Besar</td><td>5</td></tr>
+  <tr><td>Besar</td><td>8</td></tr>
+</table>
+
+<h3>4.2 Konversi ke Mandays &amp; Kapasitas Sprint</h3>
+<ul>
+  <li><b>Mandays = SP × ~1.17</b> — rasio throughput riil tim BUMA ID: 312 SP dalam 366 person-days (6 orang × 61 hari kerja, basis 5 sprint terakhir).</li>
+  <li><b>Kapasitas efektif sprint = ~43.7 SP/sprint</b> — 70% dari rata-rata velocity riil (62.4 SP/sprint); 30% sisanya untuk production support.</li>
+</ul>
+
+<!-- ===================== 5. RINCIAN ESTIMASI ===================== -->
+<h1>5. Rincian Estimasi Effort</h1>
+
+<h3>5.1 Storage Location pada Create Order</h3>
+<table>
+  <tr><th style="width:46%;">Komponen</th><th style="width:8%;">SP</th><th style="width:11%;">Mandays</th><th>Catatan</th></tr>
+  <tr><td>Backend: endpoint material list membawa field Storage Location</td><td>1</td><td>1.2</td><td>List sudah menampilkan baris per-Sloc; tinggal surface kolom yang sudah ada</td></tr>
+  <tr><td>Frontend: labeli Sloc di tiap card + selection membawa Sloc terpilih (2 layar)</td><td>2</td><td>2.3</td><td>Pola sama dengan label Batch yang sudah ada</td></tr>
+  <tr><td>Transaksi material: kolom Storage Location baru + simpan pilihan saat "Save"</td><td>2</td><td>2.3</td><td>Pola sama dengan penyimpanan Batch yang sudah ada</td></tr>
+  <tr><td>Outbound ke SAP: pakai Sloc tersimpan (ganti penentuan otomatis yang ambigu)</td><td>1</td><td>1.2</td><td>Menyederhanakan proses + memperbaiki bug Sloc keliru</td></tr>
+  <tr><td>Testing end-to-end + regresi</td><td>3</td><td>3.5</td><td>Tampil → tersimpan → terkirim benar ke SAP</td></tr>
+  <tr class="total-row"><td>Subtotal Storage Location</td><td>9</td><td>~10</td><td></td></tr>
+</table>
+
+<h3>5.2 Planner Group pada Order Approval — 2 Opsi</h3>
+<div class="opt-grid">
+  <div class="opt-col zero">
+    <h4>Opsi 1 — Auto-Derive di SAP</h4>
+    <div class="opt-sp">0 SP</div>
+    <ul>
+      <li>Tidak ada perubahan di Digiman+ — SAP menentukan Planner Group dari mapping Equipment.</li>
+      <li>Perlu dikonfirmasi tim SAP MKP: kelengkapan mapping Equipment → Planner Group.</li>
+    </ul>
+  </div>
+  <div class="opt-col">
+    <h4>Opsi 2 — Input Eksplisit di Approval</h4>
+    <div class="opt-sp">14 SP / ~16 mandays</div>
+    <ul>
+      <li>Planner memilih Planner Group (wajib) saat approve order.</li>
+      <li>Master data baru per Site + toggle on/off per tenant.</li>
+      <li>Diperlukan bila K01 terkait proses pembuatan order, bukan sekadar atribut Equipment.</li>
+    </ul>
+  </div>
+</div>
+<table>
+  <tr><th style="width:46%;">Komponen (Opsi 2)</th><th style="width:8%;">SP</th><th style="width:11%;">Mandays</th><th>Catatan</th></tr>
+  <tr><td>Master data Planner Group baru (CRUD, per Site, maintain manual)</td><td>3</td><td>3.5</td><td>CRUD standar + dimensi Site</td></tr>
+  <tr><td>Permission code baru</td><td>1</td><td>1.2</td><td>Setup + assign role</td></tr>
+  <tr><td>Toggle on/off per tenant (1 flag + gating)</td><td>2</td><td>2.3</td><td>Fitur aktif hanya untuk tenant yang membutuhkan</td></tr>
+  <tr><td>Order Approval: dropdown mandatory + validasi gate approve</td><td>2</td><td>2.3</td><td>Approve diblok bila belum diisi</td></tr>
+  <tr><td>Endpoint dropdown Planner Group difilter per Site user login</td><td>1</td><td>1.2</td><td>Approval sudah dibatasi per site — aman</td></tr>
+  <tr><td>Simpan Planner Group di order + publish ke payload outbound</td><td>2</td><td>2.3</td><td>Mapping BAPI aktual = middleware, di luar scope</td></tr>
+  <tr><td>Testing end-to-end + regresi</td><td>3</td><td>3.5</td><td>Toggle on/off, mandatory gate, filter site</td></tr>
+  <tr class="total-row"><td>Subtotal Planner Group (Opsi 2)</td><td>14</td><td>~16</td><td></td></tr>
+</table>
+
+<h3>5.3 Total Gabungan</h3>
+<table>
+  <tr><th style="width:60%;">Skenario Scope</th><th style="width:15%;">Total SP</th><th>Total Mandays</th></tr>
+  <tr><td>Storage Location + Planner Group <b>Opsi 1</b> (auto-derive SAP)</td><td>9</td><td>~10</td></tr>
+  <tr class="total-row"><td>Storage Location + Planner Group <b>Opsi 2</b> (input eksplisit)</td><td>23</td><td>~27</td></tr>
+  <tr><td>Mapping BAPI Planner Group → SAP (middleware)</td><td colspan="2">Belum bisa diestimasi (di luar scope Digiman+)</td></tr>
+</table>
+<p style="font-size:9.6pt;color:#667;line-height:1.5;">Estimasi berdasarkan review UI &amp; skema data serta desain arsitektur hasil diskusi teknis, tanpa akses langsung ke source code — perlu divalidasi oleh engineer pemegang codebase <code>maintenance-order</code>.</p>
+
+<!-- ===================== 6. SKENARIO ===================== -->
+<h1>6. Skenario Pengerjaan &amp; Timeline</h1>
+<p>Timeline di bawah untuk scope gabungan <b>23 SP</b> (Planner Group Opsi 2). Bila MKP memilih Opsi 1, scope turun ke 9 SP dan durasinya lebih pendek lagi.</p>
+
+<table>
+  <tr><th style="width:24%;">Skenario</th><th style="width:34%;">Komposisi Tim</th><th style="width:12%;">Mandays</th><th>Durasi</th></tr>
+  <tr>
+    <td><span class="badge badge-recommended">Direkomendasikan</span><br><b>Tim BUMA ID (existing)</b></td>
+    <td>6 orang — 2 Backend, 1 Frontend Web, 1 Frontend Mobile, 2 QA (sudah berpengalaman di codebase ini)</td>
+    <td>~27</td>
+    <td><b>~1 sprint</b> (~53% kapasitas — muat nyaman, sisa ruang untuk pekerjaan lain)</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-alt">Alternatif</span><br><b>Tim Baru — dengan Knowledge Transfer</b></td>
+    <td>4 orang baru (1 BE, 1 FE Web, 1 FE Mobile, 1 QA) — tim scrum terpisah, dengan pendampingan KT</td>
+    <td>~28</td>
+    <td><b>~3 sprint</b></td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-alt">Alternatif</span><br><b>Tim Baru — tanpa Knowledge Transfer</b></td>
+    <td>4 orang baru, idem, tanpa pendampingan khusus</td>
+    <td>~33</td>
+    <td><b>~3 sprint</b></td>
+  </tr>
+</table>
+
+<h3>6.1 Mengapa Tim Baru Butuh Lebih Lama</h3>
+<p>Tim existing memakai kapasitas riil tim (data historis) sehingga scope kecil ini muat dalam 1 sprint. Tim baru belum punya data historis — velocity-nya diasumsikan lebih rendah (0.7–0.81 SP/hari/orang vs ~0.85 tim existing). Pada skenario tim baru, <b>Backend menjadi bottleneck tunggal</b> (~54% dari total SP: 12.5 dari 23), sementara Frontend Web + Mobile hanya 4.5 SP gabungan dan selesai lebih dulu. Menambah Backend ke-2 akan memangkas durasi jauh lebih efektif daripada menambah Frontend/QA. Knowledge Transfer di skala ini menghemat mandays, tetapi belum cukup untuk memangkas satu sprint penuh (kedua skenario tim baru tetap ~3 sprint).</p>
+
+<!-- ===================== 7. ASUMSI & RISIKO ===================== -->
+<h1>7. Asumsi &amp; Risiko</h1>
+<ul>
+  <li><b>Mapping BAPI ke SAP</b> (Planner Group) di luar scope ini — tanggung jawab middleware, feasibility &amp; effort-nya belum diketahui.</li>
+  <li><b>Keputusan Opsi 1 vs Opsi 2</b> untuk Planner Group menunggu konfirmasi tim SAP MKP — menentukan apakah total 23 SP atau cukup 9 SP.</li>
+  <li>Toggle per-tenant Planner Group mengasumsikan infrastruktur konfigurasi per-tenant sudah ada — bila belum, komponen ini bisa sedikit lebih besar.</li>
+  <li>Estimasi berbasis review UI/skema data &amp; desain arsitektur, <b>belum divalidasi terhadap source code</b> oleh engineer pemegang codebase.</li>
+  <li>Asumsi pembagian layar Web vs Mobile pada skenario tim baru belum dikonfirmasi ke komposisi tim aktual.</li>
+  <li>Memilih tim BUMA ID existing berarti mengalihkan ~1 sprint kapasitas dari roadmap product yang sudah direncanakan (walau scope kecil, tetap perlu dijadwalkan).</li>
+</ul>
+
+<!-- ===================== 8. REKOMENDASI ===================== -->
+<h1>8. Rekomendasi</h1>
+<div class="callout decision">
+  <b>Rekomendasi utama:</b> kerjakan menggunakan <b>tim BUMA ID existing</b> dalam <b>~1 sprint</b> — kedua enhancement kecil ini muat nyaman bersama (23 SP, ~53% kapasitas) dan bisa dijadwalkan berbarengan dengan pekerjaan roadmap lain di sprint yang sama.
+  <p style="margin-top:8px;"><b>Langkah selanjutnya:</b> (1) konfirmasi ke tim SAP MKP: pilih <b>Opsi 1</b> (0 SP, auto-derive) atau <b>Opsi 2</b> (14 SP, input eksplisit) untuk Planner Group — ini menentukan total scope; (2) validasi estimasi ke engineer pemegang codebase <code>maintenance-order</code>; (3) koordinasi dengan tim middleware untuk mapping BAPI Planner Group ke field SAP aktual.</p>
+</div>
+
+<div class="footer">
+  Dokumen ini dihasilkan dari analisis desain arsitektur internal Digiman+ (dokumen sumber: <i>storage-location-planner-group-enhancement.md</i> &amp; <i>storage-location-planner-group-effort-summary.md</i>). Angka estimasi bersifat sementara dan dapat berubah setelah validasi engineer &amp; keputusan Opsi 1/Opsi 2.
+</div>
+
+</body>
+</html>

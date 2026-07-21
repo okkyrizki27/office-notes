@@ -60,13 +60,17 @@ Index ini melacak semua dokumen **enhancement/proposal** di bawah `digiman+/arch
 
 - Client export: `pm-shutdown-bd-corrective/workcard-sync-improvement.html`, `Workcard_Sync_Improvement.pdf` (2026-07-03)
 
-### Planner Group pada Order Approval
+### Storage Location & Planner Group *(dibundel — 2 enhancement kecil, 1 rilis/sprint)*
 
-**Client:** MKP
+**Client:** MKP (kedua enhancement) — Storage Location diimplementasi tanpa toggle per-tenant, jadi berlaku semua tenant
 
-| Dokumen | Status | Last Updated |
-|---|---|---|
-| [inspection-order/planner-group-enhancement.md](inspection-order/planner-group-enhancement.md) | 📝 Internal Draft — 2 opsi disiapkan untuk proposal, menunggu konfirmasi tim SAP MKP | 2026-07-21 |
+| Dokumen | Fitur/Service | Status | Last Updated |
+|---|---|---|---|
+| [inspection-order/storage-location-planner-group-enhancement.md](inspection-order/storage-location-planner-group-enhancement.md) *(Bagian A)* | Create Order — material picker "Add Part": tampil & simpan Sloc | 📝 Internal Draft | 2026-07-21 |
+| [inspection-order/storage-location-planner-group-enhancement.md](inspection-order/storage-location-planner-group-enhancement.md) *(Bagian B)* | Order Approval (Planner Group) | 📝 Internal Draft — 2 opsi disiapkan untuk proposal, menunggu konfirmasi tim SAP MKP | 2026-07-21 |
+
+- Effort estimate gabungan: [inspection-order/storage-location-planner-group-effort-summary.md](inspection-order/storage-location-planner-group-effort-summary.md) — **23 SP / ~27 mandays / 1 sprint** (Storage Location 9 + Planner Group Opsi 2 14; Opsi 1 = 0), baseline BUMA ID; **~3 sprint** kalau tim baru "BUMA ID Modified" (2026-07-21)
+- Client proposal (draft): `inspection-order/storage-location-planner-group-proposal.html` / `.pdf` (2026-07-21)
 
 ### Form / IIR External API Integration
 
