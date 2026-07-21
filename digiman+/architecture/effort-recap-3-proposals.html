@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Rekap Effort — 3 Proposal Enhancement Digiman+</title>
+<style>
+  @page { size: A4 portrait; margin: 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11.3pt; color: #1a1a1a; margin: 0; padding: 40px; line-height: 1.6; }
+
+  .eyebrow { font-size: 10.5pt; font-weight: 700; color: #2c5f8a; letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-size: 22pt; color: #1f3a5f; margin: 0 0 6px; line-height: 1.3; }
+  .subtitle { font-size: 12pt; color: #556; margin: 0 0 4px; }
+  .meta { font-size: 9.6pt; color: #888; margin-bottom: 26px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 10pt; margin: 8px 0 22px; }
+  th { background: #1f3a5f; color: #fff; padding: 11px 12px; text-align: left; font-weight: 600; }
+  th.c, td.c { text-align: center; }
+  td { padding: 11px 12px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; }
+  tr:nth-child(even) td { background: #f4f7fa; }
+  tr.combined td { background: #eef3f8; border-top: 2px solid #2c5f8a; }
+  tr.combined td:first-child { font-style: italic; }
+  .ename { font-weight: 700; color: #1f3a5f; font-size: 10.5pt; }
+  .esub { font-size: 8.8pt; color: #777; font-weight: 400; margin-top: 2px; }
+  .big { font-size: 15pt; font-weight: 800; color: #1f3a5f; line-height: 1.1; }
+  .note { font-size: 8.4pt; color: #888; margin-top: 3px; }
+
+  .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 13px 17px; border-radius: 0 6px 6px 0; margin: 14px 0; line-height: 1.55; font-size: 9.7pt; }
+  .callout.info { border-left-color: #6c3483; background: #f7f0fa; }
+  .callout-label { font-weight: 700; font-size: 9.2pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 5px; }
+  .callout.info .callout-label { color: #6c3483; }
+  .callout ul { margin: 6px 0 0; padding-left: 20px; }
+  .callout li { margin: 4px 0; }
+
+  code { background: #f0f2f5; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9.2pt; }
+  .footer { margin-top: 26px; font-size: 8.8pt; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }
+
+  @media print {
+    th, tr.combined td, .callout { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="eyebrow">Digiman+ · Rekap Effort untuk Management</div>
+<h1>Rekap Effort — 3 Proposal Enhancement</h1>
+<div class="subtitle">Perbandingan durasi Tim BUMA ID (existing) vs Tim Baru (terpisah)</div>
+<div class="meta">21 Juli 2026 · Disiapkan oleh Okky Rizki R — Bukit Technology · Semua durasi dalam sprint (1 sprint = 2 minggu)</div>
+
+<table>
+  <tr>
+    <th style="width:52%;">Enhancement</th>
+    <th class="c" style="width:24%;">Tim BUMA ID</th>
+    <th class="c" style="width:24%;">Tim Baru</th>
+  </tr>
+  <tr>
+    <td>
+      <div class="ename">Maintenance Activity Type &amp; Integrasi Inspection→Order</div>
+      <div class="esub">48 SP · ~56 mandays · menghentikan kegagalan integrasi create MO ke SAP</div>
+    </td>
+    <td class="c"><div class="big">~2 sprint</div></td>
+    <td class="c"><div class="big">~5–6 sprint</div><div class="note">dengan KT ~5 · tanpa KT ~6</div></td>
+  </tr>
+  <tr>
+    <td>
+      <div class="ename">Area of Unit, Component &amp; Sub Component</div>
+      <div class="esub">~37 SP · ~43 mandays · Area of Unit + Component/Sub Component di semua jalur order</div>
+    </td>
+    <td class="c"><div class="big">~1 sprint</div></td>
+    <td class="c"><div class="big">~4 sprint</div><div class="note">dengan/tanpa KT sama</div></td>
+  </tr>
+  <tr>
+    <td>
+      <div class="ename">Man Power, Duration &amp; Man Hours</div>
+      <div class="esub">~59–67 SP · ~69–78 mandays · rencana-vs-aktual tenaga kerja lintas alur (2 skenario rollup)</div>
+    </td>
+    <td class="c"><div class="big">~2 sprint</div></td>
+    <td class="c"><div class="big">~5–7 sprint</div><div class="note">Tanpa ~5–6 · Dengan ~6–7</div></td>
+  </tr>
+  <tr class="combined">
+    <td>
+      <div class="ename" style="font-style:italic;">Area + Man Power digabung (1 inisiatif, dijadwalkan bareng)</div>
+      <div class="esub">~96–104 SP · layar &amp; endpoint identik — disarankan 1 penjadwalan, bukan penjumlahan kaku</div>
+    </td>
+    <td class="c"><div class="big">~2–3 sprint</div></td>
+    <td class="c"><div class="big">~9–11 sprint</div></td>
+  </tr>
+</table>
+
+<div class="callout">
+  <div class="callout-label">Dasar perhitungan</div>
+  <ul>
+    <li><b>Tim BUMA ID (existing)</b> — 6 orang (2 BE, 1 FE Web, 1 FE Mobile, 2 QA), kapasitas efektif <b>~43.7 SP/sprint</b> (70% dari velocity riil 62.4 SP/sprint, 30% untuk production support). Sudah menguasai codebase.</li>
+    <li><b>Tim Baru (terpisah)</b> — 4 orang baru (1 BE, 1 FE Web, 1 FE Mobile, 1 QA), belum kenal codebase. Velocity <b>0.7 SP/hari/orang</b> (tanpa Knowledge Transfer) / <b>0.81</b> (dengan KT). Durasi dihitung dari <b>critical path Backend + QA</b> — Backend jadi bottleneck tunggal (~57–65% total SP), jadi jumlah staf FE/QA tidak banyak mempengaruhi durasi.</li>
+    <li><b>Dampak Report &amp; Power BI (DE/DA)</b> sudah termasuk di total SP tiap proposal, tapi dikerjakan resource Data Engineer/Analyst yang <b>berjalan paralel</b> — tidak menambah jumlah sprint.</li>
+  </ul>
+</div>
+
+<div class="callout info">
+  <div class="callout-label">Catatan penjadwalan</div>
+  <b>Area of Unit</b> dan <b>Man Power</b> berasal dari 1 inisiatif bisnis yang sama dan menyentuh layar/endpoint identik (Inspection, Additional Order, Edit eMOL, <code>PoolingMOItem</code>, MO Backlog, testing e2e) — <b>sangat disarankan dikerjakan dalam penjadwalan yang sama</b> supaya layar yang sama tidak disentuh 2×. Angka gabungan (~2–3 sprint BUMA ID / ~9–11 sprint tim baru) lebih kecil dari penjumlahan kaku karena menghindari re-touch layar &amp; pembulatan batas sprint ganda. <b>Maintenance Activity Type</b> adalah inisiatif terpisah, tapi juga menyentuh layar Additional Order — idealnya diselaraskan penjadwalannya.
+</div>
+
+<div class="footer">
+  Ringkasan dari 3 proposal: <i>maintenance-activity-type-effort-proposal</i>, <i>area-of-unit-enhancement-proposal</i>, <i>man-power-duration-enhancement-proposal</i>. Angka estimasi bersifat sementara, dapat berubah setelah validasi engineer. Mapping BAPI ke SAP di luar semua estimasi di atas (assessment client dengan tim SAP mereka).
+</div>
+
+</body>
+</html>
