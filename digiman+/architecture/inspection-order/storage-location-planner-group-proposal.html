@@ -87,7 +87,7 @@
   <h1>Enhancement Storage Location<br>&amp; Planner Group</h1>
   <div class="subtitle">Dua enhancement kecil di alur Order, dibundel jadi satu rilis — estimasi effort untuk pengajuan prioritas &amp; alokasi sumber daya ke Management</div>
   <table class="cover-meta">
-    <tr><td>Tanggal</td><td>21 Juli 2026</td></tr>
+    <tr><td>Tanggal</td><td>22 Juli 2026</td></tr>
     <tr><td>Produk</td><td>Digiman+</td></tr>
     <tr><td>Modul terdampak</td><td>Create Order (material picker), Order Approval, Master Data, SAP Sync (outbound)</td></tr>
     <tr><td>Client</td><td>MKP — kedua enhancement (Storage Location diimplementasi tanpa toggle per-tenant, berlaku semua tenant)</td></tr>
@@ -108,19 +108,19 @@
 
 <div class="exec-cards">
   <div class="exec-card">
-    <div class="num">23 SP</div>
+    <div class="num">25 SP</div>
     <div class="label">Total Effort</div>
-    <div class="sub">Storage Location 9 + Planner Group Opsi 2 14</div>
+    <div class="sub">Storage Location 10 + Planner Group Opsi 2 15</div>
   </div>
   <div class="exec-card">
-    <div class="num">~27</div>
+    <div class="num">~29</div>
     <div class="label">Estimasi Mandays</div>
     <div class="sub">dengan tim BUMA ID existing</div>
   </div>
   <div class="exec-card">
     <div class="num">~1 sprint</div>
     <div class="label">Durasi — Tim Existing</div>
-    <div class="sub">muat nyaman (~53% kapasitas 1 sprint)</div>
+    <div class="sub">muat (~57% kapasitas 1 sprint)</div>
   </div>
   <div class="exec-card">
     <div class="num">~3 sprint</div>
@@ -131,12 +131,17 @@
 
 <div class="callout decision">
   <div class="callout-label">Rekomendasi Singkat</div>
-  Kerjakan pakai <b>tim BUMA ID yang sudah berjalan</b> — 6 orang (2 Backend, 1 Frontend Web, 1 Frontend Mobile, 2 QA), throughput ~43.7 SP/sprint (data 5 sprint terakhir). Beban gabungan (23 SP) <b>muat nyaman dalam 1 sprint</b> (~53% kapasitas), menyisakan ruang untuk pekerjaan roadmap lain di sprint yang sama.
+  Kerjakan pakai <b>tim BUMA ID yang sudah berjalan</b> — 6 orang (2 Backend, 1 Frontend Web, 1 Frontend Mobile, 2 QA), throughput ~43.7 SP/sprint (data 5 sprint terakhir). Beban gabungan (25 SP) <b>muat dalam 1 sprint</b> (~57% kapasitas), menyisakan ruang untuk pekerjaan roadmap lain di sprint yang sama.
 </div>
 
 <div class="callout">
   <div class="callout-label">Catatan keputusan — Planner Group 2 opsi</div>
-  Angka <b>23 SP</b> di atas mengasumsikan Planner Group memakai <b>Opsi 2</b> (input eksplisit di Digiman+). Jika client MKP memilih <b>Opsi 1</b> (auto-derive dari Equipment di sisi SAP), effort Digiman+ untuk Planner Group menjadi <b>0 SP</b> — sehingga total gabungan turun menjadi <b>hanya 9 SP</b> (Storage Location saja). Keputusan Opsi 1 vs Opsi 2 menunggu konfirmasi tim SAP MKP.
+  Angka <b>25 SP</b> di atas mengasumsikan Planner Group memakai <b>Opsi 2</b> (input eksplisit di Digiman+). Jika client MKP memilih <b>Opsi 1</b> (auto-derive dari Equipment di sisi SAP), effort Digiman+ untuk Planner Group menjadi <b>0 SP</b> — sehingga total gabungan turun menjadi <b>hanya 10 SP</b> (Storage Location saja). Keputusan Opsi 1 vs Opsi 2 menunggu konfirmasi tim SAP MKP.
+</div>
+
+<div class="callout">
+  <div class="callout-label">Catatan platform</div>
+  Create Order &amp; Order Approval sama-sama tersedia di <b>Web dan Mobile</b>, sehingga perubahan UI (picker material &amp; dropdown approval) dikerjakan di <b>dua platform</b>; Master Data Planner Group tetap di <b>Web admin</b> saja. Sudah tercermin di rincian estimasi Bagian 5 (dikonfirmasi 22 Jul 2026).
 </div>
 
 <!-- ===================== 2. LATAR BELAKANG ===================== -->
@@ -209,11 +214,12 @@
 <table>
   <tr><th style="width:46%;">Komponen</th><th style="width:8%;">SP</th><th style="width:11%;">Mandays</th><th>Catatan</th></tr>
   <tr><td>Backend: endpoint material list membawa field Storage Location</td><td>1</td><td>1.2</td><td>List sudah menampilkan baris per-Sloc; tinggal surface kolom yang sudah ada</td></tr>
-  <tr><td>Frontend: labeli Sloc di tiap card + selection membawa Sloc terpilih (2 layar)</td><td>2</td><td>2.3</td><td>Pola sama dengan label Batch yang sudah ada</td></tr>
+  <tr><td>Frontend Mobile: labeli Sloc di tiap card + selection membawa Sloc terpilih (picker mobile)</td><td>2</td><td>2.3</td><td>Pola sama dengan label Batch yang sudah ada</td></tr>
+  <tr><td>Frontend Web: sama, di material picker create order versi Web</td><td>1</td><td>1.2</td><td>Create order ada di Web juga — codebase terpisah, meniru pola Mobile</td></tr>
   <tr><td>Transaksi material: kolom Storage Location baru + simpan pilihan saat "Save"</td><td>2</td><td>2.3</td><td>Pola sama dengan penyimpanan Batch yang sudah ada</td></tr>
   <tr><td>Outbound ke SAP: pakai Sloc tersimpan (ganti penentuan otomatis yang ambigu)</td><td>1</td><td>1.2</td><td>Menyederhanakan proses + memperbaiki bug Sloc keliru</td></tr>
   <tr><td>Testing end-to-end + regresi</td><td>3</td><td>3.5</td><td>Tampil → tersimpan → terkirim benar ke SAP</td></tr>
-  <tr class="total-row"><td>Subtotal Storage Location</td><td>9</td><td>~10</td><td></td></tr>
+  <tr class="total-row"><td>Subtotal Storage Location</td><td>10</td><td>~12</td><td></td></tr>
 </table>
 
 <h3>5.2 Planner Group pada Order Approval — 2 Opsi</h3>
@@ -228,7 +234,7 @@
   </div>
   <div class="opt-col">
     <h4>Opsi 2 — Input Eksplisit di Approval</h4>
-    <div class="opt-sp">14 SP / ~16 mandays</div>
+    <div class="opt-sp">15 SP / ~18 mandays</div>
     <ul>
       <li>Planner memilih Planner Group (wajib) saat approve order.</li>
       <li>Master data baru per Site + toggle on/off per tenant.</li>
@@ -241,67 +247,67 @@
   <tr><td>Master data Planner Group baru (CRUD, per Site, maintain manual)</td><td>3</td><td>3.5</td><td>CRUD standar + dimensi Site</td></tr>
   <tr><td>Permission code baru</td><td>1</td><td>1.2</td><td>Setup + assign role</td></tr>
   <tr><td>Toggle on/off per tenant (1 flag + gating)</td><td>2</td><td>2.3</td><td>Fitur aktif hanya untuk tenant yang membutuhkan</td></tr>
-  <tr><td>Order Approval: dropdown mandatory + validasi gate approve</td><td>2</td><td>2.3</td><td>Approve diblok bila belum diisi</td></tr>
+  <tr><td>Order Approval: dropdown mandatory (Web + Mobile) + validasi gate approve</td><td>3</td><td>3.5</td><td>Approval ada di Web &amp; Mobile → dropdown 2 platform; gate/validasi shared. Approve diblok bila belum diisi</td></tr>
   <tr><td>Endpoint dropdown Planner Group difilter per Site user login</td><td>1</td><td>1.2</td><td>Approval sudah dibatasi per site — aman</td></tr>
   <tr><td>Simpan Planner Group di order + publish ke payload outbound</td><td>2</td><td>2.3</td><td>Mapping BAPI aktual = middleware, di luar scope</td></tr>
   <tr><td>Testing end-to-end + regresi</td><td>3</td><td>3.5</td><td>Toggle on/off, mandatory gate, filter site</td></tr>
-  <tr class="total-row"><td>Subtotal Planner Group (Opsi 2)</td><td>14</td><td>~16</td><td></td></tr>
+  <tr class="total-row"><td>Subtotal Planner Group (Opsi 2)</td><td>15</td><td>~18</td><td></td></tr>
 </table>
 
 <h3>5.3 Total Gabungan</h3>
 <table>
   <tr><th style="width:60%;">Skenario Scope</th><th style="width:15%;">Total SP</th><th>Total Mandays</th></tr>
-  <tr><td>Storage Location + Planner Group <b>Opsi 1</b> (auto-derive SAP)</td><td>9</td><td>~10</td></tr>
-  <tr class="total-row"><td>Storage Location + Planner Group <b>Opsi 2</b> (input eksplisit)</td><td>23</td><td>~27</td></tr>
+  <tr><td>Storage Location + Planner Group <b>Opsi 1</b> (auto-derive SAP)</td><td>10</td><td>~12</td></tr>
+  <tr class="total-row"><td>Storage Location + Planner Group <b>Opsi 2</b> (input eksplisit)</td><td>25</td><td>~29</td></tr>
   <tr><td>Mapping BAPI Planner Group → SAP (middleware)</td><td colspan="2">Belum bisa diestimasi (di luar scope Digiman+)</td></tr>
 </table>
 <p style="font-size:9.6pt;color:#667;line-height:1.5;">Estimasi berdasarkan review UI &amp; skema data serta desain arsitektur hasil diskusi teknis, tanpa akses langsung ke source code — perlu divalidasi oleh engineer pemegang codebase <code>maintenance-order</code>.</p>
 
 <!-- ===================== 6. SKENARIO ===================== -->
 <h1>6. Skenario Pengerjaan &amp; Timeline</h1>
-<p>Timeline di bawah untuk scope gabungan <b>23 SP</b> (Planner Group Opsi 2). Bila MKP memilih Opsi 1, scope turun ke 9 SP dan durasinya lebih pendek lagi.</p>
+<p>Timeline di bawah untuk scope gabungan <b>25 SP</b> (Planner Group Opsi 2). Bila MKP memilih Opsi 1, scope turun ke 10 SP dan durasinya lebih pendek lagi.</p>
 
 <table>
   <tr><th style="width:24%;">Skenario</th><th style="width:34%;">Komposisi Tim</th><th style="width:12%;">Mandays</th><th>Durasi</th></tr>
   <tr>
     <td><span class="badge badge-recommended">Direkomendasikan</span><br><b>Tim BUMA ID (existing)</b></td>
     <td>6 orang — 2 Backend, 1 Frontend Web, 1 Frontend Mobile, 2 QA (sudah berpengalaman di codebase ini)</td>
-    <td>~27</td>
-    <td><b>~1 sprint</b> (~53% kapasitas — muat nyaman, sisa ruang untuk pekerjaan lain)</td>
+    <td>~29</td>
+    <td><b>~1 sprint</b> (~57% kapasitas — muat, sisa ruang untuk pekerjaan lain)</td>
   </tr>
   <tr>
     <td><span class="badge badge-alt">Alternatif</span><br><b>Tim Baru — dengan Knowledge Transfer</b></td>
     <td>4 orang baru (1 BE, 1 FE Web, 1 FE Mobile, 1 QA) — tim scrum terpisah, dengan pendampingan KT</td>
-    <td>~28</td>
+    <td>~31</td>
     <td><b>~3 sprint</b></td>
   </tr>
   <tr>
     <td><span class="badge badge-alt">Alternatif</span><br><b>Tim Baru — tanpa Knowledge Transfer</b></td>
     <td>4 orang baru, idem, tanpa pendampingan khusus</td>
-    <td>~33</td>
+    <td>~36</td>
     <td><b>~3 sprint</b></td>
   </tr>
 </table>
 
 <h3>6.1 Mengapa Tim Baru Butuh Lebih Lama</h3>
-<p>Tim existing memakai kapasitas riil tim (data historis) sehingga scope kecil ini muat dalam 1 sprint. Tim baru belum punya data historis — velocity-nya diasumsikan lebih rendah (0.7–0.81 SP/hari/orang vs ~0.85 tim existing). Pada skenario tim baru, <b>Backend menjadi bottleneck tunggal</b> (~54% dari total SP: 12.5 dari 23), sementara Frontend Web + Mobile hanya 4.5 SP gabungan dan selesai lebih dulu. Menambah Backend ke-2 akan memangkas durasi jauh lebih efektif daripada menambah Frontend/QA. Knowledge Transfer di skala ini menghemat mandays, tetapi belum cukup untuk memangkas satu sprint penuh (kedua skenario tim baru tetap ~3 sprint).</p>
+<p>Tim existing memakai kapasitas riil tim (data historis) sehingga scope kecil ini muat dalam 1 sprint. Tim baru belum punya data historis — velocity-nya diasumsikan lebih rendah (0.7–0.81 SP/hari/orang vs ~0.85 tim existing). Pada skenario tim baru, <b>Backend menjadi bottleneck tunggal</b> (~50% dari total SP: 12.5 dari 25), sementara Frontend Web + Mobile hanya 6.5 SP gabungan dan selesai lebih dulu. Menambah Backend ke-2 akan memangkas durasi jauh lebih efektif daripada menambah Frontend/QA. Knowledge Transfer di skala ini menghemat mandays, tetapi belum cukup untuk memangkas satu sprint penuh (kedua skenario tim baru tetap ~3 sprint).</p>
 
 <!-- ===================== 7. ASUMSI & RISIKO ===================== -->
 <h1>7. Asumsi &amp; Risiko</h1>
 <ul>
   <li><b>Mapping BAPI ke SAP</b> (Planner Group) di luar scope ini — tanggung jawab middleware, feasibility &amp; effort-nya belum diketahui.</li>
-  <li><b>Keputusan Opsi 1 vs Opsi 2</b> untuk Planner Group menunggu konfirmasi tim SAP MKP — menentukan apakah total 23 SP atau cukup 9 SP.</li>
+  <li><b>Keputusan Opsi 1 vs Opsi 2</b> untuk Planner Group menunggu konfirmasi tim SAP MKP — menentukan apakah total 25 SP atau cukup 10 SP.</li>
   <li>Toggle per-tenant Planner Group mengasumsikan infrastruktur konfigurasi per-tenant sudah ada — bila belum, komponen ini bisa sedikit lebih besar.</li>
   <li>Estimasi berbasis review UI/skema data &amp; desain arsitektur, <b>belum divalidasi terhadap source code</b> oleh engineer pemegang codebase.</li>
-  <li>Asumsi pembagian layar Web vs Mobile pada skenario tim baru belum dikonfirmasi ke komposisi tim aktual.</li>
+  <li>Create Order &amp; Order Approval dikonfirmasi ada di Web + Mobile (22 Jul 2026); pembagian SP per komponen ke masing-masing platform masih asumsi, perlu dikonfirmasi ke komposisi tim aktual.</li>
   <li>Memilih tim BUMA ID existing berarti mengalihkan ~1 sprint kapasitas dari roadmap product yang sudah direncanakan (walau scope kecil, tetap perlu dijadwalkan).</li>
 </ul>
 
 <!-- ===================== 8. REKOMENDASI ===================== -->
 <h1>8. Rekomendasi</h1>
 <div class="callout decision">
-  <b>Rekomendasi utama:</b> kerjakan menggunakan <b>tim BUMA ID existing</b> dalam <b>~1 sprint</b> — kedua enhancement kecil ini muat nyaman bersama (23 SP, ~53% kapasitas) dan bisa dijadwalkan berbarengan dengan pekerjaan roadmap lain di sprint yang sama.
-  <p style="margin-top:8px;"><b>Langkah selanjutnya:</b> (1) konfirmasi ke tim SAP MKP: pilih <b>Opsi 1</b> (0 SP, auto-derive) atau <b>Opsi 2</b> (14 SP, input eksplisit) untuk Planner Group — ini menentukan total scope; (2) validasi estimasi ke engineer pemegang codebase <code>maintenance-order</code>; (3) koordinasi dengan tim middleware untuk mapping BAPI Planner Group ke field SAP aktual.</p>
+  <b>Rekomendasi utama:</b> kerjakan menggunakan <b>tim BUMA ID existing</b> dalam <b>~1 sprint</b> — kedua enhancement kecil ini muat bersama (25 SP, ~57% kapasitas) dan bisa dijadwalkan berbarengan dengan pekerjaan roadmap lain di sprint yang sama.
+  <p style="margin-top:8px;"><b>Langkah selanjutnya:</b> (1) konfirmasi ke tim SAP MKP: pilih <b>Opsi 1</b> (0 SP, auto-derive) atau <b>Opsi 2</b> (15 SP, input eksplisit) untuk Planner Group — ini menentukan total scope; (2) validasi estimasi ke engineer pemegang codebase <code>maintenance-order</code>; (3) koordinasi dengan tim middleware untuk mapping BAPI Planner Group ke field SAP aktual.</p>
 </div>
 
 <div class="footer">

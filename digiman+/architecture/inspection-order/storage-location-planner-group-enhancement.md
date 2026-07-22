@@ -1,13 +1,13 @@
 # Enhancement: Storage Location & Planner Group
 
-*Last updated: 2026-07-21*
+*Last updated: 2026-07-22*
 
 ---
 
 **Feature:** Order (Digiman+) — **Create Order** (Storage Location) & **Order Approval** (Planner Group)
 **Client:** **MKP** (kedua enhancement) — Storage Location diimplementasi **tanpa toggle per-tenant** (keputusan teknis), sehingga berlaku untuk semua tenant
 **Related doc:** [order-emol-sap-sync.md](order-emol-sap-sync.md), [maintenance-order-schema.md](../database/maintenance-order-schema.md)
-**Effort:** [storage-location-planner-group-effort-summary.md](storage-location-planner-group-effort-summary.md) — gabungan **23 SP / ~27 mandays / 1 sprint** (baseline BUMA ID)
+**Effort:** [storage-location-planner-group-effort-summary.md](storage-location-planner-group-effort-summary.md) — gabungan **25 SP / ~29 mandays / 1 sprint** (baseline BUMA ID)
 
 ---
 
@@ -39,6 +39,7 @@ Keduanya berasal dari **request MKP**.
 |---|---|
 | Titik input | Saat **"Add Part"** di create order (per baris material), 2 jalur: "Order Details" (Inspection) & "Order #N" (Additional Order) |
 | Perubahan UI | **Labeli Sloc** di tiap card material list — pola sama dengan label Batch (`NEW`/`REPAIRED`) yang sudah ada. Selection membawa Sloc baris terpilih |
+| Platform | **Create order ada di Web & Mobile** (dikonfirmasi 22 Jul 2026) → picker material dikerjakan di **dua platform** (FE Web + FE Mobile) |
 | Simpan di transaksi | **Kolom `StorageLocation` baru di `MechanicOrderMaterial`** — pola sama dengan `BatchCode` yang sudah tersimpan hari ini |
 | Outbound ke SAP | Ganti auto-resolve Step 2 `PoolingMOItem` → pakai `MechanicOrderMaterial.StorageLocation` (pilihan user). Field `SLoc` & jalur ke SAP **tidak berubah** — cuma sumbernya. Sekaligus memperbaiki bug data laten (kirim Sloc arbitrer) |
 | Toggle per tenant | **Tidak ada** — walau request dari MKP, ini perbaikan data/UX yang aman untuk semua tenant, jadi tidak di-gate per-tenant (keputusan user 21 Jul 2026) |
@@ -93,6 +94,7 @@ Ada dua opsi yang akan dipresentasikan ke client sebagai pilihan (lihat catatan 
 | Aspek | Keputusan |
 |---|---|
 | Titik input | Saat **approval oleh Planner** (bukan saat create eMOL/order) |
+| Platform | Master Data Planner Group = **Web admin saja**; **Order Approval ada di Web & Mobile** (dikonfirmasi 22 Jul 2026) → dropdown approval dikerjakan di **dua platform** |
 | Wajib/opsional | **Mandatory** — approval tidak bisa lanjut tanpa mengisi Planner Group |
 | Visibility fitur | **Toggle on/off per tenant** — satu flag, berlaku sama untuk semua site di bawah tenant tsb (bukan per site) |
 | Master data Planner Group | Entity baru, **di-scope per Site**, **maintain manual lewat UI Admin** — bukan sync API dari SAP (eksplisit di luar scope saat ini) |
@@ -123,9 +125,9 @@ Keputusan final antara "pilih salah satu" vs "kombinasi keduanya" diserahkan ke 
 
 Estimasi effort (baseline tim BUMA ID + skenario tim baru "BUMA ID Modified") ada di **[storage-location-planner-group-effort-summary.md](storage-location-planner-group-effort-summary.md)**. Ringkas:
 
-- **Storage Location:** 9 SP / ~10 mandays
-- **Planner Group:** Opsi 1 = **0 SP**; Opsi 2 = **14 SP / ~16 mandays**
-- **Gabungan (Storage Location + Planner Group Opsi 2):** **23 SP / ~27 mandays** → **1 sprint** (baseline BUMA ID); **~3 sprint** kalau tim baru "BUMA ID Modified" (lihat effort summary).
+- **Storage Location:** 10 SP / ~12 mandays
+- **Planner Group:** Opsi 1 = **0 SP**; Opsi 2 = **15 SP / ~18 mandays**
+- **Gabungan (Storage Location + Planner Group Opsi 2):** **25 SP / ~29 mandays** → **1 sprint** (baseline BUMA ID); **~3 sprint** kalau tim baru "BUMA ID Modified" (lihat effort summary).
 
 **Catatan tim eksekusi:** tim technical yang akan mengeksekusi (baik di sisi MKP maupun BTech) **belum ditentukan** (lihat [MOM 01-Jul-2026](../../../MKP-Project/2026-07-01-meeting-notes.md) poin #10) — baseline BUMA ID dipakai sebagai **referensi** estimasi, bukan commitment tim. **Mapping BAPI** (agar `PlannerGroup` sampai ke field SAP aktual) tetap di luar scope, tanggung jawab middleware.
 

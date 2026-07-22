@@ -69,8 +69,8 @@ Index ini melacak semua dokumen **enhancement/proposal** di bawah `digiman+/arch
 | [inspection-order/storage-location-planner-group-enhancement.md](inspection-order/storage-location-planner-group-enhancement.md) *(Bagian A)* | Create Order — material picker "Add Part": tampil & simpan Sloc | 📝 Internal Draft | 2026-07-21 |
 | [inspection-order/storage-location-planner-group-enhancement.md](inspection-order/storage-location-planner-group-enhancement.md) *(Bagian B)* | Order Approval (Planner Group) | 📝 Internal Draft — 2 opsi disiapkan untuk proposal, menunggu konfirmasi tim SAP MKP | 2026-07-21 |
 
-- Effort estimate gabungan: [inspection-order/storage-location-planner-group-effort-summary.md](inspection-order/storage-location-planner-group-effort-summary.md) — **23 SP / ~27 mandays / 1 sprint** (Storage Location 9 + Planner Group Opsi 2 14; Opsi 1 = 0), baseline BUMA ID; **~3 sprint** kalau tim baru "BUMA ID Modified" (2026-07-21)
-- Client proposal (draft): `inspection-order/storage-location-planner-group-proposal.html` / `.pdf` (2026-07-21)
+- Effort estimate gabungan: [inspection-order/storage-location-planner-group-effort-summary.md](inspection-order/storage-location-planner-group-effort-summary.md) — **25 SP / ~29 mandays / 1 sprint** (Storage Location 10 + Planner Group Opsi 2 15; Opsi 1 = 0), baseline BUMA ID; **~3 sprint** kalau tim baru "BUMA ID Modified" (2026-07-22, create order & approval = Web+Mobile)
+- Client proposal (draft): `inspection-order/storage-location-planner-group-proposal.html` / `.pdf` (2026-07-22)
 
 ### Form / IIR External API Integration
 

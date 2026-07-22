@@ -1,6 +1,6 @@
 # Effort Summary — Storage Location & Planner Group (Gabungan)
 
-*Last updated: 2026-07-21*
+*Last updated: 2026-07-22*
 
 ---
 
@@ -8,6 +8,8 @@ Dokumen ini merangkum estimasi effort **gabungan** untuk dua enhancement kecil d
 
 1. **Storage Location pada Create Order** — [storage-location-planner-group-enhancement.md](storage-location-planner-group-enhancement.md) Bagian A — tampilkan & simpan Storage Location (Sloc) saat pilih material ("Add Part"), menggantikan auto-resolve yang ambigu. *(Divalidasi ke UI & data nyata, 21 Jul 2026.)*
 2. **Planner Group pada Order Approval** — [storage-location-planner-group-enhancement.md](storage-location-planner-group-enhancement.md) Bagian B, **Opsi 2** (input eksplisit saat approval).
+
+> **⚠️ Revisi 22 Jul 2026 (platform):** dikonfirmasi **create order & order approval sama-sama ada di Web dan Mobile**. Karena picker material (Storage Location) & dropdown approval (Planner Group) harus diimplementasi di **dua platform**, total naik **23 → 25 SP** (+1 SP FE Web untuk picker Web, +1 SP FE Mobile untuk dropdown approval Mobile). Master Data Planner Group tetap **Web admin saja**.
 
 Metodologi kalibrasi SP & mandays memakai **baseline tim BUMA ID** yang sama dengan [area-of-unit-man-power-effort-summary.md](../area-of-unit-man-power-effort-summary.md) dan [maintenance-activity-type-effort-summary.md](maintenance-activity-type-effort-summary.md) — tidak diulang detailnya di sini, hanya dipakai hasilnya.
 
@@ -39,7 +41,7 @@ Metodologi kalibrasi SP & mandays memakai **baseline tim BUMA ID** yang sama den
 - Transaksi `MechanicOrderMaterial` **tidak menyimpan** Sloc — field-nya cuma `MaterialNumber`/`Quantity`/`BatchCode`/dll ([maintenance-activity-type-enhancement.md](maintenance-activity-type-enhancement.md#L405-L421)). Sloc baru di-resolve otomatis saat insert `PoolingMOItem` (Step 2, match `Number+Description+BatchCode+SiteId+SectionTypeCode`) di [order-emol-sap-sync.md](order-emol-sap-sync.md#L186-L200). Karena 1 material bisa punya banyak Sloc, resolve ini **ambigu** dan berpotensi mengirim **Sloc arbitrer** ke SAP.
 
 **Keputusan scope:**
-- **Labeli Sloc** di tiap card material list — pola sama dengan label Batch yang sudah ada.
+- **Labeli Sloc** di tiap card material list — pola sama dengan label Batch yang sudah ada. **Create order ada di Web & Mobile** (dikonfirmasi 22 Jul 2026), jadi picker dikerjakan di **dua platform**.
 - **Simpan Sloc terpilih** di `MechanicOrderMaterial` — pola sama dengan `BatchCode` yang sudah tersimpan hari ini.
 - **Pakai Sloc tersimpan** di outbound — ganti auto-resolve Step 2 → pakai `MechanicOrderMaterial.StorageLocation` (pilihan user), sekaligus **memperbaiki bug data laten** (kirim Sloc arbitrer).
 - **Tanpa toggle per-tenant** — walau request dari MKP, ini perbaikan data/UX yang aman untuk semua tenant, jadi tidak di-gate per-tenant (keputusan user 21 Jul 2026). Beda dari Planner Group (yang tetap pakai toggle).
@@ -49,12 +51,13 @@ Metodologi kalibrasi SP & mandays memakai **baseline tim BUMA ID** yang sama den
 
 | Komponen | Kompleksitas | SP | Mandays | Catatan |
 |---|---|---|---|---|
-| **BE**: material list endpoint bawa field `StorageLocation` (proyeksi + DTO) | Kecil | 1 | 1.2 | List sudah per-Sloc (tanpa dedup, dikonfirmasi UI) — tinggal surface kolom yang sudah ada di master `Material` |
-| **FE**: labeli Sloc di tiap card material list + selection bawa Sloc terpilih — 2 jalur (Additional Order "Order #N" + Inspection "Order Details") | Kecil–Sedang | 2 | 2.3 | Membedakan card yang tadinya tampak identik; reuse komponen picker yang sama di kedua jalur; pola label sama dengan Batch (NEW/REPAIRED) yang sudah ada |
-| `MechanicOrderMaterial`: kolom `StorageLocation` baru (migration) + capture Sloc baris terpilih saat "Save" | Kecil–Sedang | 2 | 2.3 | Transaksi belum simpan Sloc (dikonfirmasi schema) — pola sama dengan `BatchCode` yang sudah tersimpan |
-| Outbound: ganti resolve SLoc Step 2 `PoolingMOItem` → pakai `MechanicOrderMaterial.StorageLocation` | Kecil | 1 | 1.2 | Menyederhanakan query existing + hilangkan ambiguitas/kirim Sloc arbitrer. Field `SLoc` & jalur ke SAP tidak berubah |
-| Testing e2e: Sloc dari BE → tampil 2 jalur → tersimpan di transaksi → mengalir benar ke `PoolingMOItem.SLoc` → payload → SAP; regresi picker & pooling (termasuk material yang muncul di banyak Sloc) | Sedang | 3 | 3.5 | Termasuk regresi penghapusan auto-resolve lama |
-| **Total (Storage Location)** | | **9** | **~10** | 1 angka pasti hasil kalibrasi Fibonacci per baris |
+| **BE**: material list endpoint bawa field `StorageLocation` (proyeksi + DTO) | Kecil | 1 | 1.2 | List sudah per-Sloc (tanpa dedup, dikonfirmasi UI) — tinggal surface kolom yang sudah ada di master `Material`. Shared 2 platform |
+| **FE Mobile**: labeli Sloc di tiap card + selection bawa Sloc terpilih — picker mobile, 2 jalur (Additional Order "Order #N" + Inspection "Order Details") | Kecil–Sedang | 2 | 2.3 | Membedakan card yang tadinya tampak identik; pola label sama dengan Batch (NEW/REPAIRED) yang sudah ada |
+| **FE Web**: sama, di material picker create order versi **Web** | Kecil | 1 | 1.2 | *(Baru 22 Jul 2026)* Create order ada di Web juga — codebase terpisah; lebih murah karena meniru pola Mobile |
+| `MechanicOrderMaterial`: kolom `StorageLocation` baru (migration) + capture Sloc baris terpilih saat "Save" | Kecil–Sedang | 2 | 2.3 | Transaksi belum simpan Sloc (dikonfirmasi schema) — pola sama dengan `BatchCode` yang sudah tersimpan. BE, shared 2 platform |
+| Outbound: ganti resolve SLoc Step 2 `PoolingMOItem` → pakai `MechanicOrderMaterial.StorageLocation` | Kecil | 1 | 1.2 | Menyederhanakan query existing + hilangkan ambiguitas/kirim Sloc arbitrer. Field `SLoc` & jalur ke SAP tidak berubah. BE |
+| Testing e2e: Sloc dari BE → tampil (Web & Mobile) → tersimpan di transaksi → mengalir benar ke `PoolingMOItem.SLoc` → payload → SAP; regresi picker & pooling | Sedang | 3 | 3.5 | Termasuk regresi penghapusan auto-resolve lama |
+| **Total (Storage Location)** | | **10** | **~12** | 1 angka pasti hasil kalibrasi Fibonacci per baris |
 
 *Catatan: forward-only — order/eMOL lama tetap apa adanya (Sloc lama hasil auto-resolve), enhancement berlaku untuk Order baru. Tidak ada open item teknis tersisa — Sloc-sync tidak perlu (data sudah multi-row), grain list sudah per-Sloc.*
 
@@ -65,7 +68,7 @@ Metodologi kalibrasi SP & mandays memakai **baseline tim BUMA ID** yang sama den
 Scope lengkap & keputusan di [storage-location-planner-group-enhancement.md](storage-location-planner-group-enhancement.md) Bagian B. Ada **2 opsi**:
 
 - **Opsi 1 — Auto-derive dari Equipment (SAP side)**: **Effort Digiman+ = 0 SP** — tidak ada perubahan apapun di Digiman+ (field tetap tidak dikirim, SAP yang menentukan dari mapping Equipment).
-- **Opsi 2 — Input eksplisit saat Approval (di bawah)**: **14 SP / ~16 mandays**.
+- **Opsi 2 — Input eksplisit saat Approval (di bawah)**: **15 SP / ~18 mandays**.
 
 Estimasi di bawah untuk **Opsi 2** (Opsi 1 tidak butuh baris effort). Planner Group **tetap pakai toggle on/off per-tenant** — itu bagian dari desain Opsi 2 (fitur MKP-specific), berbeda dari keputusan "tanpa toggle" untuk Storage Location.
 
@@ -73,14 +76,14 @@ Estimasi di bawah untuk **Opsi 2** (Opsi 1 tidak butuh baris effort). Planner Gr
 
 | Komponen | Kompleksitas | SP | Mandays | Catatan |
 |---|---|---|---|---|
-| Master Data UI baru `PlannerGroup` (CRUD, di-scope per Site, maintain manual via UI Admin) | Sedang | 3 | 3.5 | Reference class: Master Data `MaintenanceActivityType`/`Area` CRUD standalone (Sedang, 3 SP). Dimensi Site = 1 FK + list difilter per site — masih CRUD standar |
+| Master Data UI baru `PlannerGroup` (CRUD, di-scope per Site, maintain manual via UI Admin **Web**) | Sedang | 3 | 3.5 | Reference class: Master Data `MaintenanceActivityType`/`Area` CRUD standalone (Sedang, 3 SP). Dimensi Site = 1 FK + list difilter per site — masih CRUD standar. **Web admin saja** |
 | Permission code baru untuk maintain Master Data Planner Group | Kecil | 1 | 1.2 | Setup permission code + assign ke role |
 | Toggle on/off per tenant (1 flag, gating show + enforce di approval) | Kecil–Sedang | 2 | 2.3 | Asumsi infra config per-tenant sudah ada — 1 flag + wiring conditional. Kalau infra flag belum ada, bisa naik |
-| Order Approval: dropdown Planner Group **mandatory** + validasi gate approve | Kecil–Sedang | 2 | 2.3 | Field baru di layar approval + approve diblok kalau kosong. Sedikit di atas reuse murni (dropdown baru + gating) |
-| Endpoint dropdown Planner Group difilter Site user login | Kecil | 1 | 1.2 | Aman krn approval sudah dibatasi per site per section — tidak ada skenario lintas-site (dikonfirmasi 21 Jul 2026) |
-| Simpan `PlannerGroup` di order + publish field baru di payload outbound (message bus) | Kecil–Sedang | 2 | 2.3 | Migration kolom + wiring **publish-only**. Mapping ke field BAPI SAP = tanggung jawab middleware, **di luar scope** (konsisten pola field publish-only lain) |
-| Testing e2e (CRUD master data, toggle on & off, mandatory gate, filter site, payload berisi `PlannerGroup`) | Sedang | 3 | 3.5 | Titik integrasi lebih sedikit — tanpa round-trip SAP (BAPI di middleware) & tanpa cross-service baru |
-| **Total (Planner Group — Opsi 2)** | | **14** | **~16** | 1 angka pasti hasil kalibrasi Fibonacci per baris |
+| Order Approval: dropdown Planner Group **mandatory** (**Web + Mobile**) + validasi gate approve | Sedang | 3 | 3.5 | *(Naik dari 2 SP, 22 Jul 2026)* Approval ada di **Web & Mobile** → dropdown diimplementasi 2 platform (FE Web 1 + FE Mobile 1); gate/validasi BE shared (1). Approve diblok kalau kosong |
+| Endpoint dropdown Planner Group difilter Site user login | Kecil | 1 | 1.2 | Aman krn approval sudah dibatasi per site per section — tidak ada skenario lintas-site (dikonfirmasi 21 Jul 2026). BE |
+| Simpan `PlannerGroup` di order + publish field baru di payload outbound (message bus) | Kecil–Sedang | 2 | 2.3 | Migration kolom + wiring **publish-only**. Mapping ke field BAPI SAP = tanggung jawab middleware, **di luar scope** (konsisten pola field publish-only lain). BE |
+| Testing e2e (CRUD master data, toggle on & off, mandatory gate Web & Mobile, filter site, payload berisi `PlannerGroup`) | Sedang | 3 | 3.5 | Titik integrasi lebih sedikit — tanpa round-trip SAP (BAPI di middleware) & tanpa cross-service baru |
+| **Total (Planner Group — Opsi 2)** | | **15** | **~18** | 1 angka pasti hasil kalibrasi Fibonacci per baris |
 
 *Catatan: **Mapping BAPI ke SAP** (agar `PlannerGroup` sampai ke field SAP aktual) **di luar total ini** — tanggung jawab middleware, belum bisa diestimasi dari sisi Digiman+. Enforcement rule K01/material tetap SOP manual (0 SP). Seeder awal tidak perlu (data di-maintain manual, entity baru tanpa row existing).*
 
@@ -90,10 +93,10 @@ Estimasi di bawah untuk **Opsi 2** (Opsi 1 tidak butuh baris effort). Planner Gr
 
 | # | Enhancement | SP | Mandays |
 |---|---|---|---|
-| 1 | Storage Location pada Create Order | **9** | ~10 |
-| 2 | Planner Group pada Order Approval — **Opsi 2** *(Opsi 1 = 0 SP)* | **14** | ~16 |
+| 1 | Storage Location pada Create Order | **10** | ~12 |
+| 2 | Planner Group pada Order Approval — **Opsi 2** *(Opsi 1 = 0 SP)* | **15** | ~18 |
 | — | Mapping BAPI Planner Group → SAP *(middleware)* | **Belum bisa diestimasi** | **Belum bisa diestimasi** |
-| | **Total gabungan** | **23** | **~27** |
+| | **Total gabungan** | **25** | **~29** |
 
 *(SP 1 angka pasti hasil kalibrasi Fibonacci per baris — bukan range. Mandays = SP × 1.17, basis 5 sprint terakhir tim BUMA ID.)*
 
@@ -103,9 +106,9 @@ Kapasitas efektif tim BUMA ID = **~43.7 SP/sprint** (velocity 62.4 SP/sprint × 
 
 | Skenario | SP | ÷ Kapasitas Efektif (43.7 SP/sprint) | Kebutuhan Sprint |
 |---|---|---|---|
-| Gabungan (Storage Location + Planner Group Opsi 2) | 23 | 23 ÷ 43.7 = 0.53 | **1 sprint** (~53% kapasitas efektif) |
+| Gabungan (Storage Location + Planner Group Opsi 2) | 25 | 25 ÷ 43.7 = 0.57 | **1 sprint** (~57% kapasitas efektif) |
 
-Kedua enhancement muat nyaman dalam **1 sprint** dengan sisa kapasitas ~47% — inilah alasan keduanya digabung jadi satu rilis (masing-masing sendirian < 1 sprint: Storage Location ~0.21 sprint, Planner Group ~0.32 sprint).
+Kedua enhancement muat dalam **1 sprint** dengan sisa kapasitas ~43% — inilah alasan keduanya digabung jadi satu rilis (masing-masing sendirian < 1 sprint: Storage Location ~0.23 sprint = 10÷43.7, Planner Group ~0.34 sprint = 15÷43.7).
 
 ---
 
@@ -117,34 +120,34 @@ Kedua enhancement muat nyaman dalam **1 sprint** dengan sisa kapasitas ~47% — 
 
 ### Breakdown SP per role
 
-Asumsi platform: **Master Data admin & Order Approval = Web; layar create order (material picker "Add Part") = Mobile; schema/API/migration/outbound/kalkulasi = BE; testing = QA.**
+Asumsi platform (**diperbarui 22 Jul 2026**): **Master Data admin = Web; create order & Order Approval = Web + Mobile (dikerjakan di kedua platform); schema/API/migration/outbound/kalkulasi = BE; testing = QA.**
 
 | Sumber | BE | FE Web | FE Mobile | QA | Total |
 |---|---|---|---|---|---|
-| Storage Location (9 SP) | 4 | 0 | 2 | 3 | 9 |
-| Planner Group Opsi 2 (14 SP) | 8.5 | 2.5 | 0 | 3 | 14 |
-| **Total (23 SP)** | **12.5** | **2.5** | **2** | **6** | **23** |
+| Storage Location (10 SP) | 4 | 1 | 2 | 3 | 10 |
+| Planner Group Opsi 2 (15 SP) | 8.5 | 2.5 | 1 | 3 | 15 |
+| **Total (25 SP)** | **12.5** | **3.5** | **3** | **6** | **25** |
 
-> **Detail split**: Storage Location BE = endpoint Sloc (1) + `MechanicOrderMaterial` kolom+capture (2) + outbound Step 2 (1); FE Mobile = labeli Sloc + selection (2); QA = testing (3). Planner Group BE = Master Data schema/API (1.5) + permission (1) + toggle flag/gating (2) + approval gate (1) + dropdown API filter site (1) + simpan+publish outbound (2); FE Web = Master Data CRUD UI (1.5) + approval dropdown UI (1); QA = testing (3). Asumsi platform belum dikonfirmasi ke tim aktual. **Tidak ada track DE/DA** — kedua enhancement tidak menyentuh report/Power BI.
+> **Detail split**: Storage Location BE = endpoint Sloc (1) + `MechanicOrderMaterial` kolom+capture (2) + outbound Step 2 (1); FE Mobile = picker mobile labeli Sloc + selection (2); FE Web = picker web (1); QA = testing (3). Planner Group BE = Master Data schema/API (1.5) + permission (1) + toggle flag/gating (2) + approval gate (1) + dropdown API filter site (1) + simpan+publish outbound (2); FE Web = Master Data CRUD UI (1.5) + dropdown approval Web (1); FE Mobile = dropdown approval Mobile (1); QA = testing (3). **Tidak ada track DE/DA** — kedua enhancement tidak menyentuh report/Power BI.
 
 ### Velocity, Critical Path & Jumlah Sprint
 
 Velocity tim baru (asumsi sama dengan assessment sebelumnya): **Tanpa KT 0.7 SP/hari/orang**, **Dengan KT 0.81** (menutup 75% jarak dari 0.7 ke ceiling riil BUMA ID 0.85: `0.7 + 0.75 × (0.85 − 0.7) ≈ 0.81`).
 
-Critical path = **BE + QA** (serial) — FE (Web 2.5 + Mobile 2 = 4.5 SP) jauh lebih kecil dari BE (12.5 SP), selalu selesai duluan lalu menganggur; QA fase terakhir serial setelah BE selesai (butuh endpoint, outbound, integrasi kelar untuk test e2e). Critical path = 12.5 + 6 = **18.5 SP**. Sprint = 10 hari kerja / 2 minggu, dibulatkan ke atas.
+Critical path = **BE + QA** (serial) — FE (Web 3.5 + Mobile 3 = 6.5 SP, masing-masing role paralel) jauh lebih kecil dari BE (12.5 SP), selalu selesai duluan lalu menganggur; QA fase terakhir serial setelah BE selesai (butuh endpoint, outbound, integrasi kelar untuk test e2e). Critical path = 12.5 + 6 = **18.5 SP** *(tidak berubah oleh revisi platform — tambahan +2 SP semuanya jatuh ke FE, bukan BE/QA)*. Sprint = 10 hari kerja / 2 minggu, dibulatkan ke atas.
 
-| Skenario | Critical Path (BE+QA) | ÷ Velocity → Hari | Sprint | Total Mandays (23 SP ÷ velocity) |
+| Skenario | Critical Path (BE+QA) | ÷ Velocity → Hari | Sprint | Total Mandays (25 SP ÷ velocity) |
 |---|---|---|---|---|
-| Modified — dengan KT | 18.5 SP | ÷ 0.81 = 22.8 hari | **~3 sprint** | ~28 |
-| Modified — tanpa KT | 18.5 SP | ÷ 0.7 = 26.4 hari | **~3 sprint** | ~33 |
+| Modified — dengan KT | 18.5 SP | ÷ 0.81 = 22.8 hari | **~3 sprint** | ~31 |
+| Modified — tanpa KT | 18.5 SP | ÷ 0.7 = 26.4 hari | **~3 sprint** | ~36 |
 
 ### Perbandingan lintas tim (konsolidasi)
 
 | Skenario | SP | BUMA ID baseline (43.7 SP/sprint, 6 orang) | Modified — dengan KT | Modified — tanpa KT |
 |---|---|---|---|---|
-| Gabungan (Storage Location + Planner Group Opsi 2) | 23 | **1 sprint** | **~3 sprint** | **~3 sprint** |
+| Gabungan (Storage Location + Planner Group Opsi 2) | 25 | **1 sprint** | **~3 sprint** | **~3 sprint** |
 
-**Temuan penting**: BE mendominasi **~54% total SP** (12.5/23) — **1 BE tunggal di tim baru = bottleneck mutlak**. FE Web+Mobile (4.5 SP gabungan) selesai jauh sebelum BE. Menambah **BE ke-2** memangkas critical path jauh lebih efektif daripada menambah FE/QA. **KT menghemat ~5 mandays** (33→28) tapi **tidak menghemat sprint penuh di skala ini** — dua-duanya tetap ~3 sprint (beda dari inisiatif besar di mana KT bisa memangkas 1 sprint). Gap besar vs baseline (1 vs 3 sprint) wajar & bukan kontradiksi: baseline pakai throughput 6 orang paralel yang riil-terukur, sedangkan tim baru dihitung dari critical path 1 BE + 1 QA serial dengan velocity per-orang lebih rendah.
+**Temuan penting**: BE mendominasi **~50% total SP** (12.5/25) — **1 BE tunggal di tim baru = bottleneck mutlak**. FE Web+Mobile (6.5 SP gabungan) selesai jauh sebelum BE. Menambah **BE ke-2** memangkas critical path jauh lebih efektif daripada menambah FE/QA. **KT menghemat ~5 mandays** (36→31) tapi **tidak menghemat sprint penuh di skala ini** — dua-duanya tetap ~3 sprint (beda dari inisiatif besar di mana KT bisa memangkas 1 sprint). Gap besar vs baseline (1 vs 3 sprint) wajar & bukan kontradiksi: baseline pakai throughput 6 orang paralel yang riil-terukur, sedangkan tim baru dihitung dari critical path 1 BE + 1 QA serial dengan velocity per-orang lebih rendah.
 
 ---
 
