@@ -1,3 +1,4 @@
 Jira/token/
 .claude/
 __pycache__/
+.mcp.json

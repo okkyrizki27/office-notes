@@ -1,13 +1,13 @@
-# Enhancement: Maintenance Activity Type & Rapikan Integrasi Inspection→Order
+# Enhancement: Activity Type & Rapikan Integrasi Inspection→Order
 
-*Last updated: 2026-07-17*
+*Last updated: 2026-07-24*
 
 ---
 
 **Feature:** Inspection & Order (Digiman+)
 **Related doc:** [order-emol-sap-sync.md](order-emol-sap-sync.md) *(schema & flow existing yang jadi dasar enhancement ini — Bagian 4.2 khususnya)*, [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) *(enhancement lain yang menyentuh layar sama persis — lihat Bagian 6)*
 
-> **Scope dokumen ini (dikonfirmasi 15 Jul 2026)**: sengaja digabung jadi **satu dokumen**, dua tujuan sekaligus — (1) redesign sourcing PM Activity Type → "Maintenance Activity Type" (Bagian 2.1–2.8), dan (2) **merapikan integrasi Inspection→Order secara umum** (Bagian 2.9: relasi `WorkOrder`/`TaskPersonalized`↔`MechanicOrderSummary`/`MechanicOrderList`, hapus ketergantungan cross-service call yang tidak perlu). Kedua tujuan ini saling terkait erat (ditemukan saat menganalisa yang pertama), jadi tidak dipisah jadi dokumen lain.
+> **Scope dokumen ini (dikonfirmasi 15 Jul 2026)**: sengaja digabung jadi **satu dokumen**, dua tujuan sekaligus — (1) redesign sourcing PM Activity Type → "Activity Type" (Bagian 2.1–2.8), dan (2) **merapikan integrasi Inspection→Order secara umum** (Bagian 2.9: relasi `WorkOrder`/`TaskPersonalized`↔`MechanicOrderSummary`/`MechanicOrderList`, hapus ketergantungan cross-service call yang tidak perlu). Kedua tujuan ini saling terkait erat (ditemukan saat menganalisa yang pertama), jadi tidak dipisah jadi dokumen lain.
 
 > Dokumen ini berawal dari **diskusi desain internal** (14–15 Jul 2026), dan **sudah dikonfirmasi ke business/client (21 Jul 2026)** — statusnya sekarang setara dengan [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md). Keputusan di sini (skema, penamaan) sudah disepakati dari sisi business, tapi **belum divalidasi ke tim technical/engineer** yang pegang codebase `maintenance-order` — lihat Bagian 5 Open Items.
 
@@ -28,55 +28,45 @@ Enhancement ini membetulkan ketiga hal di atas sekaligus: **memisahkan** axis ek
 
 ## 2. Keputusan & Scope
 
-### 2.1 Penamaan: "Maintenance Activity Type"
+### 2.1 Penamaan: "Activity Type" (mengikuti ticket & Figma)
 
-- Field **`PMActType`/"PM Activity Type"** diganti istilah generik **"Maintenance Activity Type"** — drop prefix "PM" (SAP Plant Maintenance) supaya tidak SAP-minded, tapi tetap jelas maksudnya (aktivitas maintenance apa yang perlu dilakukan).
-- **Istilah yang dipertimbangkan tapi ditolak** (dicatat supaya tidak dibahas ulang):
-  - **"Work Order"** — ditolak. Sudah dipakai untuk entity berbeda (`WorkOrder` di `maintenance-execution`, scope eksekusi luas & ERP-agnostic) — beda scope dari Order/`maintenance-order` yang spesifik untuk artifact ke ERP/SAP (lihat Bagian 1).
-  - **"eMOL"** — ditolak untuk penamaan field baru ini (meski istilah itu sendiri tetap valid untuk entity `MechanicOrderList`). "Mechanic" di eMOL juga istilah sempit (mining/heavy-equipment-minded), sama masalahnya dengan "PM".
+- **Label UI: "Activity Type"** — mengikuti penamaan di ticket epic [IAMS30-4536](https://bukittechnology.atlassian.net/browse/IAMS30-4536) & Figma (label "Activity Type" / tab "Activity Mapping"). Istilah SAP `PMActType`/"PM Activity Type" (SAP Plant Maintenance) tidak dipakai sebagai label — diganti "Activity Type" yang generik/ERP-agnostic.
+- **Entity BE/DB: `MaintenanceCategory`** (existing) — "Activity Type" cuma **label UI** di atas entity `MaintenanceCategory`; penamaan BE/DB tidak berubah. Bukan master baru, lihat 2.4.
+- **Revisi dari proposal awal**: dokumen ini semula memakai istilah generik lain (drop prefix "PM") + **master baru lokal** di `maintenance-order`. Keputusan final (ikut ticket): pakai label **"Activity Type"** di atas **`MaintenanceCategory`** existing (reuse) — bukan istilah/master baru. Alternatif "Work Order"/"eMOL" yang sempat ditolak jadi tidak relevan lagi karena label kini mengikuti ticket.
 
 ### 2.2 Level Data: Per-eMOL, Seragam untuk Inspection & Additional
 
-- `Maintenance Activity Type` dipilih **manual oleh user, per eMOL**, tepat setelah memilih **Order Type** — berlaku **sama** untuk eMOL tipe Inspection maupun Additional. Ini menghapus percabangan logic yang didokumentasikan di [order-emol-sap-sync.md](order-emol-sap-sync.md) 4.2 (tabel "Sourcing berbeda tergantung tipe eMOL").
-- **Inspection**: **tidak ada default/pre-fill** dari `WorkOrder.MaintenanceCategory.Code`. Cross-service call `GetWorkOrderById` kemungkinan masih dipakai untuk field lain (mis. Equipment) — perlu dicek, tapi **tidak lagi** jadi sumber `Maintenance Activity Type` (lihat Bagian 5 Open Items).
+- `Activity Type` dipilih **manual oleh user, per eMOL**, tepat setelah memilih **Order Type** — berlaku **sama** untuk eMOL tipe Inspection maupun Additional. Ini menghapus percabangan logic yang didokumentasikan di [order-emol-sap-sync.md](order-emol-sap-sync.md) 4.2 (tabel "Sourcing berbeda tergantung tipe eMOL").
+- **Inspection**: **tidak ada default/pre-fill** dari `WorkOrder.MaintenanceCategory.Code`. Cross-service call `GetWorkOrderById` kemungkinan masih dipakai untuk field lain (mis. Equipment) — perlu dicek, tapi **tidak lagi** jadi sumber `Activity Type` (lihat Bagian 5 Open Items).
 - **Additional**: field lama di screen 1 Asset Details ("Activity Type", backed oleh `MechanicOrderSummary.MaintenanceCategoryCode`) **dihapus total** dari screen tersebut. Kolom `MaintenanceCategoryCode`/`MaintenanceCategoryName` di `MechanicOrderSummary` dibiarkan ada di DB (forward-only, lihat 2.6) tapi tidak lagi diisi lewat UI.
   - **Dikonfirmasi (15 Jul 2026)**: dropdown "Activity Type" ini sumbernya endpoint `GET /api/workorder/inspection/offline/dropdown/maintenancecategory` (memanggil `MaintenanceExecAPI.GetWorkOrderAsync`) — lihat audit dampak endpoint lengkap di 2.11.
 - **Wajib isi (mandatory)** sebelum submit — untuk kedua tipe eMOL.
 
 ### 2.3 Opsi Dropdown: Dependent terhadap Order Type
 
-- Opsi `Maintenance Activity Type` yang ditampilkan **difilter berdasarkan Order Type** (`CostTypeCode`/`MaterialCostType`) yang sudah dipilih user — bukan daftar independen. Butuh mapping **many-to-many** baru: 1 Order Type bisa punya beberapa Activity Type valid, dan 1 Activity Type bisa berlaku untuk beberapa Order Type.
+- Opsi `Activity Type` yang ditampilkan **difilter berdasarkan Order Type** (`CostTypeCode`/`MaterialCostType`) yang sudah dipilih user — bukan daftar independen. Butuh mapping **many-to-many** baru: 1 Order Type bisa punya beberapa Activity Type valid, dan 1 Activity Type bisa berlaku untuk beberapa Order Type.
 - **Alasan M:N (bukan 1:N)**: fleksibilitas untuk client yang konvensi Order Type/Activity Type-nya belum diketahui, dan **belum tentu semua target SAP** — mapping ini murni data Digiman+ (per-tenant, lihat 2.4), independen dari BAPI/ERP spesifik manapun.
-- **UX saat Order Type belum dipilih — diputuskan (15 Jul 2026): dropdown `Maintenance Activity Type` disabled.** User harus pilih Order Type dulu baru bisa membuka dropdown Activity Type — konsisten dengan sifatnya yang dependent/filtered (2.3).
+- **UX saat Order Type belum dipilih — diputuskan (15 Jul 2026): dropdown `Activity Type` disabled.** User harus pilih Order Type dulu baru bisa membuka dropdown Activity Type — konsisten dengan sifatnya yang dependent/filtered (2.3).
 - **Validasi wajib-isi saat submit — diputuskan (15 Jul 2026)**: divalidasi, dengan rekomendasi copy (English, konsisten Bahasa Inggris seperti field lain di layar yang sudah direview — "Order Type", "Part", dst):
-  - **Error message (field kosong saat submit)**: `"Maintenance Activity Type is required."`
+  - **Error message (field kosong saat submit)**: `"Activity Type is required."`
   - **Helper text saat dropdown disabled** (Order Type belum dipilih) — mengikuti pola placeholder existing di layar yang sama (mis. Order Type sendiri pakai "Choose material based on order type"): `"Select Order Type first"`
-  - **Helper text saat dropdown enabled** (siap dipilih): `"Choose Maintenance Activity Type based on Order Type"`
+  - **Helper text saat dropdown enabled** (siap dipilih): `"Choose Activity Type based on Order Type"`
 
-### 2.4 Skema Data Baru
+### 2.4 Skema Data — Reuse MaintenanceCategory + Mapping M:N Baru
 
-**`MaintenanceActivityType`** (master baru)
+**Master `MaintenanceCategory`** (existing — **reuse, BUKAN master baru**)
+- "Activity Type" (label UI) di-back oleh entity existing **`MaintenanceCategory`**, tersimpan di service **`maintenance-strategy`** (bukan `maintenance-order`). Field: `Code` (unique, immutable), `Name`, `IsActive`. CRUD-nya dikelola epic terpisah [IAMS30-4535](https://bukittechnology.atlassian.net/browse/IAMS30-4535) — BE [IAMS30-4543](https://bukittechnology.atlassian.net/browse/IAMS30-4543) (`GetMaintenanceCategoryMinimal`, lookup Active-only), FE tab "Activity Type" [IAMS30-4544](https://bukittechnology.atlassian.net/browse/IAMS30-4544).
+- **Revisi dari proposal awal**: dokumen ini semula mengusulkan **master baru lokal** di `maintenance-order`, sengaja independen dari `maintenance-strategy`. **Keputusan final membalik ini — reuse `MaintenanceCategory` existing.** Trade-off: masalah "master ganda"/governance drift hilang (cuma 1 master), tapi muncul **ketergantungan cross-DB** — mapping & validasi harus call `maintenance-strategy` (tidak ada physical FK). Lihat 5.1.
+
+**`OrderTypeMaintenanceCategoryMapping`** (junction M:N baru — di `maintenance-order`, [IAMS30-4546](https://bukittechnology.atlassian.net/browse/IAMS30-4546))
 ```
-Id            ← PK, int identity
-Code          ← unique constraint (BUKAN PK — beda dari MaterialCostType existing yang PK-nya Code/varchar)
-Description
+Id                       ← PK, bigint identity
+OrderTypeCode            ← FK varchar → MaterialCostType.Code (same DB)
+MaintenanceCategoryCode  ← FK varchar → MaintenanceCategory.Code (cross-DB, no physical FK; divalidasi via IAMS30-4543 saat create/update)
 IsActive
-CreatedAt, CreatedBy
-ModifiedAt, ModifiedBy
+CreatedAt, CreatedBy, ModifiedAt, ModifiedBy
 ```
-- Per-tenant secara implisit — mengikuti arsitektur DB existing yang sudah isolated-per-tenant (sama seperti `MaterialCostType`, tidak perlu kolom `TenantCode` eksplisit).
-- **Independen dari data master "maintenance activity" yang sudah ada di service `maintenance-strategy`** *(dikonfirmasi 14 Jul 2026)* — meski kemungkinan besar isinya overlap (contoh data BUMA ID yang dibahas berisi code seperti `INP`, `SCH`, `BEX` yang juga dipakai di `WorkOrder.MaintenanceCategoryCode`/`maintenance-execution`, sumber aslinya di `maintenance-strategy`), tabel ini **sengaja dibuat baru & lokal** di `maintenance-order`, bukan referensi cross-service. Konsekuensi: kalau data master di `maintenance-strategy` berubah, **tidak otomatis ter-reflect** di sini — perlu proses/governance terpisah untuk menjaga kedua list tetap selaras kalau memang harus (lihat Open Items).
-- Kolom `TypeCode`/`IsPeriodicalService` yang ada di data master `maintenance-strategy` **sengaja tidak dibawa** ke tabel baru ini — di luar scope enhancement ini, mungkin dibahas terpisah nanti.
-
-**`MaterialCostTypeActivityTypeMapping`** (junction M:N, nama sementara)
-```
-MaterialCostTypeCode       ← FK varchar → MaterialCostType.Code (PK asli tabel legacy tsb)
-MaintenanceActivityTypeId  ← FK int → MaintenanceActivityType.Id
-IsActive
-CreatedAt, CreatedBy
-ModifiedAt, ModifiedBy
-```
-> Tipe FK asimetris (varchar vs int) murni cerminan bahwa `MaterialCostType` (legacy) pakai Code sebagai PK, sementara `MaintenanceActivityType` (baru) pakai Id — bukan inkonsistensi baru yang diperkenalkan enhancement ini.
+> M:N: 1 Order Type bisa map ke beberapa Activity Type (`MaintenanceCategory`), dan sebaliknya — masing-masing 1 baris. Kombinasi `OrderTypeCode`+`MaintenanceCategoryCode` unik antar baris Active. Deactivate = Update `IsActive=false` (tidak ada endpoint Remove terpisah). Web admin CRUD-nya di tab "Activity Mapping" ([IAMS30-4547](https://bukittechnology.atlassian.net/browse/IAMS30-4547)) dalam page "Work Management" ([IAMS30-4548](https://bukittechnology.atlassian.net/browse/IAMS30-4548)).
 
 **Perubahan ke `MechanicOrderList`** (existing table — struktur real dikonfirmasi 15 Jul 2026)
 ```
@@ -96,9 +86,11 @@ CompletedDate                datetime, null
 IsActive                    bit, not null
 CreatedBy/CreatedAt, ModifiedBy/ModifiedAt
 
-+ MaintenanceActivityTypeCode   ← BARU, varchar(64) (samakan tipe dgn CostTypeCode), wajib diisi sebelum submit
++ ActivityType         ← BARU, varchar(64), references MaintenanceCategory.Code (samakan pola dgn CostTypeCode), wajib diisi sebelum submit — IAMS30-4625
++ ActivityTypeName     ← BARU, varchar(128), snapshot nama Activity Type (denormalized) — IAMS30-4625
++ MaterialCostTypeName ← BARU, varchar(128), snapshot nama Order Type (denormalized) — IAMS30-4625
 ```
-- **Menyimpan value (Code), bukan FK Id** — sejajar pola `CostTypeCode` yang sudah ada di tabel yang sama, dan konsisten dengan prinsip "data transaksi disimpan by value, bukan by ID reference" yang sudah ditetapkan di [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) 2.2 untuk Component/Sub Component/Area. Konsekuensinya sama: kalau master data `MaintenanceActivityType` berubah/dihapus di kemudian hari, eMOL historis tidak terpengaruh.
+- **Menyimpan value (Code), bukan FK Id** — sejajar pola `CostTypeCode` yang sudah ada di tabel yang sama, dan konsisten dengan prinsip "data transaksi disimpan by value, bukan by ID reference" yang sudah ditetapkan di [area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) 2.2 untuk Component/Sub Component/Area. Konsekuensinya sama: kalau master data `MaintenanceCategory` berubah/dihapus di kemudian hari, eMOL historis tidak terpengaruh.
 
 **`MechanicOrderDetail`** (existing table — struktur real dikonfirmasi 15 Jul 2026, **tidak diubah** oleh enhancement ini, dicatat sebagai referensi)
 ```
@@ -122,10 +114,10 @@ IsActive, CreatedAt/By, ModifiedAt/By
 
 **`PoolingMOItem`** (existing table, [order-emol-sap-sync.md](order-emol-sap-sync.md) 5.2) — **tidak di-rename**
 ```
-PMActType   ← tetap nama ini, sekarang diisi langsung dari mol.MaintenanceActivityTypeCode
+PMActType   ← tetap nama ini, sekarang diisi langsung dari mol.ActivityType
 ```
-- **Prinsip**: generic naming di layer bisnis (`MechanicOrderList`, master data baru), nama SAP-spesifik tetap dipertahankan di *boundary* integrasi (`PoolingMOItem`, mapping BAPI). `PoolingMOItem` memang staging table khusus SAP sync — wajar "berbicara bahasa SAP" di titik itu. Kalau nanti ada client non-SAP, cukup tambah *boundary* integrasi baru tanpa sentuh model bisnis inti (`MechanicOrderList`/`MaintenanceActivityType`).
-- Populate logic jadi lebih simpel: copy langsung `mol.MaintenanceActivityTypeCode`, sama pola dengan `MOType` yang sudah copy langsung dari `mol.CostTypeCode` hari ini — tidak perlu lagi resolve `@MaintenanceCategoryCode` lewat percabangan logic (4.2 lama).
+- **Prinsip**: generic naming di layer bisnis (`MechanicOrderList`, master `MaintenanceCategory`), nama SAP-spesifik tetap dipertahankan di *boundary* integrasi (`PoolingMOItem`, mapping BAPI). `PoolingMOItem` memang staging table khusus SAP sync — wajar "berbicara bahasa SAP" di titik itu. Kalau nanti ada client non-SAP, cukup tambah *boundary* integrasi baru tanpa sentuh model bisnis inti (`MechanicOrderList`/`MaintenanceCategory`).
+- Populate logic jadi lebih simpel: copy langsung `mol.ActivityType`, sama pola dengan `MOType` yang sudah copy langsung dari `mol.CostTypeCode` hari ini — tidak perlu lagi resolve `@MaintenanceCategoryCode` lewat percabangan logic (4.2 lama).
 
 ### 2.5 UI Changes
 
@@ -146,7 +138,7 @@ Defect Information: Component & Sub Component*, Damage Code*, Cause Code,
                      How Long Will This Defect Repair Take?*
 No Parts Required declaration (checkbox)
 Order Type*
-→ Maintenance Activity Type* (BARU — di bawah Order Type, opsi filtered by Order Type)
+→ Activity Type* (BARU — di bawah Order Type, opsi filtered by Order Type)
 Part* (Add Part)
 ```
 
@@ -163,11 +155,11 @@ Tidak ada penomoran `#1`/`#2` di screen ini — tiap finding sudah punya screen 
             Cause Group & Cause Code, Action Remedy, Finding Images, Defect Notes
 No Parts Required declaration (checkbox)
 Order Type*
-→ Maintenance Activity Type* (BARU — di bawah Order Type, opsi filtered by Order Type)
+→ Activity Type* (BARU — di bawah Order Type, opsi filtered by Order Type)
 Part*
 ```
 
-- Section header **"Material Order" → "Order"** (rename, tanpa `#N` karena singular/konteksnya sudah 1 finding) — alasan sama dengan Bagian 3: "Material" terlalu sempit, apalagi setelah `Maintenance Activity Type` masuk ke section ini.
+- Section header **"Material Order" → "Order"** (rename, tanpa `#N` karena singular/konteksnya sudah 1 finding) — alasan sama dengan Bagian 3: "Material" terlalu sempit, apalagi setelah `Activity Type` masuk ke section ini.
 - Tombol submit di screen ini berlabel **"Complete Order"** (beda label dari "Preview"/"Create" di Additional Order) — dikonfirmasi ini **flow yang sama**, cuma beda label saja, bukan state/behavior berbeda. **Dibiarkan as-is** — bukan bagian dari scope enhancement ini untuk diseragamkan.
 
 ### 2.6 Migrasi: Forward-Only
@@ -184,11 +176,11 @@ Part*
 | Tujuan | Filter opsi yang **boleh dipilih user** saat create eMOL | Filter MO mana yang **ditarik balik** jadi backlog dari SAP |
 | Titik pakai | Data-entry (create Order/eMOL) | Inbound sync (SAP → Digiman+) |
 
-Kalau di masa depan mau digabung (mis. tambah kolom flag `IsEligibleForBacklogPull` di `MaterialCostTypeActivityTypeMapping`), itu **keputusan terpisah** yang perlu didiskusikan ulang — dicatat di sini supaya tidak digabung tanpa sadar.
+Kalau di masa depan mau digabung (mis. tambah kolom flag `IsEligibleForBacklogPull` di `OrderTypeMaintenanceCategoryMapping`), itu **keputusan terpisah** yang perlu didiskusikan ulang — dicatat di sini supaya tidak digabung tanpa sadar.
 
 ### 2.8 Order Approval Checkpoint
 
-- **`Maintenance Activity Type` tetap bisa diedit oleh SPV saat Order Approval** *(dikonfirmasi 14 Jul 2026)* — perlakuan **sama seperti Order Type** yang sudah editable di titik approval. Konsisten dengan pola Component/Sub Component/Area/Duration/Man Power yang juga validated & editable di checkpoint yang sama ([area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) 2.6) — SPV jadi checkpoint terakhir sebelum data dikirim ke SAP untuk field ini juga.
+- **`Activity Type` tetap bisa diedit oleh SPV saat Order Approval** *(dikonfirmasi 14 Jul 2026)* — perlakuan **sama seperti Order Type** yang sudah editable di titik approval. Konsisten dengan pola Component/Sub Component/Area/Duration/Man Power yang juga validated & editable di checkpoint yang sama ([area-of-unit-man-power-enhancement.md](area-of-unit-man-power-enhancement.md) 2.6) — SPV jadi checkpoint terakhir sebelum data dikirim ke SAP untuk field ini juga.
 - Aturan wajib-isi (2.3) & dependent-terhadap-Order-Type (2.4) berlaku sama di titik approval ini — bukan form terpisah yang lebih longgar.
 
 ### 2.9 Relasi WorkOrder → Order Disederhanakan
@@ -261,7 +253,7 @@ TaskPersonalizedFinding: Id, TaskPersonalizedId, FormSubmissionTabId, FormTaskCo
 
 **Koreksi (15 Jul 2026): `Inspector` jadi 2 kolom terpisah** — `InspectorCode` dan `InspectorName`, menyamai struktur target `PoolingMOItem` yang sudah ada. Alasan: `TaskPersonalized.UserCode` cuma kode, nama perlu di-resolve terpisah (mis. dari master data User) — kalau cuma simpan Code, `InspectorName` di `PoolingMOItem` nanti butuh resolve ulang saat sync (balik ke masalah live-lookup yang mau kita hindari). Simpan keduanya sebagai snapshot sekaligus di titik Order dibuat.
 
-Lengkap skema real `PoolingMOItem`: lihat [maintenance-order-schema.md](../database/maintenance-order-schema.md). ⚠️ **`PoolingMOItem.PMActType` cuma `varchar(5)`** — constraint penting: `MaintenanceActivityType.Code` (2.4) harus dijaga ≤5 karakter supaya tidak terpotong saat sync. Sample data BUMA ID yang sudah diterima (35 code, semua 3 karakter) aman terhadap constraint ini.
+Lengkap skema real `PoolingMOItem`: lihat [maintenance-order-schema.md](../database/maintenance-order-schema.md). **✅ Keputusan final (24 Jul 2026) — kolom `PoolingMOItem.PMActType` DILEBARKAN, `MaintenanceCategory.Code` TIDAK dibatasi panjangnya.** Sebelumnya (15 Jul) diputuskan `Code` harus dijaga ≤5 karakter karena `PMActType` cuma `varchar(5)` — **keputusan itu dibalik**. Alasan: `varchar(5)` adalah warisan constraint SAP, sedangkan Digiman+ didesain sebagai **produk standalone/ERP-agnostic** — panjang field di core (`MaintenanceCategory.Code`, `MechanicOrderList.ActivityType`) ditentukan kebutuhan produk, bukan lebar kolom staging SAP. Yang dilebarkan adalah kolom `PMActType` (disarankan ≥ `varchar(64)`, setara sumbernya `mol.ActivityType`). Pertimbangan SAP tetap valid **tapi hanya di boundary integrasi SAP** (fit ke field BAPI `PMACTTYPE`, [order-emol-sap-sync.md](order-emol-sap-sync.md) §6.2) — diselesaikan di connector SAP itu saja (truncation/mapping kalau perlu), tidak menjadi batasan global. Sistem integrasi lain nanti tidak terikat batas ini. *(Sample data BUMA ID yang sudah diterima kebetulan 35 code semuanya 3 karakter — tapi ini bukan lagi constraint yang dijaga.)*
 
 **⚠️ Koreksi (16 Jul 2026)**: sempat disimpulkan `HourMeter`/`InspectorCode`/`InspectorName` juga perlu ditambahkan ke payload SAP (query 5.5) — **ini salah, dikoreksi user**. Mapping BAPI SAP real yang dikonfirmasi user ([order-emol-sap-sync.md](order-emol-sap-sync.md) 6.2 — `GI_HEADER`/`GI_OPER`/`GI_COMP`) **tidak punya field `HourMeter`/`Inspector` sama sekali** — payload di 6.1 (`TopicPublishLog.MessagePayload`) itu superset yang dikonsumsi message bus, middleware cuma mapping subset field ke BAPI SAP (lihat catatan baru di 6.2). Kesalahan sebelumnya: menyimpulkan dari contoh payload 6.1 tanpa cross-check ke mapping BAPI 6.2 yang **sudah terdokumentasi** — pelajaran: field yang ada di payload message bus tidak otomatis berarti field itu sampai ke SAP.
 
@@ -343,7 +335,7 @@ Merangkum seluruh keputusan 2.2–2.9 jadi satu gambaran: prinsipnya **target sc
 | `WorkOrderId` | bigint, null | Tetap diisi seperti sekarang, tidak berubah (additive, 2.9) | Selalu NULL (tidak ada WorkOrder asal — sudah sifat aslinya, bukan hal baru) |
 | `TaskPersonalizedFindingId` | bigint, null | Tetap diisi seperti sekarang, tidak berubah (additive, sama prinsipnya dengan `WorkOrderId`, 2.9) | NULL — tidak ada Finding (sudah sifat aslinya, bukan hal baru) |
 | `CostTypeCode` (Order Type) | varchar(64), null | Manual input user saat create eMOL | Manual input user |
-| `MaintenanceActivityTypeCode` **(baru, 2.2–2.3)** | varchar(64), null | Manual input user, **tanpa default** dari WorkOrder | Manual input user |
+| `ActivityType` **(baru, 2.2–2.3)** | varchar(64), null | Manual input user, **tanpa default** dari WorkOrder | Manual input user |
 | `InspectorCode` **(baru)** | — *(tipe belum dikonfirmasi)* | Copy dari `TaskPersonalized.UserCode` — **per-eMOL, bisa beda mechanic** (beda dengan `MechanicOrderSummary.CreatedBy` yang cuma dari mechanic pertama) | **NULL** — diputuskan 15 Jul 2026, lihat catatan di bawah |
 | `InspectorName` **(baru)** | — *(tipe belum dikonfirmasi)* | Resolve dari `InspectorCode` (master data User) saat Order dibuat | **NULL** |
 | `Number` | varchar(200), not null | Business logic (generate nomor eMOL) — **tanpa prefix `EXO-`**, itu khusus `MechanicOrderSummary.Number` (5.1) | Business logic biasa |
@@ -496,7 +488,7 @@ Rekomendasi hapus live call di `order-detail` **berlaku tanpa syarat** — kedua
 Screen 2 Additional Order saat ini melabeli tiap block eMOL sebagai **"Material Order #1"**, **"Material Order #2"**, dst — diganti jadi **"Order #N"**. Screen "Order Details" (create/complete eMOL dari Inspection, lihat 2.5) juga punya section berlabel "Material Order" — diganti jadi **"Order"** (tanpa `#N`, karena screen tsb sudah scoped ke 1 finding, tidak ada multiplicity).
 
 **Alasan:**
-- Block ini bukan cuma soal material — isinya defect info (Component/SubComponent/Damage Code/dst), Order Type, **dan** Maintenance Activity Type (field baru) — "Material" terlalu sempit.
+- Block ini bukan cuma soal material — isinya defect info (Component/SubComponent/Damage Code/dst), Order Type, **dan** Activity Type (field baru) — "Material" terlalu sempit.
 - **"Order Line"/"Order Item" juga ditolak** — istilah itu menyiratkan *containment* (beberapa line di dalam 1 order), padahal relasi sebenarnya **paralel**: tiap eMOL/block jadi **1 order independen** saat sync ke SAP (`1 finding = 1 order`, `MONo` di-populate per-`PoolingMOItem`/per-eMOL, bukan per-header `MechanicOrderSummary`). Header "Order" (screen "Add Order", `MechanicOrderSummary`) sebenarnya berperan sebagai **batch/wrapper pembuatan & approval** (1 Order = 1 `WorkflowTransaction`, lihat [order-emol-sap-sync.md](order-emol-sap-sync.md) Bagian 2) yang membungkus beberapa order independen — bukan 1 order yang berisi banyak line.
 - **"Order #N"** paling jujur secara semantik: screen "Add Order" (aksi, kata kerja) menghasilkan block-block "Order #1", "Order #2", dst (instance, masing-masing order utuh) — analog batch-create PO, tiap hasil tetap disebut sendiri-sendiri.
 - Mengganti nama header `MechanicOrderSummary`/screen "Add Order" itu sendiri (supaya konsisten penuh sebagai "batch/wrapper") **di luar scope enhancement ini** — dicatat sebagai observasi, bukan action item.
@@ -506,12 +498,12 @@ Screen 2 Additional Order saat ini melabeli tiap block eMOL sebagai **"Material 
 ## 4. Dampak ke Dokumen Existing
 
 [order-emol-sap-sync.md](order-emol-sap-sync.md) mendokumentasikan **kondisi saat ini** (sebelum enhancement ini) — bagian berikut akan superseded setelah enhancement ini dikerjakan (lihat catatan cross-reference yang ditambahkan di dokumen tsb):
-- **Bagian 3.2** (`MechanicOrderList`) — tambah kolom `MaintenanceActivityTypeCode`, `InspectorCode`, `InspectorName`; `WorkOrderId` **tidak berubah**, tetap diisi seperti sekarang (additive, lihat 2.9).
+- **Bagian 3.2** (`MechanicOrderList`) — tambah kolom `ActivityType`, `InspectorCode`, `InspectorName`; `WorkOrderId` **tidak berubah**, tetap diisi seperti sekarang (additive, lihat 2.9).
 - **Bagian 3.3** (`MechanicOrderDetail`, baru ditambahkan 15 Jul 2026) — sudah dikonfirmasi snapshot-copy dari `TaskPersonalizedFinding`, tidak berubah oleh enhancement ini.
 - **Bagian 4.2** (`PMActType` sourcing table) — diganti logic seragam per-eMOL (Bagian 2.2 dokumen ini).
-- **Bagian 5.2** (`PoolingMOItem` populate) — `PMActType` tidak lagi dari `@MaintenanceCategoryCode` hasil resolve BE, langsung dari `mol.MaintenanceActivityTypeCode`.
+- **Bagian 5.2** (`PoolingMOItem` populate) — `PMActType` tidak lagi dari `@MaintenanceCategoryCode` hasil resolve BE, langsung dari `mol.ActivityType`.
 - **`MechanicOrderSummary`** (3.1) — tambah kolom `Source` (varchar(128)), `SourceWorkOrderId` (varchar(128)), `SourceWorkOrderNumber` (varchar(128)), `HourMeter` (bigint) — tipe dikonfirmasi 17 Jul 2026 (lihat 2.9–2.10).
-- **`MechanicOrderList`** — tambah kolom `Inspector` (lihat 2.9–2.10), selain `MaintenanceActivityTypeCode` yang sudah dicatat di atas.
+- **`MechanicOrderList`** — tambah kolom `Inspector` (lihat 2.9–2.10), selain `ActivityType` yang sudah dicatat di atas.
 
 Selain itu, [order-result-compliance.md](../../report/transaction-report/order-result-compliance.md) (Digiman Transaction Report, halaman D'ORDER RESULT & ORDERING COMPLIANCE) juga terdampak — kolom baru `Maint. Act. Type`, detail di **2.12**.
 
@@ -526,8 +518,8 @@ Selain itu, [order-result-compliance.md](../../report/transaction-report/order-r
 - ~~Cara teknis membedakan `Scheduled Inspection` vs `Additional Inspection` untuk kolom `Source`~~ — **✅ terjawab (17 Jul 2026)**: dari `WorkOrder.WorkType` (`'Scheduled'`/`'Additional'`). *(2 kandidat sebelumnya sempat salah/dugaan — `WorkOrder.Source` dan `WorkOrder.PlanId` — dikoreksi user, jawaban benar `WorkType`.)*
 - ~~Sumber `MechanicOrderSummary.CreatedBy` untuk Inspection-origin~~ — **✅ terjawab (17 Jul 2026)**: mechanic yang **pertama kali** Sign and Finish (pola sama dengan resolusi `HourMeter`, lihat 2.9). Mechanic berikutnya tidak mengubah `CreatedBy` header.
 - **Mekanisme deteksi "submit Order terakhir" untuk trigger Workflow Approval** *(dibuka lagi 17 Jul 2026 — sempat ditandai terjawab, dikoreksi user sendiri)* — cek `MechanicOrderList.Status` semua `Complete` **tidak cukup**, karena ada celah waktu: mechanic yang belum Sign and Finish sama sekali **belum punya baris `MechanicOrderList`** untuk dicek (bukan status lain, tapi tidak ada barisnya). Kemungkinan logic sebenarnya juga perlu cek status `TaskPersonalized` dari seluruh mechanic yang di-assign, bukan cuma baris eMOL yang kebetulan sudah terbentuk — dengan filter tambahan **`TaskPersonalized.IsActive=1`** (assignment yang sudah di-cancel/dihapus jangan ikut dihitung sebagai "masih harus submit", supaya tidak macet permanen). Perlu dicek ke engineer. Detail skenario di 2.9. Submitter yang tercatat di `WorkflowTransaction` (user submit terakhir) belum dikoreksi, cuma mekanisme deteksinya yang masih perlu diperjelas.
-- **Data seeder untuk `MaintenanceActivityType`** *(diputuskan 15 Jul 2026)* — perlu dibuatkan **mekanisme seeder** untuk implementasi pertama kali di PRD; isi datanya **akan diprovide tim Product kemudian** (bukan otomatis pakai 35 code BUMA ID yang sudah diterima — itu boleh dipakai sebagai referensi/contoh, tapi bukan berarti final). Seeder-nya sendiri (script/mekanisme) perlu didesain — belum dibahas detail formatnya.
-- **Governance data master ganda** — karena `MaintenanceActivityType` (baru, lokal `maintenance-order`) sengaja dibuat independen dari data master `maintenance-strategy` (2.4), perlu diputuskan siapa yang jaga kedua list ini tetap selaras (kalau memang harus), supaya tidak drift diam-diam dari waktu ke waktu.
+- **Pengisian data awal (bukan lagi "seeder master baru")** — karena "Activity Type" reuse `MaintenanceCategory` existing (CRUD via epic [IAMS30-4535](https://bukittechnology.atlassian.net/browse/IAMS30-4535)) dan mapping-nya admin-managed via web ([IAMS30-4546](https://bukittechnology.atlassian.net/browse/IAMS30-4546)/[IAMS30-4547](https://bukittechnology.atlassian.net/browse/IAMS30-4547)), **tidak perlu seeder master baru** seperti proposal awal. Yang perlu dipastikan: (a) master `MaintenanceCategory` sudah terisi Code yang relevan, (b) admin mengisi mapping OrderType↔ActivityType awal di tab "Activity Mapping". 35 code BUMA ID yang sudah diterima boleh jadi referensi, bukan final.
+- **Ketergantungan cross-DB ke `maintenance-strategy`** — karena reuse `MaintenanceCategory` (2.4), mapping & validasi Activity Type harus call service `maintenance-strategy` (tidak ada physical FK cross-DB). Ini menghapus masalah "master ganda/drift" (cuma 1 master), tapi menambah **kopling runtime antar-service**: [IAMS30-4546](https://bukittechnology.atlassian.net/browse/IAMS30-4546) memvalidasi `MaintenanceCategoryCode` via [IAMS30-4543](https://bukittechnology.atlassian.net/browse/IAMS30-4543) saat create/update mapping — reliabilitas call ini perlu dipastikan.
 - Belum divalidasi ke tim technical/engineer `maintenance-order` — seluruh desain di dokumen ini berdasarkan diskusi arsitektur, belum ada pengecekan ke source code aktual.
 - **1 endpoint API perlu klarifikasi dev** (lihat 2.11.C): purpose `GetWorkOrderAsync` di section `orderinformation` — apakah field yang dibaca sudah tercakup snapshot `MechanicOrderSummary`.
 - ~~**Endpoint `approve` — API baru & cek service bus**~~ (2.11.E) — **terjawab (16 Jul 2026)**: mekanisme approve dikonfirmasi user (5 langkah, lihat 2.11.E) — service bus yang dimaksud murni publish payload SAP outbound (step 5), sumbernya `PoolingMOItem` yang sudah snapshot (step 3), **bukan** dependency live-call ke `maintenance-execution`. Tidak perlu dicek developer lagi.

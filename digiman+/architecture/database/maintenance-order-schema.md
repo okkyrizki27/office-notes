@@ -173,7 +173,7 @@ MODetailMaterialId bigint, null
 MOType             varchar(50), null
 MODescription      varchar(500), null
 MONo               varchar(50), null
-PMActType          varchar(5), null   ← ⚠️ SANGAT PENDEK — constraint penting untuk MaintenanceActivityType.Code
+PMActType          varchar(5), null   ← ⚠️ DILEBARKAN (keputusan final 24 Jul 2026) — lihat catatan bawah
 NotifId            bigint, null
 SupervisorId       int, null
 Equipment          varchar(50), null
@@ -304,7 +304,7 @@ Tracking status material order ke SAP (Goods Receipt/Issue, Purchase Requisition
 - **`PoolingMOItem.HourMeter`/`InspectorCode`/`InspectorName` sudah ada** — perlu cek ke tim technical bagaimana nilainya di-populate hari ini (cross-service call apa, atau computed dari mana) sebelum finalisasi desain 2.9 di `maintenance-activity-type-enhancement.md`.
 - **`SAPMOSyncOrder` sebenarnya jauh lebih kaya field-nya** (`PlanDuration`, `Cost`, `Downtime`, `HM`, dll) dari yang terdokumentasi — kemungkinan relevan untuk MO Backlog inbound dan assessment SAP di enhancement Area/Man Power. User sedang cek sendiri (15 Jul 2026), belum dibahas lebih lanjut di sini.
 - ~~`MOOpen`/`StageMOOpen`~~ — **dikonfirmasi (15 Jul 2026)**: sumber MO Backlog dari SAP.
-- **`PMActType varchar(5)`** — constraint yang perlu diperhatikan saat seed data `MaintenanceActivityType.Code` (2.4, enhancement doc). **Disetujui (15 Jul 2026)**.
+- **`PMActType varchar(5)` — DILEBARKAN (keputusan final 24 Jul 2026, membalik keputusan 15 Jul).** Sebelumnya diputuskan `MaintenanceCategory.Code` (Activity Type) harus dijaga ≤5 char supaya muat di kolom ini. Keputusan itu **dibatalkan**: kolom `PMActType` yang **dilebarkan** (disarankan ≥ `varchar(64)`, setara `MechanicOrderList.ActivityType`/`CostTypeCode` yang menjadi sumbernya), **bukan** membatasi panjang `MaintenanceCategory.Code` di core. Alasan: `varchar(5)` itu warisan constraint SAP, dan Digiman+ didesain sebagai produk standalone/ERP-agnostic — batasan SAP hanya berlaku di boundary integrasi SAP (mapping/publish ke BAPI `PMACTTYPE`, `order-emol-sap-sync.md` §6.2), tidak di-back-propagate jadi constraint global. Detail: `maintenance-activity-type-enhancement.md` §2.9.
 - **`CheckPartOrder`/`StageCheckPartOrder`** — di luar scope Order/eMOL, tidak dibahas lebih lanjut.
 
 ---
