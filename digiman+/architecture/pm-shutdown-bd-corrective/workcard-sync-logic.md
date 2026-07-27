@@ -2,7 +2,7 @@
 
 Dokumen ini mendefinisikan logic pengambilan data workcard list di Digiman+ untuk **PM Shutdown** dan **BD Corrective**.
 
-*Last updated: 2026-07-21*
+*Last updated: 2026-07-27*
 
 ---
 
@@ -64,6 +64,31 @@ Filter: `ModifiedUtcDate >= LastSyncDate`
 Jika user tidak membuka aplikasi lebih dari N hari, data di device dianggap stale sepenuhnya → **gunakan Fresh Install logic** (full refresh, replace data lokal di device).
 
 Ini menghindari delta yang terlalu besar dan memastikan data stale terbersihkan.
+
+---
+
+## Local Cleanup — Client-Side Pruning (SUBMIT & IN PROGRESS yang Aged Out)
+
+> ✅ **Section ini ditambahkan 2026-07-27**, hasil review lanjutan, dan sudah disetujui untuk masuk scope. Dicatat sebagai addendum di [IAMS30-4422](https://bukittechnology.atlassian.net/browse/IAMS30-4422) — di luar scope asli ticket tsb (yang membahas full-refresh-signal saat `LastSyncDate` basi), jadi ditulis sebagai kondisi terpisah di sana.
+
+**Masalah:** Workcard SUBMIT/IN PROGRESS yang lama tidak disentuh (`ModifiedUtcDate` tidak pernah ter-update) tidak akan pernah tertangkap oleh delta sync (`ModifiedUtcDate >= LastSyncDate`) — karena "keluar dari window N hari" itu bukan event perubahan data, murni berlalunya waktu. Akibatnya device bisa terus menyimpan workcard yang sebetulnya sudah basi (kalau di-Fresh-Install hari ini, tidak akan muncul lagi), tapi tidak pernah dibersihkan lewat mekanisme delta sync biasa.
+
+**Prinsip:** kalau sebuah record lokal **tidak akan lolos syarat Fresh Install kalau dicek hari ini, hapus dia dari device.** Berlaku untuk semua status yang dievaluasi Fresh Install berdasarkan tanggal — `SUBMIT` dan `IN PROGRESS`. `FINISH`/`CANCEL` tidak perlu masuk sini karena sudah ditangani terpisah lewat delta sync berbasis perubahan status (lihat [After Last Sync](#after-last-sync)).
+
+**Solusi — pruning dilakukan di client, bukan lewat query delta BE:**
+
+1. **Exposure baru diperlukan** — nilai `N` (`LAST_DAY_RANGE`, lihat [Konfigurasi Range](#konfigurasi-range)) saat ini belum di-expose ke mobile. Perlu ditambahkan lewat config/settings endpoint.
+2. Setiap sync, FE menghapus record lokal yang sudah keluar dari window N hari — menggunakan **field acuan yang sama persis dengan logic Fresh Install** per status (bukan cuma `ModifiedUtcDate`):
+
+| Status | Kondisi | Field Acuan untuk Prune |
+|---|---|---|
+| `SUBMIT` | — | `ProjectFinish < today - N hari` → hapus lokal |
+| `IN PROGRESS` | `NotifNo` terisi **dan** `FinishBreakdown` terisi | `FinishBreakdown < today - N hari` → hapus lokal |
+| `IN PROGRESS` | `NotifNo` terisi, `FinishBreakdown` NULL | `ModifiedUtcDate < today - N hari` → hapus lokal |
+| `IN PROGRESS` | `NotifNo` NULL | `ModifiedUtcDate < today - N hari` → hapus lokal |
+
+3. Ini murni pembersihan lokal — **tidak perlu round-trip ke BE** untuk keputusan hapusnya, karena device sudah punya semua data (record lokal + nilai `N`) untuk menentukan sendiri record mana yang sudah tidak relevan.
+4. Beda mekanisme dari penghapusan `FINISH`/`CANCEL` di [After Last Sync](#after-last-sync) — itu dipicu **perubahan status** (di-drive server lewat delta sync), sementara ini dipicu **berlalunya waktu** (di-drive client, independen dari perubahan data apapun).
 
 ---
 
