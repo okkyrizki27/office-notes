@@ -90,8 +90,8 @@
   </div>
   <div class="cover-meta">
     Disusun untuk: Tim Technical — Sistem Eksternal<br>
-    Versi Dokumen: Draft v0.1<br>
-    Tanggal: 13 Juli 2026
+    Versi Dokumen: Draft v0.2<br>
+    Tanggal: 24 Juli 2026
   </div>
   <div class="cover-warn">
     <b>⚠ Status: Draft.</b> API ini belum live — dokumen ini dibagikan lebih awal supaya tim technical bisa mulai menyiapkan sisi integrasi. Detail non-fungsional (base URL final, kredensial, rate limit) akan dikonfirmasi terpisah sebelum go-live, dan skema kecil masih mungkin berubah sebelum rilis final.
@@ -259,7 +259,7 @@ Authorization: Bearer {access_token}</code></pre>
             {
               title,
               answers: [
-                { taskCode?, label, value, lastUpdatedBy, photos: [{ url }], number?, remark? }
+                { taskCode?, label, value, lastUpdatedBy, lastUpdatedAt, photos: [{ url }], number?, remark? }
               ]
             }
           ]
@@ -312,6 +312,7 @@ Authorization: Bearer {access_token}</code></pre>
 <tr><td><code>value</code></td><td>string</td><td><b>Ya</b></td><td>Isi jawaban. Bentuknya bervariasi tergantung tipe pertanyaan — lihat catatan di bawah</td></tr>
 <tr><td><code>remark</code></td><td>string</td><td class="opt">—</td><td>Catatan tambahan dari inspector (biasanya string kosong kalau tidak diisi)</td></tr>
 <tr><td><code>lastUpdatedBy</code></td><td>string</td><td>Tidak</td><td>Email user yang terakhir mengisi/mengubah jawaban ini</td></tr>
+<tr><td><code>lastUpdatedAt</code></td><td>string (ISO 8601)</td><td>Tidak</td><td>Waktu terakhir jawaban ini diisi/diubah</td></tr>
 <tr><td><code>photos</code></td><td>array</td><td>Tidak</td><td>Daftar foto terlampir — selalu array (bisa kosong <code>[]</code>). Lihat 4.5</td></tr>
 </table>
 
@@ -321,7 +322,6 @@ Authorization: Bearer {access_token}</code></pre>
     <li><b>Jawaban teks/pilihan biasa</b> (mis. hasil pemeriksaan "Ok"/"Not Ok", teks bebas) → string biasa</li>
     <li><b>Jawaban foto tunggal</b> (satu foto per pertanyaan) → <code>value</code> berisi identifier internal foto tersebut (bisa diabaikan — pakai <code>photos[].url</code> untuk link foto aktualnya)</li>
     <li><b>Jawaban multi-foto</b> (beberapa foto per pertanyaan) → <code>value</code> = <code>null</code>, semua foto ada di <code>photos[]</code></li>
-    <li><b>Jawaban tanda tangan</b> → <code>value</code> berisi gambar dalam format <code>data:image/png;base64,...</code> langsung (bukan URL) — bisa langsung dipakai sebagai <code>src</code> elemen <code>&lt;img&gt;</code></li>
   </ul>
 </div>
 
@@ -345,7 +345,7 @@ Authorization: Bearer {access_token}</code></pre>
     {
       "title": "Personnel Information",
       "answers": [
-        { "label": "Inspector Name", "value": "2009OBH.supervisor01", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] }
+        { "label": "Inspector Name", "value": "2009OBH.supervisor01", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "lastUpdatedAt": "2026-07-07T11:45:50.000000Z", "photos": [] }
       ]
     },
     {
@@ -355,6 +355,7 @@ Authorization: Bearer {access_token}</code></pre>
           "label": "Foto Kondisi Fisik Equipment",
           "value": null,
           "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com",
+          "lastUpdatedAt": "2026-07-07T11:46:40.000000Z",
           "photos": [
             { "label": "Foto Tampak Depan", "url": "https://.../blob/abc123.jpg" },
             { "label": "Foto Tampak Samping Kanan", "url": "https://.../blob/def456.jpg" }
@@ -372,9 +373,9 @@ Authorization: Bearer {access_token}</code></pre>
     {
       "title": "PENAMPILAN UMUM (GENERAL APPEARANCE)",
       "answers": [
-        { "number": 1, "taskCode": "Task1252", "label": "Radiator Grill / Front Grill", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
-        { "number": 4, "taskCode": "Task1100", "label": "Battery Box / Cover", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "photos": [] },
-        { "number": 6, "taskCode": "Task1014", "label": "Cat Walk", "value": "Ok", "remark": "Ada beberapa", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com",
+        { "number": 1, "taskCode": "Task1252", "label": "Radiator Grill / Front Grill", "value": "Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "lastUpdatedAt": "2026-07-07T11:47:08.677785Z", "photos": [] },
+        { "number": 4, "taskCode": "Task1100", "label": "Battery Box / Cover", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "lastUpdatedAt": "2026-07-07T11:47:14.210168Z", "photos": [] },
+        { "number": 6, "taskCode": "Task1014", "label": "Cat Walk", "value": "Ok", "remark": "Ada beberapa", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "lastUpdatedAt": "2026-07-07T11:54:48.367543Z",
           "photos": [
             { "url": "https://.../blob/1ccac17f.jpg" },
             { "url": "https://.../blob/8ffc591c.jpg" }
@@ -502,12 +503,12 @@ Retry-After: 12
 </ul>
 
 <div class="callout warn">
-  <div class="callout-label">Draft v0.1</div>
+  <div class="callout-label">Draft v0.2</div>
   Dokumen ini adalah draft awal untuk persiapan integrasi. Base URL final, kredensial akses, dan konfirmasi jadwal go-live akan dikomunikasikan terpisah. Kalau ada pertanyaan atau kebutuhan spesifik dari sisi integrasi kalian, silakan sampaikan sebelum development dimulai.
 </div>
 
 <div class="footer">
-  IIR Form Submission API — Integration Guide · Draft v0.1 · 13 Juli 2026 · Digiman+
+  IIR Form Submission API — Integration Guide · Draft v0.2 · 24 Juli 2026 · Digiman+
 </div>
 
 </body>

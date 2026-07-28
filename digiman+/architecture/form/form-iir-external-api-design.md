@@ -218,7 +218,7 @@ Contoh lengkap: [form-iir-external-api-response.json](examples/form-iir-external
             {
               title,
               answers: [
-                { taskCode?, label, value, lastUpdatedBy, photos: [{label, url}], number?, remark? }
+                { taskCode?, label, value, lastUpdatedBy, lastUpdatedAt, photos: [{label, url}], number?, remark? }
               ]
             }
           ]
@@ -242,6 +242,8 @@ Contoh lengkap: [form-iir-external-api-response.json](examples/form-iir-external
 | `taskDesc` | `label` | Disamakan namanya lintas tab |
 | `taskValue` | `value` | Disamakan namanya lintas tab. **Untuk elemen foto single-photo** (`CAMERACAPTURE`/`TAKEPHOTO`, mis. "Photo Machine SMU"), `value` diisi raw GUID yang sama dengan yang dipakai untuk resolve `photos[].url` (bukan `null`) — supaya konsumen API bisa correlate balik ke `ReferenceId` sumbernya kalau perlu. **Untuk multi-photo** (`PHOTOLIST`, mis. "Foto Kondisi Fisik Equipment"), `value` tetap `null` karena ada N GUID (satu per foto), tidak bisa direduksi ke satu scalar — masing-masing GUID cuma tersimpan implisit di balik `photos[].url` |
 | `taskCode` (tab spesifik saja) | `taskCode` | **Cuma di-include untuk jawaban tab spesifik** — lihat Keputusan Desain #7. Untuk tab General, field ini `null`/tidak ada di response |
+| `lastUpdatedByUserCode` | `lastUpdatedBy` | Email user yang terakhir mengubah jawaban (bukan display name `lastUpdatedBy` di raw). PII — disetujui di-share, lihat Keputusan Desain #6 |
+| `lastUpdatedDate` | `lastUpdatedAt` | Timestamp (ISO-8601 UTC) terakhir jawaban diubah. Diambil per-answer; kalau satu `taskCode` punya beberapa timestamp (mis. remark/foto di-update belakangan), pakai yang **paling akhir** (max) sebagai "kapan jawaban ini terakhir berubah" |
 | `photoGuid` (bentuk tidak konsisten — lihat tabel di atas) | `photos: [{label, url}]` | **Selalu array**, `url` di-resolve dari SQL `TaskPersonalizedEvidence.ContentAddress` (join `ReferenceId = photoGuid` — lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto)) — konsumen API tidak perlu tahu/branch berdasarkan elementCode asal (`TAKEPHOTO`/`CAMERACAPTURE`/`PHOTOLIST`) |
 | `sectionTitle: ""` | `title: null` | `null` lebih jujur merepresentasikan "tidak ada judul" dibanding string kosong |
 | `number` | `number` (nullable, hanya ada di tab spesifik) | Tidak dipaksakan ada di semua row |
