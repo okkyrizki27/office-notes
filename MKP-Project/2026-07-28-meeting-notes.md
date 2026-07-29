@@ -36,8 +36,8 @@
 
 ### 1. Non-Section Code
 
-- Unit yang tidak punya section akan dibuatkan kode section **`MKP000`**. _(#1)_
-- Employee yang tidak punya section juga disesuaikan, memakai kode **`S000`**. _(#2)_
+- Unit yang tidak punya section akan dibuatkan kode section **`200`**. _(#1)_
+- Employee yang tidak punya section juga disesuaikan, memakai kode **`S000`** — akan disesuaikan kembali setelah ada konfirmasi ke HRIS atau SAP HR. _(#2)_
 
 ### 2. Section Type Code untuk Material "All Model"
 
@@ -108,8 +108,8 @@ Struktur master data Planner Group yang akan dibangun: _(#11)_
 
 ## Decisions
 
-- Non-section code unit: **`MKP000`**. _(#1)_
-- Non-section code employee: **`S000`**. _(#2)_
+- Non-section code unit: **`200`**. _(#1)_
+- Non-section code employee: **`S000`**, menunggu konfirmasi ke HRIS/SAP HR. _(#2)_
 - Unit Riung tetap under MKP, beda funloc saja (ada funloc khusus di SAP). _(#4)_
 - Unit rental **tidak** dimaintain di Digiman+. _(#5.1)_
 - System Status mapping SAP → Digiman+ ditetapkan sesuai tabel di atas (INST/AVLB → IN OPERATION, INAC → IDLE, DLFL → RETIRED). _(#6)_
