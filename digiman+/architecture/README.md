@@ -33,7 +33,7 @@ Index ini melacak semua dokumen **enhancement/proposal** di bawah `digiman+/arch
 | Dokumen | Fitur/Service | Status | Last Updated |
 |---|---|---|---|
 | [inspection-order/area-of-unit-man-power-enhancement.md](inspection-order/area-of-unit-man-power-enhancement.md) | Inspection, Order, Approval Order | ✅ Confirmed (Business) | 2026-07-20 |
-| [dplan/man-power-man-hours-excel-enhancement.md](dplan/man-power-man-hours-excel-enhancement.md) | Digiplan (Excel template) | ✅ Confirmed (Business) | 2026-07-10 |
+| [dplan/area-of-unit-man-power-dplan-enhancement.md](dplan/area-of-unit-man-power-dplan-enhancement.md) | Digiplan (Excel template) | ✅ Confirmed (Business) | 2026-07-10 |
 | [pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md](pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md) | PM Shutdown, BD Corrective | ✅ Confirmed (Business) | 2026-07-20 |
 
 - Effort estimate gabungan: [area-of-unit-man-power-effort-summary.md](area-of-unit-man-power-effort-summary.md) (2026-07-20)
@@ -90,13 +90,13 @@ Dokumen berikut sengaja **tidak** masuk katalog karena isinya deskripsi kondisi 
 - `database/*-schema.md`, `database/new-model-checklist.md`, `database/sap-material-integration.md`
 - `form/form-builder.md`, `form/form-submission.md`, `form/IIR-Form-Submission-API-Documentation.*`
 - `inspection-order/order-emol-sap-sync.md` *(eksplisit ditandai "referensi teknis, bukan dokumen enhancement" di effort summary)*
-- `homepage/homepage-revamp.md`, `pm-shutdown-bd-corrective/bd-corrective-page-revamp.md`, `pm-shutdown-bd-corrective/pm-shutdown-page-revamp.md`, `pm-shutdown-bd-corrective/outstanding-administration.md` — meski namanya mengandung "revamp", isinya "Current State" pasca-release 4.0.0 (sudah live, sudah ada referensi Jira yang closed)
+- `homepage/homepage-current-state.md`, `pm-shutdown-bd-corrective/bd-corrective-page-current-state.md`, `pm-shutdown-bd-corrective/pm-shutdown-page-current-state.md`, `pm-shutdown-bd-corrective/outstanding-administration.md` — isinya "Current State" pasca-release 4.0.0 (sudah live, sudah ada referensi Jira yang closed)
 
 ---
 
 ## Observasi dari Penyusunan Index Ini
 
-1. **Penamaan "-revamp.md" ambigu** — tiga dokumen di `pm-shutdown-bd-corrective/` dan `homepage/` pakai suffix "-revamp" tapi isinya current-state (sudah selesai), bukan proposal pending. Kalau nanti ada enhancement baru dengan pola nama serupa, ini berpotensi bikin bingung mana yang pending vs sudah live — pertimbangkan konvensi nama yang lebih eksplisit (mis. `-current-state.md` vs `-enhancement.md`).
+1. ~~Penamaan "-revamp.md" ambigu~~ — **✅ resolved 30 Jul 2026**: tiga dokumen di `pm-shutdown-bd-corrective/` dan `homepage/` sebelumnya pakai suffix "-revamp" meski isinya current-state (sudah selesai), bukan proposal pending. Sudah di-rename ke suffix `-current-state.md` (`homepage-current-state.md`, `pm-shutdown-page-current-state.md`, `bd-corrective-page-current-state.md`) supaya jelas beda dari dokumen `-enhancement.md` yang masih pending.
 
 *(2 observasi lain — status basi di `maintenance-activity-type-enhancement.md` dan `workcard-sync-logic.md` — sudah dikonfirmasi & header dokumen sumbernya sudah disinkronkan, 21 Jul 2026.)*
 

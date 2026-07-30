@@ -6,6 +6,8 @@
 
 Dokumen ini merinci skenario delivery untuk **squad baru** yang mengerjakan ketiga proposal enhancement Digiman+ — [Man Power, Duration & Man Hours](man-power-duration-enhancement-proposal.html), [Area of Unit, Component & Sub Component](area-of-unit-enhancement-proposal.html), dan [Maintenance Activity Type & Integrasi Inspection→Order](inspection-order/maintenance-activity-type-effort-proposal.html) — setelah disepakati komitmen komersial **8 sprint** dengan squad baru (lihat [effort-recap-3-proposals.html](effort-recap-3-proposals.html) untuk estimasi awal per-proposal). Dokumen ini **turunan perencanaan**, bukan revisi proposal aslinya — angka SP tetap merujuk ke ketiga proposal sumber.
 
+**Gantt chart interaktif**: [claude.ai/code/artifact/48c52811-981a-46a2-ad3d-20d88633c413](https://claude.ai/code/artifact/48c52811-981a-46a2-ad3d-20d88633c413) — versi live/interaktif (hover tooltip per task, dark mode) dari Gantt Bagian 2 di bawah. Update Artifact ini (bukan bikin baru) kalau ada perubahan timeline — lihat `squad-baru-release-timeline.html` untuk salinan source-nya.
+
 ## Ringkasan Skenario
 
 | | |
@@ -20,11 +22,11 @@ Dokumen ini merinci skenario delivery untuk **squad baru** yang mengerjakan keti
 
 Dari analisis awal (1 BE saja per skenario "Tim Baru" di tiap proposal), Backend konsisten jadi bottleneck tunggal — 57–65% dari total SP tiap proposal. Simulasi kapasitas dengan 1 BE untuk ketiga proposal sekaligus (bahkan dengan opsi Man Power "Tanpa" rollup penuh, dan defer item `ReferenceTransactionId`) hanya pas-pasan di ~9 sprint, melebihi budget 8 sprint.
 
-Dengan **2 BE**, kapasitas pool BE (2 orang × ~67 SP/8 sprint = ~134 SP) jauh melebihi kebutuhan total (~65 SP dev BE di ketiga rilis, direvisi 30 Jul 2026 — koreksi role split Rilis 2 + penghapusan scope SAP Sync di Rilis 1 & 2) — cukup longgar untuk:
+Dengan **2 BE**, kapasitas pool BE (2 orang × ~67 SP/8 sprint = ~134 SP) jauh melebihi kebutuhan total (~71 SP dev BE di ketiga rilis, direvisi 30 Jul 2026 — koreksi role split Rilis 2, redesign auto-fill jadi local join `PoolingMOItem`/`MO Number` bukan lewat SAP di Rilis 1 & 2) — cukup longgar untuk:
 - Mengembalikan item `ReferenceTransactionId` (5 SP) yang sempat direncanakan di-defer.
 - Menyisakan buffer ~1 sprint sebagai **kontingensi** (bukan dialokasikan ke scope tambahan — keputusan 29 Jul 2026).
 
-FE Fullstack dan QA (masing-masing 1 orang) tidak pernah jadi bottleneck di skenario manapun — kapasitas mereka jauh di atas kebutuhan (~25–27 SP vs ~67 SP kapasitas/8 sprint).
+FE Fullstack dan QA (masing-masing 1 orang) tidak pernah jadi bottleneck di skenario manapun — kapasitas mereka jauh di atas kebutuhan (~25–28 SP vs ~67 SP kapasitas/8 sprint).
 
 ## Metodologi Estimasi
 
@@ -46,7 +48,7 @@ SP & mandays memakai metodologi yang sama dengan ketiga proposal sumber — kali
 | **19** | Rilis 3 | **Release Preparation** |
 | — | | **🚀 Rilis 3 ship — akhir Minggu 19** |
 
-Alokasi minggu dev+QA proporsional ke beban BE tiap rilis (23/14/28 SP dari total 65 SP) terhadap budget 16 minggu — Rilis 1 & 2 kini punya buffer lebih longgar dari perkiraan awal setelah koreksi role split + penghapusan scope SAP Sync (30 Jul 2026); rentang minggu tiap rilis dipertahankan apa adanya (tidak dikompres lebih lanjut) sebagai kontingensi tambahan.
+Alokasi minggu dev+QA proporsional ke beban BE tiap rilis (27/16/28 SP dari total 71 SP) terhadap budget 16 minggu — rentang minggu tiap rilis dipertahankan apa adanya (tidak dikompres lebih lanjut) sebagai kontingensi tambahan, meski beban BE Rilis 1&2 naik lagi (30 Jul 2026) setelah auto-fill di-redesign jadi local join (dikembalikan ke scope, tadinya sempat dihapus sebagai "SAP Sync").
 
 Alokasi BE: kedua BE all-hands di Rilis 1 (prioritas tertinggi). Setelah itu, BE tidak dikunci kaku 1 orang per rilis — begitu salah satu rilis (Area, lebih kecil) selesai duluan, BE yang lowong gabung membantu rilis berikutnya, bukan menganggu.
 
@@ -58,21 +60,25 @@ Alokasi BE: kedua BE all-hands di Rilis 1 (prioritas tertinggi). Setelah itu, BE
 
 | Kategori | Task | Role | SP | Mandays |
 |---|---|---|---|---|
-| Inspection & Additional Order | Field Man Power (Inspection/Add. Inspection), Duration+Man Power (Additional Order) | BE | 2 | 2.5 |
-| Inspection & Additional Order | Field Man Power/Duration UI (Inspection, Additional Order) | FE | 4 | 4.9 |
+| Inspection & Additional Order | Field Man Power (Inspection/Add. Inspection, Additional Order) — Duration di kedua layar **sudah ada**, bukan scope baru | BE | 2 | 2.5 |
+| Inspection & Additional Order | Field Man Power UI (Inspection, Additional Order) — Duration UI **sudah ada** di kedua layar | FE | 4 | 4.9 |
 | Order Approval & Workflow | Edit eMOL carry-forward, validasi & edit Man Power/Duration di Approval | BE | 4 | 4.9 |
 | Order Approval & Workflow | Edit Man Power/Duration UI di Order Approval | FE | 2 | 2.5 |
 | Digiplan | Grid recalculate, Excel export/import, auto-recalculate struktur, assessment formula rollup — **termasuk** logic PM Shutdown & BD Corrective (assignment warning, `ManPowerVarianceReason`, 2 skenario mandatory), tidak ada baris SP terpisah untuk itu | BE | 17 | 21.0 |
 | Digiplan | Guardrail Template Config UI, grid Man Hours read-only | FE | 3 | 3.7 |
 | PM Shutdown & BD Corrective | Card visibility (UI) | FE | (dalam 9) | (dalam 11.1) |
-| QA / Testing | Testing end-to-end + Digiplan + PM/BD | QA | 12 | 14.0 |
+| Integrasi `maintenance-order`↔Digiplan | `PoolingMOItem`: tambah kolom Duration, Man Power (porsi Area di Rilis 2) — lokal, tidak lagi lewat SAP | BE | 2 | 2.3 |
+| Integrasi `maintenance-order`↔Digiplan | MO Backlog: JOIN ke `PoolingMOItem` by `MO Number` — surface Duration, Man Power (porsi Area di Rilis 2) | BE | 2 | 2.3 |
+| QA / Testing | Testing end-to-end + Digiplan + PM/BD | QA | 11 | 12.9 |
 | Dashboard | Digiman Transaction Dashboard (D'Inspect/D'Order — Man Power/Duration/Man Hours) + Power BI | DE/DA (paralel) | 9.75 | 11.4 |
 
-**Total BE: 23 SP / 28.4 mandays · FE: 9 SP / 11.1 mandays · QA: 12 SP / 14.0 mandays · DE/DA (paralel, di luar kapasitas squad): 9.75 SP / 11.4 mandays**
+**Total BE: 27 SP / 33.0 mandays · FE: 9 SP / 11.1 mandays · QA: 11 SP / 12.9 mandays · DE/DA (paralel, di luar kapasitas squad): 9.75 SP / 11.4 mandays**
+
+*Catatan (30 Jul 2026): Testing turun 12→11 SP — porsi testing jalur "→ SAP →" diganti local join (lebih deterministik/murah ditest), lihat detail perhitungan di `area-of-unit-man-power-effort-summary.md`.*
 
 *Catatan rasio: baris BE & FE di Rilis 1 pakai **1/0.81 ≈ 1.235 mandays/SP** (bukan 1.17) — seluruh kerjaan BE+FE rilis ini selesai dalam periode ramp-up Sprint 1–2 (Minggu 1–4), belum masuk fase full speed. QA & Dashboard tetap 1.17 karena baru mulai di Minggu 4–6 (sudah full speed). Rilis 2 & 3 memakai 1.17 penuh — keduanya di luar periode ramp-up.*
 
-*Catatan koreksi scope (30 Jul 2026): baris **SAP Sync** (`PoolingMOItem`/MO Backlog, 5.2 SP BE) dihapus dari rilis ini — per arahan user, SAP Sync hanya di-scope di Rilis 3 (Maintenance Activity Type). Lihat catatan #8 di Risiko & Catatan Terbuka soal implikasinya ke baris QA/Testing.*
+*~~Catatan koreksi scope (30 Jul 2026): baris SAP Sync (PoolingMOItem/MO Backlog, 5.2 SP BE) dihapus dari rilis ini~~ — **✅ direvisi lagi 30 Jul 2026**: dikonfirmasi user auto-fill Digiplan bisa jalan lewat **local join `PoolingMOItem` by `MO Number`** (bukan lewat SAP sama sekali, lihat redesign [inspection-order/area-of-unit-man-power-enhancement.md](inspection-order/area-of-unit-man-power-enhancement.md) 2.5) — jadi kerjaan ini **dikembalikan ke scope** (2 baris baru di atas, 4 SP BE), tapi berupa kerjaan lokal, bukan "SAP Sync". Assessment BAPI ke SAP tetap di luar estimasi (non-blocking, lihat catatan #10).*
 
 **Scope note**: memakai opsi **"Tanpa" rollup** (parent Man Power/Man Hours dikosongkan dulu) — bukan logic penuh predecessor/serial/paralel. Opsi "Dengan" (+8 SP) di-defer, bisa disusulkan di rilis berikutnya.
 
@@ -88,16 +94,20 @@ Alokasi BE: kedua BE all-hands di Rilis 1 (prioritas tertinggi). Setelah itu, BE
 | Master Data | Data migration backfill `AreaCode` + permission code | BE | 3 | 3.5 |
 | Inspection & Additional Order | Backend derive + snapshot `AreaCode`/`AreaName` — Inspection & Additional Order (dropdown Component/SubComponent sudah ada di kedua layar, tidak perlu dibangun UI baru) | BE | 2 | 2.3 |
 | Order Approval & Workflow | Edit eMOL: carry-forward Component/SubComponent | BE | 1 | 1.2 |
+| Integrasi `maintenance-order`↔Digiplan | `PoolingMOItem`: tambah kolom Area (porsi Duration/Man Power di Rilis 1) — lokal, tidak lagi lewat SAP | BE | 1 | 1.2 |
 | Digiplan | Grid UI: 3 dropdown cascading Area→Component→SubComponent | FE | 3 | 3.5 |
-| Digiplan | `DPColumn` 3 kolom baru, auto-fill dari MO Backlog, Excel export/import+validasi | BE | 8 | 9.4 |
-| QA / Testing | Testing end-to-end + Digiplan | QA | 7 | 8.2 |
+| Digiplan | `DPColumn` 3 kolom baru, Excel export/import+validasi | BE | 8 | 9.4 |
+| Integrasi `maintenance-order`↔Digiplan | MO Backlog: JOIN ke `PoolingMOItem` by `MO Number` — surface Area (porsi Duration/Man Power di Rilis 1) | BE | 1 | 1.2 |
+| QA / Testing | Testing end-to-end + Digiplan | QA | 6 | 7.0 |
 | Dashboard | Digiman Transaction Dashboard (D'Inspect/D'Order — Area) + Power BI | DE/DA (paralel) | 3.25 | 3.8 |
 
-**Total BE: 14 SP / 16.4 mandays · FE: 10 SP / 11.7 mandays · QA: 7 SP / 8.2 mandays · DE/DA (paralel): 3.25 SP / 3.8 mandays**
+**Total BE: 16 SP / 18.8 mandays · FE: 10 SP / 11.7 mandays · QA: 6 SP / 7.0 mandays · DE/DA (paralel): 3.25 SP / 3.8 mandays**
+
+*Catatan (30 Jul 2026): Testing turun 7→6 SP — porsi testing jalur "→ SAP →" diganti local join, konsisten dengan revisi yang sama di Rilis 1.*
 
 *Rasio mandays 1.17 (1/0.85, full speed) — Rilis 2 (Minggu 8–12) sepenuhnya di luar periode ramp-up Sprint 1–2.*
 
-*Catatan koreksi (30 Jul 2026): (1) Master Data (10 SP) yang sebelumnya ter-duplikasi ke BE dan FE sekaligus sudah dipecah benar (FE 7, BE 3). (2) Grid UI dropdown cascading Digiplan (3 SP, jelas FE) dipindah dari BE. (3) "Edit eMOL carry-forward" disamakan ke **BE** (konsisten dengan baris yang sama di Rilis 1 Man Power — carry-forward adalah soal wiring data mengalir, bukan UI baru). (4) Baris **SAP Sync** (`PoolingMOItem`/MO Backlog, 2.8 SP BE) dihapus — per arahan user, SAP Sync hanya di-scope di Rilis 3.*
+*Catatan koreksi (30 Jul 2026): (1) Master Data (10 SP) yang sebelumnya ter-duplikasi ke BE dan FE sekaligus sudah dipecah benar (FE 7, BE 3). (2) Grid UI dropdown cascading Digiplan (3 SP, jelas FE) dipindah dari BE. (3) "Edit eMOL carry-forward" disamakan ke **BE** (konsisten dengan baris yang sama di Rilis 1 Man Power — carry-forward adalah soal wiring data mengalir, bukan UI baru). (4) ~~Baris SAP Sync (`PoolingMOItem`/MO Backlog, 2.8 SP BE) dihapus~~ — **✅ direvisi lagi 30 Jul 2026**: dikembalikan ke scope sebagai kerjaan **lokal** (2 baris baru di atas, 2 SP BE) lewat local join `PoolingMOItem` by `MO Number`, bukan lewat SAP — lihat catatan #10 & redesign [inspection-order/area-of-unit-man-power-enhancement.md](inspection-order/area-of-unit-man-power-enhancement.md) 2.5.*
 
 **Dependency**: Master Data Area (Equipment Mapping enhance) harus selesai lebih dulu sebelum kolom Area di Digiplan bisa dikembangkan penuh.
 
@@ -139,7 +149,9 @@ Alokasi BE: kedua BE all-hands di Rilis 1 (prioritas tertinggi). Setelah itu, BE
 5. **Buffer ~1 sprint** dari kapasitas 2 BE disimpan sebagai kontingensi murni (risiko estimasi belum divalidasi engineer, mapping BAPI ke SAP di luar kontrol tim Digiman+) — tidak dialokasikan ke scope tambahan.
 6. **Mapping BAPI ke SAP** tetap di luar seluruh estimasi ini di ketiga rilis — assessment kelayakan teknis dikoordinasikan client (PIC: Faiza) dengan tim SAP internal mereka.
 7. **Koreksi scope (29 Jul 2026)**: proposal [Area of Unit](area-of-unit-enhancement-proposal.html) berasumsi Additional Order "belum punya field Component/Sub Component sama sekali" — dikonfirmasi user, asumsi ini **salah**. Dropdown Component/SubComponent sudah ada di Inspection, Additional Inspection, **dan** Additional Order. Scope yang tersisa untuk Rilis 2 bukan membangun UI, melainkan **BE derive + snapshot `AreaCode`/`AreaName`** dari pilihan itu (backend-only, sama pola dengan Inspection) — berlaku juga untuk Additional Order, bukan cuma Inspection. Proposal HTML sumber **belum diubah** (perlu persetujuan terpisah sebelum revisi dokumen client-facing).
-8. **Keputusan scope (30 Jul 2026)**: SAP Sync (`PoolingMOItem`/payload, MO Backlog inbound parse) dihapus dari Rilis 1 (Man Power, 5.2 SP) dan Rilis 2 (Area, 2.8 SP) — per arahan user, hanya di-scope di Rilis 3 (Maintenance Activity Type). **Belum diklarifikasi**: apakah baris QA/Testing di Rilis 1 (12 SP) & Rilis 2 (7 SP) — yang tadinya mencakup pengujian alur "→ SAP → MO Backlog →" sebagai bagian dari testing e2e — perlu ikut dikurangi, atau tetap sama karena testing tetap mencakup titik-titik lain di alur yang sama. Belum dikurangi di dokumen ini sampai ada arahan lebih lanjut.
+8. ~~Keputusan scope (30 Jul 2026): SAP Sync (`PoolingMOItem`/payload, MO Backlog inbound parse) dihapus dari Rilis 1 (Man Power, 5.2 SP) dan Rilis 2 (Area, 2.8 SP) — per arahan user, hanya di-scope di Rilis 3 (Maintenance Activity Type).~~ — **superseded oleh #10 (30 Jul 2026, sesi yang sama)**: keputusan ini direvisi lagi setelah ditemukan alternatif desain yang tidak bergantung SAP sama sekali. **Belum diklarifikasi** (masih terbuka): apakah baris QA/Testing di Rilis 1 (12 SP) & Rilis 2 (7 SP) perlu ikut disesuaikan mengingat scope-nya sekarang murni local join (bukan lagi "→ SAP →"), atau tetap sama karena testing tetap mencakup titik-titik lain di alur yang sama.
+9. **✅ Koreksi label (30 Jul 2026)**: baris 61–62 Rilis 1 sebelumnya menyebut "Duration+Man Power (Additional Order)"/"Man Power/Duration UI" — stale, cuma menangkap separuh dari koreksi #7 (yang cuma bahas Component/Sub Component). Cross-check ke `maintenance-activity-type-enhancement.md` 2.5 (pemetaan Screen 2 Additional Order) membuktikan **Duration juga sudah ada** di Additional Order (field "How Long Will This Defect Repair Take?", sudah live) — bukan cuma Component/Sub Component. Label diperbaiki jadi cuma **Man Power** untuk porsi Additional Order; SP (2 BE / 4 FE) **tidak berubah** karena effort wiring backend/UI untuk 1 field tambahan di layar terpisah tetap besarannya sama, konsisten dengan koreksi yang sama di `area-of-unit-man-power-effort-summary.md` hari ini.
+10. **✅ Redesign auto-fill Digiplan (30 Jul 2026)**: keputusan #8 (hapus SAP Sync) **direvisi** setelah user mengusulkan alternatif — auto-fill MO Backlog di Digiplan **tidak harus** lewat SAP round-trip (kirim ke SAP via BAPI → SAP echo balik lewat MO Backlog response, yang bergantung assessment client PIC Faiza). Alternatifnya: **local join** — data Area/Duration/Man Power tetap diinsert ke `PoolingMOItem` secara lokal (service `maintenance-order`), lalu saat MO Backlog masuk dari SAP (dipicu **MO Number** assignment SAP, key korelasi dikonfirmasi user tersedia), query MO Backlog di sisi Digiplan **JOIN langsung ke `PoolingMOItem` by MO Number** — tidak perlu parsing dari payload/response SAP sama sekali. **Dampak**: (a) auto-fill Digiplan jadi **tidak lagi bergantung** ke assessment BAPI/SAP client — mapping BAPI cuma relevan kalau client mau field ini tampil juga di SAP mereka sendiri (kebutuhan terpisah, tetap "belum bisa diestimasi"); (b) 6 SP kerjaan yang sempat dihapus di #8 **dikembalikan ke scope** sebagai kerjaan lokal — dipecah 4 SP ke Rilis 1 (porsi Duration/Man Power) + 2 SP ke Rilis 2 (porsi Area), lihat baris baru di kedua tabel rilis. Detail desain: [inspection-order/area-of-unit-man-power-enhancement.md](inspection-order/area-of-unit-man-power-enhancement.md) 2.5.
 
 ---
 

@@ -2,7 +2,7 @@
 
 *Sumber: DDL script asli (`dplan.sql`), schema `dbo`, script date 15/07/2026 1:53 PM — skema real, bukan document-derived.*
 *Disimpan: 15 Jul 2026.*
-*DB: `DPlanDB`, alias `dplan` — lihat [`digital-planning.md`](../dplan/digital-planning.md) dan [`man-power-man-hours-excel-enhancement.md`](../dplan/man-power-man-hours-excel-enhancement.md).*
+*DB: `DPlanDB`, alias `dplan` — lihat [`digital-planning.md`](../dplan/digital-planning.md) dan [`area-of-unit-man-power-dplan-enhancement.md`](../dplan/area-of-unit-man-power-dplan-enhancement.md).*
 
 ---
 
@@ -58,7 +58,7 @@ RemarkOverduration  varchar(300), null
 CreatedBy, CreatedUtcDate   not null
 ModifiedBy, ModifiedUtcDate null
 ```
-Remark wajib kemungkinan saat durasi aktual plan melebihi plan duration — relevan untuk diskusi rollup Duration di [`man-power-man-hours-excel-enhancement.md`](../dplan/man-power-man-hours-excel-enhancement.md) (siapa yang harus kasih justifikasi kalau parent Duration/Man Hours melenceng dari plan).
+Remark wajib kemungkinan saat durasi aktual plan melebihi plan duration — relevan untuk diskusi rollup Duration di [`area-of-unit-man-power-dplan-enhancement.md`](../dplan/area-of-unit-man-power-dplan-enhancement.md) (siapa yang harus kasih justifikasi kalau parent Duration/Man Hours melenceng dari plan).
 
 ---
 
@@ -616,7 +616,7 @@ TaskId_Temp:       TaskId bigint not null (BUKAN identity, beda dari PlanId_Temp
 
 ## Referensi
 - [`digital-planning.md`](../dplan/digital-planning.md) — narasi lifecycle, hierarki task, dynamic column, predecessor, mekanisme Template→Plan (document-derived, sekarang terkonfirmasi cocok dengan DDL real untuk hierarki inti)
-- [`man-power-man-hours-excel-enhancement.md`](../dplan/man-power-man-hours-excel-enhancement.md) — enhancement kolom Man Power/Man Hours, relevan ke `DPColumn`/`DPValue`/`TemplateColumn`
+- [`area-of-unit-man-power-dplan-enhancement.md`](../dplan/area-of-unit-man-power-dplan-enhancement.md) — enhancement kolom Man Power/Man Hours, relevan ke `DPColumn`/`DPValue`/`TemplateColumn`
 - [`order-emol-sap-sync.md`](../inspection-order/order-emol-sap-sync.md) — jalur sync SAP sisi `maintenance-order`, untuk dibandingkan dengan `SAPMOSynchronization`/`CloseMO` di sini
 - [`user-management-schema.md`](user-management-schema.md) — gap `UserEmploymentProfile` yang kemungkinan terjawab sebagian oleh `dplan.User`/`StageUser`
 - [`services-asset-schema.md`](services-asset-schema.md), [`maintenance-order-schema.md`](maintenance-order-schema.md), [`maintenance-execution-schema.md`](maintenance-execution-schema.md), [`maintenance-strategy-schema.md`](maintenance-strategy-schema.md) — skema service lain untuk perbandingan pola (`Configuration`/`AuditLog`/`MaintenanceCategory`/taxonomy Component-Damage-Cause direplikasi per-service dengan variasi shape)

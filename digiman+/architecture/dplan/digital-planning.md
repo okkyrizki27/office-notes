@@ -102,7 +102,7 @@ ModifiedBy, ModifiedUtcDate
 Active                    ← bit
 ```
 
-> **Implikasi penting untuk rollup Man Power/Man Hours di level parent** (lihat [man-power-man-hours-excel-enhancement.md](man-power-man-hours-excel-enhancement.md) 3.3/4.0.1): konsep serial/paralel antar child task **sudah dimodelkan** lewat tabel ini (via `Type` + graph `FromTask`→`ToTask`), bukan sesuatu yang perlu dibangun dari nol. Assessment yang tersisa jadi lebih ke **finalisasi formula perhitungan** (bagaimana `Type`/`Lag` diterjemahkan ke rumus rollup Man Power/Man Hours), bukan riset ulang bagaimana menangkap struktur predecessor-nya — data modelnya sudah matang.
+> **Implikasi penting untuk rollup Man Power/Man Hours di level parent** (lihat [area-of-unit-man-power-dplan-enhancement.md](area-of-unit-man-power-dplan-enhancement.md) 3.3/4.0.1): konsep serial/paralel antar child task **sudah dimodelkan** lewat tabel ini (via `Type` + graph `FromTask`→`ToTask`), bukan sesuatu yang perlu dibangun dari nol. Assessment yang tersisa jadi lebih ke **finalisasi formula perhitungan** (bagaimana `Type`/`Lag` diterjemahkan ke rumus rollup Man Power/Man Hours), bukan riset ulang bagaimana menangkap struktur predecessor-nya — data modelnya sudah matang.
 
 ## Schema Tabel `DPColumn`
 
@@ -185,7 +185,7 @@ Meski kolom di `DPColumn` bersifat dinamis/generic secara skema, beberapa kolom 
   - **Precedence saat task berasal dari MO Backlog** *(dikonfirmasi 10 Jul 2026)*: kalau task dibuat dari MO Backlog yang membawa nilai Duration plan sendiri (lihat [../inspection-order/area-of-unit-man-power-enhancement.md](../inspection-order/area-of-unit-man-power-enhancement.md) 2.5), **nilai dari MO Backlog yang menang** — bukan default `1`. Default `1` hanya berlaku untuk task yang dibuat manual (tanpa MO Backlog).
   - **Auto-fill dari MO Backlog tetap editable** — nilai Duration (juga Component/Sub Component/Area/Man Power) yang auto-fill dari MO Backlog **bukan read-only/lock**; user (planner) tetap bisa mengubahnya sesuai analisa & kondisi terkini saat membuat Plan.
 
-*(Lihat [man-power-man-hours-excel-enhancement.md](man-power-man-hours-excel-enhancement.md) untuk rencana penambahan kolom Man Power & Man Hours yang mengikuti pola serupa.)*
+*(Lihat [area-of-unit-man-power-dplan-enhancement.md](area-of-unit-man-power-dplan-enhancement.md) untuk rencana penambahan kolom Man Power & Man Hours yang mengikuti pola serupa.)*
 
 ## Add Backlog dari SAP (Current State)
 

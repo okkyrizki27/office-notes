@@ -11,7 +11,7 @@ Dokumen ini merangkum total estimasi effort dari inisiatif **Area of Unit & Man 
 | Dokumen | Fitur/Service | Isi |
 |---|---|---|
 | [inspection-order/area-of-unit-man-power-enhancement.md](inspection-order/area-of-unit-man-power-enhancement.md) | Inspection, Additional Order, Order Approval, Master Data | Field baru Area/Man Power di Inspection & Additional Order, enhance UI existing "Equipment Mapping" untuk assign `AreaCode` (1:N per `ModelComponentSubComponent`), validasi di Order Approval, gap kirim data ke SAP |
-| [dplan/man-power-man-hours-excel-enhancement.md](dplan/man-power-man-hours-excel-enhancement.md) | Digiplan | Man Power/Man Hours + Component/Sub Component/Area di grid & Excel template |
+| [dplan/area-of-unit-man-power-dplan-enhancement.md](dplan/area-of-unit-man-power-dplan-enhancement.md) | Digiplan | Man Power/Man Hours + Component/Sub Component/Area di grid & Excel template |
 | [pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md](pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md) | PM Shutdown, BD Corrective | Visibility Duration/Man Power/Man Hours di card task, assignment mechanic |
 | [inspection-order/order-emol-sap-sync.md](inspection-order/order-emol-sap-sync.md) | `maintenance-order`, SAP middleware | Referensi teknis (bukan dokumen enhancement) — schema & flow existing yang jadi dasar assessment SAP |
 
@@ -92,25 +92,25 @@ Setelah dikalibrasi per-baris ke Fibonacci lalu dijumlahkan (bottom-up), totalny
 | Master data `Area` (Code/Name): UI maintain baru (CRUD standalone) | Sedang | 3 | 3.5 | *(Baris baru, 20 Jul 2026)* Terpisah dari modal "Add New Component" (yang cuma assign `AreaCode` ke row existing) — ini layar untuk **mendefinisikan** daftar Area itu sendiri, reference class: CRUD standar + validasi unique Code, pola sama dengan Master Data UI `MaintenanceActivityType` di [inspection-order/maintenance-activity-type-effort-summary.md](inspection-order/maintenance-activity-type-effort-summary.md) |
 | Permission code baru untuk maintain Master Data (admin HO) | Kecil | 1 | 1.2 | Setup permission code + assign ke role |
 | Inspection & Additional Inspection: tambah field Man Power di create finding | Kecil–Sedang | 2 | 2.3 | *(Direvisi 16 Jul 2026 — Area bukan field UI, cukup derive+simpan backend)* Component/Sub Component sudah ada (cascading 2 level tidak berubah), tinggal extend +1 field Man Power + logic backend lookup `AreaCode` — 1 form yang sama berlaku untuk Inspection maupun Additional Inspection, tidak perlu effort terpisah |
-| Additional Order: tambah field Component, Sub Component, Duration, Man Power di create screen | Sedang | 2 | 2.3 | *(Direvisi 16 Jul 2026 — Area dikeluarkan dari field UI)* Field baru di layar ini (belum ada sebelumnya, layar terpisah dari Inspection) + cascading dropdown 2 level (Component→Sub Component, sama pola dengan Inspection) + validasi + backend derive Area |
+| Additional Order: tambah field Man Power di create screen (Component, Sub Component, Duration sudah ada) | Kecil–Sedang | 2 | 2.3 | **✅ Dikoreksi 30 Jul 2026** — sebelumnya baris ini menghitung Component/Sub Component/Duration sebagai field baru ("belum ada sebelumnya, cascading dropdown 2 level perlu dibangun"), ternyata **salah**: cross-check ke [inspection-order/maintenance-activity-type-enhancement.md](inspection-order/maintenance-activity-type-enhancement.md) 2.5 (pemetaan Screen 2 Additional Order, direview 14 Jul 2026) membuktikan Component/Sub Component/Duration **sudah ada** di layar ini — cuma Activity Type yang ditandai baru. Scope sekarang sejajar dengan baris Inspection di atas: **cuma tambah Man Power** + backend derive `AreaCode` dari Component+SubComponent yang sudah ada (bukan bangun cascading dari nol). SP tetap 2 (sama besaran dengan task identik di baris Inspection) karena tetap butuh wiring backend terpisah untuk screen ini. |
 | Edit eMOL: carry-forward nilai dari Finding/Additional Order (auto-fill, tetap editable) | Kecil–Sedang | 2 | 2.3 | Passing value ke layar edit eMOL, bukan re-input |
 | Order Approval: tambah validasi & edit Man Power, Duration | Kecil–Sedang | 2 | 2.3 | *(Direvisi 20 Jul 2026 — Component/Sub Component diralat, diabaikan dulu dari scope layar ini; tetap tidak bisa diedit di approval seperti behavior sekarang. Sebelumnya 16 Jul 2026 Area juga sudah dikeluarkan.)* Scope sekarang cuma 2 field numerik (Man Power, Duration) — tidak perlu reuse dropdown Master Data lagi di layar ini. UI baru di layar approval (edit mode + save) + validasi Man Power integer >0 |
-| `PoolingMOItem`/payload: tambah kolom Area, Duration, Man Power (Component/Sub Component sudah ada) | Sedang | 3 | 3.5 | Extend insert query & payload di [inspection-order/order-emol-sap-sync.md](inspection-order/order-emol-sap-sync.md) |
-| Mapping BAPI: kirim Component, Sub Component, Area, Duration, Man Power ke SAP | **Belum bisa diestimasi** | — | — | Tergantung hasil assessment client dengan tim SAP mereka — bisa kecil (numpang field text) atau besar/multi-sprint (custom Z-field, butuh kerja sisi SAP client di luar kontrol estimasi tim Digiman+) |
-| MO Backlog inbound: parse balik Component, Sub Component, Area, Duration, Man Power dari SAP response | Sedang | 3 | 3.5 | Extend parsing/mapping saat pull MO Backlog |
+| `PoolingMOItem`: tambah kolom Area, Duration, Man Power (Component/Sub Component sudah ada) | Sedang | 3 | 3.5 | Extend insert query lokal di [inspection-order/order-emol-sap-sync.md](inspection-order/order-emol-sap-sync.md) Bagian 5.2 — **✅ tetap in-scope (30 Jul 2026)**: kerjaan lokal di service `maintenance-order`, tidak bergantung ke assessment BAPI/SAP (lihat redesign auto-fill di [area-of-unit-man-power-enhancement.md](inspection-order/area-of-unit-man-power-enhancement.md) 2.5) |
+| Mapping BAPI: kirim Component, Sub Component, Area, Duration, Man Power ke SAP | **Belum bisa diestimasi** | — | — | **✅ Non-blocking (30 Jul 2026)** — tidak lagi jadi prasyarat auto-fill Digiplan (lihat 2.5), cuma relevan kalau client mau field ini tampil juga di sisi SAP mereka. Tergantung hasil assessment client dengan tim SAP mereka — bisa kecil (numpang field text) atau besar/multi-sprint (custom Z-field, butuh kerja sisi SAP client di luar kontrol estimasi tim Digiman+) |
+| MO Backlog: JOIN ke `PoolingMOItem` by `MO Number` untuk surface Component, Sub Component, Area, Duration, Man Power | Sedang | 3 | 3.5 | **✅ Redesign 30 Jul 2026** — sebelumnya "parse balik dari SAP response" (bergantung BAPI mapping selesai dulu), diganti **local join** by `MO Number` (key dikonfirmasi user tersedia) ke `PoolingMOItem` yang sudah diisi lokal (baris di atas) — auto-fill Digiplan jadi tidak bergantung ke assessment SAP sama sekali. Extend query MO Backlog di integrasi `dplan` |
 | ~~MO Backlog filter jadi konfigurasi per-client (bukan hardcode)~~ | — | **0** | **0** | **✅ Diputuskan (17 Jul 2026): bukan lagi item dev Digiman+.** Tanggung jawab filtering dipindah ke **sisi tenant/middleware** — client yang menentukan MO mana yang dikirim ke Digiman+ lewat konfigurasi middleware/SAP mereka sendiri, bukan Digiman+ yang filter dari MO yang sudah diterima. Alasan: fleksibilitas per-client tanpa Digiman+ perlu bangun & maintain config UI/logic filter |
-| Testing end-to-end (Finding/Additional Order → eMOL → Approval → SAP → MO Backlog → Digiplan) | Besar | 8 | 9.4 | Banyak titik integrasi lintas service (`maintenance-execution`, `maintenance-order`, `dplan`), perlu test tiap checkpoint + regresi |
+| Testing end-to-end (Finding/Additional Order → eMOL → Approval → `PoolingMOItem` → join `MO Number` → Digiplan) | Sedang–Besar | 6 | 7.0 | **✅ Direvisi 30 Jul 2026** — turun dari 8 SP: sebelumnya asumsi jalur lewat SAP round-trip (harus mock/tunggu response SAP, dependency eksternal). Setelah auto-fill di-redesign jadi local join `PoolingMOItem` by `MO Number` (2.5), titik tersulit (integrasi SAP) hilang — sisanya murni test lintas service internal (`maintenance-execution`, `maintenance-order`, `dplan`), lebih deterministik & lebih murah ditest |
 | **[DE]** Digiman Transaction Report — D'INSPECT RESULT: tambah `Area`/`Man Power`/`Duration`/`Man Hours` ke `vw_report_iams_inspection_results` (2.7) | Kecil–Sedang | 2 | 2.3 | *(Baris baru, 20 Jul 2026)* 1 jalur sumber, 3 titik CTE (lihat [inspection-result.md](../report/transaction-report/inspection-result.md) Planned Changes) |
 | **[DE]** Digiman Transaction Report — D'ORDER RESULT & ORDERING COMPLIANCE: tambah 4 kolom yang sama ke `vw_report_iams_f_am_digiman_dorder` (2.7) | Sedang | 3 | 3.5 | *(Baris baru, 20 Jul 2026)* Lebih kompleks dari `Maint. Act. Type` — 2 jalur sumber (Inspection + Additional Order) di-`COALESCE`, 7 titik CTE (lihat [order-result-compliance.md](../report/transaction-report/order-result-compliance.md) Planned Changes). Reference class riil (Jira, dicek 20 Jul 2026): [IAMS30-3946](https://bukittechnology.atlassian.net/browse/IAMS30-3946) (Varian/DE, 3 SP — "Enhance `vw_report_iams_f_am_digiman_dorder`", tambah 1 kolom + 1 tabel baru ke **view yang sama persis**) — 3 SP di sini konsisten dengan preseden itu meski scope kita lebih besar (4 kolom, 2 jalur sumber vs 1 kolom 1 jalur) |
 | **[DA]** Update dataset/report Power BI — tampilkan `Area`/`Man Power`/`Duration`/`Man Hours` di D'Inspect Result & D'Order Result/Ordering Compliance (2 halaman) | Besar | 8 | 9.4 | *(Baris baru, 20 Jul 2026, direvisi setelah cek Jira langsung)* Reference class riil: subtask [IAMS30-3946](https://bukittechnology.atlassian.net/browse/IAMS30-3946) — [IAMS30-3950](https://bukittechnology.atlassian.net/browse/IAMS30-3950) (Herianto/DA, 2 SP, "Adjust PBI based on WorkflowTransaction status") + [IAMS30-3980](https://bukittechnology.atlassian.net/browse/IAMS30-3980) (Herianto/DA, 3 SP, "Add Last Sync in Dashboard") = **5 SP untuk scope lebih kecil** (1 view, ~1 metrik + 1 tabel baru) dari punya kita (4 kolom × 2 halaman) — diskalakan naik ke 8 SP. **Bukti nyata risiko stabilisasi** dari fitur yang sama persis: 3 bug reopen pasca-rilis — [IAMS30-4012](https://bukittechnology.atlassian.net/browse/IAMS30-4012) (DE, 2 SP), [IAMS30-4013](https://bukittechnology.atlassian.net/browse/IAMS30-4013) (DE, 1 SP), [IAMS30-4015](https://bukittechnology.atlassian.net/browse/IAMS30-4015) (DA, unpointed) — **bukan hipotetis, ini pola nyata yang sudah terjadi 2×** untuk perubahan sejenis di view yang sama, pertimbangkan serius buffer stabilisasi pasca-rilis (di luar 8 SP ini) |
-| **Total (di luar mapping BAPI)** | | **45** | **~52** | *(Naik dari 32 SP, 20 Jul 2026 — tambah 3 baris dampak report: 2 SQL view [DE] + 1 Power BI [DA], +13 SP, direvisi dari +10 SP setelah cek reference class Jira riil)* 1 angka pasti (bukan range) — hasil kalibrasi Fibonacci per baris |
+| **Total (di luar mapping BAPI)** | | **43** | **~50** | *(30 dev + 13 DE/DA, 30 Jul 2026 — dev turun dari 32→30 setelah testing e2e direvisi 8→6 SP pasca-redesign auto-fill local join. Sebelumnya naik dari 32 SP, 20 Jul 2026 — tambah 3 baris dampak report: 2 SQL view [DE] + 1 Power BI [DA], +13 SP)* 1 angka pasti (bukan range) — hasil kalibrasi Fibonacci per baris |
 | **⚠️ Catatan role [DE]/[DA]** | | | | **BUMA ID roster (6 orang) tidak punya DE/DA** (`Jira/sprint-report/ORR_sprint_report.py` — cuma 2 BE/1 FE Web/1 FE Mobile/2 QA) — DE/DA riil di project ini adalah **Varian Aditya Iryanto** (DE) & **Herianto Salim** (DA), dikonfirmasi lewat histori Jira 20 Jul 2026. SP di atas **sudah** pakai reference class SP riil dari kerja mereka (bukan lagi placeholder murni). **Rasio mandays 1.17 tetap placeholder** — histori timestamp Jira mereka (`resolutiondate`) banyak mengelompok di tanggal yang sama (batch-close), jadi tidak bisa dipakai hitung throughput SP/hari riil tanpa analisis changelog/transisi status lebih dalam (di luar scope pengecekan cepat ini) — rasio BUMA ID (1.17) dipakai sebagai pendekatan terbaik yang tersedia sekarang. Implikasi lain: karena DE/DA di luar 6 orang BUMA ID, effort ini **kemungkinan tidak memperebutkan kapasitas 43.7 SP/sprint** tim BUMA ID — bisa jalan paralel, bukan otomatis nambah durasi sprint BUMA ID. Lihat Estimasi Jumlah Sprint di bawah untuk implikasinya. |
 
 *Catatan: estimasi berdasarkan deskripsi arsitektur dari pemilik produk, tanpa akses langsung ke source code — perlu divalidasi oleh engineer yang pegang codebase `maintenance-execution`/`maintenance-order`. Skema mapping Area sudah final secara desain (16 Jul 2026: 1 kolom `AreaCode` di `ModelComponentSubComponent`) dan asumsi 1:N-nya sudah divalidasi ke data real/mechanical SME (20 Jul 2026). Mapping BAPI tetap sumber ketidakpastian terbesar lainnya.*
 
 ---
 
-### 2. `dplan/man-power-man-hours-excel-enhancement.md` — Digiplan (Man Power/Man Hours + Component/Sub Component/Area)
+### 2. `dplan/area-of-unit-man-power-dplan-enhancement.md` — Digiplan (Man Power/Man Hours + Component/Sub Component/Area)
 
 *(Scope keputusan lengkap ada di dokumen sumber, Bagian 3. SP dikalibrasi Fibonacci, mandays = SP × 1.17.)*
 
@@ -200,14 +200,14 @@ Setelah dikalibrasi per-baris ke Fibonacci lalu dijumlahkan (bottom-up), totalny
 
 | # | Sumber | Scope | SP | Mandays |
 |---|---|---|---|---|
-| 1 | area-of-unit-man-power-enhancement.md (tim BUMA ID) | Master Data (enhance UI existing + UI maintain `Area` baru), permission, Inspection, Additional Order, edit eMOL, Order Approval, `PoolingMOItem`/payload, MO Backlog inbound, testing e2e | **32** | **~37** |
+| 1 | area-of-unit-man-power-enhancement.md (tim BUMA ID) | Master Data (enhance UI existing + UI maintain `Area` baru), permission, Inspection, Additional Order, edit eMOL, Order Approval, `PoolingMOItem` (lokal), MO Backlog join by `MO Number`, testing e2e | **30** | **~35** *(turun dari 32, 30 Jul 2026 — testing e2e 8→6 SP pasca-redesign auto-fill local join)* |
 | 1-DE/DA | area-of-unit-man-power-enhancement.md 2.7 (tim **DE/DA**: Varian & Herianto Salim, di luar BUMA ID) | Dampak ke Digiman Transaction Report — 2 SQL view + Power BI (lihat tabel di atas, baris `[DE]`/`[DA]`) | **13** | **~15** *(SP dari reference class Jira riil; mandays masih placeholder rasio BUMA ID, lihat catatan role di atas)* |
-| 2a | man-power-man-hours-excel-enhancement.md ("Tanpa" logic penuh) | Man Power/Man Hours (23) + assessment predecessor/serial/paralel (3) + Component/Sub Component/Area (14) — parent Man Power/Man Hours **dikosongkan dulu** (interim) | **40** | **~47** |
-| 2b | man-power-man-hours-excel-enhancement.md (tambahan kalau **"Dengan"** logic penuh, pakai `DPPredecessor` existing) | Implementasi penuh rollup Man Power/Man Hours parent dengan kondisi predecessor/serial/paralel | **+8** (di atas 2a) | **+~9** (di atas 2a) |
+| 2a | area-of-unit-man-power-dplan-enhancement.md ("Tanpa" logic penuh) | Man Power/Man Hours (23) + assessment predecessor/serial/paralel (3) + Component/Sub Component/Area (14) — parent Man Power/Man Hours **dikosongkan dulu** (interim) | **40** | **~47** |
+| 2b | area-of-unit-man-power-dplan-enhancement.md (tambahan kalau **"Dengan"** logic penuh, pakai `DPPredecessor` existing) | Implementasi penuh rollup Man Power/Man Hours parent dengan kondisi predecessor/serial/paralel | **+8** (di atas 2a) | **+~9** (di atas 2a) |
 | 3 | man-power-duration-visibility-enhancement.md | Visibility card task, assignment mechanic warning/notes, 2 skenario mandatory (PM Shutdown/BD Corrective) | **11** | **~13** |
 | — | Mapping BAPI ke SAP (bagian dari #1, assessment tim client dengan SAP mereka) | Kirim Component/Sub Component/Area/Duration/Man Power lewat BAPI | **Belum bisa diestimasi** | **Belum bisa diestimasi** |
 
-**Catatan penting (revisi 20 Jul 2026 — DE/DA tidak lagi dibuat track terpisah, per arahan user)**: baris **1-DE/DA (13 SP / ~15 mandays)** sekarang **dihitung masuk ke total effort** (bukan lagi track terpisah, pola sama dengan [inspection-order/maintenance-activity-type-effort-summary.md](inspection-order/maintenance-activity-type-effort-summary.md)). Tapi pekerjaannya dikerjakan resource DE/DA (Varian/Herianto) yang **berbeda dari 6 orang tim BUMA ID** — jadi **berjalan paralel** dengan dev dan muat di dalam durasi dev, **tidak menambah sprint count**. Karena itu: **total effort headline** sudah termasuk 13 SP report (96/104 SP di bawah), sementara **jumlah sprint** tetap dihitung dari SP **dev** (83/91) yang memperebutkan kapasitas 43.7 SP/sprint.
+**Catatan penting (revisi 20 Jul 2026 — DE/DA tidak lagi dibuat track terpisah, per arahan user)**: baris **1-DE/DA (13 SP / ~15 mandays)** sekarang **dihitung masuk ke total effort** (bukan lagi track terpisah, pola sama dengan [inspection-order/maintenance-activity-type-effort-summary.md](inspection-order/maintenance-activity-type-effort-summary.md)). Tapi pekerjaannya dikerjakan resource DE/DA (Varian/Herianto) yang **berbeda dari 6 orang tim BUMA ID** — jadi **berjalan paralel** dengan dev dan muat di dalam durasi dev, **tidak menambah sprint count**. Karena itu: **total effort headline** sudah termasuk 13 SP report (94/102 SP di bawah), sementara **jumlah sprint** tetap dihitung dari SP **dev** (81/89) yang memperebutkan kapasitas 43.7 SP/sprint.
 
 ### Total Estimasi — 2 Skenario (termasuk dampak report DE/DA, di luar mapping BAPI ke SAP)
 
@@ -215,8 +215,8 @@ Setelah dikalibrasi per-baris ke Fibonacci lalu dijumlahkan (bottom-up), totalny
 
 | Skenario | SP dev (1/2a/2b/3) | + Report DE/DA | **Total SP** | **Total Mandays** |
 |---|---|---|---|---|
-| **Tanpa** logic penuh — parent Man Power/Man Hours dikosongkan dulu (1 + 2a + 3) | 83 | 13 | **96 SP** | **~112 mandays** |
-| **Dengan** logic penuh predecessor/serial/paralel (1 + 2a + 2b + 3) | 91 | 13 | **104 SP** | **~122 mandays** |
+| **Tanpa** logic penuh — parent Man Power/Man Hours dikosongkan dulu (1 + 2a + 3) | 81 | 13 | **94 SP** | **~110 mandays** |
+| **Dengan** logic penuh predecessor/serial/paralel (1 + 2a + 2b + 3) | 89 | 13 | **102 SP** | **~119 mandays** |
 
 **Selisih: 8 SP (~9 mandays)** kalau business memilih implementasi logic predecessor/serial/paralel penuh sejak rilis pertama, dibanding opsi interim (parent kosong dulu, bisa direvisit belakangan). Selisih ini jauh lebih kecil dari perkiraan awal karena data model dependency (`DPPredecessor` — `FromTask`/`ToTask`/`Type`/`Lag`) sudah ada, bukan perlu dibangun dari nol — sehingga opsi "Dengan" logic penuh cukup layak dipertimbangkan untuk rilis pertama sekalian.
 
@@ -232,16 +232,16 @@ Karena tim juga menangani **support issue Production** di sela sprint (pola yang
 
 **Kapasitas efektif = 62.4 × 70% = ~43.7 SP/sprint**
 
-*(Jumlah sprint dihitung dari **SP dev** — 83/91 — bukan total SP, karena report/PBI DE/DA berjalan paralel di resource terpisah dan tidak memperebutkan kapasitas 43.7 SP/sprint tim dev. Total effort termasuk report = 96/104 SP, lihat kolom di Total Estimasi.)*
+*(Jumlah sprint dihitung dari **SP dev** — 81/89 — bukan total SP, karena report/PBI DE/DA berjalan paralel di resource terpisah dan tidak memperebutkan kapasitas 43.7 SP/sprint tim dev. Total effort termasuk report = 94/102 SP, lihat kolom di Total Estimasi.)*
 
 | Skenario | SP dev | ÷ Kapasitas Efektif (43.7 SP/sprint) | Kebutuhan Sprint |
 |---|---|---|---|
-| **Tanpa** logic penuh | 83 SP | 83 ÷ 43.7 = 1.90 | **2 sprint** |
-| **Dengan** logic penuh | 91 SP | 91 ÷ 43.7 = 2.08 | **3 sprint** (2 sprint hanya cukup ~87.4 SP, sisa ~3.6 SP masuk ke sprint ke-3) |
+| **Tanpa** logic penuh | 81 SP | 81 ÷ 43.7 = 1.85 | **2 sprint** |
+| **Dengan** logic penuh | 89 SP | 89 ÷ 43.7 = 2.04 | **3 sprint** (2 sprint hanya cukup ~87.4 SP, sisa ~1.6 SP masuk ke sprint ke-3) |
 
 *Catatan: ini asumsi kasar mengabaikan panjang sprint yang sebenarnya bervariasi (9–17 hari kerja per sprint pada data historis) dan mengasumsikan alokasi 70/30 konsisten sepanjang durasi pengerjaan. Angka riil bisa berubah tergantung prioritas production issue yang muncul saat itu.*
 
-**Report & Power BI — DE/DA (dampak report, 2.7)**: 13 SP / ~15 mandays *(SP dari reference class Jira riil — Varian/Herianto Salim; mandays masih placeholder rasio BUMA ID, lihat catatan role)*, **sudah termasuk di total effort** (96/104 SP) tapi dikerjakan resource DE/DA yang berbeda dari tim dev — **berjalan paralel** dan muat di dalam durasi sprint dev, jadi **tidak menambah jumlah sprint**. Durasi absolut track DE/DA sendiri belum bisa dihitung dengan metodologi sprint yang sama — histori `resolutiondate` Varian/Herianto di Jira banyak mengelompok di tanggal yang sama (batch-close), jadi throughput SP/hari riil mereka belum bisa dihitung tanpa analisis changelog/transisi status lebih dalam.
+**Report & Power BI — DE/DA (dampak report, 2.7)**: 13 SP / ~15 mandays *(SP dari reference class Jira riil — Varian/Herianto Salim; mandays masih placeholder rasio BUMA ID, lihat catatan role)*, **sudah termasuk di total effort** (94/102 SP) tapi dikerjakan resource DE/DA yang berbeda dari tim dev — **berjalan paralel** dan muat di dalam durasi sprint dev, jadi **tidak menambah jumlah sprint**. Durasi absolut track DE/DA sendiri belum bisa dihitung dengan metodologi sprint yang sama — histori `resolutiondate` Varian/Herianto di Jira banyak mengelompok di tanggal yang sama (batch-close), jadi throughput SP/hari riil mereka belum bisa dihitung tanpa analisis changelog/transisi status lebih dalam.
 
 ---
 
@@ -257,12 +257,14 @@ Setiap baris effort di dokumen ini dipetakan ke role pakai asumsi platform yang 
 
 | Sumber | BE | FE Web | FE Mobile | QA | Total |
 |---|---|---|---|---|---|
-| #1 Area of Unit core (32 SP) | 17.5 | 4.5 | 2 | 8 | 32 |
+| #1 Area of Unit core (30 SP) | 17.5 | 4.5 | 2 | 6 | 30 |
 | #2a Digiplan "Tanpa" logic penuh (40 SP) | 25 | 7 | 0 | 8 | 40 |
 | #3 PM Shutdown & BD Corrective (11 SP) | 6 | 0 | 2 | 3 | 11 |
-| **Subtotal "Tanpa" logic penuh (83 SP)** | **48.5** | **11.5** | **4** | **19** | **83** |
+| **Subtotal "Tanpa" logic penuh (81 SP)** | **48.5** | **11.5** | **4** | **17** | **81** |
 | #2b Tambahan "Dengan" logic penuh predecessor/serial/paralel (+8 SP) | +8 | 0 | 0 | 0 | +8 |
-| **Subtotal "Dengan" logic penuh (91 SP)** | **56.5** | **11.5** | **4** | **19** | **91** |
+| **Subtotal "Dengan" logic penuh (89 SP)** | **56.5** | **11.5** | **4** | **17** | **89** |
+
+*(#1 turun dari 32→30, QA dari 8→6, 30 Jul 2026 — testing e2e direvisi pasca-redesign auto-fill local join, lihat detail effort di atas.)*
 
 > Asumsi platform (Web vs Mobile) belum dikonfirmasi ke tim aktual — kalau ternyata beda, breakdown per role perlu disesuaikan. Baris "campur" (field UI + logic backend) dipecah proporsional; angka pecahan (mis. 17.5) berasal dari split baris Master Data schema-vs-UI — pola sama dengan maint activity type. **Report/PBI DE/DA (13 SP) tidak masuk breakdown role ini** — sudah termasuk di total effort tapi dikerjakan resource DE/DA paralel (di luar 4 orang tim baru), jadi tidak menambah critical path. Tambahan "Dengan" logic penuh (2b, +8 SP) murni kerja BE (traversal graph `DPPredecessor` + formula rollup), tidak menyentuh FE/QA di luar regresi yang sudah tercakup baris QA.
 
@@ -280,27 +282,27 @@ Critical path = **BE + QA** (serial), karena FE (Web 11.5 + Mobile 4 = 15.5 SP g
 
 | Skenario Logic | Team | Critical Path (BE+QA) | ÷ Velocity → Hari | Sprint | Total Mandays (SP ÷ velocity) |
 |---|---|---|---|---|---|
-| **Tanpa** (83 SP) | Modified — dengan KT | 48.5 + 19 = 67.5 SP | ÷ 0.81 = 83.3 hari | **~9 sprint** | ~103 |
-| **Tanpa** (83 SP) | Modified — tanpa KT | 67.5 SP | ÷ 0.7 = 96.4 hari | **~10 sprint** | ~119 |
-| **Dengan** (91 SP) | Modified — dengan KT | 56.5 + 19 = 75.5 SP | ÷ 0.81 = 93.3 hari | **~10 sprint** | ~112 |
-| **Dengan** (91 SP) | Modified — tanpa KT | 75.5 SP | ÷ 0.7 = 107.9 hari | **~11 sprint** | ~130 |
+| **Tanpa** (81 SP) | Modified — dengan KT | 48.5 + 17 = 65.5 SP | ÷ 0.81 = 80.9 hari | **~9 sprint** | ~100 |
+| **Tanpa** (81 SP) | Modified — tanpa KT | 65.5 SP | ÷ 0.7 = 93.6 hari | **~10 sprint** | ~116 |
+| **Dengan** (89 SP) | Modified — dengan KT | 56.5 + 17 = 73.5 SP | ÷ 0.81 = 90.7 hari | **~10 sprint** | ~110 |
+| **Dengan** (89 SP) | Modified — tanpa KT | 73.5 SP | ÷ 0.7 = 105.0 hari | **~11 sprint** | ~127 |
 
 #### Perbandingan lintas tim (konsolidasi)
 
 | Skenario Logic | SP dev | BUMA ID baseline (43.7 SP/sprint, tim 6 orang) | Modified — dengan KT | Modified — tanpa KT |
 |---|---|---|---|---|
-| **Tanpa** logic penuh | 83 | **2 sprint** | **~9 sprint** | **~10 sprint** |
-| **Dengan** logic penuh | 91 | **3 sprint** | **~10 sprint** | **~11 sprint** |
+| **Tanpa** logic penuh | 81 | **2 sprint** | **~9 sprint** | **~10 sprint** |
+| **Dengan** logic penuh | 89 | **3 sprint** | **~10 sprint** | **~11 sprint** |
 
-*(SP dev; report/PBI DE/DA 13 SP paralel, tidak masuk critical path — total effort 96/104 SP. Sprint tim baru tidak berubah oleh fold ini.)*
+*(SP dev; report/PBI DE/DA 13 SP paralel, tidak masuk critical path — total effort 94/102 SP. Sprint tim baru tidak berubah oleh fold ini — angka SP turun sedikit (30 Jul 2026, testing e2e pasca-redesign auto-fill) tapi tidak menggeser pembulatan jumlah sprint.)*
 
-**Temuan penting** (senada tapi lebih tajam dari maint activity type): BE mendominasi **~58–62% total SP** (48.5/83 sampai 56.5/91), jadi **1 BE tunggal di tim baru adalah bottleneck mutlak** — FE Web+Mobile (15.5 SP gabungan) selalu selesai jauh sebelum BE dan sebagian besar durasi menganggur. Menambah **BE ke-2** akan memangkas critical path jauh lebih efektif daripada menambah FE/QA. **KT menghemat ~1 sprint** di kedua skenario logic (Tanpa: 10→9; Dengan: 11→10). Gap besar vs BUMA ID baseline (2–3 sprint) wajar dan bukan kontradiksi: baseline pakai throughput 6 orang paralel yang riil-terukur, sedangkan tim baru dihitung dari critical path 1 BE + 1 QA serial dengan velocity per-orang yang lebih rendah — persis dinamika yang sama seperti di maint activity type, hanya berlipat karena inisiatif ini ~2× lebih besar (83–91 SP vs 48 SP).
+**Temuan penting** (senada tapi lebih tajam dari maint activity type): BE mendominasi **~60–63% total SP** (48.5/81 sampai 56.5/89), jadi **1 BE tunggal di tim baru adalah bottleneck mutlak** — FE Web+Mobile (15.5 SP gabungan) selalu selesai jauh sebelum BE dan sebagian besar durasi menganggur. Menambah **BE ke-2** akan memangkas critical path jauh lebih efektif daripada menambah FE/QA. **KT menghemat ~1 sprint** di kedua skenario logic (Tanpa: 10→9; Dengan: 11→10). Gap besar vs BUMA ID baseline (2–3 sprint) wajar dan bukan kontradiksi: baseline pakai throughput 6 orang paralel yang riil-terukur, sedangkan tim baru dihitung dari critical path 1 BE + 1 QA serial dengan velocity per-orang yang lebih rendah — persis dinamika yang sama seperti di maint activity type, hanya berlipat karena inisiatif ini ~2× lebih besar (81–89 SP vs 48 SP).
 
 ---
 
 ## Sumber Ketidakpastian Terbesar
 
-1. **Mapping BAPI ke SAP** (di luar total di atas) — feasibility & effort di sisi SAP belum diketahui sampai assessment client dengan tim SAP mereka selesai. Bisa kecil (numpang field text existing) atau besar/multi-sprint (custom Z-field, di luar kontrol tim Digiman+).
+1. **Mapping BAPI ke SAP** (di luar total di atas) — feasibility & effort di sisi SAP belum diketahui sampai assessment client dengan tim SAP mereka selesai. Bisa kecil (numpang field text existing) atau besar/multi-sprint (custom Z-field, di luar kontrol tim Digiman+). **✅ Non-blocking (30 Jul 2026)** — sejak auto-fill Digiplan di-redesign pakai local join `PoolingMOItem` by `MO Number` (lihat [inspection-order/area-of-unit-man-power-enhancement.md](inspection-order/area-of-unit-man-power-enhancement.md) 2.5), ketidakpastian ini **tidak lagi menghalangi delivery** — cuma relevan kalau client juga mau field-field ini tampil di sisi SAP mereka sendiri.
 2. ~~Skema Master Data Area↔Component-SubComponent — apakah 3 dimensi atau 4 dimensi~~ — **✅ resolved 20 Jul 2026**: final di 1:N per baris `ModelComponentSubComponent` (1 kolom `AreaCode`), asumsi 1:N-nya sudah divalidasi ke data real/mechanical SME. Bukan lagi sumber ketidakpastian besar — lihat detail effort di atas.
 3. **Rollup Man Power/Man Hours di level parent task** — sudah ada estimasi untuk 2 skenario (lihat tabel di atas), turun signifikan dari perkiraan awal setelah dikonfirmasi tabel `DPPredecessor` (`FromTask`/`ToTask`/`Type`/`Lag`) **sudah ada** — jadi bukan riset struktur data dari nol, cuma finalisasi formula rollup. Angka "Dengan" logic penuh (2b) masih perkiraan sampai formula final diputuskan business.
 4. Estimasi ini disusun dari deskripsi arsitektur pemilik produk tanpa akses source code — perlu divalidasi oleh engineer yang pegang codebase `maintenance-execution`, `maintenance-order`, dan `dplan` masing-masing.
@@ -309,7 +311,7 @@ Critical path = **BE + QA** (serial), karena FE (Web 11.5 + Mobile 4 = 15.5 SP g
 
 ## Referensi
 - [inspection-order/area-of-unit-man-power-enhancement.md](inspection-order/area-of-unit-man-power-enhancement.md)
-- [dplan/man-power-man-hours-excel-enhancement.md](dplan/man-power-man-hours-excel-enhancement.md)
+- [dplan/area-of-unit-man-power-dplan-enhancement.md](dplan/area-of-unit-man-power-dplan-enhancement.md)
 - [pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md](pm-shutdown-bd-corrective/man-power-duration-visibility-enhancement.md)
 - [inspection-order/order-emol-sap-sync.md](inspection-order/order-emol-sap-sync.md)
 - [dplan/digital-planning.md](dplan/digital-planning.md)

@@ -1,4 +1,4 @@
-# Enhancement: Man Power & Man Hours di Excel Template Upload Daily Plan
+# Enhancement: Man Power, Man Hours, Component/Sub Component/Area di Excel Template Upload Daily Plan
 
 *Last updated: 2026-07-10*
 
