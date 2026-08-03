@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Timeline Delivery — Digital Service Sheet</title>
+<style>
+  @page { size: A4 portrait; margin: 16mm; }
+  @page gantt-page { size: A4 landscape; margin: 12mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11.3pt; color: #1a1a1a; margin: 0; padding: 0 40px; line-height: 1.65; }
+
+  .landscape-block { page: gantt-page; break-before: page; break-after: page; }
+
+  .cover { padding: 90px 0 30px; page-break-after: always; }
+  .cover-eyebrow { font-size: 11pt; font-weight: 700; color: #2c5f8a; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+  .cover h1 { font-size: 27pt; font-weight: 800; margin: 0 0 12px; line-height: 1.3; color: #1f3a5f; }
+  .cover .subtitle { font-size: 13pt; color: #556; margin-bottom: 26px; }
+  .cover-meta { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  .cover-meta td { padding: 10px 13px; border: 1px solid #dde4ec; font-size: 10.2pt; line-height: 1.5; }
+  .cover-meta td:first-child { width: 30%; color: #667; background: #f7f9fb; }
+  .status-pill { display: inline-block; background: #eaf2fa; color: #1f3a5f; font-weight: 700; font-size: 9.4pt; letter-spacing: 0.4px; padding: 7px 16px; border-radius: 18px; border: 1px solid #cfe0f0; }
+
+  h1.sec { font-size: 18.5pt; color: #1f3a5f; border-bottom: 3px solid #1f3a5f; padding-bottom: 9px; margin: 0 0 17px; page-break-before: always; }
+  h1.sec:first-of-type { page-break-before: avoid; }
+  h2 { font-size: 13.5pt; color: #1f3a5f; margin: 21px 0 11px; }
+  h3 { font-size: 12pt; color: #2c5f8a; margin: 17px 0 9px; }
+
+  p { margin: 8px 0; }
+  b, strong { color: #111; }
+  code { background: #f0f2f5; color: #1a1a1a; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9.6pt; }
+  a { color: #2c5f8a; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 9.6pt; margin: 11px 0 17px; line-height: 1.45; }
+  th { background: #1f3a5f; color: #fff; padding: 8px 9px; text-align: left; font-weight: 600; }
+  td { padding: 7px 9px; border-bottom: 1px solid #e0e0e0; vertical-align: top; }
+  tr:nth-child(even) td { background: #f4f7fa; }
+  tr.hl td { background: #fff8ec; }
+
+  .stat-cards { display: flex; gap: 11px; margin: 17px 0; }
+  .stat-card { flex: 1; background: #f4f7fa; border-radius: 8px; padding: 15px 8px; text-align: center; }
+  .stat-card .num { font-size: 20pt; font-weight: 800; color: #1f3a5f; }
+  .stat-card .label { font-size: 8pt; color: #667; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 5px; }
+
+  .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; font-size: 9.6pt; }
+  .callout.warn { border-left-color: #d68910; background: #fdf3e3; }
+  .callout.decision { border-left-color: #1e8449; background: #eaf6ee; }
+  .callout.info { border-left-color: #6c3483; background: #f7f0fa; }
+  .callout-label { font-weight: 700; font-size: 8.6pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 5px; }
+  .callout.warn .callout-label { color: #b9770e; }
+  .callout.decision .callout-label { color: #1e8449; }
+  .callout.info .callout-label { color: #6c3483; }
+
+  .footer-note { margin-top: 22px; font-size: 9.2pt; color: #999; border-top: 1px solid #ddd; padding-top: 11px; }
+
+  /* ===== Gantt (reused pattern from squad-baru-release-timeline.html / service-sheet Artifact — grid-row eksplisit + track nested-grid; SETIAP cell (header & body) dapat grid-column eksplisit, JANGAN andalkan auto-placement begitu ada elemen lain di grid yang sama yang eksplisit posisinya — lihat memory reference_pdf_generation_process ===== */
+  #gantt-embed{
+    --gz-bg:#f2f6f9; --gz-surface:#ffffff; --gz-surface-2:#eaf1f7; --gz-ink:#182430; --gz-muted:#5c6b7a;
+    --gz-border:#dde4ec; --gz-grid-line:#e6edf3; --gz-grid-line-strong:#c7d3de;
+    --gz-item:#1f3a5f; --gz-item-ink:#ffffff; --gz-risk:#c9860f;
+    --gz-milestone:#1e8449; --gz-today-bg:#fff4e0; --gz-today-ink:#b9770e;
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  #gantt-embed .gz-legend{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; background:var(--gz-surface); border:1px solid var(--gz-border); border-radius:10px; padding:10px 14px; margin-bottom:12px; font-size:9.6pt; color:var(--gz-muted); }
+  #gantt-embed .gz-legend b{ color:var(--gz-ink); font-weight:600; margin-right:2px; }
+  #gantt-embed .gz-swatch{ display:inline-flex; align-items:center; gap:6px; }
+  #gantt-embed .gz-chip{ width:13px; height:9px; border-radius:3px; display:inline-block; }
+  #gantt-embed .gz-chip.item{ background:var(--gz-item); }
+  #gantt-embed .gz-chip.prep{ background:repeating-linear-gradient(45deg, var(--gz-milestone), var(--gz-milestone) 3px, transparent 3px, transparent 6px); border:1px solid var(--gz-milestone); }
+  #gantt-embed .gz-chip.today{ background:var(--gz-today-bg); border:1px solid var(--gz-today-ink); }
+  #gantt-embed .gz-diamond{ width:8px; height:8px; background:var(--gz-milestone); transform:rotate(45deg); display:inline-block; }
+
+  #gantt-embed .gz-gantt{ border:1px solid var(--gz-border); border-radius:10px; background:var(--gz-surface); overflow:hidden; }
+  #gantt-embed .gz-row{ display:grid; grid-template-columns:170px repeat(17, 1fr); align-items:stretch; border-bottom:1px solid var(--gz-grid-line); }
+  #gantt-embed .gz-row:last-child{ border-bottom:none; }
+  #gantt-embed .gz-head-row{ background:var(--gz-surface); border-bottom:1px solid var(--gz-grid-line-strong); }
+  #gantt-embed .gz-wk{ font-family:Consolas,monospace; font-size:7.4pt; color:var(--gz-muted); text-align:center; padding:6px 1px; border-left:1px solid var(--gz-grid-line); }
+  #gantt-embed .gz-wk.ship{ color:var(--gz-milestone); font-weight:700; }
+  #gantt-embed .gz-wk.today{ background:var(--gz-today-bg); color:var(--gz-today-ink); font-weight:700; }
+  #gantt-embed .gz-rowlabel{ background:var(--gz-surface); padding:5px 8px; font-size:8.4pt; font-weight:600; color:var(--gz-ink); border-right:1px solid var(--gz-grid-line-strong); display:flex; align-items:center; }
+  #gantt-embed .gz-group-row{ display:grid; grid-template-columns:170px repeat(17, 1fr); background:var(--gz-surface-2); border-bottom:1px solid var(--gz-grid-line-strong); border-top:1px solid var(--gz-grid-line-strong); }
+  #gantt-embed .gz-grouplabel{ background:var(--gz-surface-2); padding:6px 8px; font-size:8.2pt; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:var(--gz-item); border-right:1px solid var(--gz-grid-line-strong); }
+  #gantt-embed .gz-groupmeta{ grid-column:2 / span 17; display:flex; align-items:center; padding:6px 9px; font-size:8.2pt; color:var(--gz-muted); gap:8px; }
+  #gantt-embed .gz-track{ position:relative; grid-column:2 / span 17; display:grid; grid-template-columns:repeat(17,1fr); }
+  #gantt-embed .gz-cell-bg{ border-left:1px solid var(--gz-grid-line); grid-row:1; }
+  #gantt-embed .gz-cell-bg.today{ background:var(--gz-today-bg); }
+  #gantt-embed .gz-bar{ grid-row:1; border-radius:4px; margin:8px 0; height:17px; }
+  #gantt-embed .gz-bar.item{ background:var(--gz-item); color:var(--gz-item-ink); }
+  #gantt-embed .gz-bar.prep{ background:repeating-linear-gradient(45deg, var(--gz-milestone), var(--gz-milestone) 4px, transparent 4px, transparent 8px); border:1px solid var(--gz-milestone); }
+  #gantt-embed .gz-milestone-wrap{ grid-row:1; position:relative; height:0; }
+  #gantt-embed .gz-milestone{ position:absolute; top:50%; left:8px; transform:translate(-50%,-50%) rotate(45deg); width:9px; height:9px; background:var(--gz-milestone); border:2px solid var(--gz-surface); }
+
+  @media print {
+    th, .stat-card, .callout, tr.hl td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<div class="cover">
+  <div class="cover-eyebrow">Digiman+ · Timeline Delivery</div>
+  <h1>Timeline Delivery<br>Digital Service Sheet</h1>
+  <div class="subtitle">Service Package → Form Input Behavior → Form Submission &amp; Finish Execution → Finding/Order Integration → CBM Task → Approval Workflow → EHMS Integration</div>
+  <table class="cover-meta">
+    <tr><td>Tanggal</td><td>3 Agustus 2026</td></tr>
+    <tr><td>Produk</td><td>Digiman+</td></tr>
+    <tr><td>Mulai</td><td>25 Juni 2026 — selaras dengan sprint <code>S2 IAMS</code></td></tr>
+    <tr><td>Target Go-Live</td><td>15 Oktober 2026</td></tr>
+    <tr><td>Tim</td><td>BUMA ID Team (Jira board IAMS30)</td></tr>
+    <tr><td>Disiapkan oleh</td><td>Okky Rizki R — Bukit Technology</td></tr>
+  </table>
+  <span class="status-pill">IN PROGRESS — TARGET GO-LIVE 15 OKTOBER 2026</span>
+</div>
+
+<!-- ===================== 1. RINGKASAN ===================== -->
+<h1 class="sec">1. Ringkasan</h1>
+
+<div class="stat-cards">
+  <div class="stat-card"><div class="num">16</div><div class="label">Minggu Total</div></div>
+  <div class="stat-card"><div class="num">7</div><div class="label">Item Scope</div></div>
+  <div class="stat-card"><div class="num">35%</div><div class="label">Waktu Terlewati*</div></div>
+  <div class="stat-card"><div class="num">15 Okt</div><div class="label">Target Go-Live</div></div>
+</div>
+<p style="font-size:8.5pt;color:#999;">*per tanggal dokumen ini dibuat (3 Agustus 2026)</p>
+
+<table>
+  <tr><td style="width:22%;background:#f7f9fb;color:#667;"><b>Mulai</b></td><td>25 Juni 2026 — selaras dengan sprint <code>S2 IAMS</code></td></tr>
+  <tr><td style="background:#f7f9fb;color:#667;"><b>Target Go-Live</b></td><td>15 Oktober 2026</td></tr>
+  <tr><td style="background:#f7f9fb;color:#667;"><b>Tim</b></td><td>BUMA ID Team (Jira board <code>IAMS30</code>)</td></tr>
+  <tr><td style="background:#f7f9fb;color:#667;"><b>Status saat ini</b></td><td>Item 1 (Service Package) <b>sedang berjalan</b>; Item 2 (Form Input Behavior) <b>sudah dimulai</b> (overlap dengan Item 1) — keduanya berjalan per 3 Agustus 2026</td></tr>
+  <tr><td style="background:#f7f9fb;color:#667;"><b>Urutan scope</b></td><td>1) Service Package → 2) Form Input Behavior → 3) Form Submission &amp; Finish Execution — Item 1–3 overlap sebagian (bukan strict serial) → 4) Finding/Order Integration → 5) CBM Task → 6) Form &amp; Approval Workflow Integration (paralel dengan Item 5) → 7) EHMS Integration.</td></tr>
+</table>
+
+<div class="callout info">
+  <div class="callout-label">Catatan Penting</div>
+  Minggu 1–6 sudah berjalan (~35% dari total 16 minggu sudah lewat, per 3 Agustus 2026) — Item 1 &amp; 2 sedang berjalan paralel (overlap). Gantt di dokumen ini merefleksikan progres aktual, bukan mulai dari nol.
+</div>
+
+<h3>Master Timeline (16 Minggu)</h3>
+<table>
+  <tr><th style="width:12%;">Minggu</th><th style="width:18%;">Tanggal</th><th>Item</th></tr>
+  <tr class="hl"><td>1–6</td><td>25 Jun – 5 Agu</td><td>1. Service Package (Form × Scheduled Plan Integration) — <b>sedang berjalan</b></td></tr>
+  <tr class="hl"><td>4–7</td><td>16 Jul – 12 Agu</td><td>2. Form Input Behavior (Online/Offline) — <b>sedang berjalan</b>, overlap dengan Item 1</td></tr>
+  <tr><td>7–8</td><td>6–19 Agu</td><td>3. Form Submission &amp; Finish Execution (Online/Offline) — overlap dengan Item 2</td></tr>
+  <tr><td>9–10</td><td>20 Agu – 2 Sep</td><td>4. Finding/Order Integration</td></tr>
+  <tr><td>11–13</td><td>3–23 Sep</td><td>5. CBM Task</td></tr>
+  <tr><td>12–13</td><td>10–23 Sep</td><td>6. Form &amp; Approval Workflow Integration — paralel dengan akhir Item 5</td></tr>
+  <tr><td>14–15</td><td>24 Sep – 7 Okt</td><td>7. EHMS Integration</td></tr>
+  <tr><td><b>15–16</b></td><td>1–14 Okt</td><td><b>Release Preparation</b> — overlap dengan minggu terakhir Item 7</td></tr>
+  <tr><td>—</td><td><b>15 Okt</b></td><td>🚀 <b>Go-Live</b></td></tr>
+</table>
+
+<!-- ===================== GANTT (landscape) ===================== -->
+<div class="landscape-block">
+<h1 class="sec">2. Gantt Chart — Timeline Delivery</h1>
+<div class="callout info" style="margin-bottom:12px;">
+  <div class="callout-label">Versi interaktif tersedia</div>
+  Tabel di bawah ini untuk referensi cetak. Untuk versi <b>live/interaktif</b> (hover tooltip per item, dark mode) lihat: <a href="https://claude.ai/code/artifact/ae32f370-e42b-4ef5-a271-4bbd79ab24d9">claude.ai/code/artifact/ae32f370-e42b-4ef5-a271-4bbd79ab24d9</a>
+</div>
+<p style="font-size:9pt;color:#667;">Rentang minggu per item bersifat rough estimate (belum ada breakdown SP/mandays formal) — batas total 16 minggu sudah disepakati. Item 1–3 overlap sebagian (bukan strict serial), Item 5 &amp; 6 paralel, Release Preparation overlap dengan minggu terakhir Item 7.</p>
+
+<div id="gantt-embed">
+  <div class="gz-legend">
+    <span class="gz-swatch"><span class="gz-chip item"></span><b>Item Scope</b></span>
+    <span class="gz-swatch"><span class="gz-chip prep"></span><b>Release Prep</b></span>
+    <span class="gz-swatch"><span class="gz-diamond"></span><b>Go-Live</b></span>
+    <span class="gz-swatch"><span class="gz-chip today"></span><b>Minggu Berjalan</b> (3 Agu 2026)</span>
+  </div>
+  <div class="gz-gantt" id="gz-gantt-target"></div>
+</div>
+</div>
+
+<script>
+(function(){
+  var weekLabels = ["6/25","7/2","7/9","7/16","7/23","7/30","8/6","8/13","8/20","8/27","9/3","9/10","9/17","9/24","10/1","10/8","10/15"];
+  var TODAY_WEEK = 6;
+
+  var releases = [
+    {
+      title: "Digital Service Sheet — Release", range: "25 Jun – 15 Okt 2026 (16 minggu)", shipWeek: 17,
+      rows: [
+        { label: "1. Service Package (Form × Scheduled Plan Integration)", bars: [
+          {role:"item", from:1, to:6, text:""} ] },
+        { label: "2. Form Input Behavior (Online/Offline)", bars: [
+          {role:"item", from:4, to:7, text:""} ] },
+        { label: "3. Form Submission & Finish Execution (Online/Offline)", bars: [
+          {role:"item", from:7, to:8, text:""} ] },
+        { label: "4. Finding/Order Integration", bars: [
+          {role:"item", from:9, to:10, text:""} ] },
+        { label: "5. CBM Task", bars: [
+          {role:"item", from:11, to:13, text:""} ] },
+        { label: "6. Form & Approval Workflow Integration", bars: [
+          {role:"item", from:12, to:13, text:""} ] },
+        { label: "7. EHMS Integration", bars: [
+          {role:"item", from:14, to:15, text:""} ] },
+      ],
+      prepFrom: 15, prepTo: 16
+    }
+  ];
+
+  var WEEKS = 17;
+  var gantt = document.getElementById("gz-gantt-target");
+
+  function el(cls, html){
+    var e = document.createElement("div");
+    if(cls) e.className = cls;
+    if(html !== undefined) e.innerHTML = html;
+    return e;
+  }
+
+  var head = el("gz-row gz-head-row");
+  head.appendChild(el("gz-rowlabel", "Item"));
+  var headTrack = el("gz-track");
+  for(var w=1; w<=WEEKS; w++){
+    var isShip = releases.some(function(r){ return r.shipWeek === w; });
+    var isToday = (w === TODAY_WEEK);
+    var cls = "gz-wk" + (isShip ? " ship" : "") + (isToday ? " today" : "");
+    var wkCell = el(cls, weekLabels[w-1] + (isShip ? " 🚀" : ""));
+    wkCell.style.gridColumn = w + " / " + (w + 1);
+    headTrack.appendChild(wkCell);
+  }
+  head.appendChild(headTrack);
+  gantt.appendChild(head);
+
+  releases.forEach(function(rel){
+    var g = el("gz-group-row");
+    g.appendChild(el("gz-grouplabel", rel.title));
+    g.appendChild(el("gz-groupmeta", rel.range + " &nbsp;·&nbsp; Prep Mgg " + rel.prepFrom + "-" + rel.prepTo + " &nbsp;·&nbsp; Go-Live Mgg " + rel.shipWeek + " (15 Okt)"));
+    gantt.appendChild(g);
+
+    rel.rows.forEach(function(row){
+      var r = el("gz-row");
+      r.appendChild(el("gz-rowlabel", row.label));
+      var track = el("gz-track");
+      for(var w2=1; w2<=WEEKS; w2++){
+        var cellCls = "gz-cell-bg" + (w2 === TODAY_WEEK ? " today" : "");
+        var cellBg = el(cellCls);
+        cellBg.style.gridColumn = w2 + " / " + (w2 + 1);
+        track.appendChild(cellBg);
+      }
+      row.bars.forEach(function(b){
+        var bar = el("gz-bar " + b.role, b.text);
+        bar.style.gridColumn = b.from + " / " + (b.to + 1);
+        track.appendChild(bar);
+      });
+      r.appendChild(track);
+      gantt.appendChild(r);
+    });
+
+    var pr = el("gz-row");
+    pr.appendChild(el("gz-rowlabel", "Release Preparation"));
+    var ptrack = el("gz-track");
+    for(var w3=1; w3<=WEEKS; w3++){
+      var pCellCls = "gz-cell-bg" + (w3 === TODAY_WEEK ? " today" : "");
+      var pCellBg = el(pCellCls);
+      pCellBg.style.gridColumn = w3 + " / " + (w3 + 1);
+      ptrack.appendChild(pCellBg);
+    }
+    var pbar = el("gz-bar prep", "");
+    pbar.style.gridColumn = rel.prepFrom + " / " + (rel.prepTo + 1);
+    ptrack.appendChild(pbar);
+    var mwrap = el("gz-milestone-wrap");
+    mwrap.style.gridColumn = rel.shipWeek + " / " + (rel.shipWeek + 1);
+    mwrap.appendChild(el("gz-milestone"));
+    ptrack.appendChild(mwrap);
+    pr.appendChild(ptrack);
+    gantt.appendChild(pr);
+  });
+})();
+</script>
+<!-- ===================== /GANTT (landscape) ===================== -->
+
+<!-- ===================== 3. SCOPE PER ITEM ===================== -->
+<h1 class="sec">3. Scope per Item</h1>
+
+<h3>1. Service Package (Form × Scheduled Plan Integration)</h3>
+<p>Integrasi Form dan Scheduled Plan (Digiplan), khususnya untuk <b>Scheduled Service</b>. 6 minggu, mulai 25 Juni 2026. Detail desain sudah ada di dokumen internal <code>pm-shutdown-service-package.md</code> dan <code>PRD-PM-Shutdown-Phase1.html</code>.</p>
+
+<h3>2. Form Input Behavior (Online/Offline)</h3>
+<p>Behavior input form — mode <b>online dan offline</b>. 4 minggu, mulai 16 Juli 2026 — overlap dengan Item 1.</p>
+
+<h3>3. Form Submission &amp; Finish Execution (Online/Offline)</h3>
+<p>Behavior submission form — mode <b>online dan offline</b> — termasuk <b>Finish Execution</b>. 2 minggu, mulai 6 Agustus 2026 — overlap dengan Item 2.</p>
+
+<h3>4. Finding/Order Integration</h3>
+<p>Integrasi Finding Form ke proses pembuatan Order (Order creation). 2 minggu.</p>
+
+<h3>5. CBM Task</h3>
+<p>Task CBM (Condition Based Monitoring) — 3 tipe task: Manual Rating (A/B/C/X), Measurement (decimal), Physical Condition (Good/Damage/Missing). 3 minggu, paralel dengan Item 6.</p>
+
+<h3>6. Form &amp; Approval Workflow Integration</h3>
+<p>Integrasi alur approval untuk form yang sudah disubmit. 2 minggu, mulai minggu 10 September 2026 — selesai bersamaan dengan Item 5 (CBM Task).</p>
+
+<h3>7. EHMS Integration</h3>
+<p>Scope Digiman+ <b>terbatas pada expose API</b> data transaksi CBM Task (publish ke topic). Pemrosesan/consume di sisi EHMS (staging, dashboard, dsb) adalah tanggung jawab tim EHMS — di luar scope timeline ini. 2 minggu.</p>
+
+<div class="callout">
+  <div class="callout-label">Catatan</div>
+  Item 3, 4, dan 6 belum punya dokumen desain terpisah saat dokumen ini ditulis — dicatat sesuai definisi scope yang disepakati, detail teknis menyusul saat sesi diskusi masing-masing dimulai.
+</div>
+
+<!-- ===================== RISIKO ===================== -->
+<h1 class="sec">4. Risiko &amp; Catatan Terbuka</h1>
+<ol style="padding-left: 20px; font-size: 9.6pt;">
+  <li style="margin:8px 0;"><b>Tidak ada buffer/kontingensi murni di luar overlap yang sudah didesain.</b> Jadwal 16 minggu ini bergantung pada overlap Item 1–3 dan paralel Item 5 &amp; 6 untuk tetap muat di window — keterlambatan di item manapun berisiko langsung mendorong mundur go-live 15 Oktober, karena tidak ada slack murni yang disisihkan.</li>
+  <li style="margin:8px 0;"><b>Cakupan Release Preparation (Minggu 15–16) belum dikonfirmasi</b> — apakah termasuk UAT sign-off dari client atau hanya deployment plan/release notes/rollback plan. Prep juga kini overlap dengan minggu terakhir Item 7 (EHMS Integration).</li>
+  <li style="margin:8px 0;"><b>Durasi per item (6/4/2/2/3/2/2 minggu) belum didukung breakdown effort (SP/mandays) formal</b> — rough estimate berdasarkan kesepakatan pembagian minggu, bukan hasil sizing.</li>
+  <li style="margin:8px 0;"><b>Item 6 (Form &amp; Approval Workflow Integration) start-nya digeser ke 10 September</b> (bukan mulai bersamaan dengan Item 5 di 3 September) — konsekuensinya selesai bersamaan dengan Item 5 di 23 September, bukan lebih awal. Perlu dipastikan tidak ada dependency lain yang butuh Item 6 selesai lebih cepat.</li>
+  <li style="margin:8px 0;"><b>Item 1–3 kini overlap, bukan strict serial</b> — Item 2 mulai 16 Juli (masih 3 minggu sebelum Item 1 selesai), Item 3 mulai 6 Agustus (masih di minggu terakhir Item 2). Perlu dipastikan kapasitas tim cukup untuk mengerjakan item-item yang saling overlap ini secara bersamaan.</li>
+</ol>
+
+<div class="footer-note">
+  Dokumen ini turunan dari <i>service-sheet-release-timeline.md</i>. Rentang minggu per item bersifat rough estimate (belum ada breakdown SP/mandays) — Item 1–3 overlap sebagian, Item 5 &amp; 6 paralel, Release Preparation overlap dengan Item 7, dengan total 16 minggu dari 25 Juni s/d target go-live 15 Oktober 2026.
+</div>
+
+</body>
+</html>
