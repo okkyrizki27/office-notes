@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Timeline & Skenario Delivery — FINAL (Squad Diperkuat)</title>
+<style>
+  @page { size: A4 portrait; margin: 16mm; }
+  @page gantt-page { size: A4 landscape; margin: 12mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11.3pt; color: #1a1a1a; margin: 0; padding: 0 40px; line-height: 1.65; }
+
+  .landscape-block { page: gantt-page; break-before: page; break-after: page; }
+
+  .cover { padding: 90px 0 30px; page-break-after: always; }
+  .cover-eyebrow { font-size: 11pt; font-weight: 700; color: #2c5f8a; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+  .cover h1 { font-size: 27pt; font-weight: 800; margin: 0 0 12px; line-height: 1.3; color: #1f3a5f; }
+  .cover .subtitle { font-size: 13pt; color: #556; margin-bottom: 26px; }
+  .cover-meta { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  .cover-meta td { padding: 10px 13px; border: 1px solid #dde4ec; font-size: 10.2pt; line-height: 1.5; }
+  .cover-meta td:first-child { width: 30%; color: #667; background: #f7f9fb; }
+  .status-pill { display: inline-block; background: #eaf2fa; color: #1f3a5f; font-weight: 700; font-size: 9.4pt; letter-spacing: 0.4px; padding: 7px 16px; border-radius: 18px; border: 1px solid #cfe0f0; }
+
+  h1.sec { font-size: 18.5pt; color: #1f3a5f; border-bottom: 3px solid #1f3a5f; padding-bottom: 9px; margin: 0 0 17px; page-break-before: always; }
+  h1.sec:first-of-type { page-break-before: avoid; }
+  h2 { font-size: 13.5pt; color: #1f3a5f; margin: 21px 0 11px; }
+  h3 { font-size: 12pt; color: #2c5f8a; margin: 17px 0 9px; }
+
+  p { margin: 8px 0; }
+  b, strong { color: #111; }
+  code { background: #f0f2f5; color: #1a1a1a; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 9.6pt; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 9.6pt; margin: 11px 0 17px; line-height: 1.45; }
+  th { background: #1f3a5f; color: #fff; padding: 8px 9px; text-align: left; font-weight: 600; }
+  td { padding: 7px 9px; border-bottom: 1px solid #e0e0e0; vertical-align: top; }
+  tr:nth-child(even) td { background: #f4f7fa; }
+  tr.total td { background: #eaf6ee; font-weight: 700; border-top: 2px solid #1e8449; }
+
+  .stat-cards { display: flex; gap: 11px; margin: 17px 0; }
+  .stat-card { flex: 1; background: #f4f7fa; border-radius: 8px; padding: 15px 8px; text-align: center; }
+  .stat-card .num { font-size: 20pt; font-weight: 800; color: #1f3a5f; }
+  .stat-card.hemat .num { color: #1e8449; }
+  .stat-card .label { font-size: 8pt; color: #667; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 5px; }
+
+  .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; font-size: 9.6pt; }
+  .callout.warn { border-left-color: #d68910; background: #fdf3e3; }
+  .callout.decision { border-left-color: #1e8449; background: #eaf6ee; }
+  .callout.info { border-left-color: #6c3483; background: #f7f0fa; }
+  .callout-label { font-weight: 700; font-size: 8.6pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 5px; }
+  .callout.warn .callout-label { color: #b9770e; }
+  .callout.decision .callout-label { color: #1e8449; }
+  .callout.info .callout-label { color: #6c3483; }
+
+  .badge { display:inline-block; color:#fff; padding:4px 10px; border-radius:12px; font-size:8.3pt; font-weight:700; }
+  .badge-be { background:#1f3a5f; }
+  .badge-fe { background:#2c8fa6; }
+  .badge-qa { background:#c9950f; }
+  .badge-deda { background:#8e44ad; }
+
+  .footer-note { margin-top: 22px; font-size: 9.2pt; color: #999; border-top: 1px solid #ddd; padding-top: 11px; }
+
+  /* ===== Gantt (print, static) — same role palette as the interactive artifact ===== */
+  #gantt-embed{
+    --gz-be:#2a78d6; --gz-be-ink:#ffffff; --gz-fe:#eb6834; --gz-fe-ink:#2a1200;
+    --gz-qa:#1baf7a; --gz-qa-ink:#052018; --gz-dash:#c9860f;
+    --gz-milestone:#0ca30c;
+    --gz-border:#dde4ec; --gz-grid-line:#e6edf3; --gz-grid-line-strong:#c7d3de; --gz-muted:#5c6b7a; --gz-surface-2:#eaf1f7;
+    font-family:'Segoe UI',Arial,sans-serif;
+  }
+  #gantt-embed .gz-legend{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; background:#fff; border:1px solid var(--gz-border); border-radius:10px; padding:9px 14px; margin-bottom:11px; font-size:9pt; color:var(--gz-muted); }
+  #gantt-embed .gz-legend b{ color:#182430; font-weight:600; margin-right:2px; }
+  #gantt-embed .gz-swatch{ display:inline-flex; align-items:center; gap:6px; }
+  #gantt-embed .gz-chip{ width:13px; height:9px; border-radius:3px; display:inline-block; }
+  #gantt-embed .gz-chip.be{ background:var(--gz-be); } #gantt-embed .gz-chip.fe{ background:var(--gz-fe); }
+  #gantt-embed .gz-chip.qa{ background:var(--gz-qa); } #gantt-embed .gz-chip.qaearly{ background:var(--gz-qa); opacity:.5; }
+  #gantt-embed .gz-chip.dash{ background:#fff; border:1.5px dashed var(--gz-dash); }
+  #gantt-embed .gz-chip.prep{ background:repeating-linear-gradient(45deg, var(--gz-milestone), var(--gz-milestone) 3px, transparent 3px, transparent 6px); border:1px solid var(--gz-milestone); }
+  #gantt-embed .gz-diamond{ width:8px; height:8px; background:var(--gz-milestone); transform:rotate(45deg); display:inline-block; }
+
+  #gantt-embed .gz-gantt{ border:1px solid var(--gz-border); border-radius:10px; background:#fff; overflow:hidden; }
+  #gantt-embed .gz-head-row{ display:grid; grid-template-columns:150px repeat(12, 1fr); background:#fff; border-bottom:1px solid var(--gz-grid-line-strong); }
+  #gantt-embed .gz-wk{ font-family:Consolas,monospace; font-size:8pt; color:var(--gz-muted); text-align:center; padding:6px 1px; border-left:1px solid var(--gz-grid-line); }
+  #gantt-embed .gz-wk.ship{ color:var(--gz-milestone); font-weight:700; }
+  #gantt-embed .gz-rowlabel{ background:#fff; padding:5px 9px; font-size:8.6pt; font-weight:600; color:#182430; border-right:1px solid var(--gz-grid-line-strong); display:flex; align-items:center; }
+  #gantt-embed .gz-group-row{ display:grid; grid-template-columns:150px repeat(12, 1fr); background:var(--gz-surface-2); border-bottom:1px solid var(--gz-grid-line-strong); border-top:1px solid var(--gz-grid-line-strong); }
+  #gantt-embed .gz-grouplabel{ background:var(--gz-surface-2); padding:6px 9px; font-size:8.4pt; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:var(--gz-be); border-right:1px solid var(--gz-grid-line-strong); }
+  #gantt-embed .gz-groupmeta{ grid-column:2 / span 12; display:flex; align-items:center; padding:6px 9px; font-size:8.2pt; color:var(--gz-muted); }
+  #gantt-embed .gz-row{ display:grid; grid-template-columns:150px repeat(12, 1fr); border-bottom:1px solid var(--gz-grid-line); }
+  #gantt-embed .gz-row:last-child{ border-bottom:none; }
+  #gantt-embed .gz-track{ position:relative; grid-column:2 / span 12; display:grid; grid-template-columns:repeat(12,1fr); grid-template-rows:repeat(2,1fr); min-height:32px; }
+  #gantt-embed .gz-cell-bg{ grid-row:1/3; border-left:1px solid var(--gz-grid-line); }
+  #gantt-embed .gz-bar{ border-radius:4px; display:flex; align-items:center; padding:0 5px; font-size:7pt; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #gantt-embed .gz-bar.lane0{ grid-row:1; margin:3px 1px 1px; }
+  #gantt-embed .gz-bar.lane1{ grid-row:2; margin:1px 1px 3px; }
+  #gantt-embed .gz-bar.solo{ grid-row:1/3; margin:6px 1px; }
+  #gantt-embed .gz-bar.be{ background:var(--gz-be); color:var(--gz-be-ink); }
+  #gantt-embed .gz-bar.fe{ background:var(--gz-fe); color:var(--gz-fe-ink); }
+  #gantt-embed .gz-bar.qa{ background:var(--gz-qa); color:var(--gz-qa-ink); }
+  #gantt-embed .gz-bar.qa.early{ opacity:.5; }
+  #gantt-embed .gz-bar.dash{ background:transparent; border:1.2px dashed var(--gz-dash); color:var(--gz-dash); }
+  #gantt-embed .gz-steprow .gz-track{ grid-template-rows:1fr; min-height:26px; }
+  #gantt-embed .gz-bar.prep{ grid-row:1; margin:5px 1px; background:repeating-linear-gradient(45deg, var(--gz-milestone), var(--gz-milestone) 4px, transparent 4px, transparent 8px); border:1px solid var(--gz-milestone); color:#0a3d0a; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  #gantt-embed .gz-milestone-wrap{ grid-row:1; position:relative; height:0; }
+  #gantt-embed .gz-milestone{ position:absolute; top:50%; left:100%; transform:translate(-50%,-50%) rotate(45deg); width:9px; height:9px; background:var(--gz-milestone); border:2px solid #fff; }
+
+  @media print {
+    th, .stat-card, .callout, .badge, tr.total td, #gantt-embed .gz-bar, #gantt-embed .gz-chip, #gantt-embed .gz-milestone, #gantt-embed .gz-group-row { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<div class="cover">
+  <div class="cover-eyebrow">Digiman+ · Perencanaan Delivery</div>
+  <h1>Timeline &amp; Skenario Delivery — FINAL<br>Squad Diperkuat, 2 Rilis</h1>
+  <div class="subtitle">Man Power &amp; Man Hours + Area of Unit (gabungan) → Maintenance Activity Type</div>
+  <table class="cover-meta">
+    <tr><td>Tanggal</td><td>3 Agustus 2026</td></tr>
+    <tr><td>Produk</td><td>Digiman+</td></tr>
+    <tr><td>Cakupan</td><td>Man Power &amp; Man Hours, Area of Unit/Component/Sub Component (Rilis 1 — digabung), Maintenance Activity Type &amp; Integrasi Inspection→Order (Rilis 2)</td></tr>
+    <tr><td>Disiapkan oleh</td><td>Okky Rizki R — Bukit Technology</td></tr>
+    <tr><td>Dokumen turunan dari</td><td>squad-baru-release-timeline.md (Skenario A) — hasil diskusi bertahap skenario alternatif, keputusan final 3 Agustus 2026</td></tr>
+  </table>
+  <span class="status-pill">RENCANA DELIVERY FINAL — SQUAD DIPERKUAT (7 ORANG / 12 MINGGU)</span>
+</div>
+
+<!-- ===================== 1. RINGKASAN ===================== -->
+<h1 class="sec">1. Ringkasan Skenario</h1>
+
+<div class="stat-cards">
+  <div class="stat-card"><div class="num">12</div><div class="label">Minggu Total</div></div>
+  <div class="stat-card"><div class="num">2</div><div class="label">Rilis</div></div>
+  <div class="stat-card"><div class="num">7</div><div class="label">Orang Squad</div></div>
+  <div class="stat-card hemat"><div class="num">−7</div><div class="label">Minggu vs Skenario A (19 mgu)</div></div>
+</div>
+
+<table>
+  <tr><td style="width:20%;background:#f7f9fb;color:#667;"><b>Squad</b></td><td>7 orang — diperkuat dari 4: <b>3 Backend, 2 Frontend Fullstack (Web+Mobile, tugas dibagi bebas), 2 QA</b></td></tr>
+  <tr><td style="background:#f7f9fb;color:#667;"><b>Rilis</b></td><td>2 rilis (bukan 3): <b>Rilis 1</b> = Man Power, Duration &amp; Man Hours + Area of Unit, Component &amp; Sub Component (digabung). <b>Rilis 2</b> = Maintenance Activity Type &amp; Integrasi Inspection→Order (scope sama persis dengan Rilis 3 Skenario A)</td></tr>
+  <tr><td style="background:#f7f9fb;color:#667;"><b>Velocity</b></td><td>Sama seperti Skenario A: ramp-up 0.81 SP/hari/orang (Sprint 1–2, Minggu 1–4), full speed 0.85 SP/hari/orang (Sprint 3 dst, Minggu 5+)</td></tr>
+  <tr><td style="background:#f7f9fb;color:#667;"><b>Antar-rilis</b></td><td>Freeze code penuh — Rilis 2 tidak dimulai sebelum Rilis 1 ship (tidak ada BE yang nyicil kerjaan Rilis 2 selama Rilis 1 berjalan)</td></tr>
+  <tr><td style="background:#f7f9fb;color:#667;"><b>QA</b></td><td>Mulai bertahap (shift-left) — testing modul yang sudah code-complete duluan, bukan menunggu 100% dev rilis selesai</td></tr>
+  <tr><td style="background:#f7f9fb;color:#667;"><b>Release Preparation</b></td><td>1 minggu per rilis (2×1 minggu = 2 minggu total)</td></tr>
+</table>
+
+<h3>Kenapa 3 Backend — Bukan Cukup Nambah FE/QA Saja</h3>
+<p>Dari eksplorasi skenario headcount sebelumnya: menambah FE dan QA saja (tanpa nambah BE) tidak cukup untuk kompresi signifikan <b>selama freeze code diberlakukan</b> (tidak ada cicil antar rilis) — karena BE (2 orang) selalu jadi <i>critical path</i> di tiap rilis, FE/QA ekstra cuma menunggu BE selesai duluan. BE harus ikut ditambah supaya benar-benar berhenti jadi bottleneck di kedua rilis.</p>
+
+<h3>Kenapa ~12 Minggu — Perjalanan Angkanya</h3>
+<p>Estimasi awal skenario final (13 minggu) mengasumsikan QA baru mulai setelah <b>100% dev rilis selesai</b> ("big bang" testing). Realistisnya, task-task dalam satu rilis tidak semua selesai di hari yang sama — beberapa modul (Inspection, Order Approval, Master Data) code-complete lebih dulu daripada modul terbesar (Digiplan/SAP Sync). QA tidak perlu menunggu modul terakhir selesai untuk mulai testing modul yang sudah jadi — testing bertahap (shift-left) ini awalnya memangkas ~1 minggu di tiap rilis (13→11 minggu).</p>
+<div class="callout decision">
+  <div class="callout-label">Revisi 3 Agustus 2026</div>
+  1 minggu buffer dikembalikan <b>khusus ke Rilis 1</b> — QA end-to-end tetap mulai bertahap (shift-left, Minggu 2), tapi durasi kalendernya dilonggarkan lagi supaya Rilis 1 ship di Minggu 7, sama seperti tanggal ship Man Power standalone di Skenario A. Rilis 2 <b>tidak</b> diberi buffer tambahan — tetap shift-left penuh, cuma bergeser mengikuti mundurnya Rilis 1. Hasil akhir: <b>~12 minggu total</b> (13→11→12), tetap hemat 7 minggu dari Skenario A, dengan Rilis 1 punya margin keamanan lebih besar dibanding Rilis 2.
+</div>
+
+<h3>Metodologi Estimasi</h3>
+<p>SP &amp; mandays memakai metodologi yang sama dengan Skenario A — kalibrasi Fibonacci <code>[1,2,3,5,8]</code> per komponen kerja. Yang berbeda: skenario <b>squad diperkuat 7 orang</b> (bukan 4), <b>2 rilis</b> (bukan 3, Rilis 1 &amp; 2 Skenario A digabung), dan <b>QA shift-left</b> (mulai bertahap per modul, bukan big-bang di akhir).</p>
+
+<h3>Master Timeline (~12 Minggu)</h3>
+<table>
+  <tr><th style="width:14%;">Minggu</th><th style="width:30%;">Rilis</th><th>Fase</th></tr>
+  <tr><td>1–6</td><td>Rilis 1 (Man Power + Area)</td><td>Dev + QA (QA mulai bertahap dari Minggu 2, +1 minggu buffer)</td></tr>
+  <tr><td><b>7</b></td><td>Rilis 1</td><td><b>Release Preparation</b> → 🚀 Ship akhir Minggu 7</td></tr>
+  <tr><td>8–11</td><td>Rilis 2 (Maintenance Activity Type)</td><td>Dev + QA (QA mulai bertahap dari Minggu 9)</td></tr>
+  <tr><td><b>12</b></td><td>Rilis 2</td><td><b>Release Preparation</b> → 🚀 Ship akhir Minggu 12</td></tr>
+</table>
+<p style="font-size:9pt;color:#667;">Rilis 1 ship di <b>Minggu 7</b> — persis sama dengan tanggal ship Man Power <i>standalone</i> di Skenario A (yang cuma bawa 1 fitur dengan tim 4 orang). Trade-off "Man Power mundur" dari Skenario B/C tetap hilang (tidak mundur) meski sekarang tidak lebih cepat juga — 1 minggu buffer QA dikembalikan sebagai margin keamanan (keputusan 3 Agustus 2026). Rilis 2 tidak diberi buffer tambahan, hanya bergeser +1 minggu mengikuti mundurnya Rilis 1.</p>
+
+<!-- ===================== GANTT (landscape) ===================== -->
+<div class="landscape-block">
+<h1 class="sec">2. Gantt Chart — Timeline 2 Rilis</h1>
+<div class="callout info" style="margin-bottom:12px;">
+  <div class="callout-label">Versi interaktif tersedia</div>
+  Tabel statis di bawah ini untuk referensi cetak. Untuk versi <b>live/interaktif</b> (hover tooltip per task, dark mode, toggle tabel) lihat: <a href="https://claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204">claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204</a>
+</div>
+<p style="font-size:9pt;color:#667;">Bar QA digambar 2 lapis: <i>QA awal</i> (redup) untuk modul yang sudah code-complete duluan, <i>QA end-to-end</i> untuk testing yang butuh integrasi penuh siap dulu. Rilis 1 pakai +1 minggu buffer di fase end-to-end (ship Minggu 7); Rilis 2 tanpa buffer tambahan — lihat § "Kenapa ~12 Minggu" di Bagian 1.</p>
+
+<div id="gantt-embed">
+  <div class="gz-legend">
+    <span class="gz-swatch"><span class="gz-chip be"></span><b>BE</b> Backend (3)</span>
+    <span class="gz-swatch"><span class="gz-chip fe"></span><b>FE</b> Fullstack (2)</span>
+    <span class="gz-swatch"><span class="gz-chip qa"></span><b>QA</b> end-to-end</span>
+    <span class="gz-swatch"><span class="gz-chip qaearly"></span><b>QA</b> awal (modul selesai duluan)</span>
+    <span class="gz-swatch"><span class="gz-chip dash"></span><b>Dashboard</b> — paralel</span>
+    <span class="gz-swatch"><span class="gz-chip prep"></span><b>Prep</b> Release Preparation</span>
+    <span class="gz-swatch"><span class="gz-diamond"></span><b>Ship</b></span>
+  </div>
+  <div class="gz-gantt" id="gz-gantt-target"></div>
+</div>
+<p style="font-size:9pt;color:#999;margin-top:10px;">Dashboard (DE/DA) berjalan paralel di kapasitas resource terpisah — tidak memperebutkan kapasitas squad 7 orang.</p>
+</div>
+
+<script>
+(function(){
+  var WEEKS = 12;
+  var RELEASES = [
+    {
+      title: "Rilis 1 — Man Power, Man Hours + Area of Unit", range: "Minggu 1–7", shipWeek: 7, prep: 7,
+      rows: [
+        { label: "Inspection & Additional Order", bars: [
+          {role:"be", lane:"lane0", from:1, to:1, text:"4 SP"}, {role:"fe", lane:"lane1", from:1, to:2, text:"4 SP"} ] },
+        { label: "Order Approval & Workflow", bars: [
+          {role:"be", lane:"lane0", from:1, to:2, text:"5 SP"}, {role:"fe", lane:"lane1", from:1, to:2, text:"2 SP"} ] },
+        { label: "Master Data (Area)", bars: [
+          {role:"fe", lane:"lane1", from:1, to:2, text:"7 SP"}, {role:"be", lane:"lane0", from:1, to:1, text:"3 SP"} ] },
+        { label: "Digiplan", bars: [
+          {role:"be", lane:"lane0", from:1, to:3, text:"25 SP"}, {role:"fe", lane:"lane1", from:2, to:3, text:"6 SP"} ] },
+        { label: "Integrasi maintenance-order↔Digiplan", bars: [
+          {role:"be", lane:"solo", from:2, to:3, text:"PoolingMOItem + MO Backlog JOIN · 6 SP"} ] },
+        { label: "QA / Testing", bars: [
+          {role:"qa", lane:"lane0", cls:"early", from:2, to:2, text:"QA awal · 5 SP"},
+          {role:"qa", lane:"lane1", from:3, to:6, text:"QA end-to-end · 12 SP + buffer"} ] },
+        { label: "Dashboard (paralel)", bars: [ {role:"dash", lane:"solo", from:2, to:6, text:"D'Inspect/D'Order · Power BI · 13 SP"} ] },
+      ]
+    },
+    {
+      title: "Rilis 2 — Maintenance Activity Type", range: "Minggu 8–12", shipWeek: 12, prep: 12,
+      rows: [
+        { label: "Master Data", bars: [
+          {role:"be", lane:"lane0", from:8, to:8, text:"7 SP"}, {role:"fe", lane:"lane1", from:8, to:8, text:"4 SP"} ] },
+        { label: "Inspection & Additional Order", bars: [
+          {role:"be", lane:"lane0", from:8, to:9, text:"7 SP"}, {role:"fe", lane:"lane1", from:8, to:9, text:"4 SP"} ] },
+        { label: "SAP Sync", bars: [ {role:"be", lane:"solo", from:9, to:10, text:"MechanicOrderList + cleanup · 9 SP"} ] },
+        { label: "Order Approval & Workflow", bars: [
+          {role:"fe", lane:"lane1", from:9, to:9, text:"1 SP"}, {role:"be", lane:"lane0", from:10, to:10, text:"5 SP"} ] },
+        { label: "QA / Testing", bars: [
+          {role:"qa", lane:"lane0", cls:"early", from:9, to:9, text:"QA awal · 2 SP"},
+          {role:"qa", lane:"lane1", from:10, to:11, text:"QA end-to-end · 6 SP"} ] },
+        { label: "Dashboard (paralel)", bars: [ {role:"dash", lane:"solo", from:8, to:11, text:"D'Order Maint. Act. Type · Power BI · 3 SP"} ] },
+      ]
+    }
+  ];
+
+  var gantt = document.getElementById("gz-gantt-target");
+
+  function el(cls, html){
+    var e = document.createElement("div");
+    if(cls) e.className = cls;
+    if(html !== undefined) e.innerHTML = html;
+    return e;
+  }
+
+  var head = el("gz-head-row");
+  head.appendChild(el("gz-rowlabel", "Kategori"));
+  for(var w=1; w<=WEEKS; w++){
+    var isShip = RELEASES.some(function(r){ return r.shipWeek === w; });
+    head.appendChild(el("gz-wk" + (isShip ? " ship" : ""), "W" + w + (isShip ? " ▸" : "")));
+  }
+  gantt.appendChild(head);
+
+  RELEASES.forEach(function(rel){
+    var g = el("gz-group-row");
+    g.appendChild(el("gz-grouplabel", rel.title));
+    g.appendChild(el("gz-groupmeta", rel.range + " &nbsp;·&nbsp; Prep Mgg " + rel.prep + " &nbsp;·&nbsp; Ship akhir Mgg " + rel.shipWeek));
+    gantt.appendChild(g);
+
+    rel.rows.forEach(function(row){
+      var r = el("gz-row");
+      r.appendChild(el("gz-rowlabel", row.label));
+      var track = el("gz-track");
+      for(var w2=1; w2<=WEEKS; w2++) track.appendChild(el("gz-cell-bg"));
+      row.bars.forEach(function(b){
+        var bar = el("gz-bar " + b.role + " " + b.lane + (b.cls ? " " + b.cls : ""), b.text);
+        bar.style.gridColumn = b.from + " / " + (b.to + 1);
+        track.appendChild(bar);
+      });
+      r.appendChild(track);
+      gantt.appendChild(r);
+    });
+
+    var pr = el("gz-row gz-steprow");
+    pr.appendChild(el("gz-rowlabel", "Release Preparation"));
+    var ptrack = el("gz-track");
+    for(var w3=1; w3<=WEEKS; w3++) ptrack.appendChild(el("gz-cell-bg"));
+    var pbar = el("gz-bar prep", "Prep");
+    pbar.style.gridColumn = rel.prep + " / " + (rel.prep + 1);
+    ptrack.appendChild(pbar);
+    var mwrap = el("gz-milestone-wrap");
+    mwrap.style.gridColumn = rel.shipWeek + " / " + (rel.shipWeek + 1);
+    mwrap.appendChild(el("gz-milestone"));
+    ptrack.appendChild(mwrap);
+    pr.appendChild(ptrack);
+    gantt.appendChild(pr);
+  });
+})();
+</script>
+<!-- ===================== /GANTT (landscape) ===================== -->
+
+<!-- ===================== RILIS 1 ===================== -->
+<h1 class="sec">3. Rilis 1 — Man Power, Man Hours + Area of Unit (Minggu 1–7)</h1>
+<table>
+  <tr><th style="width:20%;">Kategori</th><th style="width:38%;">Task</th><th style="width:8%;">Role</th><th style="width:6%;">SP</th><th>Mandays</th></tr>
+  <tr><td>Inspection &amp; Additional Order</td><td>Field Man Power (Inspection/Add. Inspection, Additional Order) — Duration di kedua layar sudah ada, bukan scope baru</td><td><span class="badge badge-be">BE</span></td><td>2</td><td>2.5</td></tr>
+  <tr><td>Inspection &amp; Additional Order</td><td>Field Man Power UI</td><td><span class="badge badge-fe">FE</span></td><td>4</td><td>4.9</td></tr>
+  <tr><td>Inspection &amp; Additional Order</td><td>BE derive + snapshot <code>AreaCode</code>/<code>AreaName</code></td><td><span class="badge badge-be">BE</span></td><td>2</td><td>2.3</td></tr>
+  <tr><td>Order Approval &amp; Workflow</td><td>Edit eMOL carry-forward Man Power/Duration</td><td><span class="badge badge-be">BE</span></td><td>4</td><td>4.9</td></tr>
+  <tr><td>Order Approval &amp; Workflow</td><td>Edit eMOL carry-forward Component/SubComponent</td><td><span class="badge badge-be">BE</span></td><td>1</td><td>1.2</td></tr>
+  <tr><td>Order Approval &amp; Workflow</td><td>Edit Man Power/Duration UI di Order Approval</td><td><span class="badge badge-fe">FE</span></td><td>2</td><td>2.5</td></tr>
+  <tr><td>Master Data</td><td>Master data <code>Area</code> CRUD + Equipment Mapping modal (<code>AreaCode</code>)</td><td><span class="badge badge-fe">FE</span></td><td>7</td><td>8.2</td></tr>
+  <tr><td>Master Data</td><td>Data migration backfill <code>AreaCode</code> + permission code</td><td><span class="badge badge-be">BE</span></td><td>3</td><td>3.5</td></tr>
+  <tr><td>Digiplan</td><td>Grid recalculate, Excel export/import, rollup, assessment formula (termasuk logic PM Shutdown/BD Corrective)</td><td><span class="badge badge-be">BE</span></td><td>17</td><td>21.0</td></tr>
+  <tr><td>Digiplan</td><td>Guardrail Template Config UI, grid Man Hours read-only</td><td><span class="badge badge-fe">FE</span></td><td>3</td><td>3.7</td></tr>
+  <tr><td>Digiplan</td><td>Grid UI: 3 dropdown cascading Area→Component→SubComponent</td><td><span class="badge badge-fe">FE</span></td><td>3</td><td>3.5</td></tr>
+  <tr><td>Digiplan</td><td><code>DPColumn</code> 3 kolom baru, Excel export/import+validasi</td><td><span class="badge badge-be">BE</span></td><td>8</td><td>9.4</td></tr>
+  <tr><td>Integrasi <code>maintenance-order</code>↔Digiplan</td><td><code>PoolingMOItem</code>: kolom Duration, Man Power</td><td><span class="badge badge-be">BE</span></td><td>2</td><td>2.3</td></tr>
+  <tr><td>Integrasi <code>maintenance-order</code>↔Digiplan</td><td><code>PoolingMOItem</code>: kolom Area</td><td><span class="badge badge-be">BE</span></td><td>1</td><td>1.2</td></tr>
+  <tr><td>Integrasi <code>maintenance-order</code>↔Digiplan</td><td>MO Backlog JOIN by <code>MO Number</code> — Duration, Man Power</td><td><span class="badge badge-be">BE</span></td><td>2</td><td>2.3</td></tr>
+  <tr><td>Integrasi <code>maintenance-order</code>↔Digiplan</td><td>MO Backlog JOIN by <code>MO Number</code> — Area</td><td><span class="badge badge-be">BE</span></td><td>1</td><td>1.2</td></tr>
+  <tr><td>QA / Testing</td><td>Testing end-to-end + Digiplan + PM/BD (Man Power)</td><td><span class="badge badge-qa">QA</span></td><td>11</td><td>12.9</td></tr>
+  <tr><td>QA / Testing</td><td>Testing end-to-end + Digiplan (Area)</td><td><span class="badge badge-qa">QA</span></td><td>6</td><td>7.0</td></tr>
+  <tr><td>Dashboard</td><td>Digiman Transaction Dashboard (Man Power+Area) + Power BI</td><td><span class="badge badge-deda">DE/DA</span></td><td>13.0</td><td>15.2</td></tr>
+  <tr class="total"><td colspan="3">Total BE: 43 SP / 51.8 mandays · FE: 19 SP / 22.8 mandays · QA: 17 SP / 19.9 mandays · DE/DA (paralel): 13 SP / 15.2 mandays</td><td colspan="2"></td></tr>
+</table>
+
+<div class="callout">
+  <div class="callout-label">QA Shift-Left</div>
+  QA (2 orang) mulai bertahap: Minggu 2 — functional testing modul yang sudah code-complete duluan (Inspection, Order Approval, Master Data) ~5 SP. Minggu 3–6 — testing end-to-end yang butuh Digiplan+Integrasi siap dulu (selesai Minggu 3) ~12 SP sisanya, <b>+1 minggu buffer</b> ditambahkan di sini sebagai margin keamanan (keputusan 3 Agustus 2026).
+</div>
+<div class="callout warn">
+  <div class="callout-label">Dependency</div>
+  Master Data Area (Equipment Mapping enhance) tetap harus selesai lebih dulu sebelum kolom Area di Digiplan bisa dikembangkan penuh — sequencing internal Rilis 1, bukan lagi soal urutan rilis.
+</div>
+<div class="callout decision">
+  <div class="callout-label">Benefit ke Customer</div>
+  SPV bisa estimasi kebutuhan tenaga kerja (Man Power) sejak Order dibuat, Man Hours terhitung otomatis di Digiplan. Planner/SPV bisa mencatat &amp; memfilter pekerjaan berdasarkan lokasi kerja (Area, Component, Sub Component) — konsisten di semua jalur order, kedua fitur ship bersamaan.
+</div>
+
+<!-- ===================== RILIS 2 ===================== -->
+<h1 class="sec">4. Rilis 2 — Maintenance Activity Type &amp; Integrasi Inspection→Order (Minggu 8–12)</h1>
+<table>
+  <tr><th style="width:20%;">Kategori</th><th style="width:38%;">Task</th><th style="width:8%;">Role</th><th style="width:6%;">SP</th><th>Mandays</th></tr>
+  <tr><td>Master Data</td><td><code>MaintenanceActivityType</code> schema/API + mapping M:N + permission + seeder</td><td><span class="badge badge-be">BE</span></td><td>7</td><td>8.2</td></tr>
+  <tr><td>Master Data</td><td>Master Data CRUD UI + Mapping UI</td><td><span class="badge badge-fe">FE</span></td><td>4</td><td>4.7</td></tr>
+  <tr><td>Inspection &amp; Additional Order</td><td>Extend submit Inspection (snapshot) + resolusi InspectorName</td><td><span class="badge badge-be">BE</span></td><td>7</td><td>8.2</td></tr>
+  <tr><td>Inspection &amp; Additional Order</td><td>Additional Order Screen 1&amp;2, Order Details — dropdown Activity Type</td><td><span class="badge badge-fe">FE</span></td><td>4</td><td>4.7</td></tr>
+  <tr><td>Order Approval &amp; Workflow</td><td>Order Approval — dropdown Activity Type</td><td><span class="badge badge-fe">FE</span></td><td>1</td><td>1.2</td></tr>
+  <tr><td>Order Approval &amp; Workflow</td><td>Standardisasi <code>ReferenceTransactionId</code> + dual-lookup 3 endpoint</td><td><span class="badge badge-be">BE</span></td><td>5</td><td>5.9</td></tr>
+  <tr><td>SAP Sync</td><td><code>MechanicOrderList</code> kolom baru + extend <code>PoolingMOItem</code></td><td><span class="badge badge-be">BE</span></td><td>3</td><td>3.5</td></tr>
+  <tr><td>SAP Sync</td><td>4 endpoint cleanup (order-detail/assetnumber/approve/deprecate)</td><td><span class="badge badge-be">BE</span></td><td>6</td><td>7.0</td></tr>
+  <tr><td>QA / Testing</td><td>Testing end-to-end (create → approve → SAP sync + regresi)</td><td><span class="badge badge-qa">QA</span></td><td>8</td><td>9.4</td></tr>
+  <tr><td>Dashboard</td><td>Digiman Transaction Dashboard (Maint. Act. Type) + Power BI</td><td><span class="badge badge-deda">DE/DA</span></td><td>3</td><td>3.5</td></tr>
+  <tr class="total"><td colspan="3">Total BE: 28 SP / 32.8 mandays · FE: 9 SP / 10.5 mandays · QA: 8 SP / 9.4 mandays · DE/DA (paralel): 3 SP / 3.5 mandays</td><td colspan="2"></td></tr>
+</table>
+
+<div class="callout">
+  <div class="callout-label">QA Shift-Left</div>
+  Minggu 9 — testing modul awal (Master Data, Inspection &amp; Additional Order) ~2 SP. Minggu 10–11 — testing end-to-end create→approve→SAP sync, butuh SAP Sync+Order Approval siap dulu (selesai Minggu 10) ~6 SP sisanya. <b>Tanpa buffer tambahan</b> (beda dengan Rilis 1).
+</div>
+<div class="callout decision">
+  <div class="callout-label">Benefit ke Customer</div>
+  Kegagalan create MO ke SAP akibat kombinasi Order Type+Activity Type yang salah-derive <b>berhenti</b> — Activity Type sekarang bisa dikonfigurasi fleksibel per Order Type oleh client sendiri.
+</div>
+
+<!-- ===================== RISIKO ===================== -->
+<h1 class="sec">5. Risiko &amp; Catatan Terbuka</h1>
+<ol style="padding-left: 20px; font-size: 9.6pt;">
+  <li style="margin:8px 0;"><b>Headcount naik 75% (4→7 orang)</b> — keputusan komersial, biaya squad naik signifikan dari baseline 4 orang. Perlu persetujuan budget terpisah dari komitmen awal (8 sprint, tim 4 orang).</li>
+  <li style="margin:8px 0;"><b>Velocity ramp-up (0.81→0.85 SP/hari/orang) belum tervalidasi untuk kohort 7 orang baru sekaligus.</b> Angka ini dikalibrasi untuk skenario 4 orang menerima Knowledge Transfer dari tim BUMA ID veteran. Menaikkan jadi 7 orang berarti bandwidth KT tim veteran juga perlu di-scale — risiko ini diketahui dan sengaja dikesampingkan dalam pemodelan ini (keputusan 3 Agustus 2026), bukan tervalidasi tidak berdampak.</li>
+  <li style="margin:8px 0;"><b>Hiring lead time</b> untuk net tambahan +1 BE, +1 FE, +1 QA (di luar 4 orang existing) di luar estimasi 12 minggu ini — waktu rekrutmen/interview/notice period akan mengulur tanggal mulai Sprint 1.</li>
+  <li style="margin:8px 0;"><b>Risiko koordinasi/merge-conflict lebih tinggi</b> di 4 titik shared-screen Rilis 1 (eMOL carry-forward, <code>PoolingMOItem</code>, Digiplan grid/export, MO Backlog JOIN) karena sekarang dikerjakan 3 BE, bukan 2 — perlu pembagian task/branch yang jelas.</li>
+  <li style="margin:8px 0;"><b>Dependency yang tetap berlaku</b>: Master Data Area (Equipment Mapping enhance) tetap harus selesai lebih dulu sebelum kolom Area di Digiplan bisa dikembangkan penuh.</li>
+  <li style="margin:8px 0;">Item lain yang masih berlaku dari Skenario A: mekanisme deteksi <code>ReferenceTransactionId</code> di Rilis 2 belum bisa diestimasi penuh; mapping BAPI ke SAP tetap di luar seluruh estimasi ini (dikoordinasikan client, PIC Faiza).</li>
+  <li style="margin:8px 0;"><b>Jadwal Rilis 2 tetap lebih ketat dari Rilis 1.</b> Buffer 1 minggu (3 Agustus 2026) cuma ditambahkan ke Rilis 1. Rilis 2 masih pakai estimasi shift-left tanpa margin ekstra (dev-QA 4 minggu penuh); kalau shift-left QA di Rilis 2 sulit dieksekusi rapi (misal environment testing belum siap sebelum dev selesai penuh), realistanya jadwal Rilis 2 bisa mundur ~1 minggu lagi (total ~13 minggu).</li>
+  <li style="margin:8px 0;"><b>Risiko retest</b> kalau BE menyentuh ulang kode shared-screen (eMOL carry-forward, <code>PoolingMOItem</code>) <b>setelah</b> QA sudah mulai testing modul terkait duluan (Minggu 2 di Rilis 1, Minggu 9 di Rilis 2) — retest tambahan akibat perubahan itu belum terhitung eksplisit di estimasi ini.</li>
+</ol>
+
+<div class="footer-note">
+  Dokumen ini skenario final hasil diskusi bertahap dari <i>squad-baru-release-timeline.md</i> (Skenario A — 4 orang, 3 rilis sequential, 19 minggu). Dua skenario antara (gabung Rilis 1+2 dengan squad tetap, dan eksplorasi opsi headcount) sempat dibuat sebagai dokumen terpisah selama diskusi dan sudah digantikan oleh keputusan final ini. Gantt chart interaktif: claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204.
+</div>
+
+</body>
+</html>
