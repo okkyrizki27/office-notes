@@ -1,6 +1,6 @@
 # Form Submission — Data Structure & Flow
 
-*Last updated: 2026-06-23*
+*Last updated: 2026-08-04*
 
 ---
 
@@ -306,22 +306,28 @@ WHERE c.formSubmissionId = '4b604512-b409-4a19-ba79-9ac5ab68e16c'
       )
 ```
 
+> 🚩 **Cabang `PHOTOLIST` di query di atas (baca dari `e.valueCaption`) sudah diketahui salah — lihat koreksi tepat di bawah tabel ini.** `value`, bukan `valueCaption`, yang berisi GUID foto real. Query di atas belum diupdate ke bentuk yang benar (bentuk JSON pasti `value` masih perlu diverifikasi ke contoh data mentah).
+
 Perbedaan penting dari query tab spesifik:
 
 | Aspek | Tab Spesifik | Tab General |
 |---|---|---|
 | `taskCode` / `lastUpdatedByUserCode` | Hanya ada di sub-elemen tertentu dalam `INLINE` | Ada langsung di tiap elemen |
 | `taskValue` | Selalu di `valueCaption` | `valueCaption` kadang kosong (mis. `ACTUALSERVICESTART`, `TEXTFIELD` Current SMU) — fallback ke `value` |
-| Foto | `TAKEPHOTO.value` = JSON-encoded string, flat array of GUID (`["guid1","guid2"]`) | `CAMERACAPTURE.value` = GUID string langsung; `PHOTOLIST` = array of object `{label, value}` — keduanya tetap di `photoGuid` |
+| Foto | `TAKEPHOTO.value` = JSON-encoded string, flat array of GUID (`["guid1","guid2"]`) | `CAMERACAPTURE.value` = GUID string langsung; `PHOTOLIST` — 🚩 GUID real ada di `value` (bisa lebih dari satu), **bukan** `valueCaption` (lihat koreksi di bawah) |
 | Filter `isShow` | Elemen jawaban selalu punya `isShow` | `CUSTOMCONTENT` dan `PHOTOLIST` tidak punya key `isShow` sama sekali — filter default akan drop keduanya, makanya ada `OR e.elementCode = 'PHOTOLIST'` |
 
-**Konfirmasi — `PHOTOLIST` field mapping-nya kebalik dari elemen lain:** label per slot foto ada di `caption` (bukan `label`), dan isi/path foto ada di `valueCaption` (bukan `value`). Field `value` (`"[[0], [0], [0], [0], [0]]"`) cuma placeholder index, bukan data foto yang sebenarnya — jangan dipakai. Bentuknya **nested array** — satu array per slot foto, cocok dengan jumlah label di `caption`:
+> **⚠️ Koreksi (2026-08-04) — temuan di bawah ini salah, dikonfirmasi ulang oleh user.** Paragraf ini sebelumnya menyimpulkan `valueCaption` berisi path foto yang sebenarnya dan `value` cuma placeholder — ternyata **ini adalah gejala bug** ([IAMS30-4485](https://bukittechnology.atlassian.net/browse/IAMS30-4485)), bukan desain yang benar. Penulisan sebelumnya kebetulan memeriksa submission yang sudah kena bug ini, jadi disimpulkan seolah itu perilaku normal. Yang benar (dikonfirmasi 2026-08-04): **`value` berisi GUID foto yang sebenarnya (bisa lebih dari satu), reliable di data production saat ini** — konsisten dengan pola `TAKEPHOTO`/`CAMERACAPTURE` (value = GUID asli). `valueCaption` berisi **local device path** akibat bug tersebut — path device tidak portable/valid kalau form dibuka di device lain, jadi field ini **tidak boleh dipakai maupun tidak perlu disimpan**. Lihat penjelasan lengkap & dampaknya ke API eksternal di [Open Item #4](form-iir-external-api-design.md#4-aksesibilitas-photosurl-oleh-sistem-eksternal-belum-ada-mekanisme) / Open Item terkait `PHOTOLIST` di [`form-iir-external-api-design.md`](form-iir-external-api-design.md).
+>
+> **Query & bentuk JSON pasti di bawah ini (`e.valueCaption`, nested array `[["path1.jpg"], ...]`) juga ikut perlu dikoreksi** — tapi bentuk JSON `value` yang benar (nested per-slot seperti `valueCaption` lama, atau flat array seperti `TAKEPHOTO`) **belum diverifikasi ke contoh data mentah real**. Jangan pakai query di bawah ini apa adanya sampai dikonfirmasi ulang.
+
+~~Konfirmasi — `PHOTOLIST` field mapping-nya kebalik dari elemen lain: label per slot foto ada di `caption` (bukan `label`), dan isi/path foto ada di `valueCaption` (bukan `value`). Field `value` (`"[[0], [0], [0], [0], [0]]"`) cuma placeholder index, bukan data foto yang sebenarnya — jangan dipakai. Bentuknya **nested array** — satu array per slot foto, cocok dengan jumlah label di `caption`:~~
 
 ```
 "valueCaption": "[[\"path1.jpg\"], [\"path2.jpg\"], ...]"
 ```
 
-`photoGuid` untuk `PHOTOLIST` berupa array of object `{label, value}` — label dari `caption`, value (path foto) dari `valueCaption`, dipasangkan per index slot foto dalam satu object supaya tidak perlu zip manual di aplikasi.
+~~`photoGuid` untuk `PHOTOLIST` berupa array of object `{label, value}` — label dari `caption`, value (path foto) dari `valueCaption`, dipasangkan per index slot foto dalam satu object supaya tidak perlu zip manual di aplikasi.~~
 
 **Kenapa index-nya di-hardcode 0–4 (bukan loop/subquery):** Cosmos DB SQL API tidak mendukung iterasi dinamis untuk memasangkan `caption[i]` dengan `valueCaption[i][0]` — sudah dicoba dua cara (`FROM p IN StringToArray(...)` dan `JOIN idx IN [0,1,2,3,4]`), keduanya error **SC1001**, karena `JOIN`/`FROM ... IN ...` di Cosmos DB SQL API hanya menerima property path yang sudah ada di dokumen (mis. `c.sections`, `d.elements`) sebagai sumber array — bukan hasil function call maupun array literal. Karena itu query di atas hardcode 5 index (0–4) sesuai jumlah slot foto pada contoh form IIR (`FORM394`) ini.
 

@@ -34,7 +34,7 @@
                 { "label": "Section", "value": "OB HAULER", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:46:05.000000Z", "photos": [] },
                 { "label": "Kode Unit", "value": "HDCT73112", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:46:10.000000Z", "photos": [] },
                 { "label": "Current SMU", "value": "57780", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:46:15.000000Z", "photos": [] },
-                { "label": "Photo Machine SMU", "value": "122362d1-5230-4d2a-9883-cdb57eb97820", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:46:20.000000Z", "photos": [ { "url": "<resolved dari TaskPersonalized.MachineSMUAddress via ReferenceId=122362d1-5230-4d2a-9883-cdb57eb97820>" } ] }
+                { "label": "Photo Machine SMU", "value": null, "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:46:20.000000Z", "photos": [ { "url": "https://<host>/api/v1/iir-form-submissions/photos/122362d1-5230-4d2a-9883-cdb57eb97820" } ] }
               ]
             },
             {
@@ -42,11 +42,11 @@
               "answers": [
                 { "label": "Unit Serial Number", "value": "KDP30204", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:46:30.000000Z", "photos": [] },
                 { "label": "Foto Kondisi Fisik Equipment", "value": null, "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:46:40.000000Z", "photos": [
-                    { "label": "Foto Tampak Depan", "url": "<resolved blob URL, NOT device path>" },
-                    { "label": "Foto Tampak Samping Kanan", "url": "<resolved blob URL>" },
-                    { "label": "Foto Tampak Samping Kiri", "url": "<resolved blob URL>" },
-                    { "label": "Foto Tampak Belakang", "url": "<resolved blob URL>" },
-                    { "label": "Foto Serial Number", "url": "<resolved blob URL>" }
+                    { "label": "Foto Tampak Depan", "url": "https://<host>/api/v1/iir-form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000001" },
+                    { "label": "Foto Tampak Samping Kanan", "url": "https://<host>/api/v1/iir-form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000002" },
+                    { "label": "Foto Tampak Samping Kiri", "url": "https://<host>/api/v1/iir-form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000003" },
+                    { "label": "Foto Tampak Belakang", "url": "https://<host>/api/v1/iir-form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000004" },
+                    { "label": "Foto Serial Number", "url": "https://<host>/api/v1/iir-form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000005" }
                   ] }
               ]
             }
@@ -63,7 +63,7 @@
                 { "number": 3, "taskCode": "Task1174", "label": "Fuel Tank / Cap / Breather", "value": "Ok", "remark": "", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:47:12.401449Z", "photos": [] },
                 { "number": 4, "taskCode": "Task1100", "label": "Battery Box / Cover", "value": "Not Ok", "remark": "", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:47:14.210168Z", "photos": [] },
                 { "number": 5, "taskCode": "Task1215", "label": "Main Frame / Car Body", "value": "Not Ok", "remark": "ada kerusakan kali ya", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:55:10.257398Z", "photos": [] },
-                { "number": 6, "taskCode": "Task1014", "label": "Cat Walk", "value": "Ok", "remark": "Ada beberapa", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:54:48.367543Z", "photos": [ { "url": "<resolved blob URL for 1ccac17f-...>" }, { "url": "<resolved blob URL for 8ffc591c-...>" } ] },
+                { "number": 6, "taskCode": "Task1014", "label": "Cat Walk", "value": "Ok", "remark": "Ada beberapa", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:54:48.367543Z", "photos": [ { "url": "https://<host>/api/v1/iir-form-submissions/photos/1ccac17f-f8aa-49fe-9c53-5cc4c30ae77d" }, { "url": "https://<host>/api/v1/iir-form-submissions/photos/8ffc591c-8a6d-46e4-bfdb-d7a4d5590a47" } ] },
                 { "number": 7, "taskCode": "Task1033", "label": "Hand Grips & Rails", "value": "Ok", "remark": "", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:54:53.599349Z", "photos": [] },
                 { "number": 8, "taskCode": "Task1072", "label": "Steps / Ladders", "value": "Ok", "remark": "", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:55:16.971141Z", "photos": [] },
                 { "number": 9, "taskCode": "Task1154", "label": "Engine Hood / Doors / Covers", "value": "Ok", "remark": "", "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com", "lastUpdatedAt": "2026-07-07T11:55:19.739419Z", "photos": [] },

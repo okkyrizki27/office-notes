@@ -1,6 +1,6 @@
 # Form IIR — External API Integration Design
 
-*Last updated: 2026-07-13*
+*Last updated: 2026-08-04*
 
 *Status: Draft — proposal, belum diimplementasi*
 
@@ -45,6 +45,67 @@ Kebijakan versioning yang direkomendasikan:
 - Apakah infrastruktur routing/gateway saat ini sudah mendukung path-based versioning dengan mudah (mis. API Management/reverse proxy), atau ada kendala teknis yang bikin opsi lain (header/query-param) lebih murah diimplementasikan
 - Realistis atau tidak komitmen masa deprecation 3–6 bulan dari sisi effort maintain 2 versi berjalan bersamaan
 
+## Endpoint — Photo Download
+
+**✅ Dikonfirmasi (2026-08-04)** — proxy endpoint terpisah untuk serve konten foto, bukan expose blob path langsung maupun SAS token. *(Menggantikan Open Item #4 lama — lihat riwayat diskusi di situ.)*
+
+```
+GET /api/v1/iir-form-submissions/photos/{photoGuid}
+Authorization: Bearer <access_token>
+```
+
+Auth pakai token yang sama dengan endpoint data (lihat [Autentikasi & Otorisasi](#autentikasi--otorisasi)) — tidak ada mekanisme auth kedua terpisah.
+
+### Kenapa Proxy, Bukan SAS Token
+
+Blob penyimpanan foto **tidak bisa diakses langsung dari luar Digiman+** (dikonfirmasi user, 2026-08-04) — akses hanya lewat sistem Digiman+ sendiri (web/mobile), konsisten dengan pola gambar guideline yang di-host di Azure Blob Storage privat ([`form-builder.md`](form-builder.md#karakteristik)). Dua opsi dipertimbangkan:
+
+- **SAS token per-URL** — **ditolak**. Masalahnya soal timing: endpoint data didesain untuk polling async (Keputusan #1, bukan real-time), jadi sistem eksternal belum tentu langsung fetch foto begitu dapat response metadata (bisa jadi backfill/catch-up belakangan). SAS TTL pendek berisiko expired sebelum sempat dipakai; TTL panjang memperbesar window kebocoran kalau URL ter-log/screenshot di sisi eksternal.
+- **Proxy endpoint (dipilih)** — reuse Bearer token yang sama dengan endpoint data (satu mekanisme auth, satu titik revoke), blob tetap fully private (tidak ada perubahan access policy Azure sama sekali), dan tidak terikat masalah timing SAS.
+
+### Response — Binary, Bukan Base64
+
+```
+200 OK
+Content-Type: image/jpeg   (sesuai tipe file asli)
+Content-Length: <ukuran file>
+Cache-Control: private, max-age=31536000, immutable
+
+<raw bytes>
+```
+
+Base64 sengaja tidak dipakai — base64 cuma masuk akal kalau foto harus nempel langsung di JSON response list/detail (menaikkan ukuran payload ~33%, bertentangan dengan alasan pagination endpoint list yang sudah ada di Keputusan #2). Karena ini endpoint terpisah, binary + `Content-Type` yang benar lebih efisien: bisa di-cache, mendukung `Range` request, dan langsung bisa dibuka/didownload tanpa decode di sisi eksternal.
+
+Backend **stream** dari Blob Storage ke response (bukan buffer seluruh file ke memory) — penting untuk foto berukuran besar supaya tidak membebani memory service per-request.
+
+`Cache-Control: private, max-age=31536000, immutable` (1 tahun) — foto evidence bersifat **immutable** (satu `photoGuid` = satu foto yang tidak pernah berubah isinya begitu dibuat), jadi aman TTL panjang tanpa perlu revalidasi (`ETag`). `private` karena response butuh auth — cache berlaku buat sistem eksternal itu sendiri, bukan shared cache/CDN publik.
+
+### Resolusi `photoGuid`
+
+Logic sama dengan yang sudah didokumentasikan di [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto) — backend coba resolve ke `TaskPersonalizedEvidence.ReferenceId` dulu, fallback ke `TaskPersonalized.ReferenceId`/`Task.ReferenceId` (Keputusan #5/#13, tergantung status rollout PM Shutdown Service Package Phase 1). Filter `IsActive = 1` tetap berlaku (Keputusan #14). Bedanya dari desain lama: hasil resolusi (`ContentAddress`) dipakai backend untuk fetch & stream isi file, **bukan** dikirim sebagai string ke response JSON endpoint data.
+
+### Error
+
+```json
+404 Not Found
+{ "error": { "code": "PHOTO_NOT_FOUND", "message": "...", "details": null } }
+```
+
+Tambahan baris di [Format Error Response](#format-error-response) — dipakai kalau `photoGuid` tidak match apapun di `TaskPersonalizedEvidence`/`TaskPersonalized`/`Task`. Beda dari fallback `url: null` di endpoint data (yang tetap `200`) — di endpoint proxy ini, foto yang benar-benar tidak ada memang harus `404` karena tidak ada isi untuk di-stream.
+
+### Rate Limit — Terpisah dari Endpoint Data
+
+**1.400 req/menit, 120.000 req/hari** (sliding window, algoritma sama dengan [Rate Limiting](#rate-limiting) endpoint data) — sengaja dibuat terpisah dari limit endpoint data (30/menit, 2.500/hari) karena karakteristik beban jauh beda: fetch foto adalah operasi ringan (resolve 1 `ReferenceId` + stream, bukan JOIN 4 tabel + aggregation), dan foto punya efek multiplier tinggi per submission — 1 request data bisa butuh puluhan-ratusan request foto susulan.
+
+**Perhitungan (worst-case-literal, dikonfirmasi user 2026-08-04):**
+- Tab spesifik "Inspection" form `FORM394` punya **113 form task** (`BANKTASK`, dikonfirmasi dari [`IIR-Grader.json`](examples/IIR-Grader.json) — 113 elemen `BANKTASK` berpasangan 1:1 dengan 113 elemen `TAKEPHOTO`, tersebar di 15 section: General Appearance, Safety Items, Cabin, Engine Condition, Electrical System, Transmission, Steering, Brakes, Rear Axle, Hydraulics/Grease, Tyres, Attachment, dll).
+- Asumsi worst-case: semua task punya evidence, evidence maksimal 3 foto → 113 × 3 = **339 foto**.
+- Ditambah 5 foto section `PHOTOLIST` (General tab) + 1 foto Machine SMU (`CAMERACAPTURE`) → **total 345 foto/submission**.
+- Basis per-menit: pageSize *default* (20, representasi pemakaian wajar — bukan max 100 yang jarang terjadi) × 345 = 6.900 foto/halaman, target waktu hydrate ~5 menit → 1.380/menit → dibulatkan **1.400/menit**.
+- Basis per-hari: rasio yang sama dengan endpoint data (2.500 ÷ 30 ≈ 83x) diterapkan ke angka per-menit baru, supaya konsisten dengan filosofi "durasi wajar pemakaian sustained per hari" yang sudah dipakai → 1.400 × 83 ≈ 116.200 → dibulatkan **120.000/hari**.
+
+**🚩 Catatan penting:** ini worst-case literal (asumsi semua 113 checklist item + section foto General + SMU selalu terisi penuh 3 foto) — kemungkinan besar volume real jauh lebih rendah (biasanya cuma item defect yang di-foto, item "OK" sering dilewat tanpa evidence). Limit ini fungsinya sebagai guard rail (konsisten dengan filosofi limit endpoint data di Keputusan #9), bukan target throughput yang harus selalu dikejar. **Perlu direvisit setelah ada data volume real pasca-launch.**
+
 ## Sumber Data — SQL + Cosmos
 
 `formSubmissionId`, `formCode`, `formVersion` (`version`) **sudah ada langsung di dokumen Cosmos** `FormSubmissionStructure` — ketiganya sudah di-select di query yang ada di [form-submission.md](form-submission.md) (`c.formSubmissionId`, `c.formCode`, `c.version`), tidak perlu round-trip tambahan ke SQL.
@@ -58,11 +119,13 @@ Satu-satunya field yang **genuinely butuh SQL** adalah `formName` — Cosmos tid
 | `submittedAt` | SQL — `[dbo].[TaskPersonalized].ModifiedAt` (join `Task.Id → TaskPersonalized.TaskId`) | Waktu final submit di device — informational, **bukan** field filter (lihat `syncAt`) |
 | `syncAt` | SQL — `[dbo].[TaskPersonalized].LastSyncedModifiedAt` | Waktu record sync ke server — **ini field filter date-range**, karena Digiman+ offline-first (lihat Keputusan Desain #1) |
 | `tabs[].sections[].answers[]` (isi jawaban form) | Cosmos — `FormSubmissionStructure` | Hasil query di [form-submission.md](form-submission.md) |
-| `photos[].url` | SQL — `[dbo].[TaskPersonalizedEvidence].ContentAddress` (join `ReferenceId = photoGuid`), **kecuali** "Photo Machine SMU" via `[dbo].[TaskPersonalized].MachineSMUAddress` (join `ReferenceId = photoGuid`) | Lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto) di bawah |
+| `photos[].url` | Diisi URL ke [Endpoint — Photo Download](#endpoint--photo-download) (`.../photos/{photoGuid}`), **bukan** `ContentAddress` mentah. Resolusi `ContentAddress`/`MachineSMUAddress` tetap terjadi lewat query di bawah, tapi hasilnya dipakai backend untuk stream isi file di endpoint proxy — tidak pernah dikirim sebagai string ke response JSON | Lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto) di bawah dan [Endpoint — Photo Download](#endpoint--photo-download) |
 
 ### Resolusi Blob URL untuk Foto
 
-`photoGuid` yang didapat dari Cosmos (baik dari `TAKEPHOTO`, `CAMERACAPTURE`, maupun `PHOTOLIST` setelah fix) **bukan URL langsung** — cuma GUID. Untuk resolve jadi blob URL, join ke SQL `[dbo].[TaskPersonalizedEvidence]` berdasarkan `ReferenceId = photoGuid`:
+> ✅ **Resolved (2026-08-04)** — sebelumnya section ini flag risiko `ContentAddress` tidak bisa diakses langsung oleh sistem eksternal (dulu Open Item #4). Sudah diputuskan: nilai `ContentAddress`/`MachineSMUAddress` hasil query di bawah **tidak pernah dikirim langsung ke sistem eksternal** — dipakai backend secara internal untuk resolve & stream isi file lewat [Endpoint — Photo Download](#endpoint--photo-download) yang baru. Sistem eksternal cuma menerima URL ke endpoint proxy itu (berisi `photoGuid`), bukan path Blob Storage mentah.
+
+`photoGuid` yang didapat dari Cosmos (dari `TAKEPHOTO`, `CAMERACAPTURE`, maupun `PHOTOLIST` — ketiganya dari field `value`, lihat koreksi di [Open Item #1](#1--resolved--photolistvaluecaption-berisi-device-file-path-adalah-bug-di-field-yang-tidak-dipakai-api-ini-bukan-blocker)) **bukan URL langsung** — cuma GUID. Untuk resolve jadi blob URL, join ke SQL `[dbo].[TaskPersonalizedEvidence]` berdasarkan `ReferenceId = photoGuid`:
 
 ```sql
 SELECT 
@@ -75,7 +138,7 @@ WHERE tpe.ReferenceId IN (@photoGuid1, @photoGuid2, ...)
 
 Batch semua `photoGuid` yang terkumpul dari satu halaman hasil Cosmos jadi satu query `IN (...)` — bukan N+1 per foto.
 
-**✅ `PHOTOLIST.valueCaption` sedang diperbaiki tim** — akan berisi GUID (konsisten dengan elemen foto lainnya), bukan device file path. Lihat pembaruan di open item #1 di bawah.
+**✅ Dikoreksi (2026-08-04) — `PHOTOLIST.value` (bukan `valueCaption`) sudah reliable berisi GUID sekarang**, konsisten dengan elemen foto lainnya. `valueCaption` yang berisi device file path adalah bug terpisah ([IAMS30-4485](https://bukittechnology.atlassian.net/browse/IAMS30-4485)) yang tidak relevan untuk resolusi foto di desain ini. Lihat detail di [Open Item #1](#1--resolved--photolistvaluecaption-berisi-device-file-path-adalah-bug-di-field-yang-tidak-dipakai-api-ini-bukan-blocker) di bawah.
 
 **✅ Revisi — "Photo Machine SMU" TERNYATA sama polanya dengan foto lain, cuma beda tabel target.** Sebelumnya didokumentasikan seolah field ini butuh query metadata terpisah (`MAX(tp.MachineSMUAddress)` via `TaskId` join). **Ini salah** — dikonfirmasi dari data Cosmos nyata: `value` elemen `CAMERACAPTURE` berlabel "Photo Machine SMU" (tab General, section "Asset Information") berisi GUID biasa (contoh: `122362d1-5230-4d2a-9883-cdb57eb97820`), **persis seperti `photoGuid` elemen foto lainnya** — bedanya cuma GUID ini nunjuk ke `[dbo].[TaskPersonalized].ReferenceId`, bukan `[dbo].[TaskPersonalizedEvidence].ReferenceId`:
 
@@ -179,12 +242,12 @@ Kalau ternyata `IsActive` tidak reliable/tidak konsisten dijaga di seluruh alur,
 
 ### Fallback Kalau Resolusi Foto Gagal
 
-**✅ Disetujui — kalau `photoGuid` tidak match apapun** di `TaskPersonalizedEvidence`/`TaskPersonalized`/`Task` (mis. karena bug `PHOTOLIST` yang masih in-progress, data korup, atau race condition), entry foto **tetap muncul di `photos[]`, tapi `url: null`** — bukan di-drop diam-diam dari array.
+**✅ Disetujui — kalau `photoGuid` tidak match apapun** di `TaskPersonalizedEvidence`/`TaskPersonalized`/`Task` (mis. karena data korup, race condition, atau data lama dari sebelum [IAMS30-4485](https://bukittechnology.atlassian.net/browse/IAMS30-4485) — kasusnya soal `valueCaption`, bukan `value` yang dipakai resolusi — tapi tetap perlu fallback untuk kasus lain), entry foto **tetap muncul di `photos[]`, tapi `url: null`** — bukan di-drop diam-diam dari array.
 
 Alasan:
 - **Drop diam-diam menyembunyikan masalah** — caller tidak akan tahu ada foto yang seharusnya ada tapi hilang, jumlah `photos[]` jadi tidak match ekspektasi tanpa penjelasan
 - **`url: null` konsisten dengan pola "jujur representasikan ketiadaan"** yang sudah dipakai di tempat lain di desain ini (mis. `title: null` untuk section tanpa judul)
-- Memudahkan **observability** — endpoint bisa log/monitor berapa persen resolusi foto yang gagal per periode, sinyal awal kalau ada masalah data yang lebih luas (mis. bug `PHOTOLIST` yang belum kelar)
+- Memudahkan **observability** — endpoint bisa log/monitor berapa persen resolusi foto yang gagal per periode, sinyal awal kalau ada masalah data yang lebih luas
 
 ## Kenapa Perlu Skema Ter-normalisasi (Bukan Expose Hasil Query Mentah)
 
@@ -193,7 +256,7 @@ Hasil query Cosmos untuk tab **General** dan tab **Inspection/spesifik** punya s
 | Field hasil query | Tab General | Tab Spesifik |
 |---|---|---|
 | `taskCode` | GUID (element instance ID) — **tidak di-include di API, lihat Keputusan Desain #7** | Business code (mis. `Task1252`) — di-include di API |
-| `photoGuid` | `null`, atau array of `{label, value}` (untuk `PHOTOLIST`), atau array 1 GUID (untuk `CAMERACAPTURE`) | Array of GUID string, atau `[]` |
+| `photoGuid` | 🚩 belum diverifikasi ulang — sebelumnya ditulis `null`/array of `{label, value}` (untuk `PHOTOLIST`, sumbernya diklaim `valueCaption`) atau array 1 GUID (untuk `CAMERACAPTURE`), tapi bentuk untuk `PHOTOLIST` perlu dikonfirmasi lagi karena sumbernya sekarang `value`, bukan `valueCaption` (lihat [Open Item #1](#1--resolved--photolistvaluecaption-berisi-device-file-path-adalah-bug-di-field-yang-tidak-dipakai-api-ini-bukan-blocker)) | Array of GUID string, atau `[]` |
 | `number` | Selalu `""` | Nomor urut task |
 
 Kalau hasil query ini di-expose apa adanya ke sistem eksternal, konsumen API harus tahu detail internal Cosmos (dua struktur tab yang berbeda, bentuk `photoGuid` yang tidak konsisten) — rawan salah paham dan breaking change kalau struktur internal berubah. API contract sebaiknya **satu bentuk yang konsisten**, terlepas dari bagaimana data disimpan secara internal.
@@ -240,11 +303,11 @@ Contoh lengkap: [form-iir-external-api-response.json](examples/form-iir-external
 | SQL `TaskPersonalized.ModifiedAt` | `submittedAt` | Diganti dari sumber Cosmos ke SQL — lihat [Sumber Data](#sumber-data--sql--cosmos) |
 | SQL `TaskPersonalized.LastSyncedModifiedAt` | `syncAt` | **Field baru** — perlu verifikasi kolom ini benar ada di live schema (lihat catatan ⚠ di atas) |
 | `taskDesc` | `label` | Disamakan namanya lintas tab |
-| `taskValue` | `value` | Disamakan namanya lintas tab. **Untuk elemen foto single-photo** (`CAMERACAPTURE`/`TAKEPHOTO`, mis. "Photo Machine SMU"), `value` diisi raw GUID yang sama dengan yang dipakai untuk resolve `photos[].url` (bukan `null`) — supaya konsumen API bisa correlate balik ke `ReferenceId` sumbernya kalau perlu. **Untuk multi-photo** (`PHOTOLIST`, mis. "Foto Kondisi Fisik Equipment"), `value` tetap `null` karena ada N GUID (satu per foto), tidak bisa direduksi ke satu scalar — masing-masing GUID cuma tersimpan implisit di balik `photos[].url` |
+| `taskValue` | `value` | Disamakan namanya lintas tab. **Untuk elemen yang isinya murni foto** (`CAMERACAPTURE` mis. "Photo Machine SMU", dan `PHOTOLIST` mis. "Foto Kondisi Fisik Equipment"), `value` selalu **`null`** — terlepas dari jumlah foto (lihat Keputusan Desain #12). GUID tetap bisa didapat dari `photos[].url`. **`TAKEPHOTO` yang nempel di row checklist** (tab spesifik) tidak kena aturan ini — `value`-nya tetap jawaban `DROPDOWN` (mis. "Ok"), foto cuma lampiran tambahan |
 | `taskCode` (tab spesifik saja) | `taskCode` | **Cuma di-include untuk jawaban tab spesifik** — lihat Keputusan Desain #7. Untuk tab General, field ini `null`/tidak ada di response |
 | `lastUpdatedByUserCode` | `lastUpdatedBy` | Email user yang terakhir mengubah jawaban (bukan display name `lastUpdatedBy` di raw). PII — disetujui di-share, lihat Keputusan Desain #6 |
 | `lastUpdatedDate` | `lastUpdatedAt` | Timestamp (ISO-8601 UTC) terakhir jawaban diubah. Diambil per-answer; kalau satu `taskCode` punya beberapa timestamp (mis. remark/foto di-update belakangan), pakai yang **paling akhir** (max) sebagai "kapan jawaban ini terakhir berubah" |
-| `photoGuid` (bentuk tidak konsisten — lihat tabel di atas) | `photos: [{label, url}]` | **Selalu array**, `url` di-resolve dari SQL `TaskPersonalizedEvidence.ContentAddress` (join `ReferenceId = photoGuid` — lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto)) — konsumen API tidak perlu tahu/branch berdasarkan elementCode asal (`TAKEPHOTO`/`CAMERACAPTURE`/`PHOTOLIST`) |
+| `photoGuid` (bentuk tidak konsisten — lihat tabel di atas) | `photos: [{label, url}]` | **Selalu array**, `url` diisi link ke [Endpoint — Photo Download](#endpoint--photo-download) (`.../photos/{photoGuid}`) — bukan `ContentAddress` mentah (lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto)) — konsumen API tidak perlu tahu/branch berdasarkan elementCode asal (`TAKEPHOTO`/`CAMERACAPTURE`/`PHOTOLIST`), cukup `GET` URL tersebut dengan Bearer token yang sama |
 | `sectionTitle: ""` | `title: null` | `null` lebih jujur merepresentasikan "tidak ada judul" dibanding string kosong |
 | `number` | `number` (nullable, hanya ada di tab spesifik) | Tidak dipaksakan ada di semua row |
 
@@ -263,7 +326,7 @@ Contoh lengkap: [form-iir-external-api-response.json](examples/form-iir-external
 | 9 | Rate limit **per Client ID**, **disetujui** 30 req/menit + 2.500 req/hari (sliding window) | Endpoint didesain untuk polling berkala (bukan real-time), limit ini jadi guard rail terhadap bug/retry-loop, bukan pembatas kebutuhan wajar. Lihat [Rate Limiting](#rate-limiting) |
 | 10 | Error response pakai envelope `{ error: { code, message, details } }` dengan `code` machine-readable, bukan cuma andalkan HTTP status | Konsumen API butuh cara program-friendly untuk branch per jenis error (mis. `DATE_RANGE_TOO_LARGE` vs `RATE_LIMITED`) tanpa parsing `message` yang human-readable. Lihat [Format Error Response](#format-error-response) |
 | 11 | Filter tambahan **`siteCode`** dan **`equipmentNumber`** (opsional, combinable dengan date range) ditambahkan; kedua field ini juga di-include di response payload | Diminta eksplisit. Karena tanpa filter ini response bisa berisi campuran banyak site/equipment, kedua field juga ditambahkan ke response supaya caller bisa correlate hasil tanpa query balik — lihat [Filter Tambahan](#filter-tambahan--site--equipment-number) |
-| 12 | `value` untuk answer **single-photo** (`CAMERACAPTURE`/`TAKEPHOTO`, mis. "Photo Machine SMU") diisi raw GUID (sama dengan `ReferenceId` yang dipakai untuk resolve `photos[].url`), **bukan** `null`. Untuk **multi-photo** (`PHOTOLIST`), `value` tetap `null` | Diminta eksplisit. Raw GUID di `value` memberi konsumen API cara audit/correlate balik ke sumber foto tanpa parsing `photos[].url`. Untuk `PHOTOLIST` tidak diterapkan karena ada N GUID (satu per foto) — tidak bisa direduksi ke satu field scalar `value` |
+| 12 | **✅ Direvisi (2026-08-04)** — `value` untuk elemen yang **isinya murni foto** (`CAMERACAPTURE` mis. "Photo Machine SMU", dan `PHOTOLIST` mis. "Foto Kondisi Fisik Equipment") selalu **`null`**, terlepas dari jumlah foto (1 atau banyak). `TAKEPHOTO` yang nempel di row checklist (tab spesifik, mis. "Cat Walk") **tidak terpengaruh aturan ini** — `value`-nya tetap jawaban `DROPDOWN` (mis. "Ok"), karena foto di situ cuma lampiran tambahan, bukan keseluruhan jawaban | ~~Versi sebelumnya bikin `value` = GUID untuk 1 foto, `null` untuk >1 foto — inkonsisten, dibedakan cuma berdasarkan *jumlah* foto padahal semantiknya sama (foto = keseluruhan jawaban, tidak ada nilai lain).~~ Disederhanakan: GUID tetap bisa didapat dari `photos[].url` (nempel di path terakhir), jadi tidak ada informasi yang hilang dengan selalu `null`. `TAKEPHOTO`-dalam-row per desain bisa **maksimal 3 foto** — dipakai juga sebagai basis perhitungan rate limit di [Endpoint — Photo Download](#endpoint--photo-download) |
 | 13 | Identifikasi elemen "Photo Machine SMU" (untuk percabangan resolusi foto ke `TaskPersonalized`/`Task`, bukan `TaskPersonalizedEvidence`) pakai **`elementCode = 'CAMERACAPTURE'`**, bukan `taskCode` atau `label` | Dikonfirmasi: di [General Tab Template](form-builder.md#mekanisme-general-tab-template) (varian `maintenance` maupun `businessoperational`), `CAMERACAPTURE` cuma dipakai untuk satu elemen — "Photo Machine SMU" — elemen foto lain di template ini pakai `PHOTOLIST`. Elemen foto di tab Inspection/spesifik pakai `TAKEPHOTO`, bukan `CAMERACAPTURE`. Jadi `elementCode` saja sudah cukup unik untuk identifikasi, tidak perlu matching `taskCode` (yang belum tentu stabil lintas form) atau `label` (rawan typo/translasi) |
 | 14 | Semua query (resolusi foto & metadata) ditambahkan filter **`IsActive = 1`** di tiap tabel yang dijoin (`FormSubmission`, `Task`, `WorkOrder`, `TaskPersonalized`, `TaskPersonalizedEvidence`) | Diminta eksplisit — supaya record yang sudah di-soft-delete tidak ikut ter-expose ke sistem eksternal. **🚩 Reliabilitas mekanisme `IsActive` di live data belum diverifikasi** — lihat [Filter IsActive](#filter-isactive) dan open item baru |
 | 15 | **✅ Disetujui** — kalau resolusi `photoGuid` gagal (tidak match apapun), entry tetap muncul di `photos[]` dengan **`url: null`** — bukan di-drop dari array | Drop diam-diam menyembunyikan masalah dari caller. `url: null` konsisten dengan pola "jujur representasikan ketiadaan" (lihat `title: null`), dan memudahkan observability (bisa monitor rate kegagalan resolusi foto). Lihat [Fallback Kalau Resolusi Foto Gagal](#fallback-kalau-resolusi-foto-gagal) |
@@ -271,14 +334,26 @@ Contoh lengkap: [form-iir-external-api-response.json](examples/form-iir-external
 | 17 | **Dua endpoint terpisah** — `GET /api/v1/iir-form-submissions` (list/polling) dan `GET /api/v1/iir-form-submissions/{formSubmissionId}` (single-fetch by ID) | Diminta eksplisit — dua endpoint ini beda peruntukan (polling berkala vs re-fetch/lookup granular), tidak digabung jadi satu. Lihat [HTTP Method & Endpoint](#http-method--endpoint) |
 | 18 | Versioning API pakai **URL path** (`/api/v1/...`) | Paling eksplisit untuk konsumen B2B eksternal, gampang didokumentasikan/dites tanpa header khusus. **🚩 Masih rekomendasi, perlu di-assess developer** sebelum dikunci — lihat [API Versioning](#api-versioning) |
 | 19 | **Tidak ada pembatasan otorisasi granular per site** — 1 Client ID valid otomatis akses semua site | Diminta eksplisit. Filter `siteCode`/`equipmentNumber` di request murni narrowing hasil pencarian, bukan enforcement keamanan. Lihat [Scope Otorisasi](#scope-otorisasi) |
+| 20 | **Proxy endpoint** dipilih untuk serve foto (`GET /api/v1/iir-form-submissions/photos/{photoGuid}`), **bukan** SAS token per-URL maupun expose `ContentAddress` mentah | Blob Storage tidak bisa diakses langsung dari luar Digiman+ (dikonfirmasi user). SAS token ditolak karena masalah timing TTL — endpoint ini didesain untuk polling async, sistem eksternal belum tentu langsung fetch foto begitu dapat response metadata. Proxy reuse auth Bearer token yang sama (satu mekanisme, satu titik revoke), blob tetap fully private. Lihat [Endpoint — Photo Download](#endpoint--photo-download) |
+| 21 | Response endpoint foto pakai **binary langsung + `Content-Type`**, **bukan base64** | Base64 nge-bloat payload ~33%, cuma masuk akal kalau foto harus nempel di JSON list/detail (bertentangan dengan alasan pagination di Keputusan #2). Endpoint terpisah membuat binary lebih efisien: cache-able, mendukung `Range` request, langsung bisa dibuka tanpa decode. Lihat [Endpoint — Photo Download](#endpoint--photo-download) |
+| 22 | `Cache-Control: private, max-age=31536000, immutable` (1 tahun) untuk response foto | Foto evidence bersifat immutable per `photoGuid` — tidak perlu revalidasi (`ETag`) sama sekali. `private` karena response butuh auth, bukan buat shared cache/CDN publik |
+| 23 | Rate limit endpoint foto **terpisah** dari endpoint data: **1.400 req/menit, 120.000 req/hari** | Karakteristik beban beda jauh (fetch foto ringan vs query data yang JOIN+aggregate), dan foto punya multiplier tinggi per submission. Dihitung dari worst-case 345 foto/submission (113 form task × 3 foto + 5 foto General tab + 1 SMU) — **🚩 masih worst-case-literal, perlu direvisit ke data volume real pasca-launch.** Lihat [Endpoint — Photo Download](#endpoint--photo-download) |
+| 24 | Naming endpoint: `GET /api/v1/iir-form-submissions/photos/{photoGuid}` — **tidak** nested di bawah `{formSubmissionId}` | Tetap di namespace `iir-form-submissions` untuk konsistensi/discoverability dengan 2 endpoint lain. `photoGuid` sudah cukup unik untuk resolve sendiri, tidak butuh `formSubmissionId` sebagai konteks — apalagi otorisasi juga tidak granular per-resource (Keputusan #19) |
 
 ## Open Items — Perlu Diselesaikan Sebelum Implementasi
 
-### 1. `PHOTOLIST.valueCaption` berisi device file path, bukan blob URL — 🔧 sedang diperbaiki tim
+### 1. ✅ Resolved — `PHOTOLIST.valueCaption` berisi device file path adalah bug di field yang tidak dipakai API ini, **bukan blocker**
 
-**Status: In progress, bukan lagi open blocker murni.** Pada contoh submission yang diperiksa (`FORM394`, section tanpa judul di tab General), `PHOTOLIST.valueCaption` berisi path lokal device (`/var/mobile/Containers/Data/Application/.../CAP_....jpg`), bukan GUID seperti elemen foto lain. **Dikonfirmasi ini adalah bug yang sedang diperbaiki tim** — setelah fix, `PHOTOLIST.valueCaption` akan berisi GUID, konsisten dengan `TAKEPHOTO`/`CAMERACAPTURE`, dan bisa di-resolve ke blob URL lewat mekanisme yang sama (lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto)).
+**Ticket: [IAMS30-4485](https://bukittechnology.atlassian.net/browse/IAMS30-4485)**
 
-**Masih perlu ditindaklanjuti:** pastikan endpoint ini tidak diimplementasikan/di-rollout sebelum fix tersebut selesai — kalau tidak, `photos[].url` untuk `PHOTOLIST` akan berupa GUID yang tidak match apapun di `TaskPersonalizedEvidence` (bukan device path lagi, tapi data lama yang sudah terlanjur tersimpan dengan bug ini mungkin tetap butuh penanganan/backfill terpisah).
+**Koreksi (2026-08-04):** Analisa sebelumnya di section ini salah arah. Yang terjadi sebenarnya:
+- `PHOTOLIST.value` **sudah reliable berisi GUID foto asli sekarang** (dikonfirmasi user, bisa lebih dari satu GUID) — konsisten dengan pola `TAKEPHOTO`/`CAMERACAPTURE` (`value` = GUID asli, bukan `valueCaption`).
+- Bug IAMS30-4485 itu murni soal `valueCaption` yang kebocoran path lokal device (`/var/mobile/Containers/Data/Application/.../CAP_....jpg`) — path ini tidak portable/valid kalau form dibuka di device lain, dan **field ini tidak pernah dipakai untuk resolusi foto**.
+- **Analisa lama di [`form-submission.md`](form-submission.md#query--tab-general-flat-elements) yang menyimpulkan "isi foto ada di `valueCaption`" ternyata salah** — kemungkinan disusun dari submission yang kebetulan sudah kena bug ini, sehingga gejala bug disangka desain. Sudah dikoreksi di dokumen tersebut.
+
+**Implikasi ke endpoint ini:** endpoint IIR external API **tidak perlu menunggu fix IAMS30-4485** — resolusi `photoGuid` untuk `PHOTOLIST` harus baca dari `value` (bukan `valueCaption`), sama seperti `TAKEPHOTO`/`CAMERACAPTURE`. Bug tersebut tidak relevan/tidak menyentuh field yang dipakai desain ini.
+
+**Masih perlu ditindaklanjuti:** query di [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto)/[form-submission.md](form-submission.md#query--tab-general-flat-elements) yang mengambil dari `e.valueCaption` untuk `PHOTOLIST` perlu direvisi ke `e['value']` — tapi bentuk JSON pasti `value` (nested per-slot atau flat array) **belum diverifikasi ke contoh data mentah real**, jadi query pengganti belum ditulis final di dokumen manapun.
 
 ### 2. 🚩 Reliabilitas mekanisme `IsActive` di live data belum diverifikasi
 
@@ -292,6 +367,12 @@ Kalau ternyata tidak reliable, filter ini berisiko exclude data yang seharusnya 
 ### 3. 🚩 API Versioning — perlu di-assess developer
 
 Rekomendasi versioning (`/api/v1/...` di URL path, kebijakan breaking-change/deprecation) di [API Versioning](#api-versioning) dan Keputusan Desain #18 **masih proposal, belum final**. Perlu dinilai developer: konsistensi dengan konvensi API/endpoint lain yang sudah ada di Digiman+, kesiapan infrastruktur routing/gateway untuk path-based versioning, dan realistis-tidaknya komitmen masa deprecation dari sisi effort maintain multi-versi.
+
+### 4. ✅ Resolved — Aksesibilitas foto oleh sistem eksternal
+
+**Dikonfirmasi user (2026-08-04):** blob penyimpanan foto **tidak bisa diakses langsung dari luar Digiman+** — akses hanya berlaku lewat sistem Digiman+ sendiri (web maupun mobile). Konsisten dengan pola gambar guideline yang di-host di Azure Blob Storage privat ([`form-builder.md`](form-builder.md#karakteristik)).
+
+**Keputusan:** proxy endpoint (bukan SAS token) — lihat spec lengkap di [Endpoint — Photo Download](#endpoint--photo-download) dan Keputusan Desain #20–24. `photos[].url` sekarang mengarah ke endpoint proxy Digiman+ sendiri, bukan `ContentAddress` mentah.
 
 ---
 

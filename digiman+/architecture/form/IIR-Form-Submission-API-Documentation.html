@@ -90,8 +90,8 @@
   </div>
   <div class="cover-meta">
     Disusun untuk: Tim Technical — Sistem Eksternal<br>
-    Versi Dokumen: Draft v0.2<br>
-    Tanggal: 24 Juli 2026
+    Versi Dokumen: Draft v0.3<br>
+    Tanggal: 4 Agustus 2026
   </div>
   <div class="cover-warn">
     <b>⚠ Status: Draft.</b> API ini belum live — dokumen ini dibagikan lebih awal supaya tim technical bisa mulai menyiapkan sisi integrasi. Detail non-fungsional (base URL final, kredensial, rate limit) akan dikonfirmasi terpisah sebelum go-live, dan skema kecil masih mungkin berubah sebelum rilis final.
@@ -239,6 +239,44 @@ Authorization: Bearer {access_token}</code></pre>
 }</code></pre>
 <p><span class="opt">Catatan: response endpoint ini adalah 1 objek submission langsung (bukan dibungkus envelope <code>submissions[]</code> seperti endpoint list).</span></p>
 
+<h2>3.3 Download Photo</h2>
+<div class="endpoint"><span class="method">GET</span><span class="path">/iir-form-submissions/photos/{photoGuid}</span></div>
+<p>Ambil <b>konten foto</b> (binary) yang direferensikan lewat field <code>photos[].url</code> di response data (lihat 4.5). Auth pakai Bearer token yang sama dengan endpoint data — <b>tidak ada</b> mekanisme kredensial terpisah untuk foto.</p>
+
+<h3>Path Parameter</h3>
+<table>
+<tr><th style="width:25%">Parameter</th><th>Keterangan</th></tr>
+<tr><td><code>photoGuid</code></td><td>Identifier foto — didapat langsung dari segmen terakhir <code>photos[].url</code> pada response data, tidak perlu di-construct manual</td></tr>
+</table>
+
+<div class="pre-label">Contoh Request</div>
+<pre><code>GET /api/v1/iir-form-submissions/photos/1ccac17f-f8aa-49fe-9c53-5cc4c30ae77d
+Authorization: Bearer {access_token}</code></pre>
+
+<div class="pre-label">Contoh Response — 200 OK</div>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: image/jpeg
+Content-Length: 284213
+Cache-Control: private, max-age=31536000, immutable
+
+&lt;binary image data&gt;</code></pre>
+
+<div class="callout">
+  <div class="callout-label">Penting</div>
+  Response adalah <b>binary langsung</b> (bukan JSON, bukan base64) — konsumsi seperti file download/image biasa berdasarkan header <code>Content-Type</code>. Konten foto bersifat <b>immutable</b> (satu <code>photoGuid</code> tidak akan pernah berubah isinya setelah dibuat), jadi aman di-cache di sisi sistem eksternal sesuai <code>Cache-Control</code> yang diberikan — tidak perlu request ulang untuk <code>photoGuid</code> yang sama.
+</div>
+
+<div class="pre-label">Response — 404 Not Found</div>
+<pre><code>{
+  "error": {
+    "code": "PHOTO_NOT_FOUND",
+    "message": "Photo not found",
+    "details": null
+  }
+}</code></pre>
+
+<p><span class="opt">Rate limit endpoint ini terpisah dari endpoint data (3.1/3.2) — lihat <a href="#sec-7">7. Rate Limiting</a>.</span></p>
+
 <!-- ===================== 4. RESPONSE DATA MODEL ===================== -->
 <h1 id="sec-4">4. Response Data Model</h1>
 
@@ -320,8 +358,8 @@ Authorization: Bearer {access_token}</code></pre>
   <div class="callout-label">Catatan bentuk <code>value</code></div>
   <ul>
     <li><b>Jawaban teks/pilihan biasa</b> (mis. hasil pemeriksaan "Ok"/"Not Ok", teks bebas) → string biasa</li>
-    <li><b>Jawaban foto tunggal</b> (satu foto per pertanyaan) → <code>value</code> berisi identifier internal foto tersebut (bisa diabaikan — pakai <code>photos[].url</code> untuk link foto aktualnya)</li>
-    <li><b>Jawaban multi-foto</b> (beberapa foto per pertanyaan) → <code>value</code> = <code>null</code>, semua foto ada di <code>photos[]</code></li>
+    <li><b>Jawaban yang isinya murni foto</b> (baik 1 foto maupun beberapa foto sekaligus, mis. "Photo Machine SMU" atau "Foto Kondisi Fisik Equipment") → <code>value</code> selalu <code>null</code>, terlepas dari jumlah foto — semua foto ada di <code>photos[]</code> (lihat 4.5 &amp; 3.3)</li>
+    <li><b>Jawaban dengan foto sebagai lampiran tambahan</b> (mis. item checklist tab "Inspection" yang dijawab "Ok"/"Not Ok" lalu opsional dilampiri foto) → <code>value</code> tetap berisi jawaban utamanya (mis. <code>"Ok"</code>), foto tetap ada terpisah di <code>photos[]</code></li>
   </ul>
 </div>
 
@@ -329,12 +367,12 @@ Authorization: Bearer {access_token}</code></pre>
 <table>
 <tr><th style="width:20%">Field</th><th style="width:12%">Tipe</th><th style="width:10%">Nullable</th><th>Keterangan</th></tr>
 <tr><td><code>label</code></td><td>string</td><td class="opt">—</td><td>Label foto (mis. "Foto Tampak Depan"). Tidak selalu ada, tergantung tipe elemen</td></tr>
-<tr><td><code>url</code></td><td>string</td><td><b>Ya</b></td><td>URL blob foto yang bisa diakses langsung. <code>null</code> kalau foto gagal di-resolve di sisi server — lihat catatan di bawah</td></tr>
+<tr><td><code>url</code></td><td>string</td><td><b>Ya</b></td><td>URL ke endpoint <a href="#sec-3">Download Photo (3.3)</a> — <b>bukan</b> link langsung ke storage. Panggil URL ini dengan Bearer token yang sama untuk mendapatkan isi foto (binary). <code>null</code> kalau foto gagal di-resolve di sisi server — lihat catatan di bawah</td></tr>
 </table>
 
 <div class="callout warn">
   <div class="callout-label">Wajib di-handle</div>
-  Kalau <code>photos[].url</code> bernilai <code>null</code>, artinya foto tersebut ada tapi gagal di-resolve saat request diproses. Jangan asumsikan selalu berisi URL valid — tampilkan placeholder/skip, jangan sampai integrasi gagal total karena satu foto <code>null</code>.
+  Kalau <code>photos[].url</code> bernilai <code>null</code>, artinya foto tersebut ada tapi gagal di-resolve saat request diproses. Jangan asumsikan selalu berisi URL valid — tampilkan placeholder/skip, jangan sampai integrasi gagal total karena satu foto <code>null</code>. Kalau <code>url</code> terisi tapi endpoint 3.3 mengembalikan <code>404</code> saat dipanggil, treat sama seperti <code>null</code> (foto tidak tersedia).
 </div>
 
 <h3>4.6 Contoh Lengkap</h3>
@@ -357,8 +395,8 @@ Authorization: Bearer {access_token}</code></pre>
           "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com",
           "lastUpdatedAt": "2026-07-07T11:46:40.000000Z",
           "photos": [
-            { "label": "Foto Tampak Depan", "url": "https://.../blob/abc123.jpg" },
-            { "label": "Foto Tampak Samping Kanan", "url": "https://.../blob/def456.jpg" }
+            { "label": "Foto Tampak Depan", "url": "https://{host}/api/v1/iir-form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000001" },
+            { "label": "Foto Tampak Samping Kanan", "url": "https://{host}/api/v1/iir-form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000002" }
           ]
         }
       ]
@@ -377,8 +415,8 @@ Authorization: Bearer {access_token}</code></pre>
         { "number": 4, "taskCode": "Task1100", "label": "Battery Box / Cover", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "lastUpdatedAt": "2026-07-07T11:47:14.210168Z", "photos": [] },
         { "number": 6, "taskCode": "Task1014", "label": "Cat Walk", "value": "Ok", "remark": "Ada beberapa", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "lastUpdatedAt": "2026-07-07T11:54:48.367543Z",
           "photos": [
-            { "url": "https://.../blob/1ccac17f.jpg" },
-            { "url": "https://.../blob/8ffc591c.jpg" }
+            { "url": "https://{host}/api/v1/iir-form-submissions/photos/1ccac17f-f8aa-49fe-9c53-5cc4c30ae77d" },
+            { "url": "https://{host}/api/v1/iir-form-submissions/photos/8ffc591c-8a6d-46e4-bfdb-d7a4d5590a47" }
           ]
         }
       ]
@@ -428,15 +466,23 @@ loop:
 <!-- ===================== 7. RATE LIMITING ===================== -->
 <h1 id="sec-7">7. Rate Limiting</h1>
 
-<p>Rate limit berlaku <b>per Client ID</b> (bukan per IP):</p>
+<p>Rate limit berlaku <b>per Client ID</b> (bukan per IP). Kuota <b>terpisah</b> antara endpoint data dan endpoint download foto — karakteristik beban keduanya beda jauh (query data vs stream file).</p>
 
+<h3>7.1 Endpoint Data (3.1 List, 3.2 Get by ID)</h3>
 <table>
 <tr><th style="width:30%">Window</th><th>Limit</th></tr>
 <tr><td>Per menit</td><td>30 request</td></tr>
 <tr><td>Per hari</td><td>2.500 request</td></tr>
 </table>
-
 <p>Limit ini cukup longgar untuk pola polling berkala maupun paginasi banyak halaman — kira-kira 1 request tiap 2 detik.</p>
+
+<h3>7.2 Endpoint Download Photo (3.3)</h3>
+<table>
+<tr><th style="width:30%">Window</th><th>Limit</th></tr>
+<tr><td>Per menit</td><td>1.400 request</td></tr>
+<tr><td>Per hari</td><td>120.000 request</td></tr>
+</table>
+<p><span class="opt">Limit jauh lebih longgar karena 1 submission bisa punya puluhan hingga ratusan foto sekaligus (checklist inspeksi lengkap). Kalau butuh throughput lebih tinggi dari ini, hubungi tim Digiman+.</span></p>
 
 <h3>Saat Limit Terlampaui</h3>
 <pre><code>HTTP/1.1 429 Too Many Requests
@@ -474,7 +520,8 @@ Retry-After: 12
 <tr><td>400</td><td><code>INVALID_PAGE_SIZE</code></td><td><code>pageSize</code> lebih dari 100</td></tr>
 <tr><td>401</td><td><code>UNAUTHORIZED</code></td><td>Token tidak ada / invalid / expired</td></tr>
 <tr><td>403</td><td><code>FORBIDDEN</code></td><td>Client valid tapi tidak punya akses ke resource yang diminta</td></tr>
-<tr><td>404</td><td><code>NOT_FOUND</code></td><td>(single-fetch) <code>formSubmissionId</code> tidak ditemukan</td></tr>
+<tr><td>404</td><td><code>NOT_FOUND</code></td><td>(single-fetch, 3.2) <code>formSubmissionId</code> tidak ditemukan</td></tr>
+<tr><td>404</td><td><code>PHOTO_NOT_FOUND</code></td><td>(download photo, 3.3) <code>photoGuid</code> tidak ditemukan</td></tr>
 <tr><td>429</td><td><code>RATE_LIMITED</code></td><td>Lihat [Rate Limiting](#sec-7)</td></tr>
 <tr><td>500</td><td><code>INTERNAL_ERROR</code></td><td>Unexpected server error</td></tr>
 </table>
@@ -503,12 +550,12 @@ Retry-After: 12
 </ul>
 
 <div class="callout warn">
-  <div class="callout-label">Draft v0.2</div>
+  <div class="callout-label">Draft v0.3</div>
   Dokumen ini adalah draft awal untuk persiapan integrasi. Base URL final, kredensial akses, dan konfirmasi jadwal go-live akan dikomunikasikan terpisah. Kalau ada pertanyaan atau kebutuhan spesifik dari sisi integrasi kalian, silakan sampaikan sebelum development dimulai.
 </div>
 
 <div class="footer">
-  IIR Form Submission API — Integration Guide · Draft v0.2 · 24 Juli 2026 · Digiman+
+  IIR Form Submission API — Integration Guide · Draft v0.3 · 4 Agustus 2026 · Digiman+
 </div>
 
 </body>
