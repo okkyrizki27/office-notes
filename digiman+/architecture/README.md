@@ -86,6 +86,7 @@ Index ini melacak semua dokumen **enhancement/proposal** di bawah `digiman+/arch
 
 Dokumen berikut sengaja **tidak** masuk katalog karena isinya deskripsi kondisi *sekarang* (current-state/reference), bukan proposal yang pending:
 
+- [`system-architecture-overview.md`](system-architecture-overview.md) — sintesis arsitektur sistem end-to-end (peta service, pola lintas-service, alur inti, known debt), untuk onboarding engineer baru
 - `current-state.md`, `permission.md`, `workflow.md`
 - `database/*-schema.md`, `database/new-model-checklist.md`, `database/sap-material-integration.md`
 - `form/form-builder.md`, `form/form-submission.md`, `form/IIR-Form-Submission-API-Documentation.*`

@@ -2,6 +2,8 @@
 
 Dokumen ini merangkum kondisi arsitektur dan fitur Digiman+ saat ini sebagai dasar diskusi roadmap ke depan.
 
+> Untuk gambaran arsitektur sistem yang lebih dalam (peta service, pola lintas-service, alur data inti, known architecture debt) — lihat [`system-architecture-overview.md`](system-architecture-overview.md).
+
 *Last updated: 2026-06-23*
 
 ---
