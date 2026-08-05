@@ -81,7 +81,7 @@ IsActive       bit, not null (default 1)
 CreatedAt, CreatedBy   datetime/varchar(200), null
 ModifiedAt, ModifiedBy datetime/varchar(200), null
 ```
-Constraint default bernama `DF_TempMOList_IsActive` — nama menyebut `TempMOList`, tidak match nama tabel `EmployeeShiftLog`. Kemungkinan tabel ini rename dari nama sebelumnya (`TempMOList`) tanpa update nama constraint. `ShiftId` tidak punya FK eksplisit ke tabel Shift manapun di skema ini — tabel `Shift` kemungkinan ada di DB lain atau belum di-generate di script ini.
+Constraint default bernama `DF_TempMOList_IsActive` — nama menyebut `TempMOList`, tidak match nama tabel `EmployeeShiftLog`. Kemungkinan tabel ini rename dari nama sebelumnya (`TempMOList`) tanpa update nama constraint. `ShiftId` tidak punya FK eksplisit ke tabel Shift manapun di skema ini — referensinya ke `tenant.SiteShift.Id` (dikonfirmasi user 05 Aug 2026, lihat [`tenant-schema.md`](tenant-schema.md)), lintas-DB jadi tidak ada FK constraint eksplisit di DDL.
 
 ---
 
@@ -126,6 +126,7 @@ CreatedAt, CreatedBy   datetime/varchar(200), null
 ModifiedAt, ModifiedBy datetime/varchar(200), null
 ```
 `ParentPermissionCode` menunjukkan `PermissionCode` bersifat **hierarkis** (parent-child, kemungkinan untuk grouping menu/fitur bertingkat). Default `TenantCode = 'BUMAID'` — hardcoded ke satu tenant spesifik, kemungkinan tenant awal/default sebelum multi-tenant lain onboard.
+> **Dikonfirmasi user (05 Aug 2026)**: ini jalur permission yang aktif dipakai Digiman+ saat ini — permission di-assign **langsung ke user** di sini, belum lewat Role (`UserRoleMapping` di bawah belum aktif dipakai, lihat catatannya).
 > **Cross-reference**: `PermissionCode` di sini kemungkinan yang direferensikan oleh `maintenance-execution.Feature.PermissionCode` (lihat [`maintenance-execution-schema.md`](maintenance-execution-schema.md)) — `Feature` di service `maintenance-execution` menyimpan `PermissionCode` untuk menentukan akses fitur per permission. Relasi lintas-DB ini belum pernah didokumentasikan sebelumnya, perlu dikonfirmasi.
 
 ### `UserRoleMapping`
@@ -137,7 +138,7 @@ IsActive       bit, not null (default 1)
 CreatedAt, CreatedBy   datetime/varchar(200), null
 ModifiedAt, ModifiedBy datetime/varchar(200), null
 ```
-Tidak ada tabel `Role` master di skema ini — `RoleCode` free-form tanpa FK, sama seperti `EmployeeShiftLog.ShiftId` tanpa FK ke `Shift`. Kemungkinan tabel master `Role`/`Shift` ada di DB lain (misalnya `tenant`) yang tidak tercakup di script ini.
+Tidak ada tabel `Role` master di skema ini — `RoleCode` free-form tanpa FK. **Dikonfirmasi user (05 Aug 2026)**: Digiman+ saat ini belum punya konsep Role — permission di-mapping langsung ke user lewat `UserPermission` (di atas). Tabel ini kemungkinan disiapkan untuk fitur Role yang belum diaktifkan, bukan master data yang hilang/belum ditemukan.
 
 ---
 
