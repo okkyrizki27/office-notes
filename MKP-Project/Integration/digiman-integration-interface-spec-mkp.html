@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Digiman+ Integration Interface Specification for MKP</title>
+<style>
+  :root {
+    --navy: #16233f;
+    --navy-2: #1f3358;
+    --accent: #2563eb;
+    --accent-soft: #eef3fe;
+    --text: #1c2430;
+    --muted: #5b6472;
+    --border: #dde3ec;
+    --code-bg: #f5f7fa;
+    --ok: #0f7a45;
+    --warn: #b45309;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "Segoe UI", Arial, "Helvetica Neue", sans-serif;
+    color: var(--text);
+    font-size: 13.5px;
+    line-height: 1.55;
+    background: #fff;
+  }
+  code, pre, .mono {
+    font-family: Consolas, "SF Mono", Menlo, monospace;
+  }
+  .page { max-width: 900px; margin: 0 auto; padding: 0 8px; }
+
+  /* Cover */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 50px;
+    background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 55%, #274677 100%);
+    color: #fff;
+  }
+  .cover .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 12px;
+    color: #9fb3dd;
+    margin-bottom: 18px;
+  }
+  .cover h1 {
+    font-size: 34px;
+    line-height: 1.25;
+    margin: 0 0 14px 0;
+    font-weight: 700;
+  }
+  .cover .sub {
+    font-size: 15px;
+    color: #cdd9f0;
+    max-width: 560px;
+    margin-bottom: 40px;
+  }
+  .cover .meta {
+    display: flex;
+    gap: 40px;
+    border-top: 1px solid rgba(255,255,255,.25);
+    padding-top: 20px;
+    font-size: 12.5px;
+    color: #cdd9f0;
+  }
+  .cover .meta b { display: block; color: #fff; font-size: 13.5px; margin-bottom: 3px; }
+  .cover-break { break-after: page; page-break-after: always; }
+
+  /* TOC */
+  .toc { padding: 50px 8px; }
+  .toc h2 { border: none; margin-top: 0; }
+  .toc ol { list-style: none; padding-left: 0; counter-reset: sect; }
+  .toc > ol > li { counter-increment: sect; margin-bottom: 10px; font-weight: 600; }
+  .toc > ol > li::before { content: counter(sect) ". "; color: var(--accent); }
+  .toc ol ol { list-style: none; padding-left: 22px; margin-top: 6px; counter-reset: none; font-weight: 400; }
+  .toc ol ol li { margin-bottom: 6px; color: var(--muted); }
+  .toc a { color: inherit; text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+  .toc-break { break-after: page; page-break-after: always; }
+
+  h2 {
+    font-size: 21px;
+    color: var(--navy);
+    border-bottom: 2px solid var(--navy);
+    padding-bottom: 8px;
+    margin-top: 46px;
+    break-before: page;
+    page-break-before: always;
+  }
+  .page > h2:first-of-type { break-before: auto; page-break-before: auto; }
+  h3 {
+    font-size: 16.5px;
+    color: var(--navy-2);
+    margin-top: 30px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  h4 {
+    font-size: 14px;
+    color: var(--accent);
+    margin-top: 22px;
+    margin-bottom: 8px;
+  }
+  p { margin: 10px 0; }
+  ul, ol { margin: 8px 0; padding-left: 22px; }
+  li { margin-bottom: 4px; }
+
+  .callout {
+    background: var(--accent-soft);
+    border-left: 4px solid var(--accent);
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+  .callout b { color: var(--navy); }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0 20px 0;
+    font-size: 12px;
+    break-inside: avoid;
+  }
+  table.meta-table { width: auto; min-width: 55%; }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--navy);
+    color: #fff;
+    font-weight: 600;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+  }
+  tr:nth-child(even) td { background: #fafbfd; }
+  td code, th code { background: rgba(0,0,0,.05); padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+  .col-field { font-family: Consolas, monospace; font-size: 11.5px; color: var(--navy-2); white-space: nowrap; }
+  .nullable-no { color: #b3261e; font-weight: 700; }
+  .nullable-yes { color: var(--ok); font-weight: 700; }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    font-size: 11.5px;
+    line-height: 1.5;
+    break-inside: avoid;
+    margin: 10px 0 18px 0;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+  .badge-post { background: #e3f6ea; color: var(--ok); }
+  .badge-put { background: #fff2e0; color: var(--warn); }
+  .endpoint-box {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 12px 0;
+    font-size: 12.5px;
+  }
+  .endpoint-box code { font-size: 12px; }
+
+  .resp-block { margin: 6px 0 16px 0; }
+  .resp-label { font-weight: 700; font-size: 12px; color: var(--navy-2); margin: 10px 0 4px 0; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 30px 0; }
+
+  .footer-note {
+    margin-top: 50px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    break-before: avoid;
+  }
+
+  @media print {
+    .cover { min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cover cover-break">
+  <div class="eyebrow">API Integration Documentation</div>
+  <h1>Digiman+ Integration Interface Specification untuk MKP</h1>
+  <div class="sub">Dokumen spesifikasi teknis integrasi dari atau ke platform Digiman+ (dibuat khusus untuk MKP).</div>
+  <div class="meta">
+    <div><b>Versi</b>2.0</div>
+    <div><b>Tanggal Rilis</b>06 Jul 2026</div>
+    <div><b>Disiapkan untuk</b>Tim Integrasi MKP</div>
+    <div><b>Disiapkan oleh</b>Tim Digiman+ (BTECH)</div>
+  </div>
+</div>
+
+<div class="page toc toc-break">
+  <h2 style="break-before:auto">Daftar Isi</h2>
+  <ol>
+    <li><a href="#s1">Pendahuluan</a></li>
+    <li><a href="#s2">Ikhtisar Integrasi</a>
+      <ol>
+        <li><a href="#s2-1">Kapabilitas Integrasi</a></li>
+        <li><a href="#s2-2">Teknologi Integrasi</a></li>
+        <li><a href="#s2-3">Autentikasi &amp; Kontrol Akses</a></li>
+        <li><a href="#s2-4">Base URL per Environment</a></li>
+      </ol>
+    </li>
+    <li><a href="#s3">Terminologi</a></li>
+    <li><a href="#s4">Arsitektur</a></li>
+    <li><a href="#s5">Spesifikasi API Outbound</a>
+      <ol>
+        <li><a href="#s5-1">Backlog Execution</a></li>
+        <li><a href="#s5-2">Create Maintenance Order</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6">Spesifikasi API Inbound</a>
+      <ol>
+        <li><a href="#s6-1">Employee</a></li>
+        <li><a href="#s6-2">Asset &amp; Asset Status</a></li>
+        <li><a href="#s6-3">Material</a></li>
+        <li><a href="#s6-4">Backlog</a></li>
+        <li><a href="#s6-5">Breakdown Notification</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7">Glosarium &amp; Kode Error</a></li>
+  </ol>
+</div>
+
+<div class="page">
+
+<h2 id="s1" style="break-before:auto">1. Pendahuluan</h2>
+<p>Dokumen ini menjelaskan framework integrasi antara Digiman+ dan sistem eksternal (ERP seperti SAP/Oracle, atau third-party lain). Tujuan dokumen:</p>
+<ul>
+  <li>Menjelaskan mekanisme integrasi</li>
+  <li>Mendefinisikan struktur data yang dibutuhkan</li>
+  <li>Menjelaskan spesifikasi API</li>
+  <li>Menjabarkan kebutuhan teknis &amp; konfigurasi dari sisi client</li>
+  <li>Memastikan kesiapan sebelum implementasi integrasi</li>
+</ul>
+<p>Ditujukan untuk membantu client memahami cara kerja integrasi, mengidentifikasi field wajib &amp; kebutuhan konfigurasi, serta menemukan gap informasi/prasyarat teknis sebelum mulai integrasi.</p>
+
+<h2 id="s2">2. Ikhtisar Integrasi</h2>
+
+<h3 id="s2-1">2.1 Kapabilitas Integrasi</h3>
+<p>Digiman+ mendukung pertukaran data dengan sistem eksternal melalui HTTP:</p>
+<ul>
+  <li><b>Outbound Integration</b>: data dari Digiman+ → sistem eksternal</li>
+  <li><b>Inbound Integration</b>: data dari sistem eksternal → Digiman+</li>
+</ul>
+
+<h3 id="s2-2">2.2 Teknologi Integrasi</h3>
+<ul>
+  <li><b>Tipe Integrasi</b>: REST API</li>
+  <li><b>Format Data</b>: JSON</li>
+  <li><b>Protokol Komunikasi</b>: HTTPS</li>
+</ul>
+
+<h3 id="s2-3">2.3 Autentikasi &amp; Kontrol Akses</h3>
+<ol>
+  <li><b>API Key Authentication</b> — semua request wajib menyertakan API Key yang valid di header <code>X-API-Key</code>. Request tanpa API Key valid akan ditolak. API Key di-provide oleh tim Digiman+ (client tidak generate sendiri).</li>
+  <li><b>IP Whitelisting</b> — akses API dibatasi hanya untuk IP client yang sudah terdaftar. Client wajib menyediakan:
+    <ul>
+      <li>Public IP address(es) yang dipakai untuk API calls</li>
+      <li>IP per environment (UAT dan Production)</li>
+    </ul>
+    Whitelisting dilakukan oleh tim Digiman+ berdasarkan IP yang disediakan client tersebut. Request dari IP yang tidak di-whitelist akan diblokir di level network.
+  </li>
+</ol>
+
+<h3 id="s2-4">2.4 Base URL per Environment</h3>
+<p>Nilai <code>base_url</code> yang dipakai di seluruh endpoint Inbound API pada dokumen ini (section 6) mengacu ke tabel berikut:</p>
+<table class="meta-table">
+  <tr><th>Environment</th><th>Base URL</th></tr>
+  <tr><td>Dev</td><td><code>https://cst-shared-apm-dev-001.azure-api.net/integration/external-integration/</code></td></tr>
+</table>
+<div class="callout">Base URL di atas sudah termasuk path <code>integration/external-integration/</code>, jadi endpoint tiap API (mis. <code>.../employee</code>, <code>.../asset</code>) tinggal ditambahkan langsung tanpa mengulang path tersebut.</div>
+
+<h2 id="s3">3. Terminologi</h2>
+<table>
+  <tr><th style="width:20%">Istilah</th><th>Definisi</th></tr>
+  <tr><td>Digiman+</td><td>SaaS platform dari BTECH untuk manajemen aktivitas asset maintenance.</td></tr>
+  <tr><td>External System</td><td>Sistem pihak ketiga mana pun yang terintegrasi dengan Digiman+.</td></tr>
+  <tr><td>Integration</td><td>Mekanisme teknis pertukaran data terstruktur antara Digiman+ dan sistem eksternal via REST API over HTTPS dengan payload JSON.</td></tr>
+  <tr><td>Inbound Integration</td><td>Data flow yang berasal dari sistem eksternal dan diproses oleh Digiman+.</td></tr>
+  <tr><td>Outbound Integration</td><td>Data flow yang berasal dari Digiman+ dan dikirim ke sistem eksternal.</td></tr>
+  <tr><td>API Key</td><td>Secret key unik yang diberikan ke sistem eksternal untuk otentikasi request ke Digiman+ API.</td></tr>
+  <tr><td>IP Whitelisting</td><td>Kontrol keamanan level network yang membatasi akses API hanya ke IP client yang sudah disetujui.</td></tr>
+</table>
+
+<h2 id="s4">4. Arsitektur</h2>
+<p>Alur integrasi: <b>Digiman+ ⇄ Client Middleware ⇄ Client System (SAP / Oracle / dll.)</b></p>
+<ul>
+  <li><b>Inbound</b> (Client → Digiman+, via middleware): Employee, Asset/Equipment, Asset/Equipment Status, Material, Maintenance Order Backlog, Notification</li>
+  <li><b>Outbound</b> (Digiman+ → Client, via middleware): Complete MO Inspection, Close &amp; Delete MO Inspection, Backlog Execution, Create Maintenance Order</li>
+</ul>
+
+<h2 id="s5">5. Spesifikasi API Outbound</h2>
+<p>Outbound = Digiman+ memanggil API milik client.</p>
+
+<h3 id="s5-1">5.1 Backlog Execution</h3>
+<p>Dipanggil saat backlog dieksekusi oleh mekanik.</p>
+<div class="endpoint-box"><span class="badge badge-post">POST</span><code>{Backlog Execution Client's API}</code></div>
+<p><b>Header:</b> <code>Content-Type: application/json</code></p>
+
+<div class="resp-label">Request</div>
+<pre>{
+  "MONumber": [
+    "1104499011",
+    "1104499012",
+    "1104499013",
+    "1104499014"
+  ]
+}</pre>
+
+<div class="resp-label">Expected Response</div>
+<pre>[
+  {
+    "MONumber": "1104499011",
+    "SAPStatus": "1",
+    "SAPText": "Order has been CLOSED|Save log history success",
+    "ModifiedUtcDate": "2026-01-15T14:44:37.8770544+00:00"
+  }
+]</pre>
+
+<table>
+  <tr><th>Field</th><th>Type</th><th>Nullable</th><th>Deskripsi</th></tr>
+  <tr><td class="col-field">MONumber (request)</td><td>Array list of varchar</td><td class="nullable-no">No</td><td>List Maintenance Order number yang dieksekusi</td></tr>
+  <tr><td class="col-field">MONumber (response)</td><td>varchar</td><td class="nullable-no">No</td><td>Maintenance Order number — satu per item hasil</td></tr>
+  <tr><td class="col-field">SAPStatus</td><td>varchar</td><td class="nullable-no">No</td><td>Status integrasi: 1 = Berhasil, 2 = Gagal</td></tr>
+  <tr><td class="col-field">SAPText</td><td>varchar</td><td class="nullable-no">No</td><td>Pesan dari integrasi SAP</td></tr>
+  <tr><td class="col-field">ModifiedUtcDate</td><td>Datetime (ISO 8601)</td><td class="nullable-no">No</td><td>Tanggal dan waktu</td></tr>
+</table>
+
+<h3 id="s5-2">5.2 Create Maintenance Order</h3>
+<p>Dipanggil saat order di-approve.</p>
+<div class="endpoint-box"><span class="badge badge-post">POST</span><code>{Create MO Client's API}</code></div>
+<p><b>Header:</b> <code>Content-Type: application/json</code></p>
+
+<div class="resp-label">Request</div>
+<pre>[
+  {
+    "EMolNumber": "IFD-2602001584",
+    "SupervisorId": 1100800565,
+    "Body": [
+      {
+        "Id": 4807,
+        "SiteId": 2009,
+        "PoolingId": 4628,
+        "MOType": "MT01",
+        "MODescription": "P1-Flushing AC Function Internal ",
+        "PMActType": "IH7",
+        "Equipment": "DAVV40022",
+        "BasicStartDate": "2026-03-11T07:54:21.293",
+        "MaterialNumber": "1740467",
+        "MaterialQuantity": "2.00",
+        "Batch": "",
+        "MOCreatedBy": "2009OBH.supervisor01@protonmail.com",
+        "AttachmentUrl": "https://digiman-dev.bukittechnology.com/order-list/material-order?workOrderId=20356&amp;assetNumber=DAVV40022&amp;taskPersonalizedFindingId=5391&amp;molNumber=IFD-2602001584",
+        "SLoc": "WH01",
+        "MoDescriptionLong": "Model Unit : A40-G\nKode Unit : DAVV40022\nDamage : Air Leaks-Internal\nInspector : 2009OBH.supervisor01"
+      }
+    ]
+  }
+]</pre>
+
+<div class="resp-label">Expected Response</div>
+<pre>[
+  {
+    "MONumber": "1105239395",
+    "SAPStatus": "1",
+    "SAPText": "Success Create MO: 1105239395 and log history",
+    "ModifiedUtcDate": "2026-01-15T14:44:37.8770544+00:00"
+  }
+]</pre>
+
+<table>
+  <tr><th>Field</th><th>Type</th><th>Nullable</th><th>Deskripsi</th></tr>
+  <tr><td class="col-field">EMolNumber</td><td>varchar</td><td class="nullable-no">No</td><td>Nomor electronic mechanic order</td></tr>
+  <tr><td class="col-field">SupervisorId</td><td>numeric</td><td class="nullable-no">No</td><td>Nomor identitas supervisor</td></tr>
+  <tr><td class="col-field">Body</td><td>array</td><td class="nullable-no">No</td><td>List of MO detail records yang akan dibuat</td></tr>
+  <tr><td class="col-field">Body.Id</td><td>integer</td><td class="nullable-no">No</td><td>Id sinkronisasi</td></tr>
+  <tr><td class="col-field">Body.SiteId</td><td>numeric</td><td class="nullable-no">No</td><td>Id site</td></tr>
+  <tr><td class="col-field">Body.PoolingId</td><td>integer</td><td class="nullable-no">No</td><td>Id pooling</td></tr>
+  <tr><td class="col-field">Body.MOType</td><td>varchar</td><td class="nullable-no">No</td><td>Tipe maintenance/work order. Bervariasi per client, butuh konfigurasi.</td></tr>
+  <tr><td class="col-field">Body.MODescription</td><td>varchar</td><td class="nullable-no">No</td><td>Deskripsi Maintenance Order / Work Order</td></tr>
+  <tr><td class="col-field">Body.PMActType</td><td>varchar</td><td class="nullable-no">No</td><td>Tipe Plant Maintenance Activity. Bervariasi per client, butuh konfigurasi.</td></tr>
+  <tr><td class="col-field">Body.Equipment</td><td>varchar</td><td class="nullable-no">No</td><td>Nomor equipment</td></tr>
+  <tr><td class="col-field">Body.BasicStartDate</td><td>Datetime (ISO 8601)</td><td class="nullable-no">No</td><td>Tanggal mulai</td></tr>
+  <tr><td class="col-field">Body.MaterialNumber</td><td>varchar</td><td class="nullable-no">No</td><td>Nomor material</td></tr>
+  <tr><td class="col-field">Body.MaterialQuantity</td><td>varchar</td><td class="nullable-no">No</td><td>Jumlah material yang dipesan</td></tr>
+  <tr><td class="col-field">Body.Batch</td><td>varchar</td><td class="nullable-yes">Yes</td><td>Batch material</td></tr>
+  <tr><td class="col-field">Body.MOCreatedBy</td><td>varchar</td><td class="nullable-no">No</td><td>User code pembuat order</td></tr>
+  <tr><td class="col-field">Body.AttachmentUrl</td><td>varchar</td><td class="nullable-no">No</td><td>Bukti/evidence temuan</td></tr>
+  <tr><td class="col-field">Body.SLoc</td><td>varchar</td><td class="nullable-no">No</td><td>Storage location material</td></tr>
+  <tr><td class="col-field">Body.MoDescriptionLong</td><td>varchar</td><td class="nullable-no">No</td><td>Deskripsi panjang MO/WO</td></tr>
+  <tr><td class="col-field">MONumber (response)</td><td>varchar</td><td class="nullable-no">No</td><td>MO number yang digenerate ERP</td></tr>
+  <tr><td class="col-field">SAPStatus (response)</td><td>varchar</td><td class="nullable-no">No</td><td>1 = Berhasil, 2 = Gagal</td></tr>
+  <tr><td class="col-field">SAPText (response)</td><td>varchar</td><td class="nullable-no">No</td><td>Pesan dari integrasi SAP</td></tr>
+  <tr><td class="col-field">ModifiedUtcDate (response)</td><td>Datetime (ISO 8601)</td><td class="nullable-no">No</td><td>Tanggal dan waktu</td></tr>
+</table>
+
+<h2 id="s6">6. Spesifikasi API Inbound</h2>
+<p>Inbound = client memanggil API Digiman+.</p>
+
+<h3 id="s6-1">6.1 Employee</h3>
+<p>Upsert employee — matched by <code>employees.userCode</code>; kalau sudah ada → update, kalau belum → create. Mendukung single &amp; bulk.</p>
+<div class="endpoint-box"><span class="badge badge-post">POST</span><code>base_url/employee</code></div>
+
+<div class="resp-label">Request</div>
+<pre>{
+  "employees": [
+    {
+      "userCode": "mkpinspector01@protonmail.com",
+      "fullName": "mkpinspector01",
+      "employeeId": "0000895",
+      "positionCode": "C01",
+      "positionName": "Supervisor",
+      "levelCode": "3A",
+      "levelName": "3A",
+      "siteCode": "1001",
+      "siteName": "Sesayap",
+      "departmentCode": "PLT",
+      "departmentName": "Plant",
+      "sectionCode": "S001",
+      "sectionName": "Hauler",
+      "isActive": true
+    }
+  ]
+}</pre>
+
+<table>
+  <tr><th>Field</th><th>Type</th><th>Nullable</th><th>Deskripsi</th></tr>
+  <tr><td class="col-field">employees</td><td>array</td><td class="nullable-no">No</td><td>Daftar record employee (mendukung pengiriman bulk)</td></tr>
+  <tr><td class="col-field">employees.userCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Identifier unik user; harus unik</td></tr>
+  <tr><td class="col-field">employees.fullName</td><td>varchar(150)</td><td class="nullable-no">No</td><td>Nama lengkap employee</td></tr>
+  <tr><td class="col-field">employees.employeeId</td><td>varchar(50)</td><td class="nullable-no">No</td><td>ID Employee (NIK)</td></tr>
+  <tr><td class="col-field">employees.positionCode</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Kode posisi/jabatan employee</td></tr>
+  <tr><td class="col-field">employees.positionName</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Nama posisi/jabatan employee</td></tr>
+  <tr><td class="col-field">employees.levelCode</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Kode level employee</td></tr>
+  <tr><td class="col-field">employees.levelName</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Nama level employee</td></tr>
+  <tr><td class="col-field">employees.siteCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Site tempat employee ditugaskan. Jika kode belum terdaftar, akan otomatis di-insert ke master data.</td></tr>
+  <tr><td class="col-field">employees.siteName</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Nama site</td></tr>
+  <tr><td class="col-field">employees.departmentCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Department identifier (referensi saja). Jika kode belum terdaftar, akan otomatis di-insert ke master data.</td></tr>
+  <tr><td class="col-field">employees.departmentName</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Nama department</td></tr>
+  <tr><td class="col-field">employees.sectionCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Identifier Section user. Jika kode belum terdaftar, akan otomatis di-insert ke master data.</td></tr>
+  <tr><td class="col-field">employees.sectionName</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Nama section</td></tr>
+  <tr><td class="col-field">employees.isActive</td><td>boolean</td><td class="nullable-no">No</td><td>true = aktif, false = tidak aktif</td></tr>
+</table>
+
+<div class="resp-label">Response</div>
+<div class="resp-block">
+<b>HTTP 200 – Success</b>
+<pre>{
+  "status": "success",
+  "totalData": 1,
+  "successCount": 1,
+  "failedCount": 0,
+  "results": [
+    { "userCode": "mkpinspector01@protonmail.com", "status": "success" }
+  ]
+}</pre>
+<b>HTTP 200 – Partial Success</b>
+<pre>{
+  "status": "success",
+  "totalData": 2,
+  "successCount": 1,
+  "failedCount": 1,
+  "results": [
+    { "userCode": "mkpinspector01@protonmail.com", "status": "success" },
+    { "userCode": "mkpinspector02@protonmail.com", "status": "failed", "errorCode": "ERR-0017" }
+  ]
+}</pre>
+<b>HTTP 400</b>
+<pre>{
+  "status": "error",
+  "totalData": 1,
+  "successCount": 0,
+  "failedCount": 1,
+  "results": [
+    { "userCode": "mkpinspector01@protonmail.com", "status": "failed", "errorCode": "ERR-0017" }
+  ]
+}</pre>
+<p><b>HTTP 403:</b> <code>{ "errorCode": "ERR-0006" }</code> &nbsp; <b>HTTP 500:</b> <code>{ "errorCode": "ERR-0007" }</code></p>
+</div>
+
+<h3 id="s6-2">6.2 Asset &amp; Asset Status</h3>
+<h4>6.2.1 Asset</h4>
+<p>Upsert asset — matched by <code>assets.assetNumber</code>. Mendukung single &amp; bulk.</p>
+<div class="endpoint-box"><span class="badge badge-post">POST</span><code>base_url/asset</code></div>
+
+<div class="resp-label">Request</div>
+<pre>{
+  "assets": [
+    {
+      "assetNumber": "EXC00031",
+      "siteCode": "1001",
+      "siteName": "Sesayap",
+      "sectionTypeCode": "OBL",
+      "sectionTypeName": "Loader",
+      "assetCategoryCode": "A",
+      "assetTypeCode": "EXC",
+      "assetTypeName": "Excavator",
+      "assetBrandCode": "KOM",
+      "assetBrandName": "KOMATSU",
+      "assetModelCode": "PC2000-8",
+      "assetModelName": "PC2000-8",
+      "assetClassName": "EXA 200 TON CLASS",
+      "assetVariantName": "EXA 200 TON CLASS",
+      "isActive": true
+    }
+  ]
+}</pre>
+
+<table>
+  <tr><th>Field</th><th>Type</th><th>Nullable</th><th>Deskripsi</th><th>Tabel SAP</th><th>Catatan</th></tr>
+  <tr><td class="col-field">assets</td><td>array</td><td class="nullable-no">No</td><td>Daftar record asset (mendukung pengiriman bulk)</td><td></td><td></td></tr>
+  <tr><td class="col-field">assets.assetNumber</td><td>varchar(200)</td><td class="nullable-no">No</td><td>Identifier unik asset</td><td>EQUI-EQUNR</td><td></td></tr>
+  <tr><td class="col-field">assets.siteCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Site tempat equipment ditugaskan. Jika kode belum terdaftar, akan otomatis di-insert ke master data.</td><td>ILOA-SWERK</td><td></td></tr>
+  <tr><td class="col-field">assets.siteName</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Nama site</td><td></td><td></td></tr>
+  <tr><td class="col-field">assets.sectionTypeCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Identifier section/area equipment. Tidak diproses jika belum terdaftar.</td><td>ILOA-BEBER</td><td>contoh: 201</td></tr>
+  <tr><td class="col-field">assets.sectionTypeName</td><td>varchar(512)</td><td class="nullable-no">No</td><td>Nama section/area (pasangan sectionTypeCode)</td><td>T357-FING</td><td>contoh: Hauler</td></tr>
+  <tr><td class="col-field">assets.assetCategoryCode</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Kode kategori asset. Tidak diproses jika belum terdaftar.</td><td>EQUI-EQTYP</td><td>contoh: H, M</td></tr>
+  <tr><td class="col-field">assets.assetCategoryName</td><td>varchar</td><td class="nullable-yes">Yes</td><td>Nama category (pasangan assetCategoryCode — keduanya wajib atau tidak sama sekali)</td><td>T370T-TYPTX</td><td>contoh: Heavy Equipment, Machines</td></tr>
+  <tr><td class="col-field">assets.assetTypeCode</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Kode tipe asset (pasangan assetTypeName)</td><td>EQUI-EQART</td><td>contoh: 01, 02</td></tr>
+  <tr><td class="col-field">assets.assetTypeName</td><td>varchar (trunc. 200)</td><td class="nullable-yes">Yes</td><td>Nama tipe asset. Tidak diproses jika belum terdaftar.</td><td>T370K-EARTX</td><td>contoh: Excavator</td></tr>
+  <tr><td class="col-field">assets.assetBrandCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Kode brand asset (pasangan assetBrandName). Wajib diisi.</td><td>AUSP-ATWRT / EQUI-HERST</td><td>contoh: KOMATSU</td></tr>
+  <tr><td class="col-field">assets.assetBrandName</td><td>varchar(128)</td><td class="nullable-no">No</td><td>Nama brand asset. Tidak diproses jika belum terdaftar.</td><td>AUSP-ATWRT / EQUI-HERST</td><td>contoh: KOMATSU</td></tr>
+  <tr><td class="col-field">assets.assetModelCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Kode model asset (pasangan assetModelName). Wajib diisi.</td><td>AUSP-ATWRT / EQUI-TYPBZ</td><td>contoh: PC2000-8</td></tr>
+  <tr><td class="col-field">assets.assetModelName</td><td>varchar(50)</td><td class="nullable-no">No</td><td>Nama model asset. Tidak diproses jika belum terdaftar.</td><td>AUSP-ATWRT / EQUI-TYPBZ</td><td>contoh: PC2000-8</td></tr>
+  <tr><td class="col-field">assets.assetClassCode</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Kode class asset (pasangan assetClassName)</td><td>TBD — konfirmasi tim SAP</td><td><b>Tidak Pakai</b></td></tr>
+  <tr><td class="col-field">assets.assetClassName</td><td>varchar(128)</td><td class="nullable-yes">Yes</td><td>Nama class asset. Tidak diproses jika belum terdaftar.</td><td>AUSP-ATWRT</td><td><b>Tidak Pakai</b></td></tr>
+  <tr><td class="col-field">assets.assetVariantCode</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Kode variant asset (pasangan assetVariantName)</td><td></td><td><b>Tidak dipakai</b></td></tr>
+  <tr><td class="col-field">assets.assetVariantName</td><td>varchar (trunc. 200)</td><td class="nullable-yes">Yes</td><td>Nama variant asset. Tidak diproses jika belum terdaftar.</td><td>AUSP-ATWRT</td><td><b>→ tidak dipakai</b></td></tr>
+  <tr><td class="col-field">assets.assetOwnershipCode</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Kode kepemilikan asset</td><td>TBD — konfirmasi tim SAP</td><td></td></tr>
+  <tr><td class="col-field">assets.isActive</td><td>boolean</td><td class="nullable-yes">Yes</td><td>Opsional, default true bila diomit</td><td>Dikirim dari SAP true/false berdasarkan status equipment</td><td>INAC atau DLFL = false</td></tr>
+</table>
+<div class="callout"><b>Catatan:</b> <code>assetClassCode</code>/<code>assetClassName</code> dan <code>assetVariantCode</code>/<code>assetVariantName</code> ditandai <b>Tidak Pakai</b> khusus untuk konteks MKP (SAP MKP tidak menggunakan konsep class/variant ini). Field-nya tetap Nullable=Yes secara skema, jadi aman baik dikirim maupun tidak — contoh payload di atas menampilkan value hanya untuk ilustrasi format, bukan berarti field ini aktif dipakai MKP.</div>
+<p><b>Response:</b> sama pola dengan Employee API (<code>assetNumber</code> sebagai key), HTTP 200 Success/Partial Success, 400, 403 (<code>ERR-0006</code>), 500 (<code>ERR-0007</code>).</p>
+
+<h4>6.2.2 Asset Status</h4>
+<p>Registrasi status operasional equipment di Digiman+, sebagai historical log kondisi unit.</p>
+<div class="callout">Client hanya perlu mengirim status <b>terakhir (last status)</b> setiap kali terjadi perubahan status — tidak perlu mengirim ulang seluruh histori status equipment di setiap request.</div>
+<div class="endpoint-box"><span class="badge badge-post">POST</span><code>base_url/asset-status</code></div>
+
+<div class="resp-label">Request</div>
+<pre>{
+  "assetStatus": [
+    {
+      "trDate": "2024-10-14T00:00:00+07:00",
+      "assetNumber": "BDCT10003",
+      "status": "IN OPERATION"
+    }
+  ]
+}</pre>
+
+<table>
+  <tr><th>Field</th><th>Type</th><th>Nullable</th><th>Deskripsi</th><th>Tabel SAP</th><th>Catatan</th></tr>
+  <tr><td class="col-field">assetStatus</td><td>array</td><td class="nullable-no">No</td><td>Kumpulan record status asset</td><td></td><td></td></tr>
+  <tr><td class="col-field">assetStatus.trDate</td><td>datetime (ISO 8601)</td><td class="nullable-no">No</td><td>Tanggal/waktu efektif status di source system, dengan timezone</td><td>JCDS-UDATE</td><td></td></tr>
+  <tr><td class="col-field">assetStatus.assetNumber</td><td>varchar(50)</td><td class="nullable-no">No</td><td>Nomor asset unik. Tidak diproses jika belum terdaftar.</td><td>EQUI-EQUNR</td><td></td></tr>
+  <tr><td class="col-field">assetStatus.status</td><td>varchar(20)</td><td class="nullable-no">No</td><td>Status: 1. IN OPERATION, 2. IDLE, 3. RETIRED</td><td>JEST-STAT</td><td>EQUI-OBJNR = JEST-OBJNR where JEST-INACT = NULL And JEST-STAT = 'I*'</td></tr>
+</table>
+
+<div class="resp-label">Response</div>
+<ul>
+  <li><b>HTTP 200 – Success:</b> <code>{"status":"success","totalData":1,"successCount":1,"failedCount":0,"results":[{"assetNumber":"BDCT10003","trDate":"2024-10-14T00:00:00+07:00"}]}</code></li>
+  <li><b>HTTP 200 – Partial Success:</b> hasil per item, item gagal punya <code>errorCode</code> (contoh <code>ERR-0014</code>)</li>
+  <li><b>HTTP 400:</b> <code>status: "error"</code> dengan <code>errorCode</code> per item</li>
+  <li><b>HTTP 403:</b> <code>ERR-0006</code> &nbsp; <b>HTTP 500:</b> <code>ERR-0007</code></li>
+</ul>
+
+<h3 id="s6-3">6.3 Material</h3>
+<h4>6.3.1 Material</h4>
+<p>Upsert material — matched by <code>materials.materialNumber</code>. Mendukung single &amp; bulk.</p>
+<div class="endpoint-box"><span class="badge badge-post">POST</span><code>base_url/material</code></div>
+
+<div class="resp-label">Request</div>
+<pre>{
+  "materials": [
+    {
+      "materialNumber": "01-085785-9",
+      "materialName": "SLEEVE,SPECTRUM ADJUSTMENT,BR",
+      "batchCode": "NEW",
+      "siteCode": "1001",
+      "sectionTypeCode": "OBH",
+      "uomCode": "EA",
+      "assetModelCode": "740C",
+      "storageLocation": "WHA1",
+      "currency": "USD",
+      "map": 14.32,
+      "mapLocalCurr": 234217.92,
+      "stock": 25,
+      "ranking": "E",
+      "isActive": true
+    }
+  ]
+}</pre>
+
+<table>
+  <tr><th>Field</th><th>Type</th><th>Nullable</th><th>Deskripsi</th><th>Tabel SAP</th><th>Catatan</th></tr>
+  <tr><td class="col-field">materials</td><td>array</td><td class="nullable-no">No</td><td>Daftar record material (mendukung pengiriman bulk)</td><td></td><td></td></tr>
+  <tr><td class="col-field">materials.materialNumber</td><td>varchar(200)</td><td class="nullable-no">No</td><td>Identifier unik material</td><td>MARA-MATNR</td><td></td></tr>
+  <tr><td class="col-field">materials.materialName</td><td>varchar(200)</td><td class="nullable-no">No</td><td>Nama/deskripsi material</td><td>MARA-MAKTX</td><td></td></tr>
+  <tr><td class="col-field">materials.batchCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Identifier batch. Contoh: NEW, REPAIRED, string kosong</td><td>MBEW-BWTAR</td><td>MARA-MATNR = MBEW-MATNR</td></tr>
+  <tr><td class="col-field">materials.siteCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Site tempat material berada. Tidak diproses jika belum terdaftar.</td><td>MBEW-BWKEY</td><td></td></tr>
+  <tr><td class="col-field">materials.sectionTypeCode</td><td>varchar(64)</td><td class="nullable-no">No</td><td>Kode section type. Tidak diproses jika belum terdaftar.</td><td>AUSP-ATWRT</td><td>1) get equipment dari material master: AUSP-ATINN='EQP_MOD_OEM*' and AUSP-ATWRT=[material model]; 2) get hierarki (loader/hauler): AUSP-ATINN='EQP_MOD_HIR' and AUSP-OBJEK=[1]</td></tr>
+  <tr><td class="col-field">materials.uomCode</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Satuan unit (UOM). Tidak diproses jika belum terdaftar.</td><td>MARA-MEINS</td><td></td></tr>
+  <tr><td class="col-field">materials.assetModelCode</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Kode model asset. Tidak diproses jika belum terdaftar.</td><td>AUSP-ATWRT</td><td>ATINN='MODEL_UNIT'</td></tr>
+  <tr><td class="col-field">materials.storageLocation</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Lokasi penyimpanan material</td><td>MARD-LGORT</td><td></td></tr>
+  <tr><td class="col-field">materials.currency</td><td>varchar(5)</td><td class="nullable-yes">Yes</td><td>Mata uang harga material</td><td>CKMLCR-WAERS</td><td>CKMLRCURTP=10</td></tr>
+  <tr><td class="col-field">materials.map</td><td>float</td><td class="nullable-yes">Yes</td><td>Moving average price / harga rata-rata material</td><td>CKMLCR-PVPRS</td><td>contoh 14.32</td></tr>
+  <tr><td class="col-field">materials.mapLocalCurr</td><td>float</td><td class="nullable-yes">Yes</td><td>Harga dalam mata uang lokal</td><td>CKMLCR-PVPRS</td><td>CKMLRCURTP=40</td></tr>
+  <tr><td class="col-field">materials.stock</td><td>float</td><td class="nullable-yes">Yes</td><td>Jumlah stok saat ini</td><td>MARD-LABST</td><td></td></tr>
+  <tr><td class="col-field">materials.ranking</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Ranking material (A, B, C, dst.)</td><td>MARC-MAABC</td><td></td></tr>
+  <tr><td class="col-field">materials.isActive</td><td>boolean</td><td class="nullable-yes">Yes</td><td>Mengaktifkan/menonaktifkan material. Opsional, default true</td><td>MARC-LVORM</td><td></td></tr>
+</table>
+<p><b>Response:</b> pola sama (key <code>materialNumber</code>), HTTP 200/400/403(<code>ERR-0006</code>)/500(<code>ERR-0007</code>).</p>
+
+<h3 id="s6-4">6.4 Backlog</h3>
+<h4>6.4.1 Backlog</h4>
+<p>Registrasi <b>Pending Work Order</b> baru beserta material yang dibutuhkan, dalam satu langkah integrasi.</p>
+<div class="endpoint-box"><span class="badge badge-post">POST</span><code>base_url/backlog</code></div>
+
+<div class="resp-label">Request</div>
+<pre>{
+  "backlogs": [
+    {
+      "moNumber": "1105152450",
+      "moDescription": "Replace hose compressor",
+      "siteCode": "1001",
+      "assetNumber": "EXCT61016",
+      "orderType": "MT01",
+      "assetModelCode": "6015B",
+      "assetTypeCode": "EXC",
+      "maintenanceCategoryCode": "BEX",
+      "maintenanceCategoryName": "Breakdown Excavator",
+      "object": "IDLER LH",
+      "reservationNumber": "1234567890",
+      "moCreatedDate": "2024-01-08T08:00:00+07:00",
+      "moCreatedBy": "SAP",
+      "moUpdatedDate": "2024-01-08T09:00:00+07:00",
+      "moUpdatedBy": "SAP",
+      "moReleaseDate": "2024-01-09T08:00:00+07:00",
+      "moTecoDate": null,
+      "moClosedDate": null,
+      "moPlanCost": 500000.00,
+      "moActualCost": 0.00,
+      "moStatus": "OPEN",
+      "isActive": true,
+      "materials": [
+        {
+          "materialNumber": "MAT-001",
+          "materialName": "Hydraulic Hose",
+          "batch": "NEW",
+          "orderQuantity": 1.00,
+          "uom": "PCS",
+          "storageLocation": "WH01",
+          "prStatus": "CREATED",
+          "prNumber": "12345",
+          "poNumber": "98765",
+          "orderStatus": "OPEN",
+          "grStatus": "PARTIAL",
+          "grQuantity": 1.00,
+          "grNumber": "77889",
+          "giNumber": "77889",
+          "giDate": "2024-01-10T08:00:00+07:00",
+          "giStatus": "PARTIAL",
+          "giQuantity": 1.00,
+          "estCost": 500000.00,
+          "isActive": true
+        }
+      ]
+    }
+  ]
+}</pre>
+
+<div class="resp-label">Header Fields</div>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Nullable</th><th>Deskripsi</th><th>Tabel SAP</th><th>Catatan</th></tr>
+  <tr><td class="col-field">backlogs</td><td>array</td><td class="nullable-no">No</td><td>Daftar record backlog MO (mendukung pengiriman bulk)</td><td></td><td></td></tr>
+  <tr><td class="col-field">backlogs.moNumber</td><td>varchar(12)</td><td class="nullable-no">No</td><td>Nomor MO unik dari sistem eksternal</td><td>AUFK-AUFNR</td><td></td></tr>
+  <tr><td class="col-field">backlogs.moDescription</td><td>varchar(250)</td><td class="nullable-no">No</td><td>Deskripsi pekerjaan maintenance</td><td>AUFK-KTEXT</td><td></td></tr>
+  <tr><td class="col-field">backlogs.siteCode</td><td>varchar(4)</td><td class="nullable-no">No</td><td>Site/plant code. Numeric only 1–4 digit (mis. "1001"). Tidak diproses jika belum terdaftar.</td><td>AUFK-WERKS</td><td></td></tr>
+  <tr><td class="col-field">backlogs.assetNumber</td><td>varchar(20)</td><td class="nullable-no">No</td><td>Identifier asset/equipment terkait. Data ditolak jika equipment belum terdaftar di Digiman+.</td><td>EQUI-EQUNR</td><td></td></tr>
+  <tr><td class="col-field">backlogs.orderType</td><td>varchar(20)</td><td class="nullable-yes">Yes</td><td>Tipe maintenance order (mis. MT01). Tidak diproses jika belum terdaftar.</td><td>AUFK-AUART</td><td></td></tr>
+  <tr><td class="col-field">backlogs.assetModelCode</td><td>varchar(50)</td><td class="nullable-yes">Yes</td><td>Kode model asset</td><td>TBD — konfirmasi tim SAP</td><td></td></tr>
+  <tr><td class="col-field">backlogs.assetTypeCode</td><td>varchar(100)</td><td class="nullable-yes">Yes</td><td>Kode tipe asset. Tidak diproses jika belum terdaftar.</td><td>EQUI-EQART</td><td></td></tr>
+  <tr><td class="col-field">backlogs.maintenanceCategoryCode</td><td>varchar(16)</td><td class="nullable-no">No</td><td>Kode kategori maintenance activity (PM, BEX, dll). Tidak diproses jika belum terdaftar.</td><td>AFIH-ILART</td><td>AUFK-AUFNR = AFIH-AUFNR</td></tr>
+  <tr><td class="col-field">backlogs.maintenanceCategoryName</td><td>varchar(100)</td><td class="nullable-yes">Yes</td><td>Nama kategori (pasangan maintenanceCategoryCode)</td><td>TBD — konfirmasi tim SAP</td><td>→ PM Activity Type</td></tr>
+  <tr><td class="col-field">backlogs.object</td><td>varchar(50)</td><td class="nullable-yes">Yes</td><td>Tipe Technical Object, Komponen Utama</td><td>EQUI-EQART</td><td>AFIH-EQUNR = EQUI-EQUNR</td></tr>
+  <tr><td class="col-field">backlogs.reservationNumber</td><td>varchar(19)</td><td class="nullable-yes">Yes</td><td>Nomor reservasi. Hanya karakter numerik.</td><td>TBD — konfirmasi tim SAP</td><td>Numeric only (^\d+$), Int64</td></tr>
+  <tr><td class="col-field">backlogs.moCreatedDate</td><td>datetime</td><td class="nullable-no">No</td><td>Tanggal MO dibuat di source system, ISO 8601</td><td>AUFK-ERDAT</td><td></td></tr>
+  <tr><td class="col-field">backlogs.moCreatedBy</td><td>varchar(100)</td><td class="nullable-yes">Yes</td><td>User/system pembuat MO</td><td>AUFK-ERNAM</td><td></td></tr>
+  <tr><td class="col-field">backlogs.moUpdatedDate</td><td>datetime</td><td class="nullable-yes">Yes</td><td>Tanggal MO terakhir diupdate</td><td>AUFK-AEDAT</td><td></td></tr>
+  <tr><td class="col-field">backlogs.moUpdatedBy</td><td>varchar(100)</td><td class="nullable-yes">Yes</td><td>User/system yang terakhir update MO</td><td>AUFK-AENAM</td><td></td></tr>
+  <tr><td class="col-field">backlogs.moReleaseDate</td><td>datetime</td><td class="nullable-yes">Yes</td><td>Tanggal MO dirilis untuk eksekusi</td><td>AFKO-FTRMI</td><td>AUFK-AUFNR = AFKO-AUFNR</td></tr>
+  <tr><td class="col-field">backlogs.moTecoDate</td><td>datetime</td><td class="nullable-yes">Yes</td><td>Tanggal MO TECO (technically complete)</td><td>AUFK-IDAT2</td><td></td></tr>
+  <tr><td class="col-field">backlogs.moClosedDate</td><td>datetime</td><td class="nullable-yes">Yes</td><td>Tanggal MO ditutup administratif</td><td>AUFK-IDAT3</td><td></td></tr>
+  <tr><td class="col-field">backlogs.moPlanCost</td><td>decimal(18,2)</td><td class="nullable-yes">Yes</td><td>Estimasi biaya (planned cost)</td><td>COSP-WTG*</td><td>AUFK-AUFNR = COSP-'*OBJNR', COSP-VRGNG = 'KPPP'</td></tr>
+  <tr><td class="col-field">backlogs.moActualCost</td><td>decimal(18,2)</td><td class="nullable-yes">Yes</td><td>Biaya aktual</td><td>COSP-WTG*</td><td>AUFK-AUFNR = COSP-'*OBJNR', COSP-VRGNG = 'COIN'</td></tr>
+  <tr><td class="col-field">backlogs.moStatus</td><td>varchar(100)</td><td class="nullable-yes">Yes</td><td>1. OPEN, 2. RELEASED, 3. COMPLETED, 4. CLOSED, 5. DELETED</td><td>JEST-STAT</td><td>AUFK-OBJNR = JEST-OBJNR where JEST-INACT = NULL And JEST-STAT = 'I*'</td></tr>
+  <tr><td class="col-field">backlogs.isActive</td><td>boolean</td><td class="nullable-no">No</td><td>true = MO aktif, false = MO tidak aktif</td><td>JEST-STAT</td><td>True = I0001, I0002, I0045, I0046, atau I0327. False = I0043</td></tr>
+</table>
+
+<div class="resp-label">Material Array Fields (<code>backlogs.materials</code>)</div>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Nullable</th><th>Deskripsi</th><th>Tabel SAP</th><th>Catatan</th></tr>
+  <tr><td class="col-field">materials</td><td>array</td><td class="nullable-yes">Yes</td><td>List material terkait backlog</td><td></td><td></td></tr>
+  <tr><td class="col-field">materials.materialNumber</td><td>varchar(50)</td><td class="nullable-no">No</td><td>Identifier material</td><td>RESB-MATNR</td><td>RESB-AUFNR = AUFK-AUFNR</td></tr>
+  <tr><td class="col-field">materials.materialName</td><td>varchar(100)</td><td class="nullable-no">No</td><td>Deskripsi material</td><td>MAKT-MAKTX</td><td>MAKT-MATNR = RESB-MATNR</td></tr>
+  <tr><td class="col-field">materials.batch</td><td>varchar(50)</td><td class="nullable-no">No</td><td>Klasifikasi usage material (NEW, REPLACE, dll; bisa kosong)</td><td>RESB-CHARG</td><td>RESB-AUFNR = AUFK-AUFNR</td></tr>
+  <tr><td class="col-field">materials.orderQuantity</td><td>decimal(18,2)</td><td class="nullable-yes">Yes</td><td>Quantity yang dipesan/direservasi</td><td>RESB-BDMNG</td><td>RESB-AUFNR = AUFK-AUFNR</td></tr>
+  <tr><td class="col-field">materials.uom</td><td>varchar(50)</td><td class="nullable-no">No</td><td>Satuan unit (PCS, EA, SET)</td><td>RESB-MEINS</td><td>RESB-AUFNR = AUFK-AUFNR</td></tr>
+  <tr><td class="col-field">materials.storageLocation</td><td>varchar(50)</td><td class="nullable-yes">Yes</td><td>Lokasi penyimpanan material</td><td>RESB-LGORT</td><td>RESB-AUFNR = AUFK-AUFNR</td></tr>
+  <tr><td class="col-field">materials.prStatus</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Status Purchase Requisition (CREATED, APPROVED)</td><td>EBAN-FRGKZ</td><td>Lihat logika Release Strategy di dokumen asli</td></tr>
+  <tr><td class="col-field">materials.prNumber</td><td>varchar(19)</td><td class="nullable-yes">Yes</td><td>Nomor Purchase Requisition. Hanya karakter numerik.</td><td>EBAN-BANFN</td><td>EBAN-ZZ_AUFNR = AUFK-AUFNR</td></tr>
+  <tr><td class="col-field">materials.poNumber</td><td>varchar(19)</td><td class="nullable-yes">Yes</td><td>Nomor Purchase Order. Hanya karakter numerik.</td><td>EKKO-EBELN</td><td>Step 1: EBAN-BANFN where EBAN-ZZ_AUFNR = AUFK-AUFNR; Step 2: EKKO-EBELN = EBAN-EBELN</td></tr>
+  <tr><td class="col-field">materials.orderStatus</td><td>varchar(16)</td><td class="nullable-yes">Yes</td><td>Status order terkait supply material</td><td>EKKO-FRGKE</td><td>Lihat logika Release Strategy di dokumen asli</td></tr>
+  <tr><td class="col-field">materials.grStatus</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Status Goods Receipt</td><td>EKPO-ELIKZ</td><td>"FULL RECEIVED" jika EKPO-ELIKZ=X dan EKPO-LOEKZ=blank, else "PARTIAL"</td></tr>
+  <tr><td class="col-field">materials.grQuantity</td><td>decimal(18,2)</td><td class="nullable-yes">Yes</td><td>Quantity diterima via Goods Receipt</td><td>MATDOC-MENGE</td><td>MATDOC-MBLNR = materials.giNumber</td></tr>
+  <tr><td class="col-field">materials.grNumber</td><td>varchar(40)</td><td class="nullable-yes">Yes</td><td>Nomor dokumen Goods Receipt (free text)</td><td>MATDOC-MBLNR</td><td>MATDOC-EBELN = EKKO-EBELN where MATDOC-SMBLN=blank and MATDOC-CANCELLED=blank and MATDOC-BWART='101'</td></tr>
+  <tr><td class="col-field">materials.giNumber</td><td>varchar(40)</td><td class="nullable-yes">Yes</td><td>Nomor dokumen Goods Issue (free text)</td><td>MATDOC-MBLNR</td><td>MATDOC-AUFNR = AUFK-AUFNR where MATDOC-SMBLN=blank and MATDOC-CANCELLED=blank and MATDOC-BWART='261'</td></tr>
+  <tr><td class="col-field">materials.giDate</td><td>datetime</td><td class="nullable-yes">Yes</td><td>Tanggal transaksi Goods Issue, ISO 8601</td><td>MATDOC-BUDAT + MATDOC-CPUTM</td><td>MATDOC-MBLNR = materials.giNumber</td></tr>
+  <tr><td class="col-field">materials.giStatus</td><td>varchar(64)</td><td class="nullable-yes">Yes</td><td>Status Goods Issue (PARTIAL/COMPLETE)</td><td>RESB-KZEAR</td><td>Partial jika RESB-KZEAR != X; Complete jika RESB-KZEAR = X, where RESB-AUFNR = AUFK-AUFNR</td></tr>
+  <tr><td class="col-field">materials.giQuantity</td><td>decimal(18,2)</td><td class="nullable-yes">Yes</td><td>Quantity yang di-issue via Goods Issue</td><td>MATDOC-MENGE</td><td>MATDOC-AUFNR = AUFK-AUFNR</td></tr>
+  <tr><td class="col-field">materials.estCost</td><td>decimal(18,2)</td><td class="nullable-yes">Yes</td><td>Estimasi biaya material</td><td>COSP-WTG*</td><td>AUFK-AUFNR = COSP-'*OBJNR', COSP-VRGNG = 'KPPP'</td></tr>
+  <tr><td class="col-field">materials.isActive</td><td>boolean</td><td class="nullable-no">No</td><td>Status aktif material record</td><td>MARC-LVORM</td><td></td></tr>
+</table>
+
+<div class="callout"><b>Response</b> (perhatikan key berbeda dari API lain: <code>totalRecords</code>/<code>successRecords</code>/<code>failedRecords</code>):</div>
+<b>HTTP 200 – Success</b>
+<pre>{"status":"success","totalRecords":1,"successRecords":1,"failedRecords":0,"results":[{"moNumber":"1105152450","status":"success"}]}</pre>
+<ul>
+  <li><b>HTTP 200 – Partial Success:</b> item gagal punya <code>errorCode</code> (mis. <code>ERR-0002</code>)</li>
+  <li><b>HTTP 400:</b> <code>status:"error"</code> dengan <code>totalData/successCount/failedCount</code></li>
+  <li><b>HTTP 403:</b> <code>ERR-0006</code> &nbsp; <b>HTTP 500:</b> <code>ERR-0007</code></li>
+</ul>
+
+<h3 id="s6-5">6.5 Breakdown Notification</h3>
+<h4>6.5.1 Breakdown Notification</h4>
+<p>Upsert breakdown notification — matched by <code>breakdownNotifications.notification</code>; kalau sudah ada → update, kalau belum → create. Mendukung single &amp; bulk. Hanya ada satu API (POST) untuk create maupun update.</p>
+<div class="endpoint-box"><span class="badge badge-post">POST</span><code>base_url/breakdown-notification</code></div>
+
+<div class="resp-label">Request</div>
+<pre>{
+  "breakdownNotifications": [
+    {
+      "notification": "810002225968",
+      "notificationStatus": "IN PROGRESS",
+      "breakdownDescription": "Hydraulic hose leakage",
+      "siteCode": "1001",
+      "assetNumber": "DT777001",
+      "assetModelCode": "777D",
+      "breakdownType": "Unscheduled",
+      "hmBreakdown": 58008.78,
+      "breakdownStartDate": "2026-01-19T08:26:57+08:00",
+      "breakdownEndDate": null,
+      "rfuEstimateDate": "2026-01-19T17:00:00+08:00",
+      "location": "TA BARAT",
+      "isCloseBreakdown": false,
+      "isActive": true
+    }
+  ]
+}</pre>
+
+<table>
+  <tr><th>Field</th><th>Type</th><th>Nullable</th><th>Deskripsi</th><th>Tabel SAP</th><th>Catatan</th></tr>
+  <tr><td class="col-field">breakdownNotifications</td><td>Varchar</td><td class="nullable-no">No</td><td>Daftar record breakdown notification (mendukung pengiriman bulk)</td><td></td><td></td></tr>
+  <tr><td class="col-field">breakdownNotifications.notification</td><td>Varchar(12)</td><td class="nullable-no">No</td><td>Nomor notifikasi unik, wajib unik di sistem</td><td>QMEL-QMNUM</td><td></td></tr>
+  <tr><td class="col-field">breakdownNotifications.notificationStatus</td><td>Varchar(20)</td><td class="nullable-no">No</td><td>1. OPEN, 2. IN PROGRESS, 3. COMPLETED, 4. DELETED</td><td>JEST-STAT</td><td>QMEL-QMNUM = JEST-OBJNR where JEST-INACT = NULL And JEST-STAT = 'I*'</td></tr>
+  <tr><td class="col-field">breakdownNotifications.breakdownDescription</td><td>Varchar(200)</td><td class="nullable-no">No</td><td>Deskripsi kerusakan/kegagalan equipment</td><td>QMEL-QMTXT</td><td></td></tr>
+  <tr><td class="col-field">breakdownNotifications.siteCode</td><td>Varchar(4)</td><td class="nullable-no">No</td><td>Site lokasi breakdown. Tidak diproses jika belum terdaftar.</td><td>QMIH-IWERK</td><td>QMEL-QMNUM = QMIH-QMNUM</td></tr>
+  <tr><td class="col-field">breakdownNotifications.assetNumber</td><td>Varchar(25)</td><td class="nullable-no">No</td><td>Identifier equipment. Data ditolak jika equipment belum terdaftar di Digiman+.</td><td>EQUI-EQUNR</td><td></td></tr>
+  <tr><td class="col-field">breakdownNotifications.assetModelCode</td><td>Varchar(40)</td><td class="nullable-yes">Yes</td><td>Kode model asset. Tidak diproses jika belum terdaftar.</td><td>AUSP-ATWRT</td><td>EQUI-EQUNR = AUSP.OBJEK where ATINN = EQP_MOD_OEM*</td></tr>
+  <tr><td class="col-field">breakdownNotifications.breakdownType</td><td>varchar (free text)</td><td class="nullable-yes">Yes</td><td>Teks bebas — Digiman+ memetakan value server-side: "Unscheduled" → tipe Unscheduled, nilai lain default ke tipe Breakdown</td><td>ZIDMBD-BDSUBTYP</td><td>QMEL-QMNUM = ZIDMBD-QMNUM</td></tr>
+  <tr><td class="col-field">breakdownNotifications.hmBreakdown</td><td>Decimal(13,2)</td><td class="nullable-yes">Yes</td><td>Hour meter saat breakdown terjadi</td><td>ZIDMBD-HM_BD</td><td>QMEL-QMNUM = ZIDMBD-QMNUM</td></tr>
+  <tr><td class="col-field">breakdownNotifications.breakdownStartDate</td><td>Datetime</td><td class="nullable-no">No</td><td>Tanggal/waktu mulai breakdown, ISO 8601 dengan timezone</td><td>QMIH-VIQMEL + QMIH-AUZTV</td><td>QMEL-QMNUM = QMIH-QMNUM</td></tr>
+  <tr><td class="col-field">breakdownNotifications.breakdownEndDate</td><td>Datetime</td><td class="nullable-yes">Yes</td><td>Tanggal/waktu breakdown selesai, ISO 8601 dengan timezone. Null jika breakdown belum selesai (<code>isCloseBreakdown</code> = false).</td><td>QMIH-AUSBS + QMIH-AUZTB</td><td></td></tr>
+  <tr><td class="col-field">breakdownNotifications.rfuEstimateDate</td><td>Datetime</td><td class="nullable-yes">Yes</td><td>Estimasi tanggal/waktu equipment kembali beroperasi (Ready For Use), ISO 8601 dengan timezone</td><td>ZIDMBD-RFUESTDATE1</td><td>QMEL-QMNUM = ZIDMBD-QMNUM</td></tr>
+  <tr><td class="col-field">breakdownNotifications.location</td><td>Varchar(200)</td><td class="nullable-yes">Yes</td><td>Lokasi breakdown dalam site operasional</td><td>-</td><td>contoh: TA BARAT</td></tr>
+  <tr><td class="col-field">breakdownNotifications.isCloseBreakdown</td><td>Boolean</td><td class="nullable-no">No</td><td>true = breakdown sudah selesai/finish dan ditutup (closed), false = masih berlangsung/terbuka (open)</td><td>ZIDMBD-ISSTATBD</td><td>QMEL-QMNUM = ZIDMBD-QMNUM</td></tr>
+  <tr><td class="col-field">breakdownNotifications.isActive</td><td>boolean</td><td class="nullable-no">No</td><td>Status validitas data record (bukan status breakdown). true = data valid/aktif, false = record sudah di-cancel/delete (tidak valid)</td><td>JEST-STAT</td><td>True = I0061; False = I0060 OR I0062</td></tr>
+</table>
+<p><b>Response:</b> pola sama seperti API lain (key <code>notification</code>), HTTP 200/400/403(<code>ERR-0006</code>)/500(<code>ERR-0007</code>).</p>
+
+<h2 id="s7">7. Glosarium — 7.1 Kode Error</h2>
+<table>
+  <tr><th style="width:15%">Kode</th><th>Deskripsi</th></tr>
+  <tr><td>ERR-0001</td><td>Kode tenant yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0002</td><td>Kode site yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0003</td><td>Kode department yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0004</td><td>Kode section yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0005</td><td>User dengan user code yang sama sudah ada di sistem.</td></tr>
+  <tr><td>ERR-0006</td><td>Akses ke API ini ditolak karena permission tidak mencukupi.</td></tr>
+  <tr><td>ERR-0007</td><td>Terjadi internal server error saat memproses request.</td></tr>
+  <tr><td>ERR-0008</td><td>Kode tipe asset yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0009</td><td>Kode class asset yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0010</td><td>Kode variant asset yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0011</td><td>Kode model asset yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0012</td><td>Kode brand asset yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0013</td><td>Kode kategori asset yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0014</td><td>Identifier equipment yang dikirim belum terdaftar di sistem.</td></tr>
+  <tr><td>ERR-0015</td><td>Kode batch yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0016</td><td>Kode UOM (unit of measure) yang dikirim belum terdaftar di master data sistem.</td></tr>
+  <tr><td>ERR-0017</td><td>User code yang dikirim belum terdaftar di sistem.</td></tr>
+</table>
+
+<div class="footer-note">Digiman+ Integration Interface Specification untuk MKP — Versi 2.0 — Terakhir diperbarui 05 Agustus 2026.</div>
+
+</div>
+</body>
+</html>
