@@ -168,7 +168,7 @@ Digiman+ sudah memiliki retry mechanism yang dipertahankan. Ditambah prinsip **i
 | Form reopen setelah submit | **Deferred to next MVP** |
 | Mechanic sakit/pergi, data belum sync | **Behavior berbeda per jenis data** (keputusan desain eksplisit): (1) **Form content** (field values) → **ditolak** jika sync setelah form status `Complete` — data tidak boleh mengubah form yang sudah final; (2) **Activity records** (`TaskPersonalizedLog`) → **diterima** selama `StartDate < submitted time` — activity adalah historical log, tidak mempengaruhi form content, selalu valid |
 | Visibility antar mechanic | Mechanic bisa saling melihat progress sampai level field — bukan per tab. Mechanic B dapat melihat field mana saja yang sudah diisi Mechanic A beserta identitasnya. **Mekanisme: auto-sync kombinasi dua trigger (aktif hanya saat ada koneksi):** (1) After input + debounce 3 detik → upload dirty fields + download latest; (2) Background timer 30 detik → download latest meski tidak ada input baru. Near real-time tanpa persistent connection. Trade-off: interval timer mempengaruhi battery |
-| Field validation range & attachment | → dibahas di [Form Behavior](pm-shutdown-form-behavior.md) |
+| Field validation range & attachment | Belum dibahas — dokumen pembahasan sebelumnya (`pm-shutdown-form-behavior.md`) dihapus 2026-08-06, dinyatakan tidak relevan untuk saat ini |
 
 ---
 

@@ -273,15 +273,21 @@ Element `ASSESSMENTCHECK` di `FormStructure` me-reference TaskKit via field `cat
 
 **General Check:**
 
-| Category | Name | Jumlah Kolom |
-|----------|------|-------------|
-| `ASSESSMENT` | General Check - Assessment Check | 4 |
-| `WASHING` | General Check - Washing | 4 |
-| `ACTION` | General Check - Action Task | 4 |
-| `DEFECT` | General Check - Defect Check | 4 |
-| `CRACK` | General Check - Crack Defect | 4 |
-| `CONDITION_CHECK` | General Check - Condition Check | 4 |
-| `DATAINPUT` | General Check - Data Input | 6 |
+| Category | Name | Jumlah Kolom | Opsi Dropdown (fixed per TaskKit) |
+|----------|------|-------------|---|
+| `ASSESSMENT` | General Check - Assessment Check | 4 | `Comply` / `Not Comply` / `Not Applicable` |
+| `WASHING` | General Check - Washing | 4 | `Clean` / `Dirty` / `Not Applicable` |
+| `ACTION` | General Check - Action Task | 4 | `Complete` / `Not Applicable` |
+| `DEFECT` | General Check - Defect Check | 4 | `Normal, system working` / `Defect Identified` / `Not Applicable` |
+| `CRACK` | General Check - Crack Defect | 4 | `No Crack Identified` / `Crack Identified: Monitor` / `Crack Identified: Repair Required` / `Not Applicable` |
+| `CONDITION_CHECK` | General Check - Condition Check | 4 | `Ok` / `Not Ok` |
+| `DATAINPUT` | General Check - Data Input | 6 | `Normal, System Working` / `Defect Identified` / `Not Applicable` (+ kolom `Volume`, input bebas sebelum dropdown) |
+
+*Opsi dropdown dikonfirmasi dari screenshot UI Form Builder & preview form (2026-08-06).*
+
+**Struktur row (semua General Check TaskKit seragam):** `Task` (nomor urut) → `Description` → [`Volume`, khusus Data Input] → dropdown status → 2 action icon: camera+ (`TAKEPHOTO`, add photo evidence) dan pencil (`ADDITIONALINFORMATION`, add remark bebas), plus `⋮` (more options). **Label kolom header** (`Task`, `Description`/`Operational Check`, `Status`/`Condition`/`Response`) **editable oleh Form Builder** — tapi **opsi dropdown itu sendiri fixed per TaskKit category**, bukan dikonfigurasi ulang per form.
+
+**Gap penting:** tidak ada satupun TaskKit General Check yang punya field `Component`/`SubComponent`/`DamageCode`/`CauseCode`/`ActionRemedyCode`/`PriorityCode`/`RepairDuration` di level row — field-field yang mengisi `TaskPersonalizedFinding` (lihat [form-submission.md](form-submission.md#schema-tabel-taskpersonalizedfinding)) dan jadi source `MechanicOrderDetail` di eMOL ([order-emol-sap-sync.md](../inspection-order/order-emol-sap-sync.md#33-maintenance-ordermechanicorderdetail-detail-defect-per-emol--struktur-real-dikonfirmasi-15-jul-2026)). Row cuma capture dropdown status + foto + remark bebas. **Belum dikonfirmasi** bagaimana/di mana taksonomi defect itu sebenarnya diisi user hari ini — lihat [order-integration.md](../../roadmap/phase2-order-integration/order-integration.md) untuk diskusi lanjutannya (scope Order Integration).
 
 **CBM:**
 

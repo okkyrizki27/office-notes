@@ -484,6 +484,7 @@ Inbound = client memanggil API Digiman+.
       "assetNumber": "EXCT61016",
       "orderType": "MT01",
       "assetModelCode": "6015B",
+      "assetModelName": "6015B",
       "assetTypeCode": "EXC",
       "maintenanceCategoryCode": "BEX",
       "maintenanceCategoryName": "Breakdown Excavator",
@@ -538,7 +539,8 @@ Inbound = client memanggil API Digiman+.
 | backlogs.siteCode | varchar(4) | No | Site/plant code. Numeric only 1–4 digit (mis. "1001"). Tidak diproses jika belum terdaftar. | AUFK-WERKS | |
 | backlogs.assetNumber | varchar(20) | No | Identifier asset/equipment terkait. Data ditolak jika equipment belum terdaftar di Digiman+. | EQUI-EQUNR | |
 | backlogs.orderType | varchar(20) | Yes | Maintenance order type (mis. MT01). Tidak diproses jika belum terdaftar. | AUFK-AUART | |
-| backlogs.assetModelCode | varchar(50) | Yes | Asset model code | TBD — konfirmasi tim SAP | |
+| backlogs.assetModelCode | varchar(50) | Yes | Asset model code (pasangan assetModelName) | TBD — konfirmasi tim SAP | |
+| backlogs.assetModelName | varchar(50) | Yes | Asset model name (pasangan assetModelCode). Tidak diproses jika belum terdaftar. | TBD — konfirmasi tim SAP | |
 | backlogs.assetTypeCode | varchar(100) | Yes | Asset type code. Tidak diproses jika belum terdaftar. | EQUI-EQART | |
 | backlogs.maintenanceCategoryCode | varchar(16) | No | Kode kategori maintenance activity (PM, BEX, dll). Tidak diproses jika belum terdaftar. | AFIH-ILART | AUFK-AUFNR = AFIH-AUFNR |
 | backlogs.maintenanceCategoryName | varchar(100) | Yes | Nama kategori (pasangan maintenanceCategoryCode) | TBD — konfirmasi tim SAP | → PM Activity Type |
