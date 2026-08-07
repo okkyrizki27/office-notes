@@ -4,8 +4,10 @@
 |---|---|
 | **Project** | BUMA AU |
 | **Reported by** | Benedict Panizza |
-| **Date Raised** | 2026-07-27 |
+| **Date Raised** | 2026-07-27 10:14 AM WIB |
+| **Priority** | N/A (Inquiry — not an Incident/Defect) |
 | **Status** | Open — Follow-up needed |
+| **Waiting On** | Okky / Agus Setiadi (BUMA side to confirm and reply to Benedict) |
 
 ## Description
 

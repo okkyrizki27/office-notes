@@ -4,8 +4,10 @@
 |---|---|
 | **Project** | BUMA AU |
 | **Reported by** | Benedict Panizza |
-| **Date Raised** | TBD |
-| **Status** | Investigated |
+| **Date Raised** | 2026-07-13 10:25 AM WIB |
+| **Priority** | N/A (working as designed — matches original 2023 requirement, not a Defect per contract definition) |
+| **Status** | Done |
+| **Date Done** | 2026-08-06 |
 
 ## Description
 
@@ -19,3 +21,28 @@ This task only creates a defect when both conditions are met:
 2. The result of the adjustment is still out of spec.
 
 If Supervisor Adjustment = No, no defect is created even though the original result is out of spec.
+
+## Timeline
+
+| Date/Time (WIB) | By | Action | Ball moves to |
+|---|---|---|---|
+| 2026-07-13 10:25 AM | Benedict Panizza | Raises "Truck Struts Out of Spec Query" — asks why out-of-spec struts (even after readjustment) don't show up on the defects/review page the way an X rating would, and where the logic lives in the IronForms backend. | Bukit Technology Support |
+| 2026-07-14 08:35 AM | Pradya (BukitTech) | Apologizes for delay; checking with backend team to validate implemented logic, will follow up. | Bukit Technology Support |
+| 2026-07-14 04:55 PM | Benedict Panizza | Clarifies the question: specifically why "out of spec" struts don't appear on the Identified Defects page the same way an X rating would for supervisors to acknowledge. | Bukit Technology Support |
+| 2026-07-14 07:41 PM | Pradya (BukitTech) | Shares where the out-of-spec logic config lives: UAT SQL DB `sqldb-ae-nonprod-astadm-001`, table `md_parameter_ehms`; attaches example config data. | Benedict Panizza |
+| 2026-07-16 07:10 PM | Pradya (BukitTech) | Explains defect-creation logic: an Identified Defect is only created if status remains **Out of Spec after the adjustment has been applied**; if the adjustment brings the value back within range, no defect is generated. Shares screenshots. | Benedict Panizza |
+| 2026-07-17 05:05 AM | Benedict Panizza | Pinpoints the actual gap: when the adjustment prompt is answered **"no"** and the struts are out of spec, they remain out of spec — a defect should still appear on the Identified Defects page for the Supervisor to acknowledge, but currently doesn't. | Bukit Technology Support |
+| 2026-08-06 10:36 PM | Okky (BukitTech) | Reports back after tracing the original requirement: found the corresponding Jira ticket (created 16 March 2023, attached `BAA-2306.pdf`), confirming this is how the logic was originally specified — but the ticket doesn't explain the reasoning. Notes the requirement originally came from "Ben" (BUMA side); asks Benedict to reach out to Ben to clarify the reasoning behind the logic. | Benedict Panizza |
+
+*No further reply from Benedict is captured in this thread after 2026-08-06.*
+
+## Resolution
+
+Traced back to the original 2023 requirement (Jira ticket, `BAA-2306.pdf`) confirming current behavior — no defect created when Supervisor Adjustment = No — matches what was originally specified by BUMA. Since the system behaves per the agreed original spec rather than deviating from it, this does not meet the contract's definition of a Defect (Schedule 3 §1: a Defect requires a verified failure to conform to the *agreed* specification). Treated as closed / working as designed.
+
+Note: the thread's last message (2026-08-06) still asks Benedict to loop in "Ben" (original requirement owner) for the rationale — that confirmation isn't captured in this thread, but the issue is being closed on the basis that current behavior matches the documented original requirement.
+
+## SLA Notes
+
+- Reclassified **N/A** — not a Defect under Schedule 3 §1 (behavior matches the agreed 2023 spec), so P1–P4 targets don't apply.
+- For reference, root-cause tracing took from 2026-07-17 (gap identified) to 2026-08-06 (traced to original ticket) — roughly 3 weeks, entirely on Bukit Technology Support's side (not a BUMA-caused pause window).

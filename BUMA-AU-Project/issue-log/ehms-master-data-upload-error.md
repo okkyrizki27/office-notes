@@ -5,6 +5,7 @@
 | **Project** | BUMA AU |
 | **Reported by** | Benedict Panizza |
 | **Date Raised** | TBD |
+| **Priority** | P3 |
 | **Status** | UAT Done |
 | **Jira Ticket** | [BAA-13509](https://bukittechnology.atlassian.net/browse/BAA-13509) — "[IronLake] Adjust CBM Parameter Uploader" (parent: [BAA-13445](https://bukittechnology.atlassian.net/browse/BAA-13445)) |
 | **Assignee** | Dian Heryana |

@@ -5,6 +5,7 @@
 | **Project** | BUMA AU |
 | **Reported by** | Benedict Panizza |
 | **Date Raised** | 2026-08-04 |
+| **Priority** | N/A (Service Request — data correction, not an Incident/Defect) |
 | **Status** | Done |
 
 ## Description

@@ -5,6 +5,7 @@
 | **Project** | BUMA AU |
 | **Reported by** | Benedict Panizza |
 | **Date Raised** | TBD |
+| **Priority** | P3 |
 | **Status** | Open |
 
 ## Description
