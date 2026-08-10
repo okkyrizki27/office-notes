@@ -7,7 +7,7 @@
 | **Date Raised** | 2026-07-13 10:25 AM WIB |
 | **Priority** | N/A (working as designed — matches original 2023 requirement, not a Defect per contract definition) |
 | **Status** | Done |
-| **Date Done** | 2026-08-06 |
+| **Date Done** | 2026-08-06 10:36 PM WIB |
 
 ## Description
 
