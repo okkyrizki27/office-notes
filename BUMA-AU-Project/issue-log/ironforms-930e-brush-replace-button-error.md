@@ -7,10 +7,10 @@
 | **Cc** | Justin Shaw, Traven Hooper, Benedict Panizza, Scott McBryde, Stuart Cameron, DL Blackwater Reliability |
 | **Date Raised** | 2026-06-25 09:08 WIB |
 | **Priority** | P3 |
-| **Status** | Open — being investigated by Bukit Technology Support |
+| **Status** | Done |
 | **Jira Ticket** | — |
 | **Handled by** | Okky / Pradya (Bukit Technology Support) |
-| **Waiting On** | Bukit Technology Support (as of 2026-08-06 08:58 WIB — investigating root cause) |
+| **Waiting On** | — (fix deployed 2026-08-10; awaiting Will's confirmation on his end if any issue resurfaces) |
 
 ## Description
 
@@ -38,14 +38,15 @@ On the 930E-4 electrical service sheet in IronForms, the **Replace** button for 
 | 2026-07-16 07:04 PM | Pradya (BukitTech) | Still trying to reproduce the production scenario in non-prod for A5–A8; will follow up. | Bukit Technology Support |
 | 2026-08-06 07:58 AM | Will Mullany | Sends concrete reproduction — WO **4267274**, Equipment **DT0768**, 500hr service (confirmed consistent across all 930E trucks): (1) out-of-spec measurement entered on Brush 6 (reference value 44mm, entered 11mm) → correctly flagged "Out of spec"; (2) Replace button pressed; (3) "Out Of Range" error pops up, disappears after 1–2 seconds; (4) brush still evaluated as out of spec — electrician replaces it anyway, defect/intervention raised unnecessarily. Offers to share full videos via shared folder (too large to attach); attaches network HAR log of the replicated fault. | Bukit Technology Support |
 | 2026-08-06 08:58 AM | Pradya (BukitTech) | Acknowledges receipt of the detailed info/attachments, confirms the team will investigate the root cause and follow up. | Bukit Technology Support |
+| 2026-08-10 03:18 PM | Pradya (BukitTech) | Sends RCA (attached): root cause identified as the **A5–A8 task configuration** needing an update. Plans to apply the config update same day, will notify Will once done. | Bukit Technology Support |
+| 2026-08-10 05:31 PM | Pradya (BukitTech) | Confirms configuration has been updated; sends PVT ("PVT - Fixing Cannot Replace - 100826.pdf") for the updated configuration. Asks Will to try it and report any issues. | Will Mullany |
 
 ## SLA Notes
 
-- Clock is currently on **Bukit Technology Support** (waiting on root-cause investigation since 2026-08-06 08:58 AM WIB).
+- Root cause: A5–A8 task configuration was incorrect, blocking the Replace flow for those brush items. RCA sent and configuration fix deployed 2026-08-10.
 - Periods where the ball was with **Will Mullany / BUMA** (e.g. 2026-06-26 07:42 PM → 04:52 PM same-day exchange, 2026-06-29 01:18 PM → 07-06 02:50 PM, 2026-07-15 → 07-16) should be treated as SLA-pause windows once SLA is calculated, since BukitTech was blocked waiting on confirmation/info from BUMA.
+- Elapsed from raise (2026-06-25 09:08 AM) to fix deployed (2026-08-10 05:31 PM) is well past the P3 Final Resolution Target (≤45 calendar days) — largely attributable to the repro/config gap between non-prod (data only to A4) and prod (data through A8), which required BukitTech to update non-prod to reproduce A5–A8 before diagnosing the root cause.
 
 ## Outstanding / Next Steps
 
-- Bukit Technology Support to confirm root cause using the HAR log + reproduction steps from the 2026-08-06 email.
-- Need to set up a shared folder for Will to upload the full reproduction videos (too large for email).
-- Confirm whether non-production environment has since been updated to mirror production data (A1–A8) so BukitTech can fully test the fix.
+- None — fix deployed with RCA and PVT provided 2026-08-10. Re-open if Will reports the Replace button still fails on his end.

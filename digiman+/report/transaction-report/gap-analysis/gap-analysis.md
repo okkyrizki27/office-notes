@@ -141,6 +141,7 @@ Masalah berikut muncul di lebih dari satu view. Memperbaikinya sekali akan berda
 
 ### Business Rules (Confirmed)
 - Status resolusi (INA/INB/INE/INF/ING/INI) berdasarkan `config_mapping_wo_status.csv` — identik di kedua view.
+- Selain kode status (`Status` di `get_assignment`, `InspectionStatus` di `get_molist`), kedua view juga meng-expose `StatusName` (nama status human-readable, sama-sama dari `config_mapping_wo_status.csv`) sebagai kolom terpisah. Di PBI, yang ditampilkan ke user hanya `StatusName` — kode status tidak ditampilkan karena `StatusName` yang lebih meaningful buat user.
 - Granularitas: per WO per taskpersonalized — satu WO dengan N inspector menghasilkan N baris di masing-masing view.
 - `tenantcode='MKP'` hardcoded — lihat Cross-Cutting #2.
 - SPV didefinisikan sebagai `tp.createdby` (yang membuat record assignment).

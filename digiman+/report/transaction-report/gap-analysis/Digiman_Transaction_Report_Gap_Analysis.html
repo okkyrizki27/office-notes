@@ -184,6 +184,7 @@
 <br>
 <h3>Business Rules (Confirmed)</h3>
 <p>- Status resolusi (INA/INB/INE/INF/ING/INI) berdasarkan <code>config_mapping_wo_status.csv</code> — identik di kedua view.</p>
+<p>- Selain kode status (<code>Status</code> di <code>get_assignment</code>, <code>InspectionStatus</code> di <code>get_molist</code>), kedua view juga meng-expose <code>StatusName</code> (nama status human-readable, sama-sama dari <code>config_mapping_wo_status.csv</code>) sebagai kolom terpisah. Di PBI, yang ditampilkan ke user hanya <code>StatusName</code> — kode status tidak ditampilkan karena <code>StatusName</code> yang lebih meaningful buat user.</p>
 <p>- Granularitas: per WO per taskpersonalized — satu WO dengan N inspector menghasilkan N baris di masing-masing view.</p>
 <p>- <code>tenantcode='MKP'</code> hardcoded — lihat Cross-Cutting #2.</p>
 <p>- SPV didefinisikan sebagai <code>tp.createdby</code> (yang membuat record assignment).</p>

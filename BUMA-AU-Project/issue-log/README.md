@@ -28,6 +28,6 @@ Ini dipakai sebagai sumber acuan kerja untuk saat ini karena memang belum ada re
 | [Oil Changed Parameter Missing Since Move to API](oil-changed-parameter-missing-since-api-move.md) | P3 | Done | [BAA-13511](https://bukittechnology.atlassian.net/browse/BAA-13511) |
 | [SOS Note — Escaped HTML Entities Not Rendered](sos-note-html-entity-rendering.md) | P4 | Done | [BAA-13512](https://bukittechnology.atlassian.net/browse/BAA-13512) |
 | [IronForms Service Sheets Incorrectly Opened](ironforms-service-sheets-incorrectly-opened.md) | N/A (Service Request) | Done | — |
-| [930E-4 Engine Downloads — Source Confirmation (Cummins / Hornets)](930e4-engine-downloads-hornets-source.md) | N/A (Inquiry) | Open — Follow-up needed | — |
-| [IronForms 930E Electrical Service — Comm Brush Replace Button Error (a4–a8)](ironforms-930e-brush-replace-button-error.md) | P3 | Open — Investigating | — |
+| [930E-4 Engine Downloads — Source Confirmation (Cummins / Hornets)](930e4-engine-downloads-hornets-source.md) | N/A (Inquiry) | Answered — Awaiting Benedict/BUMA decision | — |
+| [IronForms 930E Electrical Service — Comm Brush Replace Button Error (a4–a8)](ironforms-930e-brush-replace-button-error.md) | P3 | Done | — |
 | [IronPortal Historical Page — Slow Performance, No Data on Filter, Download All Error](ironportal-historical-slow-download-error.md) | P3 | Open — Investigating | — |
