@@ -10,7 +10,7 @@ Index dokumen phase 1: menghadirkan **package form** (Service Sheet, Welding For
 
 | Dokumen | Topik | Last Updated |
 |---|---|---|
-| [pm-shutdown-service-package.md](pm-shutdown-service-package.md) | Konsep Service Package, peran Planner, Choose Form Modal (UI), mandatory vs additional form | 2026-06-26 |
+| [pm-shutdown-service-package.md](pm-shutdown-service-package.md) | Konsep Service Package, peran Planner, Choose Form Modal (UI), mandatory vs additional form, split data DPlanDB vs maintenance-execution | 2026-08-11 |
 | [pm-shutdown-form-execution.md](pm-shutdown-form-execution.md) | Eksekusi form: multi-mechanic collaboration, conflict resolution (optimistic locking, first-write-wins), sync mechanism, submit flow, Finish Execution gate | 2026-06-22 |
 | [pm-shutdown-data-model.md](pm-shutdown-data-model.md) | Perubahan schema (`PlanForm` baru, `Task`/`TaskPersonalized`/`FormSubmission`), SUBMIT flow lintas service (dplan → maintenance-execution via Service Bus, Outbox Pattern) | 2026-06-22 |
 | [pm-shutdown-mechanic-activity.md](pm-shutdown-mechanic-activity.md) | Activity tracking per mechanic (`TaskPersonalizedLog` + shift), trigger Start/Finish, auto-close, simulasi 13 skenario | 2026-06-22 |

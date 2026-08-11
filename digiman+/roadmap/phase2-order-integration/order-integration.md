@@ -2,7 +2,7 @@
 
 Dokumen ini merekam diskusi phase 2: bagaimana Form (task di dalamnya) terintegrasi dengan Order — trigger create Order saat jawaban suatu task mengindikasikan defect, mekanisme capture data finding, sampai timing & flow create Order-nya.
 
-*Last updated: 2026-08-06*
+*Last updated: 2026-08-11*
 
 ---
 
@@ -17,6 +17,16 @@ Fakta current-state TaskKit General Check (7 tipe, opsi dropdown per tipe, struk
 Baseline schema lain yang relevan:
 - [form-submission.md](../../architecture/form/form-submission.md) — schema `TaskPersonalizedFinding`, `TaskResponseLog`
 - [order-emol-sap-sync.md](../../architecture/inspection-order/order-emol-sap-sync.md) — flow Order/eMOL existing (sumber saat ini: Inspection & Additional Order saja)
+
+---
+
+## Order Integration Bersifat Form-Centric, Bukan Per-Fitur
+
+Penting supaya scope tidak salah paham: integrasi Order ini **hook di level Form/Question**, bukan diimplementasikan terpisah per fitur pemanggil (Inspection/PM Shutdown/BD Corrective/pemanggil lain di masa depan). 1 Form terdiri dari N Question, tiap Question punya TaskKit type (lihat [Scope Trigger Order](#scope-trigger-order--keputusan-awal-dari-user) di bawah). Selama Question itu termasuk TaskKit yang punya opsi "Identified", integrasi Order terjadi **di manapun Form itu dipanggil** — karena mekanismenya menempel ke `TaskPersonalizedFinding` (layer Form, shared lintas fitur, lihat hierarki di [maintenance-execution-schema.md](../../architecture/database/maintenance-execution-schema.md)), bukan logic khusus per fitur.
+
+Konsekuensinya: begitu PM Shutdown/BD Corrective memakai mekanisme Form standar dari Phase 1 (lihat [pm-shutdown-service-package.md](../phase1-service-package/pm-shutdown-service-package.md#apa-yang-migrasi-ke-maintenance-execution-apa-yang-tetap-di-dplandb) — Task/Backlog Execution di level Daily Plan tetap di `DPlanDB`, cuma Form yang migrasi ke `maintenance-execution`), Order Integration otomatis berlaku untuk mereka juga — **tidak perlu development terpisah per fitur**.
+
+**Multi-mechanic per Form**: 1 Form bisa dikerjakan >1 mechanic (via "Assign to Me"/Supervisor assign) → membentuk multiple `TaskPersonalized` (1 per mechanic). Mechanic yang menjawab defect/crack found mengisi Finding + Order data di `TaskPersonalized` miliknya sendiri.
 
 ---
 
@@ -75,6 +85,7 @@ Field di step 5 & 7–10 match 1:1 ke schema `TaskPersonalizedFinding` yang suda
 
 ## Related Docs
 
+- [order-integration-checklist.md](order-integration-checklist.md) — kerangka kerja & progress diskusi Phase 2 (5 topik: UI, Data Flow, Approval, SAP/ERP, Dampak Report)
 - [pm-shutdown-service-package.md](../phase1-service-package/pm-shutdown-service-package.md) — phase 1, sumber deferred item yang jadi latar belakang phase 2 ini
 - [form-builder.md](../../architecture/form/form-builder.md) — struktur TaskKit & Bank Task row (fakta current-state lengkap)
 - [form-submission.md](../../architecture/form/form-submission.md) — schema `TaskPersonalizedFinding`, `TaskResponseLog`

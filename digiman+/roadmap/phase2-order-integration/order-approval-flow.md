@@ -35,4 +35,5 @@ Saat inspeksi berikutnya, crack yang sama bisa naik status jadi **critical**. Ek
 
 ## Related Docs
 
+- [order-integration-checklist.md](order-integration-checklist.md) — kerangka kerja & progress diskusi Phase 2 (5 topik: UI, Data Flow, Approval, SAP/ERP, Dampak Report)
 - [order-integration.md](order-integration.md) — dokumen utama phase 2 (trigger, current-state UI, open items)

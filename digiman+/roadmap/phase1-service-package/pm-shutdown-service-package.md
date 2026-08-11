@@ -2,7 +2,7 @@
 
 Dokumen ini merangkum diskusi tentang gap dan arah pengembangan fitur PM Shutdown terkait service sheet dan package form.
 
-*Last updated: 2026-06-26*
+*Last updated: 2026-08-11*
 
 ---
 
@@ -64,6 +64,39 @@ WorkOrder (1)  →  PlanId  →  dplan
         └── FormSubmission (1)         → snapshot terbentuk di sini
               └── [Cosmos: template JSON per tab, linked by FormSubmissionId]
 ```
+
+### Apa yang Migrasi ke maintenance-execution, Apa yang Tetap di DPlanDB
+
+**Sebelum Phase 1:**
+```
+1 Daily Plan ── Task 1
+             ├─ Task 2
+             ├─ Task n
+             ├─ Backlog Execution 1
+             ├─ Backlog Execution 2
+             └─ Backlog Execution n
+```
+Semua data ini murni di `DPlanDB`. `maintenance-execution` sebelum Phase 1 cuma **proxy murni** ke `dplan` — tidak create data apapun sendiri.
+
+**Setelah Phase 1:**
+```
+1 Daily Plan ── Task 1
+             ├─ Task 2
+             ├─ Task n
+             ├─ Backlog Execution 1
+             ├─ Backlog Execution 2
+             ├─ Backlog Execution n
+             ├─ Form 1 (mandatory)
+             ├─ Form 2 (optional)
+             └─ Form n
+```
+**Hanya mapping Form-ke-Plan** yang dipublish ke topic (event `PlanSubmitted`, lihat [pm-shutdown-data-model.md](pm-shutdown-data-model.md#submit-flow--service-bus)) lalu di-consume oleh `maintenance-execution` untuk create `WorkOrder`/`Task`/`FormSubmission`. **`Task` dan `Backlog Execution` di level Daily Plan tetap di `DPlanDB`, belum dimigrasi.**
+
+⚠️ **Penting — ada 2 arti "Task" di level berbeda, jangan tertukar:**
+- **Task di Daily Plan** (`DPlanDB`) — item pekerjaan terjadwal di plan, bukan form.
+- **`maintenance-execution.Task`** — 1 record per **Form** yang di-assign ke plan, dibuat lewat mekanisme consumer di atas.
+
+UI PM Shutdown (dan nanti BD Corrective) menggabungkan data dari **2 sumber**: `DPlanDB` (Task/Backlog Execution) + `maintenance-execution` (data Form).
 
 ---
 
