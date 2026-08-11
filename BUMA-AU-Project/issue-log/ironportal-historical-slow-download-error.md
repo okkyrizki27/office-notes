@@ -5,11 +5,11 @@
 | **Project** | BUMA AU |
 | **Reported by** | Benedict Panizza |
 | **Date Raised** | 2026-08-10 11:13 AM WIB |
-| **Priority** | P3 |
-| **Status** | Open — Investigating (Bukit Technology Support) |
+| **Priority** | N/A (Deprecated feature — not a Defect) |
+| **Status** | Done |
 | **Jira Ticket** | — |
-| **Handled by** | Okky (Bukit Technology Support) |
-| **Waiting On** | Bukit Technology Support (as of 2026-08-10 11:58 AM WIB — investigating root cause) |
+| **Handled by** | Okky / Pradya (Bukit Technology Support) |
+| **Waiting On** | — (Bukit Technology Support to decide/schedule removing Historical page from Admin role access, per Pradya's proposal) |
 
 ## Description
 
@@ -25,13 +25,14 @@ The IronPortal **Historical** page has three related problems reported by Benedi
 |---|---|---|---|
 | 2026-08-10 11:13 AM | Benedict Panizza | Raises issue: Historical page slow (especially filters); no data returned for the filter combination above; Download All throws a file extension error. Screenshot attached. | Bukit Technology Support |
 | 2026-08-10 11:58 AM | Okky (BukitTech) | Acknowledges, will investigate root cause and keep Benedict updated. | Bukit Technology Support |
+| 2026-08-11 01:18 PM | Pradya (BukitTech) | Explains root cause: the IronPortal Historical page should no longer be available — it's been replaced by the Dynamic Graph feature. It's currently still reachable only because it's accessible to users with the Admin role; proposes removing it from Admin access to ensure consistency across the system. Notes the API backing the Historical page was already decommissioned when Dynamic Graph went live, so the page's filter and download functionality are no longer supported (explains both the "No Data" filter result and the Download All file extension error). | Benedict Panizza |
+| 2026-08-11 10:20 AM | Benedict Panizza | "Thank you for that explanation. I will keep that in mind." *(Note: timestamp as printed in the Outlook thread is earlier than Pradya's 01:18 PM message it replies to — logged as printed, order not re-sequenced, same caveat as seen in other threads.)* | Bukit Technology Support |
 
 ## SLA Notes
 
-- Clock is currently on **Bukit Technology Support** (waiting on root-cause investigation since 2026-08-10 11:58 AM WIB).
+- Root cause: Historical page is a deprecated feature (superseded by Dynamic Graph) still reachable via Admin role, with its backing API already decommissioned — not a functional defect, but a leftover access/cleanup item.
+- Benedict acknowledged the explanation; no further action needed from BUMA side.
 
 ## Outstanding / Next Steps
 
-- Bukit Technology Support to investigate: (1) page/filter performance, (2) why the reported filter combination returns no data (data gap vs. filter bug), (3) the Download All file extension error.
-- Confirm root cause and reply to Benedict with findings/ETA.
-- Raise a Jira ticket once triaged.
+- Bukit Technology Support to decide/schedule removing the Historical page from Admin role access, per Pradya's proposal, to ensure consistency across the system.
