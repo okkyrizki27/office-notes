@@ -31,3 +31,4 @@ Ini dipakai sebagai sumber acuan kerja untuk saat ini karena memang belum ada re
 | [930E-4 Engine Downloads — Source Confirmation (Cummins / Hornets)](930e4-engine-downloads-hornets-source.md) | N/A (Inquiry) | Answered — Awaiting Benedict/BUMA decision | — |
 | [IronForms 930E Electrical Service — Comm Brush Replace Button Error (a4–a8)](ironforms-930e-brush-replace-button-error.md) | P3 | Done | — |
 | [IronPortal Historical Page — Slow Performance, No Data on Filter, Download All Error](ironportal-historical-slow-download-error.md) | N/A (Deprecated feature) | Done | — |
+| [Blackwater — Clear Backlog of 598 Pending "Normal Interventions"](blackwater-normal-interventions-pending-evaluation.md) | N/A (Service Request) | Done | [BAA-13514](https://bukittechnology.atlassian.net/browse/BAA-13514) |
