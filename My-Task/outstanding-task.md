@@ -7,6 +7,7 @@
 - [ ] `P1` RepairDuration di Digiman Transaction Dashboard
 - [ ] `P1` Change flowchart MKP
 - [ ] `P1` Provide user dan data untuk demo CERIA untuk hands-on
+- [ ] `P1` Assess next effort for enhancement dari request MKP
 - [ ] `P2` Follow up to Ko Herianto terkait view untuk details of Intervention
 - [~] `P2` Compare data master dan transaksi EHMS dengan data master Digiman+ *(menunggu diskusi dengan Soraya di hari Kamis, 21 Mei 2026)*
 - [ ] `P2` Confirmation to MKP perlakuan terhadap order yang gagal karena over budget — reject or pending, once budget release sync again to SAP

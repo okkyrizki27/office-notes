@@ -4,7 +4,7 @@ Framework diskusi requirement Phase 2 Order Integration, dipecah jadi beberapa t
 
 Urutan dikelompokkan jadi 6 fase berdasarkan dependency — fase awal menentukan scope & aktor, masuk ke jantung data model, lalu proses/workflow, integrasi, dan terakhir dashboard (baca dari hasil akhir semua keputusan sebelumnya).
 
-*Last updated: 2026-08-12*
+*Last updated: 2026-08-13*
 
 ---
 
@@ -12,7 +12,7 @@ Urutan dikelompokkan jadi 6 fase berdasarkan dependency — fase awal menentukan
 *Apa saja yang bisa memicu Finding*
 
 - [ ] **1. UI create defect/crack** — screen "Defect Identified", trigger per TaskKit/Question. Lihat [Poin 1](order-integration.md#poin-1-trigger-dan-ui-create-defect-atau-crack) — termasuk diskusi berjalan soal `IsImmediateExecutable` sebagai gate Order.
-- [ ] **2. Defect di luar pertanyaan form ("additional defect" saat eksekusi)** — mechanic ketemu defect yang tidak ada pertanyaan relevannya di form yang sedang dikerjakan. Pakai flow Additional Order existing (terpisah, tanpa konteks WorkOrder/Task), atau perlu mekanisme baru "Add Finding" di dalam form yang tetap link ke WorkOrder/Task berjalan? Ini persis skenario asal Phase 2 ("field team menemukan pekerjaan tak terduga").
+- [x] **2. Defect di luar pertanyaan form ("additional defect" saat eksekusi)** — final: mekanisme baru "Add Finding", nempel ke `TaskPersonalized` aktif dengan `FormTaskCode`/`FormSubmissionTabId`/`FormTaskNumber` NULL (skema sudah mendukung, tanpa perubahan). Sisa: UI entry-point khusus, tercatat di [Poin 1](order-integration.md#poin-1-trigger-dan-ui-create-defect-atau-crack) (UI View detail). Detail: [Poin 2](order-integration.md#poin-2-defect-di-luar-pertanyaan-form-additional-defect-saat-eksekusi).
 
 ## Fase B — Aktor
 
@@ -23,7 +23,7 @@ Urutan dikelompokkan jadi 6 fase berdasarkan dependency — fase awal menentukan
 
 - [ ] **4. Offline behavior create Finding/Order** — apakah create Finding (yang trigger Order) perlu pola offline-first seperti fitur Phase 1 lainnya (submit offline → queue → sync). Cross-cutting dengan poin 1 & 5, ditaruh di sini karena scope trigger dari Fase A sudah lengkap.
 - [ ] **5. Data flow of defect/crack** (Defect, Monitored Crack, Crack) — termasuk material handling, evidence/foto carry-over ke Order, dan konfirmasi multi-Finding dalam 1 pertanyaan (Tab Finding #1/#2, sudah ada di UI) tetap independen jadi eMOL masing-masing. Lihat [Poin 5](order-integration.md#poin-5-data-flow-defect-dan-crack).
-- [ ] **6. Duplicate/correlation handling** — correlation key untuk "temuan yang sama" (Asset + Component + SubComponent?) — foundational untuk keputusan reuse-Order di Crack Lifecycle (poin 5), dan sekarang juga relevan untuk eskalasi Defect biasa jadi critical (lihat diskusi di [Poin 1](order-integration.md#poin-1-trigger-dan-ui-create-defect-atau-crack)). Detail: [Poin 6](order-integration.md#poin-6-duplicate-atau-correlation-handling).
+- [x] **6. Duplicate/correlation handling** — correlation key = Asset + Component + SubComponent + DamageCode; sistem suggest kandidat, human (siapapun yang kerjakan form) yang pilih & validasi; Order lama tidak diubah, cukup di-close & sync SAP. Detail: [Poin 6](order-integration.md#poin-6-duplicate-atau-correlation-handling).
 - [ ] **7. Editability window sebelum approval** — bisakah mechanic edit Finding miliknya sendiri (mis. salah ketik Defect Notes) setelah submit tapi sebelum diproses Planner. Beda dari poin 10 (Reject) — ini koreksi mandiri, bukan penolakan approver.
 - [ ] **8. Cancel/Delete Finding** — pembatalan total Finding (mechanic salah identifikasi/false positive). Skema `TaskPersonalizedFinding.DeleteNotes`/`MechanicOrderList.DeleteReason` sudah ada, perlu diperjelas kapan dipakai.
 
