@@ -39,6 +39,7 @@
   .stat-card { flex: 1; background: #f4f7fa; border-radius: 8px; padding: 15px 8px; text-align: center; }
   .stat-card .num { font-size: 20pt; font-weight: 800; color: #1f3a5f; }
   .stat-card.hemat .num { color: #1e8449; }
+  .stat-card.tambah .num { color: #c9860f; }
   .stat-card .label { font-size: 8pt; color: #667; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 5px; }
 
   .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; font-size: 9.6pt; }
@@ -71,22 +72,22 @@
   #gantt-embed .gz-swatch{ display:inline-flex; align-items:center; gap:6px; }
   #gantt-embed .gz-chip{ width:13px; height:9px; border-radius:3px; display:inline-block; }
   #gantt-embed .gz-chip.be{ background:var(--gz-be); } #gantt-embed .gz-chip.fe{ background:var(--gz-fe); }
-  #gantt-embed .gz-chip.qa{ background:var(--gz-qa); } #gantt-embed .gz-chip.qaearly{ background:var(--gz-qa); opacity:.5; }
+  #gantt-embed .gz-chip.qa{ background:var(--gz-qa); } #gantt-embed .gz-chip.qaearly{ background: repeating-linear-gradient(135deg, var(--gz-qa) 0px, var(--gz-qa) 3px, #82d3b6 3px, #82d3b6 6px); border:1px solid var(--gz-qa); }
   #gantt-embed .gz-chip.dash{ background:#fff; border:1.5px dashed var(--gz-dash); }
   #gantt-embed .gz-chip.prep{ background:repeating-linear-gradient(45deg, var(--gz-milestone), var(--gz-milestone) 3px, transparent 3px, transparent 6px); border:1px solid var(--gz-milestone); }
   #gantt-embed .gz-diamond{ width:8px; height:8px; background:var(--gz-milestone); transform:rotate(45deg); display:inline-block; }
 
   #gantt-embed .gz-gantt{ border:1px solid var(--gz-border); border-radius:10px; background:#fff; overflow:hidden; }
-  #gantt-embed .gz-head-row{ display:grid; grid-template-columns:150px repeat(12, 1fr); background:#fff; border-bottom:1px solid var(--gz-grid-line-strong); }
+  #gantt-embed .gz-head-row{ display:grid; grid-template-columns:150px repeat(19, 1fr); background:#fff; border-bottom:1px solid var(--gz-grid-line-strong); }
   #gantt-embed .gz-wk{ font-family:Consolas,monospace; font-size:8pt; color:var(--gz-muted); text-align:center; padding:6px 1px; border-left:1px solid var(--gz-grid-line); }
   #gantt-embed .gz-wk.ship{ color:var(--gz-milestone); font-weight:700; }
   #gantt-embed .gz-rowlabel{ background:#fff; padding:5px 9px; font-size:8.6pt; font-weight:600; color:#182430; border-right:1px solid var(--gz-grid-line-strong); display:flex; align-items:center; }
-  #gantt-embed .gz-group-row{ display:grid; grid-template-columns:150px repeat(12, 1fr); background:var(--gz-surface-2); border-bottom:1px solid var(--gz-grid-line-strong); border-top:1px solid var(--gz-grid-line-strong); }
+  #gantt-embed .gz-group-row{ display:grid; grid-template-columns:150px repeat(19, 1fr); background:var(--gz-surface-2); border-bottom:1px solid var(--gz-grid-line-strong); border-top:1px solid var(--gz-grid-line-strong); }
   #gantt-embed .gz-grouplabel{ background:var(--gz-surface-2); padding:6px 9px; font-size:8.4pt; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:var(--gz-be); border-right:1px solid var(--gz-grid-line-strong); }
-  #gantt-embed .gz-groupmeta{ grid-column:2 / span 12; display:flex; align-items:center; padding:6px 9px; font-size:8.2pt; color:var(--gz-muted); }
-  #gantt-embed .gz-row{ display:grid; grid-template-columns:150px repeat(12, 1fr); border-bottom:1px solid var(--gz-grid-line); }
+  #gantt-embed .gz-groupmeta{ grid-column:2 / span 19; display:flex; align-items:center; padding:6px 9px; font-size:8.2pt; color:var(--gz-muted); }
+  #gantt-embed .gz-row{ display:grid; grid-template-columns:150px repeat(19, 1fr); border-bottom:1px solid var(--gz-grid-line); }
   #gantt-embed .gz-row:last-child{ border-bottom:none; }
-  #gantt-embed .gz-track{ position:relative; grid-column:2 / span 12; display:grid; grid-template-columns:repeat(12,1fr); grid-template-rows:repeat(2,1fr); min-height:32px; }
+  #gantt-embed .gz-track{ position:relative; grid-column:2 / span 19; display:grid; grid-template-columns:repeat(19,1fr); grid-template-rows:repeat(2,1fr); min-height:32px; }
   #gantt-embed .gz-cell-bg{ grid-row:1/3; border-left:1px solid var(--gz-grid-line); }
   #gantt-embed .gz-bar{ border-radius:4px; display:flex; align-items:center; padding:0 5px; font-size:7pt; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   #gantt-embed .gz-bar.lane0{ grid-row:1; margin:3px 1px 1px; }
@@ -95,7 +96,7 @@
   #gantt-embed .gz-bar.be{ background:var(--gz-be); color:var(--gz-be-ink); }
   #gantt-embed .gz-bar.fe{ background:var(--gz-fe); color:var(--gz-fe-ink); }
   #gantt-embed .gz-bar.qa{ background:var(--gz-qa); color:var(--gz-qa-ink); }
-  #gantt-embed .gz-bar.qa.early{ opacity:.5; }
+  #gantt-embed .gz-bar.qa.early{ background: repeating-linear-gradient(135deg, var(--gz-qa) 0px, var(--gz-qa) 4px, #82d3b6 4px, #82d3b6 8px); border: 1px solid var(--gz-qa); }
   #gantt-embed .gz-bar.dash{ background:transparent; border:1.2px dashed var(--gz-dash); color:var(--gz-dash); }
   #gantt-embed .gz-steprow .gz-track{ grid-template-rows:1fr; min-height:26px; }
   #gantt-embed .gz-bar.prep{ grid-row:1; margin:5px 1px; background:repeating-linear-gradient(45deg, var(--gz-milestone), var(--gz-milestone) 4px, transparent 4px, transparent 8px); border:1px solid var(--gz-milestone); color:#0a3d0a; font-weight:700; display:flex; align-items:center; justify-content:center; }
@@ -113,30 +114,41 @@
 <div class="cover">
   <div class="cover-eyebrow">Digiman+ · Perencanaan Delivery</div>
   <h1>Timeline &amp; Skenario Delivery — FINAL<br>Squad Diperkuat, 2 Rilis</h1>
-  <div class="subtitle">Man Power &amp; Man Hours + Area of Unit (gabungan) → Maintenance Activity Type</div>
+  <div class="subtitle">Man Power &amp; Man Hours + Area of Unit (gabungan) → Maintenance Activity Type + My Work &amp; eMAR</div>
   <table class="cover-meta">
-    <tr><td>Tanggal</td><td>3 Agustus 2026</td></tr>
+    <tr><td>Tanggal</td><td>3 Agustus 2026 (revisi scope Rilis 2: 13 Agustus 2026)</td></tr>
     <tr><td>Produk</td><td>Digiman+</td></tr>
-    <tr><td>Cakupan</td><td>Man Power &amp; Man Hours, Area of Unit/Component/Sub Component (Rilis 1 — digabung), Maintenance Activity Type &amp; Integrasi Inspection→Order (Rilis 2)</td></tr>
+    <tr><td>Cakupan</td><td>Man Power &amp; Man Hours, Area of Unit/Component/Sub Component (Rilis 1 — digabung), Maintenance Activity Type &amp; Integrasi Inspection→Order + My Work &amp; eMAR (Rilis 2)</td></tr>
     <tr><td>Disiapkan oleh</td><td>Okky Rizki R — Bukit Technology</td></tr>
     <tr><td>Dokumen turunan dari</td><td>squad-baru-release-timeline.md (Skenario A) — hasil diskusi bertahap skenario alternatif, keputusan final 3 Agustus 2026</td></tr>
   </table>
-  <span class="status-pill">RENCANA DELIVERY FINAL — SQUAD DIPERKUAT (7 ORANG / 12 MINGGU)</span>
+  <span class="status-pill">RENCANA DELIVERY FINAL — SQUAD DIPERKUAT (7 ORANG / 19 MINGGU)</span>
 </div>
 
 <!-- ===================== 1. RINGKASAN ===================== -->
 <h1 class="sec">1. Ringkasan Skenario</h1>
 
 <div class="stat-cards">
-  <div class="stat-card"><div class="num">12</div><div class="label">Minggu Total</div></div>
+  <div class="stat-card"><div class="num">19</div><div class="label">Minggu Total</div></div>
   <div class="stat-card"><div class="num">2</div><div class="label">Rilis</div></div>
   <div class="stat-card"><div class="num">7</div><div class="label">Orang Squad</div></div>
-  <div class="stat-card hemat"><div class="num">−7</div><div class="label">Minggu vs Skenario A (19 mgu)</div></div>
+  <div class="stat-card tambah"><div class="num">+7</div><div class="label">Minggu — My Work &amp; eMAR di Rilis 2</div></div>
+</div>
+
+<div class="callout warn">
+  <div class="callout-label">Update 13 Agustus 2026 — scope Rilis 2 diperluas</div>
+  Rilis 2 sekarang juga mencakup <b>My Work</b> &amp; <b>eMAR</b> (<i>Electronic Mechanic Activity Report</i>) — ship bersamaan dengan Maintenance Activity Type, bukan rilis terpisah. Total SP Rilis 2 naik dari 48 → <b>161 SP</b> (BE 28→75, FE 9→47, QA 8→28, Dashboard 3→11). Estimasi ship awalnya Minggu 18, lalu direvisi ke <b>Minggu 19</b> setelah capacity check per-orang (lihat callout di bawah).
+  <br><br>
+  Perbandingan &quot;−7 minggu vs Skenario A&quot; pada rencana sebelumnya <b>tidak lagi apple-to-apple</b> — Skenario A (19 minggu) tidak pernah mencakup My Work/eMAR, tidak direcompute di sini. Yang mencolok: total proyek sekarang <b>19 minggu — sama persis dengan Skenario A</b> (4 orang, 3 rilis sequential), meski Skenario A tidak pernah membawa scope My Work/eMAR. Bukan berarti squad diperkuat sia-sia (Skenario A akan lebih lambat lagi kalau My Work/eMAR ditambahkan ke dalamnya juga) — tapi benefit "lebih cepat dari Skenario A" yang jadi justifikasi awal keputusan 7 orang praktis hilang begitu Rilis 2 diperluas. Detail breakdown ada di Bagian 4.
+</div>
+<div class="callout warn">
+  <div class="callout-label">Capacity check (13 Agustus 2026, revisi kedua) — jadwal direvisi Minggu 18 → 19</div>
+  Bar Gantt awal digambar per-kategori tanpa cross-check jumlah thread konkuren terhadap headcount riil (3 BE, 2 FE) — hasilnya di Minggu 8–10 ada sampai 4 thread BE/FE "paralel" sekaligus, padahal orangnya cuma 3/2. Setelah dijadwal ulang mengikuti kapasitas riil (tabel alokasi per-orang di Bagian 4): Activity Type prioritas Minggu 8–10 (~2 dari 3 BE), eMAR mulai Minggu 9 (1 BE bebas), <b>My Work baru mulai penuh Minggu 11</b> (nunggu Activity Type melepas kapasitas) — BE &amp; FE baru selesai ~Minggu 15, bukan 13–14. <b>Total SP tidak berubah (161 SP)</b> — cuma timing yang dikoreksi.
 </div>
 
 <table>
   <tr><td style="width:20%;background:#f7f9fb;color:#667;"><b>Squad</b></td><td>7 orang — diperkuat dari 4: <b>3 Backend, 2 Frontend Fullstack (Web+Mobile, tugas dibagi bebas), 2 QA</b></td></tr>
-  <tr><td style="background:#f7f9fb;color:#667;"><b>Rilis</b></td><td>2 rilis (bukan 3): <b>Rilis 1</b> = Man Power, Duration &amp; Man Hours + Area of Unit, Component &amp; Sub Component (digabung). <b>Rilis 2</b> = Maintenance Activity Type &amp; Integrasi Inspection→Order (scope sama persis dengan Rilis 3 Skenario A)</td></tr>
+  <tr><td style="background:#f7f9fb;color:#667;"><b>Rilis</b></td><td>2 rilis (bukan 3): <b>Rilis 1</b> = Man Power, Duration &amp; Man Hours + Area of Unit, Component &amp; Sub Component (digabung). <b>Rilis 2</b> = Maintenance Activity Type &amp; Integrasi Inspection→Order + <b>My Work &amp; eMAR</b> (ditambahkan 13 Agustus 2026 — lihat Bagian 4)</td></tr>
   <tr><td style="background:#f7f9fb;color:#667;"><b>Velocity</b></td><td>Sama seperti Skenario A: ramp-up 0.81 SP/hari/orang (Sprint 1–2, Minggu 1–4), full speed 0.85 SP/hari/orang (Sprint 3 dst, Minggu 5+)</td></tr>
   <tr><td style="background:#f7f9fb;color:#667;"><b>Antar-rilis</b></td><td>Freeze code penuh — Rilis 2 tidak dimulai sebelum Rilis 1 ship (tidak ada BE yang nyicil kerjaan Rilis 2 selama Rilis 1 berjalan)</td></tr>
   <tr><td style="background:#f7f9fb;color:#667;"><b>QA</b></td><td>Mulai bertahap (shift-left) — testing modul yang sudah code-complete duluan, bukan menunggu 100% dev rilis selesai</td></tr>
@@ -146,25 +158,29 @@
 <h3>Kenapa 3 Backend — Bukan Cukup Nambah FE/QA Saja</h3>
 <p>Dari eksplorasi skenario headcount sebelumnya: menambah FE dan QA saja (tanpa nambah BE) tidak cukup untuk kompresi signifikan <b>selama freeze code diberlakukan</b> (tidak ada cicil antar rilis) — karena BE (2 orang) selalu jadi <i>critical path</i> di tiap rilis, FE/QA ekstra cuma menunggu BE selesai duluan. BE harus ikut ditambah supaya benar-benar berhenti jadi bottleneck di kedua rilis.</p>
 
-<h3>Kenapa ~12 Minggu — Perjalanan Angkanya</h3>
+<h3>Kenapa ~12 → 19 Minggu — Perjalanan Angkanya</h3>
 <p>Estimasi awal skenario final (13 minggu) mengasumsikan QA baru mulai setelah <b>100% dev rilis selesai</b> ("big bang" testing). Realistisnya, task-task dalam satu rilis tidak semua selesai di hari yang sama — beberapa modul (Inspection, Order Approval, Master Data) code-complete lebih dulu daripada modul terbesar (Digiplan/SAP Sync). QA tidak perlu menunggu modul terakhir selesai untuk mulai testing modul yang sudah jadi — testing bertahap (shift-left) ini awalnya memangkas ~1 minggu di tiap rilis (13→11 minggu).</p>
 <div class="callout decision">
   <div class="callout-label">Revisi 3 Agustus 2026</div>
   1 minggu buffer dikembalikan <b>khusus ke Rilis 1</b> — QA end-to-end tetap mulai bertahap (shift-left, Minggu 2), tapi durasi kalendernya dilonggarkan lagi supaya Rilis 1 ship di Minggu 7, sama seperti tanggal ship Man Power standalone di Skenario A. Rilis 2 <b>tidak</b> diberi buffer tambahan — tetap shift-left penuh, cuma bergeser mengikuti mundurnya Rilis 1. Hasil akhir: <b>~12 minggu total</b> (13→11→12), tetap hemat 7 minggu dari Skenario A, dengan Rilis 1 punya margin keamanan lebih besar dibanding Rilis 2.
 </div>
+<div class="callout warn">
+  <div class="callout-label">Revisi 13 Agustus 2026</div>
+  Rilis 2 diperluas mencakup My Work &amp; eMAR (113 SP baru: 27 BE + 18 FE My Work, 20 BE + 20 FE eMAR, 20 SP QA tambahan, 8 SP DE/DA tambahan). QA juga direvisi mulai <b>paralel dari Minggu 8</b> (test case design/test plan sejak hari pertama dev, bukan menunggu modul pertama code-complete) — SP QA awal naik dari 2 → 10 SP (11.7 mandays), tetap dihitung penuh di total mandays, bukan sekadar catatan kualitatif. Fase dev+QA Rilis 2 naik dari 4 → 11 minggu — didorong dua item BE terberat (auto-match engine My Work, 8 SP; integrasi DWS eMAR, 5 SP), fase QA end-to-end yang sekarang menguji 3 alur sekaligus (Activity Type + My Work + eMAR), dan koreksi capacity check per-orang (lihat callout revisi kedua di atas). Rilis 1 tidak terdampak. Hasil akhir: <b>~19 minggu total</b> — breakdown lengkap ada di Bagian 4.
+</div>
 
 <h3>Metodologi Estimasi</h3>
 <p>SP &amp; mandays memakai metodologi yang sama dengan Skenario A — kalibrasi Fibonacci <code>[1,2,3,5,8]</code> per komponen kerja. Yang berbeda: skenario <b>squad diperkuat 7 orang</b> (bukan 4), <b>2 rilis</b> (bukan 3, Rilis 1 &amp; 2 Skenario A digabung), dan <b>QA shift-left</b> (mulai bertahap per modul, bukan big-bang di akhir).</p>
 
-<h3>Master Timeline (~12 Minggu)</h3>
+<h3>Master Timeline (~19 Minggu, direvisi 13 Agustus 2026)</h3>
 <table>
   <tr><th style="width:14%;">Minggu</th><th style="width:30%;">Rilis</th><th>Fase</th></tr>
   <tr><td>1–6</td><td>Rilis 1 (Man Power + Area)</td><td>Dev + QA (QA mulai bertahap dari Minggu 2, +1 minggu buffer)</td></tr>
   <tr><td><b>7</b></td><td>Rilis 1</td><td><b>Release Preparation</b> → 🚀 Ship akhir Minggu 7</td></tr>
-  <tr><td>8–11</td><td>Rilis 2 (Maintenance Activity Type)</td><td>Dev + QA (QA mulai bertahap dari Minggu 9)</td></tr>
-  <tr><td><b>12</b></td><td>Rilis 2</td><td><b>Release Preparation</b> → 🚀 Ship akhir Minggu 12</td></tr>
+  <tr><td>8–18</td><td>Rilis 2 (Maintenance Activity Type + My Work + eMAR)</td><td>Dev + QA (QA mulai paralel dari Minggu 8; My Work BE baru mulai penuh Minggu 11 — lihat capacity check; fase end-to-end diperpanjang ke Minggu 15–18)</td></tr>
+  <tr><td><b>19</b></td><td>Rilis 2</td><td><b>Release Preparation</b> → 🚀 Ship akhir Minggu 19</td></tr>
 </table>
-<p style="font-size:9pt;color:#667;">Rilis 1 ship di <b>Minggu 7</b> — persis sama dengan tanggal ship Man Power <i>standalone</i> di Skenario A (yang cuma bawa 1 fitur dengan tim 4 orang). Trade-off "Man Power mundur" dari Skenario B/C tetap hilang (tidak mundur) meski sekarang tidak lebih cepat juga — 1 minggu buffer QA dikembalikan sebagai margin keamanan (keputusan 3 Agustus 2026). Rilis 2 tidak diberi buffer tambahan, hanya bergeser +1 minggu mengikuti mundurnya Rilis 1.</p>
+<p style="font-size:9pt;color:#667;">Rilis 1 ship di <b>Minggu 7</b> — persis sama dengan tanggal ship Man Power <i>standalone</i> di Skenario A (yang cuma bawa 1 fitur dengan tim 4 orang). Trade-off "Man Power mundur" dari Skenario B/C tetap hilang (tidak mundur) meski sekarang tidak lebih cepat juga — 1 minggu buffer QA dikembalikan sebagai margin keamanan (keputusan 3 Agustus 2026). Rilis 2 (scope Maintenance Activity Type awal) tidak diberi buffer tambahan, hanya bergeser +1 minggu mengikuti mundurnya Rilis 1 — lihat Bagian 4 untuk breakdown lengkap penambahan My Work &amp; eMAR dan capacity check per-orang yang mendorong ship ke Minggu 19.</p>
 
 <!-- ===================== GANTT (landscape) ===================== -->
 <div class="landscape-block">
@@ -173,14 +189,14 @@
   <div class="callout-label">Versi interaktif tersedia</div>
   Tabel statis di bawah ini untuk referensi cetak. Untuk versi <b>live/interaktif</b> (hover tooltip per task, dark mode, toggle tabel) lihat: <a href="https://claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204">claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204</a>
 </div>
-<p style="font-size:9pt;color:#667;">Bar QA digambar 2 lapis: <i>QA awal</i> (redup) untuk modul yang sudah code-complete duluan, <i>QA end-to-end</i> untuk testing yang butuh integrasi penuh siap dulu. Rilis 1 pakai +1 minggu buffer di fase end-to-end (ship Minggu 7); Rilis 2 tanpa buffer tambahan — lihat § "Kenapa ~12 Minggu" di Bagian 1.</p>
+<p style="font-size:9pt;color:#667;">Bar QA digambar 2 pola: <i>QA awal</i> (bergaris, warna hijau sama dengan <i>QA end-to-end</i>) untuk test case design &amp; testing modul yang sudah code-complete duluan, <i>QA end-to-end</i> (solid) untuk testing yang butuh integrasi penuh siap dulu — keduanya dihitung penuh di total mandays. Rilis 1 pakai +1 minggu buffer di fase end-to-end (ship Minggu 7); Rilis 2 (revisi) fase end-to-end memanjang jadi 4 minggu (Minggu 15–18) karena menguji 3 alur sekaligus dan baru bisa mulai setelah BE/FE My Work &amp; eMAR benar-benar selesai — lihat § "Kenapa ~12 → 19 Minggu" di Bagian 1.</p>
 
 <div id="gantt-embed">
   <div class="gz-legend">
     <span class="gz-swatch"><span class="gz-chip be"></span><b>BE</b> Backend (3)</span>
     <span class="gz-swatch"><span class="gz-chip fe"></span><b>FE</b> Fullstack (2)</span>
     <span class="gz-swatch"><span class="gz-chip qa"></span><b>QA</b> end-to-end</span>
-    <span class="gz-swatch"><span class="gz-chip qaearly"></span><b>QA</b> awal (modul selesai duluan)</span>
+    <span class="gz-swatch"><span class="gz-chip qaearly"></span><b>QA</b> awal (paralel sejak Minggu 8, test case design)</span>
     <span class="gz-swatch"><span class="gz-chip dash"></span><b>Dashboard</b> — paralel</span>
     <span class="gz-swatch"><span class="gz-chip prep"></span><b>Prep</b> Release Preparation</span>
     <span class="gz-swatch"><span class="gz-diamond"></span><b>Ship</b></span>
@@ -192,7 +208,7 @@
 
 <script>
 (function(){
-  var WEEKS = 12;
+  var WEEKS = 19;
   var RELEASES = [
     {
       title: "Rilis 1 — Man Power, Man Hours + Area of Unit", range: "Minggu 1–7", shipWeek: 7, prep: 7,
@@ -206,27 +222,31 @@
         { label: "Digiplan", bars: [
           {role:"be", lane:"lane0", from:1, to:3, text:"25 SP"}, {role:"fe", lane:"lane1", from:2, to:3, text:"6 SP"} ] },
         { label: "Integrasi maintenance-order↔Digiplan", bars: [
-          {role:"be", lane:"solo", from:2, to:3, text:"PoolingMOItem + MO Backlog JOIN · 6 SP"} ] },
+          {role:"be", lane:"solo", from:2, to:3, text:"6 SP"} ] },
         { label: "QA / Testing", bars: [
-          {role:"qa", lane:"lane0", cls:"early", from:2, to:2, text:"QA awal · 5 SP"},
-          {role:"qa", lane:"lane1", from:3, to:6, text:"QA end-to-end · 12 SP + buffer"} ] },
-        { label: "Dashboard (paralel)", bars: [ {role:"dash", lane:"solo", from:2, to:6, text:"D'Inspect/D'Order · Power BI · 13 SP"} ] },
+          {role:"qa", lane:"lane0", cls:"early", from:2, to:2, text:"5 SP"},
+          {role:"qa", lane:"lane1", from:3, to:6, text:"12 SP"} ] },
+        { label: "Dashboard (paralel)", bars: [ {role:"dash", lane:"solo", from:2, to:6, text:"13 SP"} ] },
       ]
     },
     {
-      title: "Rilis 2 — Maintenance Activity Type", range: "Minggu 8–12", shipWeek: 12, prep: 12,
+      title: "Rilis 2 — Maintenance Activity Type + My Work + eMAR (direvisi 13 Agu 2026, capacity check)", range: "Minggu 8–19", shipWeek: 19, prep: 19,
       rows: [
         { label: "Master Data", bars: [
           {role:"be", lane:"lane0", from:8, to:8, text:"7 SP"}, {role:"fe", lane:"lane1", from:8, to:8, text:"4 SP"} ] },
         { label: "Inspection & Additional Order", bars: [
           {role:"be", lane:"lane0", from:8, to:9, text:"7 SP"}, {role:"fe", lane:"lane1", from:8, to:9, text:"4 SP"} ] },
-        { label: "SAP Sync", bars: [ {role:"be", lane:"solo", from:9, to:10, text:"MechanicOrderList + cleanup · 9 SP"} ] },
+        { label: "SAP Sync", bars: [ {role:"be", lane:"solo", from:9, to:10, text:"9 SP"} ] },
         { label: "Order Approval & Workflow", bars: [
           {role:"fe", lane:"lane1", from:9, to:9, text:"1 SP"}, {role:"be", lane:"lane0", from:10, to:10, text:"5 SP"} ] },
+        { label: "eMAR — baru", bars: [
+          {role:"be", lane:"lane0", from:9, to:14, text:"20 SP"}, {role:"fe", lane:"lane1", from:9, to:15, text:"20 SP"} ] },
+        { label: "My Work — baru (mulai Mgg 11)", bars: [
+          {role:"be", lane:"lane0", from:11, to:15, text:"27 SP"}, {role:"fe", lane:"lane1", from:8, to:13, text:"18 SP"} ] },
         { label: "QA / Testing", bars: [
-          {role:"qa", lane:"lane0", cls:"early", from:9, to:9, text:"QA awal · 2 SP"},
-          {role:"qa", lane:"lane1", from:10, to:11, text:"QA end-to-end · 6 SP"} ] },
-        { label: "Dashboard (paralel)", bars: [ {role:"dash", lane:"solo", from:8, to:11, text:"D'Order Maint. Act. Type · Power BI · 3 SP"} ] },
+          {role:"qa", lane:"lane0", cls:"early", from:8, to:13, text:"10 SP"},
+          {role:"qa", lane:"lane1", from:15, to:18, text:"18 SP"} ] },
+        { label: "Dashboard (paralel)", bars: [ {role:"dash", lane:"solo", from:8, to:18, text:"11 SP"} ] },
       ]
     }
   ];
@@ -326,7 +346,9 @@
 </div>
 
 <!-- ===================== RILIS 2 ===================== -->
-<h1 class="sec">4. Rilis 2 — Maintenance Activity Type &amp; Integrasi Inspection→Order (Minggu 8–12)</h1>
+<h1 class="sec">4. Rilis 2 — Maintenance Activity Type + My Work &amp; eMAR (Minggu 8–19, direvisi 13 Agustus 2026)</h1>
+
+<h3 style="margin-top:0;">4.1 Maintenance Activity Type &amp; Integrasi Inspection→Order (scope awal)</h3>
 <table>
   <tr><th style="width:20%;">Kategori</th><th style="width:38%;">Task</th><th style="width:8%;">Role</th><th style="width:6%;">SP</th><th>Mandays</th></tr>
   <tr><td>Master Data</td><td><code>MaintenanceActivityType</code> schema/API + mapping M:N + permission + seeder</td><td><span class="badge badge-be">BE</span></td><td>7</td><td>8.2</td></tr>
@@ -337,18 +359,48 @@
   <tr><td>Order Approval &amp; Workflow</td><td>Standardisasi <code>ReferenceTransactionId</code> + dual-lookup 3 endpoint</td><td><span class="badge badge-be">BE</span></td><td>5</td><td>5.9</td></tr>
   <tr><td>SAP Sync</td><td><code>MechanicOrderList</code> kolom baru + extend <code>PoolingMOItem</code></td><td><span class="badge badge-be">BE</span></td><td>3</td><td>3.5</td></tr>
   <tr><td>SAP Sync</td><td>4 endpoint cleanup (order-detail/assetnumber/approve/deprecate)</td><td><span class="badge badge-be">BE</span></td><td>6</td><td>7.0</td></tr>
-  <tr><td>QA / Testing</td><td>Testing end-to-end (create → approve → SAP sync + regresi)</td><td><span class="badge badge-qa">QA</span></td><td>8</td><td>9.4</td></tr>
-  <tr><td>Dashboard</td><td>Digiman Transaction Dashboard (Maint. Act. Type) + Power BI</td><td><span class="badge badge-deda">DE/DA</span></td><td>3</td><td>3.5</td></tr>
-  <tr class="total"><td colspan="3">Total BE: 28 SP / 32.8 mandays · FE: 9 SP / 10.5 mandays · QA: 8 SP / 9.4 mandays · DE/DA (paralel): 3 SP / 3.5 mandays</td><td colspan="2"></td></tr>
+  <tr class="total"><td colspan="3">Subtotal scope awal — BE: 28 SP / 32.8 mandays · FE: 9 SP / 10.5 mandays</td><td colspan="2"></td></tr>
+</table>
+
+<h3>4.2 My Work &amp; eMAR (baru, ditambahkan 13 Agustus 2026)</h3>
+<p style="font-size:9.6pt;color:#667;">Confidence lebih rendah dari 4.1 — tidak ada reference class Jira (fitur belum pernah dibangun), beberapa keputusan desain masih terbuka (lihat callout risiko di bawah tabel). Detail per item: <code>my-work.md</code>, <code>mechanic-activity-report.md</code>, <code>mechanic-productivity-management.md</code>.</p>
+<table>
+  <tr><th style="width:20%;">Kategori</th><th style="width:38%;">Task</th><th style="width:8%;">Role</th><th style="width:6%;">SP</th><th>Mandays</th></tr>
+  <tr><td>My Work</td><td><code>UserActivityLog</code> schema (3) + unified feed API (5) + CRUD manual activity (3) + confirm actual done (2) + Fit to Work/gating (2) + unit/WO search (3) + auto-match engine lintas service (8) + permission/homepage (1)</td><td><span class="badge badge-be">BE</span></td><td>27</td><td>31.6</td></tr>
+  <tr><td>My Work</td><td>Home hari ini + navigasi tanggal (4) + detail assignment (2) + form tambah non-maintenance (2) + form ad-hoc maintenance+unit picker (3) + edit/delete manual (1) + layar Fit to Work+blocked state (2) + konfirmasi actual (1) + prompt auto-match (2) + empty/offline state (1)</td><td><span class="badge badge-fe">FE</span></td><td>18</td><td>21.1</td></tr>
+  <tr><td>eMAR</td><td>Report envelope+migration (3) + Submit API (5) + Approve/Reject API (2) + baseline hours config (2) + integrasi DWS <code>dplan.Dws</code> (5) + approver queue API (2) + riwayat report API (1)</td><td><span class="badge badge-be">BE</span></td><td>20</td><td>23.4</td></tr>
+  <tr><td>eMAR</td><td>Mobile: list bulanan+day detail+ganti periode+riwayat+rejected-resubmit+submit confirm (13). Web: approver detail/approve-reject+inbox/queue+admin baseline config (7)</td><td><span class="badge badge-fe">FE</span></td><td>20</td><td>23.4</td></tr>
+  <tr><td>QA / Testing</td><td><b>QA awal</b> — mulai paralel sejak Minggu 8 (test case design &amp; test plan, bukan menunggu modul pertama code-complete): Master Data &amp; Inspection Activity Type existing (2) + eMAR mobile UI &amp; layar My Work non-integrasi begitu siap (8)</td><td><span class="badge badge-qa">QA</span></td><td>10</td><td>11.7</td></tr>
+  <tr><td>QA / Testing</td><td><b>QA end-to-end</b> — create→approve→SAP sync Activity Type existing (6) + self-capture→confirm→auto-match My Work + submit→approve→reject eMAR + validasi Utilization Rate via DWS (12)</td><td><span class="badge badge-qa">QA</span></td><td>18</td><td>21.1</td></tr>
+  <tr><td>Dashboard</td><td>Digiman Transaction Dashboard Maint. Act. Type existing (3) + Mechanic Productivity Dashboard baru — Site Manager &amp; HO, drilldown Site→Section→Level→Individual (8), Power BI</td><td><span class="badge badge-deda">DE/DA</span></td><td>11</td><td>12.9</td></tr>
+  <tr class="total"><td colspan="3"><b>Total Rilis 2 (gabungan)</b> — BE: 75 SP / 87.8 mandays · FE: 47 SP / 55.0 mandays · QA: 28 SP / 32.8 mandays (10 SP/11.7 mandays QA awal + 18 SP/21.1 mandays QA end-to-end, keduanya terhitung penuh) · DE/DA (paralel): 11 SP / 12.9 mandays</td><td colspan="2"></td></tr>
 </table>
 
 <div class="callout">
-  <div class="callout-label">QA Shift-Left</div>
-  Minggu 9 — testing modul awal (Master Data, Inspection &amp; Additional Order) ~2 SP. Minggu 10–11 — testing end-to-end create→approve→SAP sync, butuh SAP Sync+Order Approval siap dulu (selesai Minggu 10) ~6 SP sisanya. <b>Tanpa buffer tambahan</b> (beda dengan Rilis 1).
+  <div class="callout-label">QA Shift-Left (revisi 13 Agustus 2026)</div>
+  QA (2 orang) mulai <b>paralel sejak Minggu 8</b> — test case design &amp; test plan dikerjakan sejak hari pertama dev, bukan menunggu modul pertama code-complete. Minggu 8–13 — QA awal (test case design + functional testing modul code-complete duluan) ~10 SP / 11.7 mandays. Minggu 15–18 — QA end-to-end (create→approve→SAP sync Activity Type + self-capture→confirm→auto-match My Work + submit→approve→reject eMAR + validasi Utilization Rate DWS) ~18 SP / 21.1 mandays. Mulai Minggu 15 (bukan 14) — lihat capacity check di bawah.
 </div>
+<div class="callout warn">
+  <div class="callout-label">Di luar 113 SP My Work &amp; eMAR (belum diestimasi)</div>
+  Push-assignment Foreman→Mechanic (My Work saat ini pull/self-assign) · split Man Power/Man Hours per-individu mechanic (tergantung enhancement lain) · notification service (dependency platform belum dikonfirmasi ada) · export PDF/Excel eMAR · GPS/location My Work. Kalau salah satu masuk scope belakangan, 161 SP di atas perlu direvisi naik.
+</div>
+
+<h3>4.3 Revisi Capacity Check (13 Agustus 2026, revisi kedua)</h3>
+<p>Estimasi BE/FE di 4.2 awalnya digambar per-kategori dengan tanggal dihitung independen dari SP÷velocity masing-masing — <b>tanpa cross-check berapa kategori berjalan bersamaan pada minggu yang sama terhadap headcount riil</b>. Hasilnya: di Minggu 8–10 ada sampai <b>4 thread BE dan 4 thread FE "paralel"</b>, padahal squad cuma 3 BE / 2 FE — tidak bisa dieksekusi seperti itu. Jadwal ulang di bawah mengasumsikan <b>reallocation aktif</b> (orang pindah bantu thread lain begitu thread-nya sendiri selesai, bukan silo tetap 1 orang 1 fitur).</p>
+
+<table>
+  <tr><th style="width:12%;">Lane</th><th style="width:38%;">Thread</th><th style="width:10%;">SP</th><th style="width:14%;">Minggu</th><th>Catatan</th></tr>
+  <tr><td>BE-1</td><td>Activity Type (Master Data 7 + Inspection 7 + SAP Sync 9 + Order Approval 5)</td><td>28</td><td>8–10</td><td>Dibantu ~2 BE lain sebentar di Minggu 8–9 supaya tetap selesai secepat rencana awal</td></tr>
+  <tr><td>BE-2</td><td>eMAR (envelope, Submit/Approve API, baseline config, DWS, approver queue, riwayat)</td><td>20</td><td>9–14</td><td>Mulai Minggu 9 — Activity Type belum butuh 3 BE penuh, 1 BE bebas</td></tr>
+  <tr><td>BE-3</td><td>My Work (schema, feed API, CRUD, confirm, Fit to Work, unit/WO search, permission, auto-match)</td><td>27</td><td><b>11–15</b></td><td><b>Baru mulai penuh Minggu 11</b> — nunggu Activity Type (selesai ~Mgg 10) melepas 2 BE untuk bantu. Auto-match (8 SP) juga butuh Inspection Activity Type stabil dulu (selesai ~Mgg 9, bukan bottleneck tambahan)</td></tr>
+  <tr><td>FE-1</td><td>Activity Type FE (9) → lanjut eMAR FE (20)</td><td>29</td><td>8–9, lalu 9–15</td><td>1 lane berkelanjutan (bukan 2 orang beda) — Activity Type FE kecil &amp; cepat, langsung lanjut eMAR FE</td></tr>
+  <tr><td>FE-2</td><td>My Work FE (Home, navigasi tanggal, detail assignment, form manual, Fit to Work, dst.)</td><td>18</td><td>8–13</td><td>Dedicated solo dari Minggu 8, tidak terdampak capacity check</td></tr>
+</table>
+
+<p style="font-size:9.6pt;color:#667;">Maks 3 BE dan 2 FE konkuren di setiap minggu ✓ (sebelumnya sampai 4). <b>BE &amp; FE baru benar-benar selesai ~Minggu 15</b> (naik dari estimasi awal Minggu 13–14) — My Work FE sendiri tetap selesai ~Minggu 13 seperti rencana awal karena FE-2 dedicated sejak awal, tapi QA end-to-end tetap harus menunggu eMAR FE (FE-1, ~Mgg 15) dan My Work BE (BE-3, ~Mgg 15) sebelum bisa mulai penuh. <b>Total SP tidak berubah (161 SP)</b> — murni koreksi timing. Dampak: QA end-to-end mundur ke Minggu 15–18, Release Prep mundur ke Minggu 19, ship mundur dari Minggu 18 → <b>Minggu 19</b>.</p>
 <div class="callout decision">
   <div class="callout-label">Benefit ke Customer</div>
-  Kegagalan create MO ke SAP akibat kombinasi Order Type+Activity Type yang salah-derive <b>berhenti</b> — Activity Type sekarang bisa dikonfigurasi fleksibel per Order Type oleh client sendiri.
+  Kegagalan create MO ke SAP akibat kombinasi Order Type+Activity Type yang salah-derive <b>berhenti</b> — Activity Type sekarang bisa dikonfigurasi fleksibel per Order Type oleh client sendiri. My Work memberi Mechanic/Foreman satu layar untuk melihat assignment harian dan mencatat aktivitas (termasuk fit to work); eMAR mengubah proses activity report bulanan dari manual jadi tercatat sistem dengan approval Supervisor dan dashboard produktivitas untuk Site Manager/HO.
 </div>
 
 <!-- ===================== RISIKO ===================== -->
@@ -356,16 +408,19 @@
 <ol style="padding-left: 20px; font-size: 9.6pt;">
   <li style="margin:8px 0;"><b>Headcount naik 75% (4→7 orang)</b> — keputusan komersial, biaya squad naik signifikan dari baseline 4 orang. Perlu persetujuan budget terpisah dari komitmen awal (8 sprint, tim 4 orang).</li>
   <li style="margin:8px 0;"><b>Velocity ramp-up (0.81→0.85 SP/hari/orang) belum tervalidasi untuk kohort 7 orang baru sekaligus.</b> Angka ini dikalibrasi untuk skenario 4 orang menerima Knowledge Transfer dari tim BUMA ID veteran. Menaikkan jadi 7 orang berarti bandwidth KT tim veteran juga perlu di-scale — risiko ini diketahui dan sengaja dikesampingkan dalam pemodelan ini (keputusan 3 Agustus 2026), bukan tervalidasi tidak berdampak.</li>
-  <li style="margin:8px 0;"><b>Hiring lead time</b> untuk net tambahan +1 BE, +1 FE, +1 QA (di luar 4 orang existing) di luar estimasi 12 minggu ini — waktu rekrutmen/interview/notice period akan mengulur tanggal mulai Sprint 1.</li>
+  <li style="margin:8px 0;"><b>Hiring lead time</b> untuk net tambahan +1 BE, +1 FE, +1 QA (di luar 4 orang existing) di luar estimasi 19 minggu ini — waktu rekrutmen/interview/notice period akan mengulur tanggal mulai Sprint 1.</li>
   <li style="margin:8px 0;"><b>Risiko koordinasi/merge-conflict lebih tinggi</b> di 4 titik shared-screen Rilis 1 (eMOL carry-forward, <code>PoolingMOItem</code>, Digiplan grid/export, MO Backlog JOIN) karena sekarang dikerjakan 3 BE, bukan 2 — perlu pembagian task/branch yang jelas.</li>
   <li style="margin:8px 0;"><b>Dependency yang tetap berlaku</b>: Master Data Area (Equipment Mapping enhance) tetap harus selesai lebih dulu sebelum kolom Area di Digiplan bisa dikembangkan penuh.</li>
   <li style="margin:8px 0;">Item lain yang masih berlaku dari Skenario A: mekanisme deteksi <code>ReferenceTransactionId</code> di Rilis 2 belum bisa diestimasi penuh; mapping BAPI ke SAP tetap di luar seluruh estimasi ini (dikoordinasikan client, PIC Faiza).</li>
-  <li style="margin:8px 0;"><b>Jadwal Rilis 2 tetap lebih ketat dari Rilis 1.</b> Buffer 1 minggu (3 Agustus 2026) cuma ditambahkan ke Rilis 1. Rilis 2 masih pakai estimasi shift-left tanpa margin ekstra (dev-QA 4 minggu penuh); kalau shift-left QA di Rilis 2 sulit dieksekusi rapi (misal environment testing belum siap sebelum dev selesai penuh), realistanya jadwal Rilis 2 bisa mundur ~1 minggu lagi (total ~13 minggu).</li>
+  <li style="margin:8px 0;"><b>Jadwal Rilis 2 tetap lebih ketat dari Rilis 1.</b> Buffer 1 minggu (3 Agustus 2026) cuma ditambahkan ke Rilis 1. Rilis 2 pakai estimasi shift-left + capacity check (13 Agustus 2026) tanpa margin ekstra tambahan di luar itu; kalau reallocation antar-thread (Risiko #9) atau shift-left QA sulit dieksekusi rapi, realistanya jadwal Rilis 2 bisa mundur lagi dari Minggu 19 (total &gt;19 minggu).</li>
   <li style="margin:8px 0;"><b>Risiko retest</b> kalau BE menyentuh ulang kode shared-screen (eMOL carry-forward, <code>PoolingMOItem</code>) <b>setelah</b> QA sudah mulai testing modul terkait duluan (Minggu 2 di Rilis 1, Minggu 9 di Rilis 2) — retest tambahan akibat perubahan itu belum terhitung eksplisit di estimasi ini.</li>
+  <li style="margin:8px 0;"><b>(Baru, 13 Agustus 2026, dikuantifikasi di revisi kedua) Tiga thread fitur bersamaan dengan hanya 3 BE.</b> Rilis 2 sekarang menjalankan Maintenance Activity Type + My Work + eMAR sekaligus. Jadwal di dokumen ini <b>sudah mengasumsikan reallocation aktif</b> (orang pindah bantu thread lain begitu thread-nya sendiri selesai — lihat tabel alokasi per-orang di Bagian 4.3), bukan silo 1 orang per fitur. Kalau reallocation ini tidak dikelola rapi di eksekusi riil, jadwal bisa mundur lagi dari Minggu 19.</li>
+  <li style="margin:8px 0;"><b>(Baru, 13 Agustus 2026) Confidence estimasi My Work &amp; eMAR (113 SP) lebih rendah</b> dari Maintenance Activity Type. Maintenance Activity Type tervalidasi reference class Jira riil; My Work &amp; eMAR murni estimasi dari desain di atas kertas, belum ada kode/mockup backend sama sekali. Beberapa keputusan yang bisa geser SP signifikan kalau berubah: push vs pull assignment dari Digiplan, arsitektur Management Dashboard (Power BI vs halaman app baru dengan RBAC), mekanisme reopen-editing setelah Reject di eMAR.</li>
+  <li style="margin:8px 0;"><b>(Baru, 13 Agustus 2026) Rilis 1 punya gap serupa (kecil) — bukan buatan sesi ini.</b> Kroscek kapasitas yang sama, diterapkan ke Rilis 1 (bagian dari rencana asli 3 Agustus 2026, bukan revisi baru): BE 43 SP diklaim selesai Minggu 3, tapi kapasitas riil 3 BE di ramp-up (0.81 SP/hari) untuk Minggu 1–3 cuma ~36.5 SP — realistanya BE selesai lebih dekat ke Minggu 4. Bedanya dengan Rilis 2: gap-nya kecil (~1 minggu) dan Rilis 1 sudah punya buffer 3 minggu QA sebelum ship (Minggu 4→7) yang kemungkinan besar menyerap slip ini. <b>Ship Minggu 7 tetap dipertahankan, tidak direvisi</b> — dicatat untuk transparansi metodologi.</li>
 </ol>
 
 <div class="footer-note">
-  Dokumen ini skenario final hasil diskusi bertahap dari <i>squad-baru-release-timeline.md</i> (Skenario A — 4 orang, 3 rilis sequential, 19 minggu). Dua skenario antara (gabung Rilis 1+2 dengan squad tetap, dan eksplorasi opsi headcount) sempat dibuat sebagai dokumen terpisah selama diskusi dan sudah digantikan oleh keputusan final ini. Gantt chart interaktif: claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204.
+  Dokumen ini skenario final hasil diskusi bertahap dari <i>squad-baru-release-timeline.md</i> (Skenario A — 4 orang, 3 rilis sequential, 19 minggu). Dua skenario antara (gabung Rilis 1+2 dengan squad tetap, dan eksplorasi opsi headcount) sempat dibuat sebagai dokumen terpisah selama diskusi dan sudah digantikan oleh keputusan final ini. Rilis 2 direvisi 13 Agustus 2026 untuk memasukkan My Work &amp; eMAR (161 SP total gabungan), lalu direvisi kedua kalinya di hari yang sama setelah capacity check per-orang — ship akhir <b>Minggu 19</b> — lihat Bagian 4 dan <code>squad-baru-release-timeline-final.md</code> untuk rincian lengkap. Gantt chart interaktif: claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204.
 </div>
 
 </body>

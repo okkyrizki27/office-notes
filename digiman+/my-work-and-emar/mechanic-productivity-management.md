@@ -140,6 +140,23 @@ Management report dihitung dari **Mechanic Activity Report yang sudah disubmit a
 
 ---
 
+## Kebutuhan UI Tambahan (untuk Estimasi Effort)
+
+| # | Layar | Deskripsi | Catatan |
+|---|-------|-----------|---------|
+| 1 | HO View — Site Cards | Dijelaskan di bagian "HO View" di atas, tapi belum ada mockup terpisah — [report-design-management-web.html](report-design-management-web.html) yang ada baru cover Site Manager View (Section Cards) | |
+| 2 | Drill-down Site → Section → Level → Individual | Navigasi bertingkat untuk HO | |
+| 3 | Export Excel/PDF | Open item lama, belum didesain | |
+| 4 | Alert/notifikasi threshold utilization | Open item lama — perlu UI konfigurasi threshold per site, atau hardcode 75%/60% dulu? | |
+
+## Kebutuhan Backend (untuk Estimasi Effort)
+
+Lihat pembahasan lengkap di bagian ["Kebutuhan Backend"](mechanic-activity-report.md) di `mechanic-activity-report.md` — dua poin di sana berlaku langsung untuk dashboard di dokumen ini:
+- **Aggregasi Management Productivity** — pertanyaan arsitektur BI report (SQL view di curated lake, pola yang sama dengan `report/transaction-report` lain di repo ini) vs halaman app baru dengan API OLTP + RBAC Site Manager/HO. Ini keputusan yang paling menentukan besar effort dashboard ini.
+- **Integrasi DWS (`dplan.Dws`)** — dibutuhkan juga di sini untuk exclude hari Off dari perhitungan Utilization Rate (baris "Daily Work Schedule" di atas).
+
+---
+
 ## Open Items
 
 - [ ] Definisi "jam kerja terjadwal" — berapa jam per shift yang dianggap standar? (misal: Day Shift = 10 jam, Night Shift = 10 jam) untuk menghitung denominator Utilization Rate

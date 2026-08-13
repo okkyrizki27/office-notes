@@ -147,6 +147,42 @@ Setiap baris = satu sesi aktivitas:
 
 ---
 
+## Kebutuhan UI Tambahan (untuk Estimasi Effort)
+
+Mockup yang sudah ada meng-cover: list bulanan mechanic ([report-design-mechanic-mobile.html](report-design-mechanic-mobile.html)), walkthrough per-hari dengan add/edit/delete manual ([report-design-mechanic-day-detail.html](report-design-mechanic-day-detail.html)), dan detail + approve/reject approver ([report-design-approver-web.html](report-design-approver-web.html)). Yang **belum** ada mockup-nya:
+
+| # | Layar | Deskripsi | Catatan |
+|---|-------|-----------|---------|
+| 1 | Form/modal "Tambah Manual" itu sendiri | Mockup hanya menampilkan tombolnya, bukan form input-nya (field, validasi, unit picker) | **Kemungkinan sama** dengan layar "Tambah Aktivitas" di [my-work.md](my-work.md) — lihat catatan cross-cutting di bawah |
+| 2 | Ganti Periode | Mockup punya tombol "Ganti ›" tapi UI pemilihan periode (kalender/list bulan) belum didesain | |
+| 3 | Riwayat Report (periode lampau) | List report mechanic dari periode-periode sebelumnya berikut statusnya | |
+| 4 | State Rejected + edit-resubmit | Mechanic melihat komentar penolakan supervisor, edit, lalu submit ulang | Tergantung keputusan open item "kebijakan editing setelah submit" |
+| 5 | Approver — Inbox/Queue | List semua report yang menunggu approval supervisor ini | Breadcrumb "Activity Reports" di [report-design-approver-web.html](report-design-approver-web.html) mengimplikasikan halaman ini ada, tapi belum didesain |
+| 6 | Approver — Bulk approve | Approve beberapa report sekaligus | Nice-to-have, perlu keputusan scope |
+| 7 | Admin HO — Config Baseline Jam Kerja | CRUD `HoursPerDay` per site dengan histori `EffectiveFrom` | Konsep data sudah ada di dokumen ini (bagian Baseline Jam Kerja), UI-nya belum sama sekali |
+| 8 | Notifikasi (submit/approve/reject) | | Dependency sama dengan yang dicatat di [my-work.md](my-work.md) |
+| 9 | Export PDF/Excel | Open item lama, UI (tombol, pilihan format) belum didesain | |
+
+---
+
+## Kebutuhan Backend (untuk Estimasi Effort)
+
+| # | Item | Jenis | Deskripsi | Catatan |
+|---|------|-------|-----------|---------|
+| 1 | Entity "report envelope" (mis. `McActivityReport`) | **Keputusan desain, bukan cuma tabel** | Dokumen ini baru mencatat field `SubmittedAt`/`ApprovedBy`/`ApprovedAt` tanpa nama entity konkret — perlu entity first-class untuk Status (Draft/Submitted/Approved/Rejected) + Period per mechanic, agar Approve/Reject/Comment punya tempat nempel | Rejected juga perlu keputusan: apakah reopen editing untuk periode lampau tanpa mengganggu data yang sedang dicatat di periode berjalan? |
+| 2 | Baseline hours config | Tabel + CRUD API | `SiteCode`/`HoursPerDay`/`EffectiveFrom`/`IsActive` — struktur sudah dijelaskan di atas, API & permission belum discope | |
+| 3 | Submit API | API baru | Lock manual entries periode berjalan, hitung summary (Total/Maintenance/NonMaintenance/Expected/Deviasi/Utilization), buat/update report envelope, notify supervisor | |
+| 4 | Approve/Reject API | API baru | Update status envelope, simpan comment, notify mechanic | Lihat catatan reopen-editing di item #1 |
+| 5 | Aggregasi Management Productivity | **Pertanyaan arsitektur, bukan cuma effort** | Cross-section/individu (Site→Section→Level→Individual) atas ratusan mechanic | Semua "report" lain di repo ini (`report/transaction-report`, dll.) dibangun sebagai SQL view di atas curated data lake (`openrowset`/Synapse), bukan halaman app dengan API OLTP. Apakah Management Productivity View **sama pola-nya** (BI report/Power BI) atau **benar-benar halaman app baru** dengan RBAC Site Manager vs HO? Keputusan ini mengubah effort secara signifikan — sebaiknya diputuskan sebelum estimasi |
+| 6 | Integrasi DWS (`dplan.Dws`) | Integrasi lintas service | Perlu untuk deteksi hari Off/shift per mechanic per periode (gap-detection "hari kerja belum ada aktivitas" + denominator Utilization Rate) | Belum ada wiring cross-DB (`maintenance-execution`/reporting membaca `dplan.Dws`) di dokumentasi manapun yang ditemukan |
+| 7 | Notifikasi | Integrasi | Dependency sama dengan yang dicatat di [my-work.md](my-work.md) | |
+| 8 | Export service (PDF/Excel) | Servis baru | Kemungkinan besar **bukan reuse** — proses PDF internal yang ada (render HTML→PDF via headless Chrome) untuk dokumen kerja tim, bukan generation dari dalam app | |
+| 9 | Job lock/deadline submission | Scheduled job | Hanya relevan jika open item "batas waktu submit" diputuskan ada | |
+
+> **Cross-cutting dengan My Work:** BE #1-3 dan UI #1 kemungkinan besar berbagi implementasi dengan `UserActivityLog` dan endpoint "Tambah Aktivitas" yang dicatat di [my-work.md](my-work.md) — jangan diestimasi dua kali sebagai fitur terpisah.
+
+---
+
 ## Open Items
 
 - [x] Baseline jam kerja — per hari, per site, dikonfigurasi Admin HO. Ditampilkan sebagai Expected vs Actual + Deviasi (+/-) + Utilization Rate
