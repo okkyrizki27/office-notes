@@ -267,6 +267,8 @@ WHERE c.formSubmissionId= '4b604512-b409-4a19-ba79-9ac5ab68e16c'
 
 Ambil apa adanya (`f[3].child[0]['value']`) akan menghasilkan string yang terlihat seperti array tapi tipenya tetap string — gunakan `StringToArray()` untuk parse jadi array beneran. Jika task tidak diisi foto, `value` kemungkinan `""` (empty string) — bukan JSON array valid, sehingga `StringToArray("")` menghasilkan `undefined` dan Cosmos akan **drop** field `photoGuid` dari hasil row tersebut (bukan error, tapi field-nya hilang). Query di atas sudah membungkus dengan ternary agar selalu dapat array (kosong jika tidak ada foto).
 
+> ✅ **Ditemukan (2026-08-14)** — tab spesifik ternyata bisa punya section yang **campuran**: sebagian besar row `BANKTASK`-nested (butuh query 3-level di atas), tapi ada section yang isinya **flat** (mis. section "Digital Signature by Inspector" berisi `PHOTOLIST` flat, dan section "RESUME FINAL INSPECTION" diakhiri 1 elemen `INPUT` "SUMMARY" flat setelah 3 row `BANKTASK`-nya). Query 3-level di atas **tidak menangkap elemen flat ini** karena elemen flat tidak punya `.elements` nested untuk di-JOIN level ketiga. Solusinya: jalankan **juga** [Query — Tab General (flat elements)](#query--tab-general-flat-elements) di bawah untuk tab spesifik, cukup ganti filter `c.title = 'General'` jadi nama tab yang sesuai (mis. `'Inspection'`) — pattern query-nya sama persis, termasuk fix filter `isShow` di bawah. Detail lihat [form-iir-external-api-design.md — Open Item #5](form-iir-external-api-design.md#5--resolved--flat-photolist-di-tab-inspection-signature-ditangani-sama-seperti-flat-elements-tab-general).
+
 ### Query — Tab General (flat elements)
 
 Tab General **tidak** punya struktur row (`NUMBERINGTEXT`/`BANKTASK`/`INLINE`) — tiap section langsung berisi list elemen datar, jadi cukup 2 level join (`sections` → `elements`), tidak perlu join ketiga (`f`):
@@ -302,11 +304,13 @@ WHERE c.formSubmissionId = '4b604512-b409-4a19-ba79-9ac5ab68e16c'
   AND c.title = 'General'
   AND (
         e.isShow = true
-        OR e.elementCode = 'PHOTOLIST'
+        OR e.elementCode IN ('PHOTOLIST', 'INPUT')
       )
 ```
 
 > 🚩 **Cabang `PHOTOLIST` di query di atas (baca dari `e.valueCaption`) sudah diketahui salah — lihat koreksi tepat di bawah tabel ini.** `value`, bukan `valueCaption`, yang berisi GUID foto real. Query di atas belum diupdate ke bentuk yang benar (bentuk JSON pasti `value` masih perlu diverifikasi ke contoh data mentah).
+
+> ✅ **Diperbaiki (2026-08-14)** — filter `WHERE` sebelumnya cuma `e.isShow = true OR e.elementCode = 'PHOTOLIST'`, dan diam-diam **drop elemen `INPUT`** (mis. "Unit Serial Number" di section Asset Detail). Dikonfirmasi dari [`IIR-Grader-tab-general-sample.json`](examples/IIR-Grader-tab-general-sample.json) dan [`IIR-General-tab-general-sample.json`](examples/IIR-General-tab-general-sample.json): ada 3 elementCode yang **sama sekali tidak punya key `isShow`** — `CUSTOMCONTENT`, `PHOTOLIST`, dan `INPUT`. Dua yang terakhir harus tetap masuk response (jawaban asli), `CUSTOMCONTENT` harus tetap di-exclude (cuma teks display/instruksional, bukan jawaban) — makanya fix-nya `e.elementCode IN ('PHOTOLIST', 'INPUT')`, bukan asal masukkan semua elemen tanpa `isShow`.
 
 Perbedaan penting dari query tab spesifik:
 
@@ -315,7 +319,7 @@ Perbedaan penting dari query tab spesifik:
 | `taskCode` / `lastUpdatedByUserCode` | Hanya ada di sub-elemen tertentu dalam `INLINE` | Ada langsung di tiap elemen |
 | `taskValue` | Selalu di `valueCaption` | `valueCaption` kadang kosong (mis. `ACTUALSERVICESTART`, `TEXTFIELD` Current SMU) — fallback ke `value` |
 | Foto | `TAKEPHOTO.value` = JSON-encoded string, flat array of GUID (`["guid1","guid2"]`) | `CAMERACAPTURE.value` = GUID string langsung; `PHOTOLIST` — 🚩 GUID real ada di `value` (bisa lebih dari satu), **bukan** `valueCaption` (lihat koreksi di bawah) |
-| Filter `isShow` | Elemen jawaban selalu punya `isShow` | `CUSTOMCONTENT` dan `PHOTOLIST` tidak punya key `isShow` sama sekali — filter default akan drop keduanya, makanya ada `OR e.elementCode = 'PHOTOLIST'` |
+| Filter `isShow` | Elemen jawaban selalu punya `isShow` | `CUSTOMCONTENT`, `PHOTOLIST`, dan `INPUT` (✅ ditemukan 2026-08-14) tidak punya key `isShow` sama sekali — filter default akan drop ketiganya, makanya `WHERE` di atas pakai `OR e.elementCode IN ('PHOTOLIST', 'INPUT')` (bukan `CUSTOMCONTENT`, yang memang harus tetap ter-exclude) |
 
 > **⚠️ Koreksi (2026-08-04) — temuan di bawah ini salah, dikonfirmasi ulang oleh user.** Paragraf ini sebelumnya menyimpulkan `valueCaption` berisi path foto yang sebenarnya dan `value` cuma placeholder — ternyata **ini adalah gejala bug** ([IAMS30-4485](https://bukittechnology.atlassian.net/browse/IAMS30-4485)), bukan desain yang benar. Penulisan sebelumnya kebetulan memeriksa submission yang sudah kena bug ini, jadi disimpulkan seolah itu perilaku normal. Yang benar (dikonfirmasi 2026-08-04): **`value` berisi GUID foto yang sebenarnya (bisa lebih dari satu), reliable di data production saat ini** — konsisten dengan pola `TAKEPHOTO`/`CAMERACAPTURE` (value = GUID asli). `valueCaption` berisi **local device path** akibat bug tersebut — path device tidak portable/valid kalau form dibuka di device lain, jadi field ini **tidak boleh dipakai maupun tidak perlu disimpan**. Lihat penjelasan lengkap & dampaknya ke API eksternal di [Open Item #4](form-iir-external-api-design.md#4-aksesibilitas-photosurl-oleh-sistem-eksternal-belum-ada-mekanisme) / Open Item terkait `PHOTOLIST` di [`form-iir-external-api-design.md`](form-iir-external-api-design.md).
 >
@@ -337,7 +341,7 @@ Perbedaan penting dari query tab spesifik:
 
 **Gotcha — `value` adalah reserved keyword di Cosmos DB SQL API.** Selalu akses field `value` pakai bracket notation (`e['value']`), **bukan** dot notation (`e.value`) — dot notation akan error karena bentrok dengan keyword `VALUE` yang dipakai di syntax `SELECT VALUE`. Field lain (`valueCaption`, `taskCode`, dll) aman pakai dot notation seperti biasa. Lihat juga query tab spesifik di atas — semua akses ke `value` konsisten pakai `['value']`.
 
-**Query di atas contoh untuk form IIR** (`FORM394`). Section-nya cuma "Personnel Information", "Asset Information", dan satu section tanpa judul (`CUSTOMCONTENT` + `PHOTOLIST`) — tidak ada section "WICOPE Quality Check", jadi filter yang mengecualikan `WICOPE Quality Check`/`DATETIME`/`DROPDOWN` (pernah ada di draft sebelumnya) sudah dihapus dari query ini. General tab adalah **template shared** yang isinya (section + elemen) berbeda-beda antar form (lihat [Mekanisme General Tab Template](form-builder.md#mekanisme-general-tab-template)) — jadi kalau nanti query ini dipakai untuk form lain, cek dulu section apa saja yang benar-benar ada di form tersebut sebelum reuse filter `isShow`/`elementCode` di atas.
+**Query di atas contoh untuk form IIR** (`FORM394`). Section-nya "Personnel Information", "Asset Information", dan "Asset Detail" (`CUSTOMCONTENT` + `PHOTOLIST`, **✅ dikoreksi 2026-08-14** — section ini punya title "Asset Detail" di data real, sebelumnya salah ditulis "tanpa judul"; lihat sample [`IIR-General-tab-general-sample.json`](examples/IIR-General-tab-general-sample.json)/[`IIR-Grader-tab-general-sample.json`](examples/IIR-Grader-tab-general-sample.json)) — tidak ada section "WICOPE Quality Check", jadi filter yang mengecualikan `WICOPE Quality Check`/`DATETIME`/`DROPDOWN` (pernah ada di draft sebelumnya) sudah dihapus dari query ini. General tab adalah **template shared** yang isinya (section + elemen) berbeda-beda antar form (lihat [Mekanisme General Tab Template](form-builder.md#mekanisme-general-tab-template)) — jadi kalau nanti query ini dipakai untuk form lain, cek dulu section apa saja yang benar-benar ada di form tersebut sebelum reuse filter `isShow`/`elementCode` di atas.
 
 **Elemen dengan `value` berupa object-literal string (bukan valid JSON):** `LABOURPERSONNEL` dan `ASSETNUMBER` menyimpan `value` dalam format Python/JS-style single-quote (`"{'userCode': '...'}"`), bukan JSON valid — `StringToObject()` akan gagal di-parse. Query di atas menghindari ini dengan selalu prioritaskan `valueCaption` (yang terisi untuk kedua elemen ini) sebagai `taskValue`.
 

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>IIR Form Submission API — Integration Guide</title>
+<title>Form Submission API — Integration Guide</title>
 <style>
   @page { size: A4 portrait; margin: 16mm; }
   * { box-sizing: border-box; }
@@ -47,9 +47,11 @@
   .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; }
   .callout.warn { border-left-color: #d68910; background: #fdf3e3; }
   .callout.decision { border-left-color: #1e8449; background: #eaf6ee; }
+  .callout.change { border-left-color: #7d3c98; background: #f4ecf7; }
   .callout-label { font-weight: 700; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 4px; }
   .callout.warn .callout-label { color: #b9770e; }
   .callout.decision .callout-label { color: #1e8449; }
+  .callout.change .callout-label { color: #7d3c98; }
 
   .endpoint { display: flex; align-items: center; gap: 10px; margin: 16px 0 4px; }
   .method { display: inline-block; background: #1e8449; color: #fff; font-weight: 800; font-size: 9.5pt; padding: 4px 12px; border-radius: 4px; letter-spacing: 0.5px; }
@@ -60,6 +62,7 @@
 
   .badge { display:inline-block; color:#fff; padding:2px 9px; border-radius:12px; font-size:8pt; font-weight:700; }
   .badge-draft { background:#7f8c8d; }
+  .badge-new { background:#7d3c98; }
 
   .toc { list-style: none; padding-left: 0; }
   .toc li { margin: 8px 0; font-size: 10.5pt; }
@@ -80,28 +83,29 @@
 <!-- ===================== COVER ===================== -->
 <div class="cover">
   <div class="cover-eyebrow">Digiman+ — API Integration Guide</div>
-  <h1>IIR Form Submission API</h1>
-  <div class="subtitle">REST API untuk menarik data submission form Inspection (IIR) dari Digiman+ ke sistem eksternal</div>
+  <h1>Form Submission API</h1>
+  <div class="subtitle">REST API untuk menarik data submission form self-service ("Form Submission" mobile menu) dari Digiman+ ke sistem eksternal — IIR adalah kategori pemakaian awal, endpoint mendukung kategori form lain lewat parameter <code style="background:rgba(255,255,255,0.2); color:#FFF8E7;">formSubGroup</code></div>
   <div class="cover-badges">
     <span class="cover-badge">🔑 Autentikasi</span>
     <span class="cover-badge">📥 Endpoints &amp; Schema</span>
+    <span class="cover-badge">🗂️ Multi-kategori Form</span>
     <span class="cover-badge">⚠️ Error Handling</span>
     <span class="cover-badge">✅ Best Practices</span>
   </div>
   <div class="cover-meta">
     Disusun untuk: Tim Technical — Sistem Eksternal<br>
-    Versi Dokumen: Draft v0.3<br>
-    Tanggal: 4 Agustus 2026
+    Versi Dokumen: Draft v0.4 (sebelumnya v0.3, 4 Agustus 2026)<br>
+    Tanggal: 14 Agustus 2026
   </div>
   <div class="cover-warn">
-    <b>⚠ Status: Draft.</b> API ini belum live — dokumen ini dibagikan lebih awal supaya tim technical bisa mulai menyiapkan sisi integrasi. Detail non-fungsional (base URL final, kredensial, rate limit) akan dikonfirmasi terpisah sebelum go-live, dan skema kecil masih mungkin berubah sebelum rilis final.
+    <b>⚠ Status: Draft.</b> API ini belum live — dokumen ini dibagikan lebih awal supaya tim technical bisa mulai menyiapkan sisi integrasi. Detail non-fungsional (base URL final, kredensial, rate limit) akan dikonfirmasi terpisah sebelum go-live, dan skema kecil masih mungkin berubah sebelum rilis final. <b>Versi ini (v0.4) punya beberapa perubahan yang tidak backward-compatible dengan v0.3</b> — lihat ringkasan di 1.1.
   </div>
 </div>
 
 <!-- ===================== DAFTAR ISI ===================== -->
 <h1>Daftar Isi</h1>
 <ul class="toc">
-  <li><a href="#sec-1"><span class="toc-num">1.</span> Overview</a></li>
+  <li><a href="#sec-1"><span class="toc-num">1.</span> Overview &amp; Perubahan dari v0.3</a></li>
   <li><a href="#sec-2"><span class="toc-num">2.</span> Autentikasi</a></li>
   <li><a href="#sec-3"><span class="toc-num">3.</span> Endpoints</a></li>
   <li><a href="#sec-4"><span class="toc-num">4.</span> Response Data Model</a></li>
@@ -114,11 +118,34 @@
 </ul>
 
 <!-- ===================== 1. OVERVIEW ===================== -->
-<h1 id="sec-1">1. Overview</h1>
+<h1 id="sec-1">1. Overview &amp; Perubahan dari v0.3</h1>
 
-<p>API ini menyediakan akses <b>read-only</b> ke data hasil pengisian form <b>IIR (Inspection Report)</b> di Digiman+, model aksesnya adalah <b>pull/polling</b> — sistem eksternal yang menarik data secara berkala (bukan webhook/push dari Digiman+).</p>
+<p>API ini menyediakan akses <b>read-only</b> ke data hasil pengisian form <b>self-service</b> di Digiman+ — form yang diisi lewat menu mobile "Form Submission" (bukan form inspeksi/PM/BD corrective terjadwal). Model aksesnya adalah <b>pull/polling</b> — sistem eksternal yang menarik data secara berkala (bukan webhook/push dari Digiman+).</p>
 
-<p>Setiap submission mencakup metadata (site, equipment, waktu submit) dan seluruh jawaban form (termasuk foto, terstruktur per tab &amp; section).</p>
+<p><b>IIR (Inspection Report)</b> adalah kasus pemakaian awal yang mendorong desain endpoint ini, tapi endpoint-nya <b>tidak dikunci ke IIR saja</b> — form self-service dikelompokkan jadi beberapa kategori (mis. <code>IIR</code>), dan endpoint ini bisa melayani kategori form lain di masa depan cukup dengan mengganti nilai parameter <code>formSubGroup</code> di request kalian — <b>tidak perlu endpoint baru</b> tiap kali ada kategori form tambahan.</p>
+
+<p>Setiap submission mencakup metadata (kategori form, site, equipment, waktu submit) dan seluruh jawaban form (termasuk foto, terstruktur per tab &amp; section).</p>
+
+<h3>1.1 Ringkasan Perubahan dari Draft v0.3</h3>
+<div class="callout change">
+  <div class="callout-label">Breaking changes — perlu penyesuaian di sisi integrasi kalian</div>
+  <ul>
+    <li><b>URL endpoint berubah</b>: <code>/iir-form-submissions</code> → <code>/form-submissions</code> (termasuk endpoint download foto)</li>
+    <li><b>Mekanisme autentikasi berubah</b>: dari OAuth2 Client Credentials Grant (Bearer token) → <b>API Key + IP whitelist</b>, disamakan dengan pola integrasi eksternal lain (mis. SAP) — lihat 2</li>
+    <li><b>Parameter baru wajib: <code>formSubGroup</code></b> — request tanpa parameter ini sekarang <b>invalid</b> (lihat 3.1 &amp; 6.3)</li>
+    <li><b>Parameter <code>siteCode</code> sekarang wajib</b> (sebelumnya opsional) — request tanpa <code>siteCode</code> sekarang <b>invalid</b> (lihat 3.1 &amp; 6.4)</li>
+    <li><b>Field baru di response: <code>formSubGroup</code></b> — muncul di setiap objek submission (lihat 4.2)</li>
+    <li><b>Field <code>taskCode</code> sekarang selalu ada</b> di kedua tab ("General" maupun "Inspection") — sebelumnya cuma ada di tab "Inspection" (lihat 4.4)</li>
+  </ul>
+</div>
+<div class="callout change">
+  <div class="callout-label">Non-breaking — aman untuk integrasi existing</div>
+  <ul>
+    <li><code>equipmentNumber</code> sekarang boleh diisi <b>lebih dari satu nilai</b> (comma-separated) — kalau kalian sudah pakai satu nilai, tetap jalan seperti biasa (lihat 6.4)</li>
+    <li>Error code baru <code>MISSING_REQUIRED_PARAMETER</code> untuk kasus <code>formSubGroup</code>/<code>siteCode</code> tidak diisi (lihat 8)</li>
+    <li>Angka rate limit endpoint download foto direvisi (lihat 7.2) — masih estimasi, belum final</li>
+  </ul>
+</div>
 
 <h3>Base URL</h3>
 <pre><code>https://{host}/api/v1</code></pre>
@@ -127,55 +154,52 @@
 <!-- ===================== 2. AUTENTIKASI ===================== -->
 <h1 id="sec-2">2. Autentikasi</h1>
 
-<p>Autentikasi pakai <b>Client ID + Secret Key</b>, di-exchange ke <b>Bearer token</b> lewat OAuth2 Client Credentials Grant — bukan mengirim Client ID/Secret langsung di setiap request data.</p>
+<p>Autentikasi pakai <b>API Key + IP whitelist</b> — pola yang sama dengan integrasi sistem eksternal lain di Digiman+ (mis. SAP). <b>Kedua faktor dicek bersamaan</b>: API Key harus valid, <b>dan</b> request harus datang dari IP yang sudah didaftarkan untuk key tersebut.</p>
 
-<h3>2.1 Exchange Token</h3>
-<div class="pre-label">Request</div>
-<pre><code>POST /oauth/token
-Content-Type: application/x-www-form-urlencoded
+<h3>2.1 Provisioning</h3>
+<p>Sebelum integrasi dimulai, kalian akan diminta menyampaikan ke tim Digiman+:</p>
+<ul>
+  <li><b>IP/CIDR range</b> asal request (egress IP sistem kalian) untuk didaftarkan ke whitelist</li>
+</ul>
+<p>Sebagai balasannya, kalian akan menerima <b>1 API Key statis</b> per integrasi. Simpan API Key ini dengan aman (mis. secret manager) — <b>jangan</b> di-commit ke source control atau di-log.</p>
 
-grant_type=client_credentials&amp;client_id={CLIENT_ID}&amp;client_secret={CLIENT_SECRET}</code></pre>
+<h3>2.2 Pakai API Key</h3>
+<p>Sertakan API Key di header berikut pada setiap request ke endpoint data maupun endpoint foto:</p>
+<pre><code>X-Api-Key: {api_key}</code></pre>
 
-<div class="pre-label">Response</div>
-<pre><code>{
-  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "Bearer",
-  "expires_in": 3600
-}</code></pre>
-
-<h3>2.2 Pakai Token</h3>
-<p>Sertakan token di header <code>Authorization</code> pada setiap request ke endpoint data:</p>
-<pre><code>Authorization: Bearer {access_token}</code></pre>
-
-<div class="callout">
+<div class="callout warn">
   <div class="callout-label">Penting</div>
-  Token punya masa berlaku terbatas (<code>expires_in</code>, contoh: 1 jam). Setelah expired, lakukan exchange ulang untuk dapat token baru — <b>jangan</b> simpan/pakai ulang <code>client_secret</code> di request data.
+  Request dengan API Key valid tapi berasal dari IP <b>di luar</b> whitelist akan tetap ditolak (<code>403 FORBIDDEN</code>, lihat 8). Kalau IP/infrastruktur sistem kalian berubah (mis. pindah data center, ganti provider cloud), <b>segera informasikan ke tim Digiman+</b> untuk update whitelist — request dari IP baru yang belum terdaftar akan gagal sampai whitelist diperbarui.
 </div>
 
 <h3>2.3 Scope Akses</h3>
-<p>Client ID yang valid otomatis punya akses ke <b>semua site</b> — tidak ada pembatasan akses per site. Parameter <code>siteCode</code>/<code>equipmentNumber</code> pada request murni untuk menyaring hasil pencarian, bukan kontrol keamanan.</p>
+<p>API Key yang valid otomatis punya akses ke <b>semua site</b> — tidak ada pembatasan akses per site. Parameter <code>formSubGroup</code>/<code>siteCode</code>/<code>equipmentNumber</code> pada request murni untuk menyaring hasil pencarian, bukan kontrol keamanan.</p>
 
 <!-- ===================== 3. ENDPOINTS ===================== -->
 <h1 id="sec-3">3. Endpoints</h1>
 
-<h2>3.1 List IIR Form Submissions</h2>
-<div class="endpoint"><span class="method">GET</span><span class="path">/iir-form-submissions</span></div>
-<p>Endpoint utama untuk <b>polling berkala</b> — ambil daftar submission dalam rentang tanggal tertentu, dengan pagination.</p>
+<h2>3.1 List Form Submissions</h2>
+<div class="endpoint"><span class="method">GET</span><span class="path">/form-submissions</span></div>
+<p>Endpoint utama untuk <b>polling berkala</b> — ambil daftar submission dalam rentang tanggal &amp; kategori form tertentu, dengan pagination.</p>
 
 <h3>Query Parameters</h3>
 <table>
 <tr><th style="width:20%">Parameter</th><th style="width:12%">Tipe</th><th style="width:10%">Wajib</th><th>Keterangan</th></tr>
 <tr><td><code>dateFrom</code></td><td>string (ISO 8601)</td><td class="req">Ya</td><td>Batas awal rentang tanggal (UTC), contoh: <code>2026-07-01T00:00:00Z</code></td></tr>
 <tr><td><code>dateTo</code></td><td>string (ISO 8601)</td><td class="req">Ya</td><td>Batas akhir rentang tanggal (UTC). <b>Maksimal 7 hari</b> dari <code>dateFrom</code></td></tr>
-<tr><td><code>siteCode</code></td><td>string</td><td class="opt">Tidak</td><td>Filter berdasarkan kode site</td></tr>
-<tr><td><code>equipmentNumber</code></td><td>string</td><td class="opt">Tidak</td><td>Filter berdasarkan nomor unit/equipment</td></tr>
+<tr><td><code>formSubGroup</code></td><td>string</td><td class="req">Ya <span class="badge badge-new">Baru</span></td><td>Kategori form, contoh: <code>IIR</code>. <b>Tepat satu nilai</b> — tidak ada mode "semua kategori". Lihat 6.3</td></tr>
+<tr><td><code>siteCode</code></td><td>string</td><td class="req">Ya <span class="badge badge-new">Diubah</span></td><td>Filter berdasarkan kode site. <b>Tepat satu nilai</b> — sebelumnya opsional, sekarang wajib. Lihat 6.4</td></tr>
+<tr><td><code>equipmentNumber</code></td><td>string</td><td class="opt">Tidak</td><td>Filter berdasarkan nomor unit/equipment. Boleh <b>lebih dari satu nilai</b>, dipisah koma (mis. <code>HDCT73112,HDCT73113</code>). Kosong = semua equipment di site &amp; kategori yang diminta. Lihat 6.4</td></tr>
 <tr><td><code>page</code></td><td>integer</td><td class="opt">Tidak</td><td>Default <code>1</code></td></tr>
 <tr><td><code>pageSize</code></td><td>integer</td><td class="opt">Tidak</td><td>Default <code>20</code>, maksimal <code>100</code></td></tr>
 </table>
 
 <div class="pre-label">Contoh Request</div>
-<pre><code>GET /api/v1/iir-form-submissions?dateFrom=2026-07-01T00:00:00Z&amp;dateTo=2026-07-07T23:59:59Z&amp;siteCode=LAT&amp;page=1&amp;pageSize=20
-Authorization: Bearer {access_token}</code></pre>
+<pre><code>GET /api/v1/form-submissions?dateFrom=2026-07-01T00:00:00Z&amp;dateTo=2026-07-07T23:59:59Z&amp;formSubGroup=IIR&amp;siteCode=LAT&amp;page=1&amp;pageSize=20
+X-Api-Key: {api_key}</code></pre>
+
+<div class="pre-label">Contoh Request — narrowing ke beberapa equipment sekaligus</div>
+<pre><code>GET /api/v1/form-submissions?dateFrom=2026-07-01T00:00:00Z&amp;dateTo=2026-07-07T23:59:59Z&amp;formSubGroup=IIR&amp;siteCode=LAT&amp;equipmentNumber=HDCT73112,HDCT73113&amp;page=1&amp;pageSize=20</code></pre>
 
 <div class="pre-label">Contoh Response — 200 OK</div>
 <pre><code>{
@@ -189,8 +213,9 @@ Authorization: Bearer {access_token}</code></pre>
     {
       "formSubmissionId": "4b604512-b409-4a19-ba79-9ac5ab68e16c",
       "formCode": "FORM394",
-      "formVersion": 6,
+      "formVersion": 16,
       "formName": "IIR-Grader",
+      "formSubGroup": "IIR",
       "siteCode": "LAT",
       "equipmentNumber": "HDCT73112",
       "submittedBy": "2009OBH.supervisor01@protonmail.com",
@@ -205,14 +230,14 @@ Authorization: Bearer {access_token}</code></pre>
 <h3>Response Headers</h3>
 <table>
 <tr><th style="width:30%">Header</th><th>Keterangan</th></tr>
-<tr><td><code>X-RateLimit-Limit</code></td><td>Batas request per menit untuk Client ID ini</td></tr>
+<tr><td><code>X-RateLimit-Limit</code></td><td>Batas request per menit untuk API Key ini</td></tr>
 <tr><td><code>X-RateLimit-Remaining</code></td><td>Sisa kuota request pada window berjalan</td></tr>
 <tr><td><code>X-RateLimit-Reset</code></td><td>Unix timestamp kapan window rate limit reset</td></tr>
 </table>
 
 <h2>3.2 Get Submission by ID</h2>
-<div class="endpoint"><span class="method">GET</span><span class="path">/iir-form-submissions/{formSubmissionId}</span></div>
-<p>Ambil <b>1 submission spesifik</b> secara lengkap. Peruntukannya beda dari endpoint list — dipakai untuk re-fetch detail setelah dapat <code>formSubmissionId</code> dari hasil list (mis. retry granular kalau 1 submission gagal diproses di sisi sistem eksternal), atau lookup manual — <b>bukan</b> untuk polling berkala.</p>
+<div class="endpoint"><span class="method">GET</span><span class="path">/form-submissions/{formSubmissionId}</span></div>
+<p>Ambil <b>1 submission spesifik</b> secara lengkap. Peruntukannya beda dari endpoint list — dipakai untuk re-fetch detail setelah dapat <code>formSubmissionId</code> dari hasil list (mis. retry granular kalau 1 submission gagal diproses di sisi sistem eksternal), atau lookup manual — <b>bukan</b> untuk polling berkala. Endpoint ini <b>tidak</b> butuh <code>formSubGroup</code>/<code>siteCode</code> — cukup ID-nya saja.</p>
 
 <h3>Path Parameter</h3>
 <table>
@@ -221,15 +246,16 @@ Authorization: Bearer {access_token}</code></pre>
 </table>
 
 <div class="pre-label">Contoh Request</div>
-<pre><code>GET /api/v1/iir-form-submissions/4b604512-b409-4a19-ba79-9ac5ab68e16c
-Authorization: Bearer {access_token}</code></pre>
+<pre><code>GET /api/v1/form-submissions/4b604512-b409-4a19-ba79-9ac5ab68e16c
+X-Api-Key: {api_key}</code></pre>
 
 <div class="pre-label">Contoh Response — 200 OK</div>
 <pre><code>{
   "formSubmissionId": "4b604512-b409-4a19-ba79-9ac5ab68e16c",
   "formCode": "FORM394",
-  "formVersion": 6,
+  "formVersion": 16,
   "formName": "IIR-Grader",
+  "formSubGroup": "IIR",
   "siteCode": "LAT",
   "equipmentNumber": "HDCT73112",
   "submittedBy": "2009OBH.supervisor01@protonmail.com",
@@ -240,8 +266,8 @@ Authorization: Bearer {access_token}</code></pre>
 <p><span class="opt">Catatan: response endpoint ini adalah 1 objek submission langsung (bukan dibungkus envelope <code>submissions[]</code> seperti endpoint list).</span></p>
 
 <h2>3.3 Download Photo</h2>
-<div class="endpoint"><span class="method">GET</span><span class="path">/iir-form-submissions/photos/{photoGuid}</span></div>
-<p>Ambil <b>konten foto</b> (binary) yang direferensikan lewat field <code>photos[].url</code> di response data (lihat 4.5). Auth pakai Bearer token yang sama dengan endpoint data — <b>tidak ada</b> mekanisme kredensial terpisah untuk foto.</p>
+<div class="endpoint"><span class="method">GET</span><span class="path">/form-submissions/photos/{photoGuid}</span></div>
+<p>Ambil <b>konten foto</b> (binary) yang direferensikan lewat field <code>photos[].url</code> di response data (lihat 4.5). Auth pakai API Key yang sama dengan endpoint data — <b>tidak ada</b> mekanisme kredensial terpisah untuk foto.</p>
 
 <h3>Path Parameter</h3>
 <table>
@@ -250,8 +276,8 @@ Authorization: Bearer {access_token}</code></pre>
 </table>
 
 <div class="pre-label">Contoh Request</div>
-<pre><code>GET /api/v1/iir-form-submissions/photos/1ccac17f-f8aa-49fe-9c53-5cc4c30ae77d
-Authorization: Bearer {access_token}</code></pre>
+<pre><code>GET /api/v1/form-submissions/photos/1ccac17f-f8aa-49fe-9c53-5cc4c30ae77d
+X-Api-Key: {api_key}</code></pre>
 
 <div class="pre-label">Contoh Response — 200 OK</div>
 <pre><code>HTTP/1.1 200 OK
@@ -287,7 +313,7 @@ Cache-Control: private, max-age=31536000, immutable
   totalRecords, page, pageSize, hasMore,   // hanya di endpoint list
   submissions: [                 // hanya di endpoint list — endpoint single-fetch return submission langsung
     {
-      formSubmissionId, formCode, formVersion, formName,
+      formSubmissionId, formCode, formVersion, formName, formSubGroup,
       siteCode, equipmentNumber,
       submittedBy, submittedAt, syncAt,
       tabs: [
@@ -297,7 +323,7 @@ Cache-Control: private, max-age=31536000, immutable
             {
               title,
               answers: [
-                { taskCode?, label, value, lastUpdatedBy, lastUpdatedAt, photos: [{ url }], number?, remark? }
+                { taskCode, label, value, lastUpdatedBy, lastUpdatedAt, photos: [{ label?, url }], number?, remark? }
               ]
             }
           ]
@@ -324,10 +350,11 @@ Cache-Control: private, max-age=31536000, immutable
 <tr><td><code>formCode</code></td><td>string</td><td>Tidak</td><td>Kode form, contoh: <code>FORM394</code></td></tr>
 <tr><td><code>formVersion</code></td><td>integer</td><td>Tidak</td><td>Versi template form yang dipakai saat submission dibuat</td></tr>
 <tr><td><code>formName</code></td><td>string</td><td>Tidak</td><td>Nama form, contoh: <code>IIR-Grader</code></td></tr>
+<tr><td><code>formSubGroup</code></td><td>string</td><td>Tidak</td><td><span class="badge badge-new">Baru</span> Kategori form, contoh: <code>IIR</code>. Selalu sama dengan nilai <code>formSubGroup</code> yang dikirim di request (lihat 3.1)</td></tr>
 <tr><td><code>siteCode</code></td><td>string</td><td>Tidak</td><td>Kode site tempat equipment berada</td></tr>
-<tr><td><code>equipmentNumber</code></td><td>string</td><td>Tidak</td><td>Nomor unit/equipment</td></tr>
+<tr><td><code>equipmentNumber</code></td><td>string</td><td>Tidak</td><td>Nomor unit/equipment. <b>Selalu satu nilai per submission</b> (meski filter request boleh multi-value — lihat 6.4), karena 1 submission memang cuma terkait 1 equipment</td></tr>
 <tr><td><code>submittedBy</code></td><td>string</td><td>Tidak</td><td>Email inspector yang submit</td></tr>
-<tr><td><code>submittedAt</code></td><td>string (ISO 8601)</td><td>Tidak</td><td>Waktu form diselesaikan di device — lihat catatan di [Filtering &amp; Panduan Polling](#sec-6)</td></tr>
+<tr><td><code>submittedAt</code></td><td>string (ISO 8601)</td><td>Tidak</td><td>Waktu form diselesaikan di device — lihat catatan di <a href="#sec-6">6. Filtering &amp; Panduan Polling</a></td></tr>
 <tr><td><code>syncAt</code></td><td>string (ISO 8601)</td><td>Tidak</td><td>Waktu data tersedia di server — <b>ini yang dipakai untuk filter <code>dateFrom</code>/<code>dateTo</code></b></td></tr>
 <tr><td><code>tabs</code></td><td>array</td><td>Tidak</td><td>Daftar tab form (umumnya "General" dan "Inspection") — lihat 4.3</td></tr>
 </table>
@@ -341,12 +368,17 @@ Cache-Control: private, max-age=31536000, immutable
 <tr><td><code>sections[].answers</code></td><td>array</td><td>Tidak</td><td>Daftar jawaban dalam section — lihat 4.4</td></tr>
 </table>
 
+<div class="callout">
+  <div class="callout-label">Penting — jangan hardcode nama tab/section</div>
+  Karena endpoint ini melayani banyak kategori form (bukan cuma IIR), <b>daftar tab, section, dan jumlah/urutan jawaban bisa berbeda-beda tergantung kategori (<code>formSubGroup</code>) dan bahkan varian form di dalamnya</b>. Perlakukan <code>tabs</code>/<code>sections</code>/<code>answers</code> sebagai struktur dinamis yang di-iterate, bukan skema tetap dengan nama section yang di-hardcode.
+</div>
+
 <h3>4.4 Objek Answer</h3>
 <table>
 <tr><th style="width:20%">Field</th><th style="width:12%">Tipe</th><th style="width:10%">Nullable</th><th>Keterangan</th></tr>
 <tr><td><code>number</code></td><td>integer</td><td><b>Ya</b></td><td>Nomor urut task. Hanya ada di tab "Inspection"; <code>null</code>/tidak ada di tab "General"</td></tr>
-<tr><td><code>taskCode</code></td><td>string</td><td><b>Ya</b></td><td>Business code task, contoh: <code>"Task1252"</code>. Hanya ada di tab "Inspection"; tidak ada di tab "General"</td></tr>
-<tr><td><code>label</code></td><td>string</td><td>Tidak</td><td>Deskripsi/pertanyaan task</td></tr>
+<tr><td><code>taskCode</code></td><td>string</td><td>Tidak <span class="badge badge-new">Diubah</span></td><td>Identifier task/elemen. <b>Sekarang selalu ada di kedua tab</b> (sebelumnya cuma tab "Inspection"). Semantiknya beda: di tab "Inspection" berupa business code yang stabil lintas submission (mis. <code>"Task1252"</code>); di tab "General" berupa GUID internal yang <b>berbeda tiap submission</b> — tidak berguna untuk korelasi antar submission, tapi tetap disertakan untuk konsistensi skema</td></tr>
+<tr><td><code>label</code></td><td>string</td><td>Tidak</td><td>Deskripsi/pertanyaan task. Selalu diisi teks yang bermakna (tidak pernah string kosong)</td></tr>
 <tr><td><code>value</code></td><td>string</td><td><b>Ya</b></td><td>Isi jawaban. Bentuknya bervariasi tergantung tipe pertanyaan — lihat catatan di bawah</td></tr>
 <tr><td><code>remark</code></td><td>string</td><td class="opt">—</td><td>Catatan tambahan dari inspector (biasanya string kosong kalau tidak diisi)</td></tr>
 <tr><td><code>lastUpdatedBy</code></td><td>string</td><td>Tidak</td><td>Email user yang terakhir mengisi/mengubah jawaban ini</td></tr>
@@ -358,7 +390,7 @@ Cache-Control: private, max-age=31536000, immutable
   <div class="callout-label">Catatan bentuk <code>value</code></div>
   <ul>
     <li><b>Jawaban teks/pilihan biasa</b> (mis. hasil pemeriksaan "Ok"/"Not Ok", teks bebas) → string biasa</li>
-    <li><b>Jawaban yang isinya murni foto</b> (baik 1 foto maupun beberapa foto sekaligus, mis. "Photo Machine SMU" atau "Foto Kondisi Fisik Equipment") → <code>value</code> selalu <code>null</code>, terlepas dari jumlah foto — semua foto ada di <code>photos[]</code> (lihat 4.5 &amp; 3.3)</li>
+    <li><b>Jawaban yang isinya murni foto</b> (baik 1 foto maupun beberapa foto sekaligus, mis. "Photo Machine SMU", "Foto Kondisi Fisik Equipment", atau tanda tangan digital) → <code>value</code> selalu <code>null</code>, terlepas dari jumlah foto — semua foto ada di <code>photos[]</code> (lihat 4.5 &amp; 3.3)</li>
     <li><b>Jawaban dengan foto sebagai lampiran tambahan</b> (mis. item checklist tab "Inspection" yang dijawab "Ok"/"Not Ok" lalu opsional dilampiri foto) → <code>value</code> tetap berisi jawaban utamanya (mis. <code>"Ok"</code>), foto tetap ada terpisah di <code>photos[]</code></li>
   </ul>
 </div>
@@ -367,12 +399,12 @@ Cache-Control: private, max-age=31536000, immutable
 <table>
 <tr><th style="width:20%">Field</th><th style="width:12%">Tipe</th><th style="width:10%">Nullable</th><th>Keterangan</th></tr>
 <tr><td><code>label</code></td><td>string</td><td class="opt">—</td><td>Label foto (mis. "Foto Tampak Depan"). Tidak selalu ada, tergantung tipe elemen</td></tr>
-<tr><td><code>url</code></td><td>string</td><td><b>Ya</b></td><td>URL ke endpoint <a href="#sec-3">Download Photo (3.3)</a> — <b>bukan</b> link langsung ke storage. Panggil URL ini dengan Bearer token yang sama untuk mendapatkan isi foto (binary). <code>null</code> kalau foto gagal di-resolve di sisi server — lihat catatan di bawah</td></tr>
+<tr><td><code>url</code></td><td>string</td><td><b>Ya</b></td><td>URL ke endpoint <a href="#sec-3">Download Photo (3.3)</a> — <b>bukan</b> link langsung ke storage. Panggil URL ini dengan API Key yang sama untuk mendapatkan isi foto (binary). <code>null</code> kalau foto gagal di-resolve di sisi server — lihat catatan di bawah</td></tr>
 </table>
 
 <div class="callout warn">
   <div class="callout-label">Wajib di-handle</div>
-  Kalau <code>photos[].url</code> bernilai <code>null</code>, artinya foto tersebut ada tapi gagal di-resolve saat request diproses. Jangan asumsikan selalu berisi URL valid — tampilkan placeholder/skip, jangan sampai integrasi gagal total karena satu foto <code>null</code>. Kalau <code>url</code> terisi tapi endpoint 3.3 mengembalikan <code>404</code> saat dipanggil, treat sama seperti <code>null</code> (foto tidak tersedia).
+  Kalau <code>photos[].url</code> bernilai <code>null</code>, artinya foto tersebut ada tapi gagal di-resolve saat request diproses. Jangan asumsikan selalu berisi URL valid — tampilkan placeholder/skip, jangan sampai integrasi gagal total karena satu foto <code>null</code>. Kalau <code>url</code> terisi tapi endpoint 3.3 mengembalikan <code>404</code> saat dipanggil, treat sama seperti <code>null</code> (foto tidak tersedia). Kasus <code>null</code> ini bisa lebih sering muncul di awal go-live selagi data foto lain di sisi Digiman+ masih dirapikan — desain graceful-handling ini sengaja disiapkan untuk itu.
 </div>
 
 <h3>4.6 Contoh Lengkap</h3>
@@ -383,20 +415,21 @@ Cache-Control: private, max-age=31536000, immutable
     {
       "title": "Personnel Information",
       "answers": [
-        { "label": "Inspector Name", "value": "2009OBH.supervisor01", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "lastUpdatedAt": "2026-07-07T11:45:50.000000Z", "photos": [] }
+        { "taskCode": "a14d849b-7241-4aae-befb-62f6e8e2f12a", "label": "Inspector Name", "value": "2009OBH.supervisor01", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "lastUpdatedAt": "2026-07-07T11:45:50.000000Z", "photos": [] }
       ]
     },
     {
-      "title": null,
+      "title": "Asset Detail",
       "answers": [
         {
+          "taskCode": "581f397c-e9d4-48de-b4c5-5e04e2d1663a",
           "label": "Foto Kondisi Fisik Equipment",
           "value": null,
           "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com",
           "lastUpdatedAt": "2026-07-07T11:46:40.000000Z",
           "photos": [
-            { "label": "Foto Tampak Depan", "url": "https://{host}/api/v1/iir-form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000001" },
-            { "label": "Foto Tampak Samping Kanan", "url": "https://{host}/api/v1/iir-form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000002" }
+            { "label": "Foto Tampak Depan", "url": "https://{host}/api/v1/form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000001" },
+            { "label": "Foto Tampak Samping Kanan", "url": "https://{host}/api/v1/form-submissions/photos/9f1c2e4a-0000-4a1b-8c2d-000000000002" }
           ]
         }
       ]
@@ -415,8 +448,23 @@ Cache-Control: private, max-age=31536000, immutable
         { "number": 4, "taskCode": "Task1100", "label": "Battery Box / Cover", "value": "Not Ok", "remark": "", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "lastUpdatedAt": "2026-07-07T11:47:14.210168Z", "photos": [] },
         { "number": 6, "taskCode": "Task1014", "label": "Cat Walk", "value": "Ok", "remark": "Ada beberapa", "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com", "lastUpdatedAt": "2026-07-07T11:54:48.367543Z",
           "photos": [
-            { "url": "https://{host}/api/v1/iir-form-submissions/photos/1ccac17f-f8aa-49fe-9c53-5cc4c30ae77d" },
-            { "url": "https://{host}/api/v1/iir-form-submissions/photos/8ffc591c-8a6d-46e4-bfdb-d7a4d5590a47" }
+            { "url": "https://{host}/api/v1/form-submissions/photos/1ccac17f-f8aa-49fe-9c53-5cc4c30ae77d" },
+            { "url": "https://{host}/api/v1/form-submissions/photos/8ffc591c-8a6d-46e4-bfdb-d7a4d5590a47" }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Digital Signature by Inspector",
+      "answers": [
+        {
+          "taskCode": "7e409e09-a463-4f3d-9629-cdea111ad2f9",
+          "label": "Digital Signature by Inspector",
+          "value": null,
+          "lastUpdatedBy": "2009OBH.supervisor01@protonmail.com",
+          "lastUpdatedAt": "2026-07-07T12:10:52.747297Z",
+          "photos": [
+            { "label": "Take photo of digital sign", "url": "https://{host}/api/v1/form-submissions/photos/b7e4a210-0000-4a1b-8c2d-000000000001" }
           ]
         }
       ]
@@ -432,7 +480,7 @@ Cache-Control: private, max-age=31536000, immutable
 <p>Loop paginasi standar:</p>
 <pre><code>page = 1
 loop:
-  response = GET /iir-form-submissions?dateFrom=...&dateTo=...&page={page}&pageSize=100
+  response = GET /form-submissions?dateFrom=...&dateTo=...&formSubGroup=IIR&siteCode=LAT&page={page}&pageSize=100
   process(response.submissions)
   if response.hasMore == false:
     break
@@ -460,13 +508,24 @@ loop:
 
 <p><b>Rekomendasi polling:</b> jalankan polling secara berurutan tanpa celah (mis. window kemarin berakhir jam 23:59:59, window hari ini mulai jam 00:00:00) — cukup andalkan <code>syncAt</code>, tidak perlu overlap manual di sisi sistem eksternal.</p>
 
-<h3>6.3 Filter Site &amp; Equipment</h3>
-<p><code>siteCode</code> dan <code>equipmentNumber</code> bersifat opsional dan bisa dikombinasikan dengan filter tanggal. Kedua field ini juga selalu muncul di response (lihat 4.2) sehingga caller bisa mengelompokkan hasil per site/equipment tanpa perlu filter di request.</p>
+<h3>6.3 Kategori Form — <code>formSubGroup</code> (Wajib) <span class="badge badge-new">Baru</span></h3>
+<p>Form self-service di Digiman+ dikelompokkan jadi beberapa <b>kategori</b> — <code>IIR</code> adalah salah satu kategori yang tersedia. Parameter <code>formSubGroup</code> <b>wajib diisi, tepat satu nilai</b> per request — tidak ada mode "ambil semua kategori sekaligus".</p>
+<p>Alasan wajib &amp; satu nilai: struktur tab/section/jawaban antar kategori form <b>bisa sangat berbeda</b> — mencampur beberapa kategori dalam satu response berisiko membingungkan sisi parsing kalian. Dengan mewajibkan satu nilai eksplisit, integrasi kalian selalu tahu persis kategori apa yang sedang diproses.</p>
+<div class="callout">
+  <div class="callout-label">Untuk masa depan</div>
+  Kalau Digiman+ menambah kategori form baru, kalian cukup mengganti nilai <code>formSubGroup</code> di request (setelah dikomunikasikan nilai kategorinya) — <b>tidak perlu perubahan endpoint atau kode integrasi</b> di sisi kalian.
+</div>
+
+<h3>6.4 Filter Site &amp; Equipment</h3>
+<p><code>siteCode</code> <b>wajib diisi, tepat satu nilai</b> — sejajar dengan <code>formSubGroup</code>, bukan filter opsional.</p>
+<p><code>equipmentNumber</code> tetap <b>opsional</b>, dan sekarang boleh diisi <b>lebih dari satu nilai</b> sekaligus (dipisah koma):</p>
+<pre><code>equipmentNumber=HDCT73112,HDCT73113</code></pre>
+<p>Kosong/tidak diisi = semua equipment di site &amp; kategori yang diminta akan ikut ke-return. Di response, <code>equipmentNumber</code> tetap muncul sebagai <b>satu nilai per submission</b> (lihat 4.2) — multi-value hanya berlaku di parameter filter request, bukan bentuk data submission itu sendiri.</p>
 
 <!-- ===================== 7. RATE LIMITING ===================== -->
 <h1 id="sec-7">7. Rate Limiting</h1>
 
-<p>Rate limit berlaku <b>per Client ID</b> (bukan per IP). Kuota <b>terpisah</b> antara endpoint data dan endpoint download foto — karakteristik beban keduanya beda jauh (query data vs stream file).</p>
+<p>Rate limit berlaku <b>per API Key</b> (bukan per IP asal request — IP dipakai untuk whitelist gate, bukan unit kuota). Kuota <b>terpisah</b> antara endpoint data dan endpoint download foto — karakteristik beban keduanya beda jauh (query data vs stream file).</p>
 
 <h3>7.1 Endpoint Data (3.1 List, 3.2 Get by ID)</h3>
 <table>
@@ -479,10 +538,10 @@ loop:
 <h3>7.2 Endpoint Download Photo (3.3)</h3>
 <table>
 <tr><th style="width:30%">Window</th><th>Limit</th></tr>
-<tr><td>Per menit</td><td>1.400 request</td></tr>
-<tr><td>Per hari</td><td>120.000 request</td></tr>
+<tr><td>Per menit</td><td>1.850 request</td></tr>
+<tr><td>Per hari</td><td>155.000 request</td></tr>
 </table>
-<p><span class="opt">Limit jauh lebih longgar karena 1 submission bisa punya puluhan hingga ratusan foto sekaligus (checklist inspeksi lengkap). Kalau butuh throughput lebih tinggi dari ini, hubungi tim Digiman+.</span></p>
+<p><span class="opt">Limit jauh lebih longgar karena 1 submission bisa punya puluhan hingga ratusan foto sekaligus (checklist inspeksi lengkap). Angka ini masih estimasi berbasis worst-case dan bisa direvisi sebelum go-live — kalau butuh throughput lebih tinggi dari ini, hubungi tim Digiman+.</span></p>
 
 <h3>Saat Limit Terlampaui</h3>
 <pre><code>HTTP/1.1 429 Too Many Requests
@@ -517,12 +576,13 @@ Retry-After: 12
 <tr><th style="width:14%">HTTP Status</th><th style="width:28%"><code>code</code></th><th>Kapan Terjadi</th></tr>
 <tr><td>400</td><td><code>INVALID_REQUEST</code></td><td>Parameter malformed (mis. format tanggal salah)</td></tr>
 <tr><td>400</td><td><code>DATE_RANGE_TOO_LARGE</code></td><td><code>dateTo - dateFrom</code> lebih dari 7 hari</td></tr>
+<tr><td>400</td><td><code>MISSING_REQUIRED_PARAMETER</code> <span class="badge badge-new">Baru</span></td><td><code>formSubGroup</code> atau <code>siteCode</code> tidak diisi, atau salah satunya diisi lebih dari satu nilai (mis. dikirim sebagai list, bukan satu string) — beda dari <code>equipmentNumber</code> yang memang boleh multi-value. <code>details</code> berisi <code>[{field, reason}]</code> kalau lebih dari satu parameter bermasalah sekaligus</td></tr>
 <tr><td>400</td><td><code>INVALID_PAGE_SIZE</code></td><td><code>pageSize</code> lebih dari 100</td></tr>
-<tr><td>401</td><td><code>UNAUTHORIZED</code></td><td>Token tidak ada / invalid / expired</td></tr>
-<tr><td>403</td><td><code>FORBIDDEN</code></td><td>Client valid tapi tidak punya akses ke resource yang diminta</td></tr>
+<tr><td>401</td><td><code>UNAUTHORIZED</code></td><td>Header <code>X-Api-Key</code> tidak ada, atau API Key tidak valid</td></tr>
+<tr><td>403</td><td><code>FORBIDDEN</code></td><td>API Key valid, tapi request datang dari IP di luar whitelist yang terdaftar untuk key tersebut — lihat 2.2</td></tr>
 <tr><td>404</td><td><code>NOT_FOUND</code></td><td>(single-fetch, 3.2) <code>formSubmissionId</code> tidak ditemukan</td></tr>
 <tr><td>404</td><td><code>PHOTO_NOT_FOUND</code></td><td>(download photo, 3.3) <code>photoGuid</code> tidak ditemukan</td></tr>
-<tr><td>429</td><td><code>RATE_LIMITED</code></td><td>Lihat [Rate Limiting](#sec-7)</td></tr>
+<tr><td>429</td><td><code>RATE_LIMITED</code></td><td>Lihat <a href="#sec-7">7. Rate Limiting</a></td></tr>
 <tr><td>500</td><td><code>INTERNAL_ERROR</code></td><td>Unexpected server error</td></tr>
 </table>
 
@@ -530,7 +590,9 @@ Retry-After: 12
 <h1 id="sec-9">9. Best Practices Integrasi</h1>
 
 <ul>
+  <li><b>Selalu kirim <code>formSubGroup</code> dan <code>siteCode</code> secara eksplisit</b> — keduanya wajib, request tanpa keduanya akan ditolak dengan <code>MISSING_REQUIRED_PARAMETER</code>.</li>
   <li><b>Selalu loop sampai <code>hasMore: false</code></b> — jangan asumsikan semua data selalu muat di 1 halaman.</li>
+  <li><b>Jangan hardcode nama tab/section</b> — iterate <code>tabs</code>/<code>sections</code>/<code>answers</code> secara dinamis (lihat catatan di 4.3), terutama kalau integrasi kalian nanti dipakai untuk kategori form (<code>formSubGroup</code>) selain IIR juga.</li>
   <li><b>Handle <code>photos[].url: null</code> dengan graceful</b> — jangan sampai 1 foto gagal resolve membuat seluruh proses integrasi gagal.</li>
   <li><b>Simpan <code>formSubmissionId</code> + <code>syncAt</code> sebagai watermark</b> untuk tracking data yang sudah diproses, memudahkan dedup kalau ada request yang di-retry.</li>
   <li><b>GET bersifat idempotent</b> — aman untuk retry otomatis kalau request gagal karena masalah jaringan (bukan karena error 4xx).</li>
@@ -550,12 +612,12 @@ Retry-After: 12
 </ul>
 
 <div class="callout warn">
-  <div class="callout-label">Draft v0.3</div>
-  Dokumen ini adalah draft awal untuk persiapan integrasi. Base URL final, kredensial akses, dan konfirmasi jadwal go-live akan dikomunikasikan terpisah. Kalau ada pertanyaan atau kebutuhan spesifik dari sisi integrasi kalian, silakan sampaikan sebelum development dimulai.
+  <div class="callout-label">Draft v0.4</div>
+  Dokumen ini adalah draft persiapan integrasi, sudah termasuk beberapa perubahan dari v0.3 sebelumnya (lihat ringkasan di 1.1) — masih mungkin berubah sebelum rilis final. Base URL final, kredensial akses, dan konfirmasi jadwal go-live akan dikomunikasikan terpisah. Kalau ada pertanyaan atau kebutuhan spesifik dari sisi integrasi kalian, silakan sampaikan sebelum development dimulai.
 </div>
 
 <div class="footer">
-  IIR Form Submission API — Integration Guide · Draft v0.3 · 4 Agustus 2026 · Digiman+
+  Form Submission API — Integration Guide · Draft v0.4 · 14 Agustus 2026 · Digiman+
 </div>
 
 </body>
