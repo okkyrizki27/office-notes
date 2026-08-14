@@ -1,10 +1,10 @@
 # Timeline & Skenario Delivery — FINAL (Squad Diperkuat, 2 Rilis)
 
-*Last updated: 2026-08-03*
+*Last updated: 2026-08-14*
 
 ---
 
-Dokumen ini adalah **skenario final** hasil diskusi bertahap dari [squad-baru-release-timeline.md](squad-baru-release-timeline.md) (Skenario A — 4 orang, 3 rilis sequential). Dua skenario antara sempat dibuat sebagai file terpisah selama diskusi — Skenario B (gabung Rilis 1+2, squad tetap 4 orang) dan Skenario C (eksplorasi opsi headcount 5/6 orang) — keduanya sudah dihapus setelah keputusan final ini diambil (sudah digantikan, bukan referensi aktif lagi).
+Dokumen ini adalah **skenario final** hasil diskusi bertahap dari Skenario A (4 orang, 3 rilis sequential, dibahas di file `squad-baru-release-timeline.md` — sudah dihapus 2026-08-14, sudah digantikan, bukan referensi aktif lagi). Dua skenario antara sempat dibuat sebagai file terpisah selama diskusi — Skenario B (gabung Rilis 1+2, squad tetap 4 orang) dan Skenario C (eksplorasi opsi headcount 5/6 orang) — keduanya sudah dihapus setelah keputusan final ini diambil (sudah digantikan, bukan referensi aktif lagi).
 
 **Gantt chart interaktif**: [claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204](https://claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204) — 2 panel Rilis 1 & Rilis 2, hover/focus per task untuk detail, toggle tabel breakdown SP.
 
@@ -15,37 +15,42 @@ Dokumen ini adalah **skenario final** hasil diskusi bertahap dari [squad-baru-re
 
 **Revisi scope (2026-08-13)**: Rilis 2 sekarang juga mencakup **My Work** & **eMAR** (*Electronic Mechanic Activity Report*) — dua fitur baru yang ship bersamaan dengan Maintenance Activity Type, bukan rilis terpisah. Total SP Rilis 2 naik dari 48 → **161 SP**. Ship awalnya diperkirakan Minggu 18, lalu **direvisi ke Minggu 19** (lihat "Revisi Capacity Check" di bawah) — total proyek: 12 → **19 minggu**. Rilis 1 tidak berubah. Breakdown lengkap ada di bagian "Dasar Perhitungan" dan di Gantt chart artifact (link di atas, sudah diupdate).
 
+**Revisi reinforcement (2026-08-14)**: Rilis 2 diperkuat lagi — **seluruh tim BUMA ID existing (6 orang: 2 Backend, 2 Frontend Web+Mobile, 2 QA) bergabung ke squad mulai Minggu 11**, di luar 7 orang squad utama. Mereka sudah full-speed (0.85 SP/hari/orang) sejak hari pertama — tidak ada ramp-up/Knowledge Transfer seperti squad utama, karena sudah menguasai codebase. Total SP Rilis 2 tidak berubah (161 SP) — ini murni penambahan kapasitas eksekusi, bukan penambahan scope. Hasilnya, ship Rilis 2 maju dari Minggu 19 → **Minggu 16** (hemat 3 minggu), total proyek: 19 → **16 minggu**. Detail perhitungan di bagian "Reinforcement Minggu 11" di bawah "Dasar Perhitungan". Catatan penting: reinforcement ini menarik tim veteran itu dari komitmen lain (production support ~30% kapasitas mereka, dan proposal enhancement lain yang biasa mereka kerjakan) — lihat Risiko #12.
+
 ---
 
 ## Ringkasan Skenario
 
 | | |
 |---|---|
-| **Squad** | 7 orang: **3 Backend, 2 Frontend Fullstack (Web+Mobile), 2 QA** |
-| **Velocity** | Sama seperti skenario sebelumnya: ramp-up 0.81 SP/hari/orang (Sprint 1–2, Minggu 1–4), full speed 0.85 SP/hari/orang (Sprint 3 dst, Minggu 5+) |
+| **Squad** | 7 orang sepanjang proyek: **3 Backend, 2 Frontend Fullstack (Web+Mobile), 2 QA**. Khusus Rilis 2, **+6 orang reinforcement dari tim BUMA ID existing mulai Minggu 11** (2 Backend, 2 Frontend, 2 QA) — puncak kapasitas Rilis 2 jadi **5 Backend, 4 Frontend, 4 QA** dari Minggu 11 sampai selesai |
+| **Velocity** | Squad utama: ramp-up 0.81 SP/hari/orang (Sprint 1–2, Minggu 1–4), full speed 0.85 SP/hari/orang (Sprint 3 dst, Minggu 5+). Reinforcement tim BUMA ID existing: **langsung full speed 0.85 SP/hari/orang sejak Minggu 11**, tanpa ramp-up (sudah menguasai codebase) |
 | **Antar-rilis** | Freeze code penuh — tidak ada overlap/cicil kerjaan Rilis 2 selama Rilis 1 berjalan |
 | **Release Preparation** | 1 minggu per rilis (2×1 minggu = 2 minggu total) |
-| **QA** | Mulai bertahap (shift-left) — testing modul yang sudah selesai duluan, bukan nunggu 100% dev rilis selesai. Rilis 1 pakai +1 minggu buffer QA (keputusan 2026-08-03); Rilis 2 tetap tanpa buffer tambahan di luar perpanjangan akibat scope baru |
-| **Total estimasi** | **~19 minggu** (naik dari ~12 minggu setelah My Work & eMAR ditambahkan ke Rilis 2, 2026-08-13 — direvisi dari estimasi awal 18 minggu setelah capacity check per-orang, lihat bawah). Perbandingan langsung ke 19 minggu Skenario A **tidak lagi apple-to-apple** — Skenario A tidak pernah mencakup My Work/eMAR, tidak direcompute di sini. Tapi angkanya kini **kebetulan sama persis**: Squad Diperkuat + My Work/eMAR = 19 minggu = Skenario A (4 orang, 3 rilis). Bukan berarti squad diperkuat sia-sia (Skenario A akan lebih lambat lagi kalau My Work/eMAR ditambahkan ke dalamnya juga) — tapi benefit "lebih cepat dari Skenario A" yang jadi justifikasi awal keputusan 7 orang praktis hilang begitu Rilis 2 diperluas |
+| **QA** | Mulai bertahap (shift-left) — testing modul yang sudah selesai duluan, bukan nunggu 100% dev rilis selesai. Rilis 1 pakai +1 minggu buffer QA (keputusan 2026-08-03); Rilis 2 tanpa buffer tambahan di luar perpanjangan akibat scope baru, tapi dipercepat lagi oleh reinforcement Minggu 11 (2026-08-14) |
+| **Total estimasi** | **~16 minggu** (turun dari ~19 minggu setelah reinforcement tim BUMA ID existing ditambahkan ke Rilis 2 mulai Minggu 11, 2026-08-14 — lihat "Reinforcement Minggu 11" di bawah). Total SP Rilis 2 tidak berubah (161 SP), murni percepatan eksekusi. Dibanding Skenario A (4 orang, 3 rilis, 19 minggu, tidak mencakup My Work/eMAR) — squad diperkuat + reinforcement kini **3 minggu lebih cepat** meski scope-nya lebih besar (termasuk My Work/eMAR yang tidak pernah dihitung di Skenario A) |
 
 ---
 
-## Master Timeline (~19 Minggu, direvisi 2026-08-13)
+## Master Timeline (~16 Minggu, direvisi 2026-08-14)
 
 | Minggu | Rilis | Fase |
 |---|---|---|
 | 1–6 | Rilis 1 (Man Power + Area) | Dev + QA (QA mulai bertahap dari Minggu 2, +1 minggu buffer) |
 | **7** | Rilis 1 | **Release Preparation** |
 | — | | **🚀 Rilis 1 ship — akhir Minggu 7** |
-| 8–18 | Rilis 2 (Maintenance Activity Type + My Work + eMAR) | Dev + QA (QA mulai paralel dari Minggu 8 — test case design sejak hari pertama; My Work BE baru mulai penuh Minggu 11 menunggu Activity Type melepas kapasitas — lihat capacity check di bawah; fase end-to-end diperpanjang ke Minggu 15–18) |
-| **19** | Rilis 2 | **Release Preparation** |
-| — | | **🚀 Rilis 2 ship — akhir Minggu 19** |
+| 8–10 | Rilis 2 (Maintenance Activity Type + My Work + eMAR) | Dev + QA, squad 3 BE/2 FE/2 QA (QA mulai paralel dari Minggu 8 — test case design sejak hari pertama; Activity Type BE/FE selesai ~Minggu 10) |
+| **11–15** | Rilis 2 | **Dev + QA dengan reinforcement** — +6 orang tim BUMA ID existing (2 BE/2 FE/2 QA) bergabung Minggu 11, full speed. BE selesai ~Minggu 13, FE selesai ~Minggu 12, QA end-to-end Minggu 13–15 — lihat "Reinforcement Minggu 11" di bawah |
+| **16** | Rilis 2 | **Release Preparation** |
+| — | | **🚀 Rilis 2 ship — akhir Minggu 16** |
 
 **Catatan (2026-08-03)**: Rilis 1 dikembalikan ke **Minggu 7** (bukan Minggu 6 di versi sebelumnya) — 1 minggu buffer ditambahkan kembali ke fase QA end-to-end sebagai margin keamanan, keputusan sadar untuk mengurangi risiko jadwal terlalu ketat (lihat Risiko #7). Hasilnya persis sama dengan tanggal ship Man Power *standalone* di Skenario A (Minggu 7, yang cuma bawa 1 fitur dengan tim 4 orang) — trade-off "Man Power mundur" dari Skenario B/C tetap hilang (tidak mundur), meski sekarang tidak lebih cepat juga. Rilis 2 (scope awal) tidak diberi buffer tambahan, hanya bergeser +1 minggu mengikuti mundurnya Rilis 1 (mulai Minggu 8, bukan Minggu 7).
 
 **Catatan (2026-08-13, revisi pertama)**: Rilis 2 diperluas mencakup My Work & eMAR (lihat bagian "Dasar Perhitungan" untuk breakdown SP lengkap). Estimasi awal: durasi dev+QA naik dari 4 → 10 minggu (ship Minggu 12 → Minggu 18).
 
 **Catatan (2026-08-13, revisi kedua — capacity check)**: Estimasi revisi pertama menggambar bar Gantt per-kategori tanpa cross-check jumlah thread konkuren terhadap headcount riil — hasilnya di Minggu 8–10 ada sampai 4 thread BE/FE "paralel" sekaligus, padahal cuma ada 3 BE/2 FE. Setelah dijadwal ulang mengikuti kapasitas nyata (lihat tabel alokasi per-orang di bagian "Dasar Perhitungan"), BE & FE baru benar-benar selesai ~Minggu 15 (bukan 13–14), QA end-to-end mundur ke Minggu 15–18, ship bergeser dari Minggu 18 → **Minggu 19**. Total SP tidak berubah (161 SP) — murni koreksi timing.
+
+**Catatan (2026-08-14, revisi ketiga — reinforcement Minggu 11)**: Seluruh tim BUMA ID existing (6 orang: 2 BE, 2 FE, 2 QA) bergabung ke squad Rilis 2 mulai Minggu 11, full speed sejak hari pertama (tanpa ramp-up). Dengan kapasitas puncak 5 BE/4 FE/4 QA dari Minggu 11, sisa pekerjaan BE (eMAR tail + My Work, ~40 SP) & FE (eMAR FE tail + My Work FE tail, ~23 SP) selesai jauh lebih cepat — BE ~Minggu 13, FE ~Minggu 12 — sehingga QA end-to-end bisa mulai Minggu 13 (bukan 15) dan selesai ~Minggu 15 dengan 4 QA. Ship bergeser maju dari Minggu 19 → **Minggu 16**. Total SP tetap 161 — murni percepatan eksekusi lewat tambahan kapasitas, bukan pengurangan scope. Detail perhitungan di bagian "Reinforcement Minggu 11" di bawah "Dasar Perhitungan".
 
 ---
 
@@ -59,7 +64,7 @@ Dokumen ini adalah **skenario final** hasil diskusi bertahap dari [squad-baru-re
   - Minggu 3–6: testing end-to-end (baru bisa jalan setelah Digiplan siap) — ~12 SP sisanya, **+1 minggu buffer** ditambahkan di sini (kerja sebenarnya ~3 minggu, dibulatkan jadi 4 minggu kalender sebagai margin keamanan)
 - Dev+QA: **6 minggu**, Release Prep: 1 minggu → **ship Minggu 7**
 
-**Rilis 2 — scope awal, Maintenance Activity Type** (28 SP BE / 9 SP FE / 8 SP QA — tabel lengkap = Rilis 3 [Skenario A](squad-baru-release-timeline.md)):
+**Rilis 2 — scope awal, Maintenance Activity Type** (28 SP BE / 9 SP FE / 8 SP QA — tabel lengkap = Rilis 3 Skenario A, file `squad-baru-release-timeline.md`, sudah dihapus 2026-08-14):
 - BE/FE (3+2 orang): Master Data + Inspection & Additional Order selesai ~Minggu 9; SAP Sync + Order Approval (`ReferenceTransactionId`) selesai ~Minggu 10
 - QA (2 orang) mulai bertahap, tanpa buffer tambahan:
   - Minggu 9: testing modul awal (Master Data, Inspection & Additional Order) — ~2 SP
@@ -163,11 +168,31 @@ Maks 2 FE konkuren ✓. **FE selesai ~Minggu 15** (eMAR FE, naik dari estimasi a
 
 **Dampak ke jadwal**: karena BE & FE baru benar-benar selesai ~Minggu 15 (bukan 13–14), QA end-to-end mundur ke **Minggu 15–18** (dari rencana awal Minggu 14–17), Release Prep mundur ke **Minggu 19**, ship **Minggu 19** (dari estimasi awal Minggu 18). **Total SP tidak berubah (161 SP)** — murni koreksi timing supaya konsisten dengan kapasitas riil.
 
+### Reinforcement Minggu 11 (2026-08-14) — Tim BUMA ID Existing Bergabung
+
+Di luar squad utama 7 orang, **seluruh tim BUMA ID existing (6 orang: 2 Backend, 2 Frontend Web+Mobile, 2 QA)** bergabung ke Rilis 2 mulai **Minggu 11**. Tim ini adalah tim veteran yang sama yang selama ini memberi Knowledge Transfer ke squad utama dan mengerjakan proposal enhancement lain (Area of Unit, Storage Location Planner Group, dll.) — bukan hire baru, sudah menguasai codebase, sehingga **langsung full speed 0.85 SP/hari/orang tanpa ramp-up**.
+
+**Sisa pekerjaan di awal Minggu 11** (sebelum reinforcement masuk, berdasarkan jadwal capacity-check di atas):
+- BE: Activity Type (28 SP) sudah selesai Minggu 10 → sisa 0 SP. eMAR (20 SP, berjalan Minggu 9–14) ± 2 minggu berjalan dari 6 minggu → sisa ~13 SP. My Work (27 SP) belum mulai → sisa 27 SP. **Total sisa BE ≈ 40 SP.**
+- FE: eMAR FE (20 SP, berjalan Minggu 9–15) ± 2 minggu berjalan dari 7 minggu → sisa ~14 SP. My Work FE (18 SP, berjalan Minggu 8–13) ± 3 minggu berjalan dari 6 minggu → sisa ~9 SP. **Total sisa FE ≈ 23 SP.**
+
+**Kapasitas baru mulai Minggu 11** (per orang 0.85 SP/hari × 5 hari = 4.25 SP/minggu):
+- BE: 3 (existing, sudah full speed) + 2 (reinforcement) = **5 orang → 21.25 SP/minggu**. Sisa 40 SP ÷ 21.25 ≈ 1.9 minggu → **BE selesai ~Minggu 13**.
+- FE: 2 (existing) + 2 (reinforcement) = **4 orang → 17 SP/minggu**. Sisa 23 SP ÷ 17 ≈ 1.4 minggu → **FE selesai ~Minggu 12**.
+- QA: 2 (existing) + 2 (reinforcement) = **4 orang** dari Minggu 11. Sisa shift-left (~5 SP dari 10 SP awal) selesai cepat ~Minggu 12. QA end-to-end (18 SP) yang tadinya menunggu BE/FE selesai Minggu 15 sekarang bisa mulai **Minggu 13** (mengikuti BE, penentu terakhir) — dengan 4 QA (2× kapasitas sebelumnya), dialokasikan **Minggu 13–15** (3 minggu, ada margin untuk siklus test-fix & retest di area shared-screen, bukan asumsi paralel sempurna — lihat Risiko #8/#9).
+
+**Hasil**: BE & FE selesai ~Minggu 12–13, QA end-to-end Minggu 13–15, Release Prep Minggu 16 → **ship Rilis 2 Minggu 16** (maju dari Minggu 19, hemat 3 minggu). Total SP Rilis 2 tetap 161 — reinforcement ini murni menambah kapasitas eksekusi, bukan mengubah scope.
+
+**Asumsi & risiko terbuka** (lihat juga Risiko #12):
+- Model ini asumsikan 6 orang reinforcement **didedikasikan penuh** ke Rilis 2 dari Minggu 11 — bukan paruh waktu. Kenyataannya tim BUMA ID existing biasanya beralokasi ~70% enhancement/30% production support (lihat metodologi di [man-power-duration-enhancement-proposal.html](man-power-duration-enhancement-proposal.html)); kalau carve-out 30% production support tetap berlaku selama reinforcement, kapasitas efektif di atas perlu dikoreksi turun ~30% dan Minggu 13/12/16 di atas akan mundur.
+- Reinforcement My Work & eMAR — meski tim ini menguasai codebase existing, **kedua fitur ini baru** (belum pernah dibangun, confidence estimasi lebih rendah — Risiko #10), jadi keunggulan "sudah kenal codebase" tidak sepenuhnya menghilangkan kurva belajar terhadap desain fitur baru ini.
+- Koordinasi hand-off antar 13 orang (squad utama 7 + reinforcement 6) yang bekerja di thread yang sama (BE-3 My Work, QA end-to-end) menambah risiko overhead komunikasi yang belum dimodelkan secara eksplisit di atas.
+
 ## Kenapa 3 BE — Bukan Cukup Nambah FE/QA Saja
 
 Dari eksplorasi Skenario C: menambah FE dan QA saja (tanpa nambah BE) tidak cukup untuk kompresi signifikan **selama freeze code diberlakukan** (tidak ada cicil antar rilis) — karena BE (2 orang) selalu jadi *critical path* di tiap rilis, FE/QA ekstra cuma menunggu BE selesai duluan. BE harus ikut ditambah supaya benar-benar berhenti jadi bottleneck di kedua rilis.
 
-## Kenapa ~12 → 19 Minggu — Perjalanan Angkanya
+## Kenapa ~12 → 19 → 16 Minggu — Perjalanan Angkanya
 
 Estimasi awal skenario final (13 minggu) mengasumsikan QA baru mulai setelah **100% dev rilis selesai** ("big bang" testing). Realistisnya, task-task dalam satu rilis tidak semua selesai di hari yang sama — beberapa modul (Inspection, Order Approval, Master Data) code-complete lebih dulu daripada modul terbesar (Digiplan/SAP Sync). QA tidak perlu menunggu modul terakhir selesai untuk mulai testing modul yang sudah jadi — testing bertahap (shift-left) ini awalnya memangkas ~1 minggu di tiap rilis (13→11 minggu), tanpa perlu freeze code dilonggarkan dan tanpa nambah orang lagi.
 
@@ -175,7 +200,9 @@ Estimasi awal skenario final (13 minggu) mengasumsikan QA baru mulai setelah **1
 
 **Revisi 2026-08-13 (pertama)**: My Work & eMAR ditambahkan ke Rilis 2 (161 SP total gabungan). Estimasi awal: dev+QA Rilis 2 naik dari 4 → 10 minggu, ship Minggu 12 → **Minggu 18**.
 
-**Revisi 2026-08-13 (kedua — capacity check)**: estimasi revisi pertama menggambar bar per-kategori tanpa cross-check jumlah thread konkuren terhadap headcount riil (3 BE, 2 FE) — Minggu 8–10 sempat menuntut sampai 4 thread BE/FE sekaligus. Setelah dijadwal ulang mengikuti kapasitas riil (tabel alokasi per-orang di "Dasar Perhitungan"), BE & FE baru benar-benar selesai ~Minggu 15 (bukan 13–14), QA end-to-end mundur ke Minggu 15–18, ship mundur dari Minggu 18 → **Minggu 19**. Total SP tidak berubah (161 SP) — murni koreksi timing. Hasil akhir: **~19 minggu total**, kebetulan sama persis dengan Skenario A.
+**Revisi 2026-08-13 (kedua — capacity check)**: estimasi revisi pertama menggambar bar per-kategori tanpa cross-check jumlah thread konkuren terhadap headcount riil (3 BE, 2 FE) — Minggu 8–10 sempat menuntut sampai 4 thread BE/FE sekaligus. Setelah dijadwal ulang mengikuti kapasitas riil (tabel alokasi per-orang di "Dasar Perhitungan"), BE & FE baru benar-benar selesai ~Minggu 15 (bukan 13–14), QA end-to-end mundur ke Minggu 15–18, ship mundur dari Minggu 18 → **Minggu 19**. Total SP tidak berubah (161 SP) — murni koreksi timing. Hasil akhir tahap ini: **~19 minggu total**, kebetulan sama persis dengan Skenario A.
+
+**Revisi 2026-08-14 (ketiga — reinforcement Minggu 11)**: squad Rilis 2 diperkuat lagi dengan seluruh tim BUMA ID existing (6 orang: 2 BE, 2 FE, 2 QA) bergabung mulai Minggu 11, full speed tanpa ramp-up (lihat "Reinforcement Minggu 11" di "Dasar Perhitungan"). Kapasitas puncak Rilis 2 naik dari 3 BE/2 FE/2 QA menjadi 5 BE/4 FE/4 QA dari Minggu 11. Sisa pekerjaan BE & FE yang tadinya baru kelar Minggu 15 sekarang selesai ~Minggu 12–13, QA end-to-end maju ke Minggu 13–15, ship maju dari Minggu 19 → **Minggu 16**. Total SP tetap 161 — murni percepatan eksekusi lewat tambahan kapasitas. Hasil akhir: **~16 minggu total**, 3 minggu lebih cepat dari Skenario A meski scope Rilis 2 jauh lebih besar (termasuk My Work/eMAR yang tidak ada di Skenario A).
 
 ---
 
@@ -192,12 +219,14 @@ Estimasi awal skenario final (13 minggu) mengasumsikan QA baru mulai setelah **1
 9. **(Baru, 2026-08-13, dikuantifikasi di revisi kedua) Tiga thread fitur bersamaan dengan hanya 3 BE.** Rilis 2 sekarang menjalankan Maintenance Activity Type + My Work + eMAR sekaligus. Jadwal yang tercantum di dokumen ini **sudah mengasumsikan reallocation aktif** (orang pindah bantu thread lain begitu thread-nya sendiri selesai — lihat tabel alokasi per-orang di "Dasar Perhitungan"), bukan silo 1 orang per fitur. Kalau reallocation ini tidak dikelola rapi di eksekusi riil (mis. karena hand-off/komunikasi antar-thread lambat), jadwal bisa mundur lagi dari Minggu 19.
 10. **(Baru, 2026-08-13) Confidence estimasi My Work & eMAR (113 SP) lebih rendah** dari Maintenance Activity Type. Maintenance Activity Type tervalidasi reference class Jira riil ([maintenance-activity-type-effort-summary.md](inspection-order/maintenance-activity-type-effort-summary.md)); My Work & eMAR murni estimasi dari desain di atas kertas, belum ada kode/mockup backend sama sekali. Beberapa keputusan yang bisa geser SP signifikan kalau berubah: push vs pull assignment dari Digiplan, arsitektur Management Dashboard (Power BI vs halaman app baru dengan RBAC), mekanisme reopen-editing setelah Reject di eMAR.
 11. **(Baru, 2026-08-13) Rilis 1 punya gap serupa (kecil) — bukan buatan sesi ini.** Kroscek kapasitas yang sama, diterapkan ke Rilis 1 (bagian dari rencana asli 3 Agustus 2026, bukan revisi baru): BE 43 SP diklaim selesai Minggu 3, tapi kapasitas riil 3 BE di ramp-up (0.81 SP/hari) untuk Minggu 1–3 cuma ~36.5 SP — realistanya BE selesai lebih dekat ke Minggu 4. Beda dengan Rilis 2: gap-nya kecil (~1 minggu) dan Rilis 1 sudah punya buffer 3 minggu QA sebelum ship (Minggu 4→7) yang kemungkinan besar menyerap slip ini. **Ship Minggu 7 tetap dipertahankan, tidak direvisi** — dicatat di sini untuk transparansi metodologi, bukan karena mengubah kesimpulan Rilis 1.
+12. **(Baru, 2026-08-14) Reinforcement menarik tim BUMA ID existing dari komitmen lain.** 6 orang yang bergabung Minggu 11 biasanya beralokasi ~70% enhancement lain (Area of Unit, Storage Location Planner Group, dst.) / ~30% production support (lihat [man-power-duration-enhancement-proposal.html](man-power-duration-enhancement-proposal.html)). Model timeline Minggu 16 ini asumsikan mereka **didedikasikan penuh** ke Rilis 2 selama reinforcement — kalau carve-out production support tetap berlaku, atau proposal lain yang biasa mereka kerjakan jadi tertunda/butuh resource pengganti, ini bukan cuma risiko jadwal Rilis 2 tapi juga trade-off komersial/prioritas yang perlu disetujui terpisah (siapa yang menutup pekerjaan yang mereka tinggalkan). Perlu dikonfirmasi ke pemilik roadmap tim BUMA ID sebelum Minggu 11 tiba.
+13. **(Baru, 2026-08-14) Koordinasi 13 orang di thread yang sama belum dimodelkan sebagai overhead eksplisit.** Dari Minggu 11, BE-3 (My Work) berpotensi dikerjakan hingga 5 BE sekaligus dan QA end-to-end oleh 4 QA — sebelumnya perhitungan SP÷kapasitas mengasumsikan penambahan orang = penambahan throughput linear, padahal hand-off & komunikasi antar tim yang baru gabung (reinforcement) dengan tim yang sudah jalan (squad utama) biasanya menambah friksi (bukan Brooks's Law penuh, tapi tidak nol). Kalau ini terjadi, Minggu 13/12/16 di "Reinforcement Minggu 11" bisa mundur.
 
 ---
 
 ## Referensi
 
-- [squad-baru-release-timeline.md](squad-baru-release-timeline.md) — Skenario A (4 orang, 3 rilis sequential, 19 minggu) — **tidak mencakup My Work/eMAR**, tidak direcompute untuk scope baru
+- Skenario A (4 orang, 3 rilis sequential, 19 minggu) — dulu di `squad-baru-release-timeline.md`, **dihapus 2026-08-14** (sudah digantikan skenario final ini, bukan referensi aktif lagi). **Tidak mencakup My Work/eMAR**, tidak direcompute untuk scope baru.
 - Gantt chart interaktif (final, direvisi 2026-08-13): [claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204](https://claude.ai/code/artifact/15a73a97-b0f1-431a-8c67-6fb5966c2204)
 - [effort-recap-3-proposals.html](effort-recap-3-proposals.html)
 - [man-power-duration-enhancement-proposal.html](man-power-duration-enhancement-proposal.html)
