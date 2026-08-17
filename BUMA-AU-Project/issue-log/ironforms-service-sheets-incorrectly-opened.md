@@ -2,11 +2,14 @@
 
 | | |
 |---|---|
+| **ID** | BUMA-LOG-006 |
 | **Project** | BUMA AU |
 | **Reported by** | Benedict Panizza |
 | **Date Raised** | 2026-08-04 |
 | **Priority** | N/A (Service Request — data correction, not an Incident/Defect) |
 | **Status** | Done |
+| **Source** | Not yet re-verified against original email (see [README limitations](README.md#sumber-data--keterbatasan)) |
+| **Last Verified** | — |
 
 ## Description
 

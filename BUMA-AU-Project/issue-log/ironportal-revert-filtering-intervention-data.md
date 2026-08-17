@@ -2,11 +2,14 @@
 
 | | |
 |---|---|
+| **ID** | BUMA-LOG-003 |
 | **Project** | BUMA AU |
 | **Reported by** | Benedict Panizza |
 | **Date Raised** | TBD |
 | **Priority** | P3 |
 | **Status** | Open |
+| **Source** | Not yet re-verified against original email (see [README limitations](README.md#sumber-data--keterbatasan)) |
+| **Last Verified** | — |
 
 ## Description
 
