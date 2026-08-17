@@ -89,6 +89,21 @@ ModifiedBy             varchar(128), null
 ```
 > **Konfirmasi (15 Jul 2026)**: snapshot-copy dari `maintenance-execution.TaskPersonalizedEvidence` — sama pola dengan `MechanicOrderDetail`. Ini yang jadi jawaban fungsi `MechanicOrderEvidence` yang sebelumnya open item di [order-emol-sap-sync.md](../inspection-order/order-emol-sap-sync.md) 5.5/Bagian 10 (di-LEFT JOIN tapi tidak muncul di SELECT) — evidence **sudah** ter-copy ke sini saat eMOL dibuat, tidak perlu perubahan.
 
+### `MechanicOrderCrackIdentified` (BARU, 2026-08-17 — Order Integration Phase 2)
+```
+Id                          PK, bigint, identity
+MechanicOrderListId         bigint, not null
+CrackDescription            varchar(1024), null
+CrackLength                 float, null (default 0)
+PrevCrackLength             float, null
+IsActive                    bit, not null (default 1)
+CreatedAt                   datetime, not null (default getutcdate())
+CreatedBy                   varchar(128), null
+ModifiedAt                  datetime, null
+ModifiedBy                  varchar(128), null
+```
+> **Belum ada di skema real — kolom baru yang perlu dibuat.** Mirror `maintenance-execution.CrackIdentified` (FK `TaskPersonalizedFindingId`, not null, 1-to-many — lihat [maintenance-execution-schema.md](maintenance-execution-schema.md)), sama pola dengan `MechanicOrderMaterial` mirror `TaskPersonalizedFindingMaterial`. **Gap ditemukan 2026-08-17** ([order-integration.md](../../roadmap/phase2-order-integration/order-integration.md) Poin 5) — sebelum ini, data Crack (`CrackDescription`/`CrackLength`/`PrevCrackLength`) tidak punya tujuan sama sekali di `maintenance-order`, padahal approval eMOL terjadi di sini — Planner tidak akan bisa lihat detail Crack tanpa tabel ini. Diisi lewat publish/consume yang sama saat eMOL dibuat (create-baru maupun reuse-vehicle).
+
 ### `MechanicOrderMaterial`
 ```
 Id                     PK, bigint, identity
@@ -122,6 +137,19 @@ CreatedAt, CreatedBy   datetime/varchar(128), not null
 ModifiedAt, ModifiedBy datetime/varchar(128), null
 ```
 *(Match dengan sample data BUMA ID yang sudah dibahas — MT01-MT06.)*
+
+### `OrderTypeMaintenanceCategoryMapping` (M:N Order Type ↔ Activity Type)
+```
+Id                       PK, bigint, not null
+OrderTypeCode            varchar(50), not null
+MaintenanceCategoryCode  varchar(50), not null
+IsActive                 bit, not null
+CreatedAt                datetime2(7), not null
+CreatedBy                varchar(200), not null
+ModifiedAt               datetime2(7), not null
+ModifiedBy               varchar(200), not null
+```
+> **Dikonfirmasi live (2026-08-16, screenshot dari SSMS user)** — tabel ini awalnya diusulkan [maintenance-activity-type-enhancement.md](../inspection-order/maintenance-activity-type-enhancement.md) 2.3–2.4 (junction M:N buat filter dropdown Activity Type dependent terhadap Order Type yang sudah dipilih), sempat dicatat "belum ada di skema real" berdasarkan dokumen ini sebelum diperbarui — **ternyata sudah rilis**, dokumen ini yang belum sempat di-update. **Scope terbatas** — cuma tabel mapping-nya yang confirmed live; field lain dari enhancement yang sama (`MechanicOrderList.ActivityType`/`ActivityTypeName`, Name companion untuk `MaintenanceCategoryCode`) **masih belum live**, jangan digeneralisasi.
 
 ### `Material`
 ```
