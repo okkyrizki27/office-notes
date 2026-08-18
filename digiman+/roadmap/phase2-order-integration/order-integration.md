@@ -10,9 +10,9 @@ Struktur dokumen ini mengikuti urutan 6 fase di [order-integration-checklist.md]
 
 ## Konteks
 
-Phase 1 ([pm-shutdown-service-package.md](../phase1-service-package/pm-shutdown-service-package.md)) men-defer item **"Skenario field team menemukan pekerjaan tak terduga"** ke next MVP. Phase 2 ini membahas spesifik itu.
+Phase 1 ([pm-shutdown-service-package.md](../phase1-service-package/pm-shutdown-service-package.md)) men-defer skenario mechanic yang sedang melakukan service rutin dan menggunakan form menemukan finding — defect atau crack — ke next MVP. Phase 2 ini membahas spesifik itu.
 
-**Sifat enhancement ini (dikonfirmasi user):** UI Finding creation **sudah dibangun** di mobile app (lihat [Poin 1](#poin-1-trigger-dan-ui-create-defect-atau-crack) di bawah) tapi **belum functional** — form sudah ada dan fieldnya sudah match skema `TaskPersonalizedFinding`/`CrackIdentified`, tapi belum tersambung ke backend (persist data & trigger create Order). Jadi scope Phase 2 ini lebih ke **"aktifkan & sambungkan"** UI yang sudah ada, bukan desain UI dari nol.
+**Sifat enhancement ini (dikonfirmasi user):** UI Finding creation **sudah dibangun** di mobile app (lihat [Poin 1](#poin-1-trigger-dan-ui-create-defect-atau-crack) di bawah) tapi **belum functional** — form sudah ada dan fieldnya sudah match skema `TaskPersonalizedFinding`/`CrackIdentified`, tapi belum tersambung ke backend (menyimpan data & trigger create Order). Jadi scope Phase 2 ini lebih ke **"aktifkan & sambungkan"** UI yang sudah ada, bukan desain UI dari nol.
 
 Fakta current-state TaskKit General Check (7 tipe, opsi dropdown per tipe, struktur row) sudah didokumentasikan di [form-builder.md](../../architecture/form/form-builder.md#taskkit) — tidak diulang di sini, dokumen ini fokus ke keputusan & open items khusus Order Integration.
 
@@ -63,7 +63,7 @@ Dasar pemilihan: opsi dropdown-nya mengandung kata **"Identified"** (`Crack Iden
 
 #### Current State — Mobile App UI (v4.0.0)
 
-Diverifikasi langsung dari screenshot app **Digiman+ mobile v4.0.0** (2026-08-06). **UI sudah ada tapi belum functional** — Save belum tentu persist data / trigger apapun ke backend.
+Diverifikasi langsung dari screenshot app **Digiman+ mobile v4.0.0** (2026-08-06). **UI sudah ada tapi belum functional** — Save belum tentu menyimpan data / trigger apapun ke backend.
 
 **Trigger**
 
@@ -178,7 +178,7 @@ Teks checkbox saat ini cuma valid untuk Skenario 1. Untuk Skenario 2, Order teta
 **Resolved (2026-08-17) — copy checkbox direvisi**, sudah tidak mengklaim "won't be processed into backlog" (yang cuma valid Skenario 1) — [lihat teks baru & detail di Struktur Screen "Defect Identified"](#struktur-screen-defect-identified) step 6.
 
 **Sudah dikonfirmasi user (2026-08-12):**
-- Defect **selalu tercatat** (Finding tetap dipersist ke `TaskPersonalizedFinding`) terlepas dieksekusi sekarang atau nanti — berlaku untuk kedua skenario.
+- Defect **selalu tercatat** (Finding tetap disimpan ke `TaskPersonalizedFinding`) terlepas dieksekusi sekarang atau nanti — berlaku untuk kedua skenario.
 - `PriorityCode` **tidak bisa dipakai** sebagai pengganti/pelengkap gate ini — kegunaannya beda: menentukan **expected delivery date** (kapan defect harus dieksekusi dalam siklus penjadwalan normal), bukan penentu "eksekusi instan di lapangan sekarang".
 
 **⚠️ Klarifikasi semantik penting (2026-08-16) — `IsImmediateExecutable` itu pernyataan FAKTA, bukan permintaan/rencana:** nama kolom ini secara ideal harusnya lebih dekat ke `IsImmediateExecuted` — mechanic menyatakan perbaikan ini **sudah/sedang dikerjakan saat itu juga**, simultan dengan pengisian form, bukan janji/permintaan untuk dikerjakan segera nanti (juga bukan permintaan prioritas). Konsisten dengan alasan asal Skenario 2 critical di atas ("harus diperbaiki saat itu juga karena kalau tidak bisa mengganggu performa unit/unscheduled breakdown") — ini kejadian eksekusi yang terjadi bersamaan dengan pelaporan. **Nama kolom `IsImmediateExecutable` TETAP dipakai apa adanya, TIDAK di-rename** — ini murni klarifikasi pemahaman/semantik, bukan proposal perubahan nama; sudah terlanjur dipakai di schema/logic existing, rename cuma akan bikin breaking changes tanpa manfaat. **Implikasi dari klarifikasi ini:** field ini otomatis berfungsi ganda sebagai **sinyal status eksekusi**, bukan cuma trigger routing Order — relevan langsung ke gap visibility approver ([lihat Poin 9](#poin-9-approval-flow)).
@@ -199,23 +199,73 @@ Sempat dipikirkan solusi "tunggu MO muncul di `MOOpen` dulu baru eksekusi lewat 
 
 **Pertanyaan sebenarnya yang perlu dikonfirmasi ke tim SAP (2026-08-15):** apakah validasi TECO di SAP **mensyaratkan GI (Goods Issue) sudah dibuat** atau tidak. Ini yang menentukan gate sebenarnya — bukan soal timing `MOOpen` sync. Kalau TECO memang butuh GI sudah posted, Digiman+ perlu cara untuk tahu status GI itu (belum ada visibility ke sana saat ini) sebelum aman men-trigger TECO. **Cuma relevan untuk kasus butuh material** — B2, dan Sub-kasus A kalau Order lama yang di-reuse punya `NoPartsRequired=0`. **Tidak relevan untuk B1** dan Sub-kasus A yang `NoPartsRequired=1` — keduanya aman TECO langsung, tidak ada GI yang perlu ditunggu.
 
-**Ringkasan skenario TECO — A/B1/B2 (2026-08-15):** "butuh material atau tidak" adalah faktor penentu tunggal, bukan soal A/B1/B2-nya per se.
+**Resolved (2026-08-18, final — supersede 3 draft sebelumnya) — determinan sebenarnya "apakah `MONo` sudah diketahui/predictable", bukan cuma "butuh material atau tidak":**
 
-| Skenario | Butuh Material? | Kapan TECO aman di-trigger |
-|---|---|---|
-| Sub-kasus A (reuse) | Tidak (`NoPartsRequired=1` di Order lama) | **Aman langsung** — begitu Planner approve di Digiman+, trigger `BacklogExecutionList` seperti biasa. |
-| Sub-kasus A (reuse) | Ya (`NoPartsRequired=0`) | **Belum pasti** — perlu konfirmasi tim SAP soal GI. Order lama ini sudah lama exist, kemungkinan besar sudah lama release/GI-ready juga, tapi belum diverifikasi. |
-| B1 (Order baru) | Tidak | **Aman langsung** — begitu Planner approve + sync SAP, create+close TECO sekaligus (desain awal tetap valid). |
-| B2 (Order baru) | Ya | **Belum pasti** — MO baru harus lewat approval SAP sendiri dulu (terpisah dari approval Planner Digiman+), baru lanjut procurement/logistic, baru genuinely siap TECO. Perlu konfirmasi tim SAP soal GI. |
+3 draft sebelumnya berturut-turut dikoreksi: (1) defensive-retry generik untuk semua kasus, (2) eager-vs-manual berdasar butuh-material-atau-tidak semata, (3) baru disadari reuse dan Order baru punya karakteristik `MONo` yang beda total, jadi mekanismenya juga harus beda — bukan cuma soal butuh material atau tidak.
+
+**Mekanisme final, dipecah per situasi:**
+
+1. **Reuse (Sub-kasus A), `MONo` sudah diketahui** (terlepas Order lama itu butuh material atau tidak) → **eager-trigger** `BacklogExecutionList` langsung di titik **final Order Approval** (tier terakhir, beda dari trigger edit-lock yang di tier pertama — [lihat Poin 7](#poin-7-editability-window-sebelum-approval)). Aman karena `MONo` yang diketahui berarti Order itu sudah confirmed real di SAP.
+2. **Reuse (Sub-kasus A), butuh material, `MONo` masih NULL** → **submit di-block** sebelum sempat masuk Order Approval sama sekali (detail & pesan di bawah). Alasan beda dari kasus B2: `MONo` Order lama ini **statusnya independen**, tidak terikat ke event apa pun dari Finding baru ini — bisa jadi sudah lama ada, bisa juga genuinely stuck, tidak ada pipeline baru yang predictable untuk ditunggu. Makanya block di depan, bukan defer.
+3. **Reuse (Sub-kasus A), tidak butuh material** → **eager-trigger**, sama seperti poin 1 (tidak ada dependency fisik apa pun yang perlu dicek).
+4. **B1 (Order baru, tidak butuh material)** → **eager-trigger** (create+close TECO sekaligus) begitu Planner approve + sync SAP — desain awal tetap valid.
+5. **B2 (Order baru, butuh material)** → **submit tetap jalan normal, tidak di-block** (beda dari reuse — `MONo` Order baru **memang selalu** NULL di titik submit, itu bukan sinyal masalah, cuma pipeline yang belum jalan). Order Approval selesai seperti biasa → **scheduler** yang urus triggernya (detail di bawah) — **bukan** mekanisme "3 jalur eksekusi MO Backlog" manual (itu tetap ada tapi untuk backlog **biasa**, bukan buat Finding `IsImmediateExecutable=Yes` Phase 2 ini).
+
+**Kenapa reuse dan B2 beda perlakuan meski sama-sama "butuh material + `MONo` belum diketahui":** untuk **B2**, Order Approval **memicu langsung** pipeline baru yang predictable — create `PoolingMOItem` → sync SAP → `MONo` terbentuk → response balik ke `SAPMOSyncOrder`. Ini kejadian **fresh**, terikat ke approval Finding ini, jadi masuk akal ditunggu/di-schedule. Untuk **reuse**, `MONo` yang ditunggu adalah status Order **lama** yang independen dari submission ini (eMOL vehicle-approval untuk reuse **skip total** sync SAP — [lihat Poin 5](#poin-5-data-flow-defect-dan-crack)) — tidak ada pipeline baru yang predictable untuk dijadikan patokan, jadi block di depan lebih tepat daripada menunggu tanpa kepastian.
+
+**Blocking untuk reuse + butuh material + `MONo` NULL — pesan validasi (di titik Submit):**
+
+> *"This Order hasn't been confirmed ready in SAP yet, so immediate execution can't be started. Uncheck this, or check back once the Order syncs."*
+
+User punya 2 jalan keluar, tidak ada yang butuh input manual: **uncheck `IsImmediateExecutable`** (submit tetap jalan sebagai `No`, jadi record approved tanpa eager-trigger), atau **skip/back** dari kandidat ini (coba lagi nanti setelah sync selesai, atau lanjut sebagai Order baru/B2).
+
+**Scheduler untuk B2 (Order baru, butuh material, `IsImmediateExecutable=Yes`) — mekanisme baru (2026-08-18):** job terjadwal **2x/hari, 1 jam sebelum shift berakhir** (jam shift persis perlu dikonfirmasi ke BPO client — placeholder dulu, mis. kalau shift 06:00–18:00/18:00–06:00 berarti jalan ~17:00 & ~05:00). Kandidat yang diproses tiap run:
+- `IsImmediateExecutable=Yes`
+- Order butuh material (`NoPartsRequired=0`)
+- Order Approval sudah **fully approved** (final, bukan tier pertama)
+- **Genuine Order baru** (bukan reuse — `ReuseOrderNumber`/`ReuseSAPOrderNumber` NULL di titik ini)
+- `SAPMOSyncOrder.MONo` **sudah terisi** (response dari SAP sudah diterima)
+- `BacklogExecutionList` **belum pernah** dibuat untuk Order ini
+
+Aksinya: create `BacklogExecutionList` (`WorkOrderId` dari konteks Finding, `MONumber` dari `SAPMOSyncOrder.MONo` yang sudah diketahui) → TECO jalan lewat mekanisme **§9.3 existing**, tidak perlu mekanisme baru untuk pengiriman TECO-nya sendiri. Kandidat yang `MONo`-nya **masih** belum terisi saat scheduler jalan → **di-skip**, dicek lagi di run berikutnya (~12 jam kemudian). **Residual/belum didesain:** ada batas maksimum berapa kali di-skip sebelum butuh eskalasi/notifikasi manual (kalau sync SAP-nya genuinely stuck lama) — dicatat sebagai open item implementasi, bukan blocker desain.
+
+**Konsekuensi ke skema — field manual `ReuseSAPOrderNumber` cuma dibutuhkan untuk escape hatch:** untuk reuse dengan `PoolingMOItem`, field ini **tidak pernah** diisi manual — kalau `MONo` sudah diketahui, otomatis lengkap; kalau belum, submit di-block duluan (poin 2 di atas), jadi tidak ada state "submit lolos tapi field-nya kosong" yang perlu ditutup manual. Manual input **cuma** dibutuhkan untuk **escape hatch** (Order yang genuinely tidak pernah masuk Digiman+, tidak ada mekanisme sync/scheduler apa pun yang bisa diandalkan di situ).
+
+**Matriks lengkap skenario TECO — A/B1/B2/Escape hatch (2026-08-15, tabel final 2026-08-18, `Sync Create MO` & `TECO` dipisah jadi 2 kolom karena beda titik waktu):**
+
+| # | Jalur | `PoolingMOItem`? | Butuh Material? | `MONo` | `IsImmediateExecutable` | Kapan Trigger **Sync Create MO ke SAP** | Mekanisme Trigger **TECO ke SAP** | Detail |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Reuse | Ada | Tidak | — | `Yes` | Tidak pernah (skip total, reuse Order lama) | **After Fully Approved** | Final Order Approval selesai |
+| 2 | Reuse | Ada | Tidak | — | `No` | Tidak pernah | — | Tidak ada — Order lama tetap open, jalan normal via siklusnya sendiri |
+| 3 | Reuse | Ada | Ya | Sudah diketahui | `Yes` | Tidak pernah | **After Fully Approved** | Final Order Approval selesai |
+| 4 | Reuse | Ada | Ya | Sudah diketahui | `No` | Tidak pernah | — | Tidak ada — Order lama tetap open |
+| 5 | Reuse | Ada | Ya | **NULL** | `Yes` | Tidak pernah | — | **Tidak applicable** — submit di-block sebelum sampai approval |
+| 6 | Reuse | Ada | Ya | NULL | `No` | Tidak pernah | — | Tidak ada — Order lama tetap open |
+| 7 | Reuse | Tidak ada (`MOOpen`-only) | Tidak relevan | Selalu ada | `Yes` | Tidak pernah | **After Fully Approved** | Final Order Approval selesai |
+| 8 | Reuse | Tidak ada | Tidak relevan | Selalu ada | `No` | Tidak pernah | — | Tidak ada — Order lama tetap open |
+| 9 | Order baru (B1) | N/A | Tidak | — | `Yes` | **Begitu Order Approval final** (create) | **After Fully Approved** | Sekaligus dengan create (close bareng) |
+| 10 | Order baru (B1) | N/A | Tidak | — | `No` | Begitu Order Approval final | — | Tidak ada — jadi backlog biasa, dieksekusi manual kapan pun via mekanisme existing |
+| 11 | Order baru (B2) | N/A | Ya | Belum ada | `Yes` | Begitu Order Approval final | **Scheduler** | Begitu `MONo` confirmed & shift-end check berikutnya |
+| 12 | Order baru (B2) | N/A | Ya | Belum ada | `No` | Begitu Order Approval final | — | Tidak ada — jadi backlog biasa, dieksekusi manual kapan pun via mekanisme existing |
+| 13 | Escape hatch | N/A | Declare tidak | Selalu ada (manual) | `Yes` | Tidak pernah | **After Fully Approved** | Final Order Approval selesai |
+| 14 | Escape hatch | N/A | Declare tidak | Selalu ada | `No` | Tidak pernah | — | Tidak ada — Order tetap open apa adanya |
+| 15 | Escape hatch | N/A | Declare ya | Selalu ada | `Yes` | Tidak pernah | **After Fully Approved** | Final Order Approval selesai (⚠️ **Accepted Risk**, declare `NoPartsRequired` tidak terverifikasi ke SAP) |
+| 16 | Escape hatch | N/A | Declare ya | Selalu ada | `No` | Tidak pernah | — | Tidak ada — Order tetap open apa adanya |
+
+**Poin kunci:**
+- "Sync Create MO ke SAP" **cuma pernah terjadi untuk Order baru genuine (baris 9–12)** — reuse & escape hatch tidak pernah membuat MO baru di SAP sama sekali (mencegah duplicate).
+- Mekanisme trigger **TECO ke SAP** hanya ada **dua jenis**: **After Fully Approved** (eager, langsung begitu final Order Approval selesai — baris 1, 3, 7, 9, 13, 15) atau **Scheduler** (baris 11 saja, karena `MONo` B2 belum tentu tersedia tepat saat approval final). Baris ber-`No` tidak trigger apa-apa (`—`).
+- Satu-satunya baris yang **submit-nya di-block** adalah **#5**.
+- Baris #10 & #12 (`No`) bukan mekanisme baru — itu backlog biasa yang sudah ada jalurnya (§9.2/9.3 existing).
 
 **Resolved:**
-- ~~Scope kerja "sambungkan backend"~~ — **terjawab lengkap** lewat mekanisme di [Poin 5](#poin-5-data-flow-defect-dan-crack): persist `TaskPersonalizedFinding`/`TaskPersonalizedFindingMaterial`/`CrackIdentified`, publish ke topic, DAN trigger create `MechanicOrderSummary`/`MechanicOrderList` (baik create-baru maupun reuse-vehicle) — bukan cuma persist Finding saja. **Koreksi (2026-08-17):** klaim "lengkap" ini sebelumnya cuma benar untuk sisi `maintenance-execution` — `CrackIdentified` ternyata tidak punya tujuan di `maintenance-order` sama sekali (gap, [lihat detail di Poin 5](#poin-5-data-flow-defect-dan-crack)), baru resolved sekarang dengan tabel baru `MechanicOrderCrackIdentified`.
+- ~~Scope kerja "sambungkan backend"~~ — **terjawab lengkap** lewat mekanisme di [Poin 5](#poin-5-data-flow-defect-dan-crack): menyimpan `TaskPersonalizedFinding`/`TaskPersonalizedFindingMaterial`/`CrackIdentified`, publish ke topic, DAN trigger create `MechanicOrderSummary`/`MechanicOrderList` (baik create-baru maupun reuse-vehicle) — bukan cuma menyimpan Finding saja. **Koreksi (2026-08-17):** klaim "lengkap" ini sebelumnya cuma benar untuk sisi `maintenance-execution` — `CrackIdentified` ternyata tidak punya tujuan di `maintenance-order` sama sekali (gap, [lihat detail di Poin 5](#poin-5-data-flow-defect-dan-crack)), baru resolved sekarang dengan tabel baru `MechanicOrderCrackIdentified`.
 - ~~UI View detail~~ — **selesai**: List Suggestion Order Lama, View Detail Order, Order Type/Activity Type/Material digabung ke 1 layar, dan tampilan post-submit (icon kaca pembesar → model 3-state: abu-abu/warning-incomplete/merah-oranye-solid sesuai warna Condition — [detail lengkap](#current-state--mobile-app-ui-v400); entry-point buka balik/tambah Finding, default buka ke Tab Finding #1 kalau >1) semua sudah didesain. Lihat [List Suggestion Order Lama](#ui-view-detail--list-suggestion-order-lama-2026-08-14), [View Detail Order](#ui-view-detail--view-detail-order-2026-08-14), [User Journey — Defect](#user-journey--defect-2026-08-13), [Current State UI](#current-state--mobile-app-ui-v400). Verifikasi implementasi aktual baru bisa dilakukan setelah backend jalan — bukan blocker diskusi, cuma blocker testing.
 - ~~Konsekuensi consumer untuk escape hatch~~ — **resolved**: mekanisme sama persis dengan eMOL vehicle-approval Sub-kasus A ([Poin 5](#poin-5-data-flow-defect-dan-crack)), bedanya `MONumber` selalu dari input manual (lihat detail di atas).
+- ~~Timing TECO untuk kasus butuh material (B2, dan Sub-kasus A kalau `NoPartsRequired=0`)~~ — **resolved (2026-08-18)**: tidak perlu tahu status GI duluan — tetap trigger TECO di titik yang sama seperti B1/tanpa-material, biarkan SAP validasi & tolak kalau belum siap, retry mechanism existing yang tangani konvergensinya. [Detail & residual monitoring concern di atas](#poin-1-trigger-dan-ui-create-defect-atau-crack).
 
 **Masih open:**
 - **Mekanisme percepatan/prioritas untuk Sub-kasus B2** (lihat di atas) — belum didesain sama sekali.
-- **⚠️ Timing TECO untuk kasus butuh material (B2, dan Sub-kasus A kalau `NoPartsRequired=0`) (2026-08-15)** — belum jelas kapan aman men-trigger TECO/`BacklogExecutionList`, karena MO baru dari Digiman+ harus lewat release/approval/procurement SAP dulu. **Perlu konfirmasi ke tim SAP**: apakah validasi TECO mensyaratkan GI (Goods Issue) sudah dibuat — itu yang jadi gate sebenarnya, bukan timing sync `MOOpen` (tidak real-time, tidak reliable buat dipakai sinyal). **Tidak relevan untuk B1 / Sub-kasus A tanpa material** — itu tetap aman TECO langsung. Lihat detail di atas.
 - **B1 perlu konfirmasi ke BPO client** sebelum dianggap final — sebagai validasi rutin.
 
 ~~Crack Defect punya 2 opsi "Identified" (`Monitor` vs `Repair Required`) — apakah keduanya sama treatment?~~ — **resolved**: sudah dijawab di [Crack Order Lifecycle](#poin-5-data-flow-defect-dan-crack) — keduanya sama-sama trigger Order, bedanya cuma priority.
@@ -237,7 +287,7 @@ Scope: **Defect saja** — Crack dibahas terpisah nanti (skenarionya beda, lihat
 | **Tidak ketemu sama sekali** | Section Order Type/Activity Type/Part **manual/editable**, submit sebagai Order baru — Sub-kasus B1/B2 kalau `Yes`, flow backlog normal kalau `No`. |
 
 5. **Material — tidak mandatory** di semua cabang yang section-nya muncul — bisa dibiarkan kosong, reuse pola `NoPartsRequired` existing.
-6. **Submit — 1 aksi save ke `maintenance-execution` saja** (`TaskPersonalizedFinding` + kolom baru `OrderType`/`ActivityType`/`ReuseOrderNumber`/SAP MO Number manual + tabel baru `TaskPersonalizedFindingMaterial`) — hindari dual-service-call/race condition ([Poin 5](#poin-5-data-flow-defect-dan-crack)).
+6. **Submit — 1 aksi save ke `maintenance-execution` saja** (`TaskPersonalizedFinding` + kolom baru `OrderType`/`ActivityType`/`ReuseOrderNumber`/`ReuseSAPOrderNumber` + tabel baru `TaskPersonalizedFindingMaterial`) — hindari dual-service-call/race condition ([Poin 5](#poin-5-data-flow-defect-dan-crack)).
 7. **Sync ke Order (async)** — publish ke topic → `maintenance-order` consume (polling, delay maks ~5 detik) → create `MechanicOrderSummary` (1:1 baru) + `MechanicOrderList` (`Type='Form'`) + `Detail`/`Material`/`Evidence`. **Reversed (2026-08-16):** ini sekarang berlaku untuk **SEMUA** cabang yang section-nya muncul, **termasuk "ketemu & dipilih, `No`"** (sebelumnya dikecualikan, sekarang juga bikin eMOL — [lihat Poin 9](#poin-9-approval-flow) untuk alasan lengkap). Tidak ada lagi cabang yang skip publish sama sekali kalau correlation sudah menghasilkan match yang dipilih.
 8. **Approval** — tetap lewat gate Planner sebelum push SAP ([Poin 9](#poin-9-approval-flow)) untuk semua Order baru/di-close.
 
@@ -267,7 +317,7 @@ Scope: **Defect saja** — Crack dibahas terpisah nanti (skenarionya beda, lihat
 
 **Keputusan:** kandidat ini **tetap muncul** di suggestion list (tidak di-exclude) — tapi begitu dipilih **dan** `MONo`-nya masih NULL, field **input manual SAP MO Number** jadi **mandatory** sebelum bisa submit (bukan sekadar opsional) — user tidak bisa lanjut tanpa mengisinya di kombinasi kondisi ini. Alasan: kemungkinan SAP MO Number **sudah ada di sisi SAP** (sudah di-print, material sudah bisa diambil secara fisik) tapi **belum sempat sync balik ke Digiman+** (lag sinkronisasi) — user yang tahu di lapangan (mis. lihat langsung dokumen MO fisik) **wajib** input manual, karena tanpa nomor ini material tidak akan pernah bisa diambil (kendala fisik Sub-kasus B2).
 
-**Konsekuensi ke skema:** ini mengkonfirmasi kita memang butuh **2 field baru** di `TaskPersonalizedFinding` untuk kasus reuse — (1) Digiman+ Order Number (reference otomatis ke Order lama yang dipilih, selalu ada) dan (2) SAP MO Number (**mandatory kalau `MONo` old order masih NULL**, kalau sudah ada tidak perlu diisi ulang). Field kedua ini beda karakter dari draft awal (bukan "cached copy buat fallback lookup" yang sempat dipertimbangkan lalu ditolak — tapi genuinely **data baru dari user** yang belum ada di Digiman+ manapun sampai user input di titik ini).
+**Konsekuensi ke skema:** ini mengkonfirmasi kita memang butuh **2 field baru** di `TaskPersonalizedFinding` untuk kasus reuse — (1) **`ReuseOrderNumber`** (reference ke `MechanicOrderList.Number` Order lama yang dipilih, selalu ada **kalau** kandidatnya punya row lokal di Digiman+) dan (2) **`ReuseSAPOrderNumber`** (nomor MO SAP — **mandatory kalau `MONo` old order masih NULL** dan butuh material, kalau sudah ada tidak perlu diisi ulang). Field kedua ini beda karakter dari draft awal (bukan "cached copy buat fallback lookup" yang sempat dipertimbangkan lalu ditolak — tapi genuinely **data baru dari user** yang belum ada di Digiman+ manapun sampai user input di titik ini). **Rasional lengkap kenapa 2 field terpisah (bukan 1 field serbaguna) & cakupan penuhnya lintas semua kondisi kandidat — [lihat Poin 6](#poin-6-duplicate-atau-correlation-handling).**
 
 **Konsekuensi ke consumer `maintenance-order` — resolved (2026-08-15):** begitu event dengan `SAPMONumber` manual ini di-consume, consumer perlu **update Order LAMA** (bukan cuma catat di Finding baru) — isi `MONo` yang tadinya NULL di `PoolingMOItem`/`SAPMOSyncOrder` milik Order lama itu dengan nilai manual yang di-supply user. Alasan: kalau tidak di-update, gap sync-nya tidak benar-benar tertutup — Order lama tetap tercatat `MONo=NULL` di Digiman+ meski user sudah bilang MO-nya sudah ada di SAP. Update ini melengkapi mekanisme [upsert by `TaskPersonalizedFindingId`](#poin-5-data-flow-defect-dan-crack) yang sudah didesain — di kasus reuse, selain create/update data si Finding baru, ada **efek tambahan ke row Order lama yang di-reuse**.
 
@@ -281,6 +331,21 @@ Scope: **Defect saja** — Crack dibahas terpisah nanti (skenarionya beda, lihat
 
 **Catatan (2026-08-17):** opsi/input manual ini **baru** (Phase 2, belum ada di app hari ini) — tampilan visualnya **butuh UI designer**, mekanisme/kapan mandatory-nya sudah didefine.
 
+**Resolved (2026-08-18) — bentuk kontrol UI:** opsi "saya tahu ada Order SAP untuk ini" pakai **checkbox**. Karena Order Type/Activity Type/Material tidak bisa di-derive sama sekali di cabang ini (Digiman+ tidak punya data apa pun soal Order tersebut), ketiganya diisi manual oleh user — termasuk **Material**, yang mengikuti alur declaration yang sama dengan flow utama ([checkbox "No parts required" mutual-exclusive dengan list Material](#user-journey--defect-2026-08-13), divalidasi di titik Submit) — bukan mekanisme terpisah.
+
+**Resolved (2026-08-18) — copy checkbox:** *"I confirm this Order already exists in SAP."* — final wording pending review UI Designer/copywriter, tapi arah teksnya sudah disepakati.
+
+**Resolved (2026-08-18) — reuse-dari-suggestion dan escape hatch checkbox saling mutually exclusive:** dua-duanya cuma 2 cara berbeda menuju hasil yang sama (link Finding ke Order existing), jadi tidak boleh aktif bersamaan — mencegah ambiguitas soal Order mana yang sebenarnya dituju kalau user sempat menyentuh keduanya.
+- **Trigger disable di titik SELEKSI, bukan di titik menjalankan search:** sekadar tap "Check Existing" (menjalankan search, lihat List Suggestion) **belum** men-disable checkbox — user masih boleh eksplorasi dulu. Begitu user **benar-benar memilih** 1 kandidat dari List Suggestion → checkbox "I confirm..." jadi **disabled**. Sebaliknya, begitu checkbox dicentang → button "Check Existing"/hasil pilihan yang sudah ada jadi **disabled**.
+- **Jalan balik eksplisit, bukan cuma disabled tanpa penjelasan:** kalau user sudah pilih kandidat lalu berubah pikiran mau pakai escape hatch (atau sebaliknya), sediakan aksi eksplisit untuk **clear pilihan yang aktif** (mis. tombol/link "Change" atau "×" di samping ringkasan kandidat yang sudah dipilih) — begitu di-clear, kontrol yang tadinya disabled ikut ter-enable lagi. Konsisten dengan mekanisme "bisa re-run Check Existing setelah pilih kandidat" yang sudah didesain — cuma sekarang eksplisit juga meng-cover arah sebaliknya (dari escape hatch balik ke reuse-dari-suggestion).
+- **Butuh UI Designer** untuk visual persis disabled-state dan tombol "Change"/clear ini — behavior & trigger-nya sudah final di atas.
+
+**Resolved (2026-08-18, final — supersede draft sebelumnya) — untuk escape hatch ini, `ReuseOrderNumber` dibiarkan NULL, `ReuseSAPOrderNumber` yang diisi dengan SAP MO Number manual.** Draft awal sempat mengusulkan `ReuseOrderNumber` dipakai ganda (menyimpan SAP MO Number kalau tidak ada row lokal) — **dibalik** setelah dipertimbangkan lebih lanjut: lebih baik tiap field punya 1 arti konsisten di semua kondisi (`ReuseOrderNumber` = selalu reference lokal Digiman+ atau NULL, tidak pernah diisi nilai lain) daripada menghemat 1 kolom tapi bikin logic baca-nya harus selalu cek "field ini isinya nomor lokal atau nomor SAP?". Detail lengkap mekanisme 2-field ini (berlaku untuk **semua** kondisi kandidat, bukan cuma escape hatch) ada di [Poin 6](#poin-6-duplicate-atau-correlation-handling).
+
+**⚠️ Accepted Risk (2026-08-18, disempitkan setelah resolusi TECO/GI di atas) — declare `NoPartsRequired` di escape hatch ini murni self-declared, tidak terverifikasi ke SAP:** karena Order-nya dibuat di luar Digiman+, tidak ada cara sistem memvalidasi apakah declare user (termasuk `NoPartsRequired`) cocok dengan kondisi asli Order tersebut di SAP. **Konsekuensinya sekarang lebih ringan** dari draft awal — dengan resolusi TECO/GI ([lihat di atas](#poin-1-trigger-dan-ui-create-defect-atau-crack)), Digiman+ tidak lagi mencoba "menebak aman atau tidak" dari `NoPartsRequired` sebelum trigger TECO — TECO **selalu** dicoba di titik yang sama, SAP sendiri yang menolak kalau belum siap (GI belum ada), retry existing yang tangani. Jadi salah declare `NoPartsRequired` **tidak lagi** menyebabkan TECO premature ke SAP — paling jauh cuma bikin call itu gagal & retry sampai SAP benar-benar siap, bukan operasional yang salah.
+
+**Sisa risiko yang genuinely diterima:** cuma di sisi **UX/data entry** — Material section (tampil/tersembunyi, mandatory minimal 1 baris) mengikuti declare user yang mungkin salah, dan record `NoPartsRequired` di Digiman+ bisa tidak match kondisi asli di SAP untuk keperluan reporting/audit trail. **Keputusan (2026-08-18, prinsip umum, berlaku juga ke kasus lain yang serupa — mis. Material hasil derive dari `CheckPartOrder` untuk kandidat Broader Match):** sistem **tidak pernah block submit** berdasarkan mismatch antara declare user dan data lain (SAP atau sumber lain manapun) — **dua arah**, baik "user bilang tidak butuh material tapi ternyata di SAP ada" maupun sebaliknya. Alasan: blocking di lapangan lebih berbahaya daripada membiarkan mismatch tercatat — mechanic yang paling tahu kondisi fisik saat itu, dan **Order Approval (Planner) jadi gate final** untuk menangkap kesalahan sebelum benar-benar dieksekusi/di-push, bukan validasi sistem otomatis.
+
 **Resolved (2026-08-15):** mekanisme consumer-nya **sama persis** dengan "eMOL vehicle approval" untuk Sub-kasus A ([Poin 5](#poin-5-data-flow-defect-dan-crack)) — consumer create eMOL baru (full snapshot, isinya dari input manual user karena Digiman+ tidak punya data lain), lewat Planner approval seperti biasa, post-approval **skip sync SAP normal** (supaya tidak create MO baru yang duplicate dengan yang sudah ada di SAP), trigger `BacklogExecutionList` — bedanya cuma `MONumber`-nya **selalu** dari input manual (bukan kondisional seperti Sub-kasus A yang bisa derive dari `MONo` existing).
 
 ~~Open item: scope correlation untuk **Crack** tidak bisa dibatasi cuma jalan saat `IsImmediateExecutable=Yes` seperti Defect — dibahas detail nanti pas sesi Crack.~~ — **resolved (2026-08-15)**: sudah dijawab di [Crack Order Lifecycle](#poin-5-data-flow-defect-dan-crack) — setelah revisi correlation jalan di kedua kondisi `IsImmediateExecutable`, open item ini otomatis resolved, Crack journey sama dengan Defect journey.
@@ -289,17 +354,23 @@ Scope: **Defect saja** — Crack dibahas terpisah nanti (skenarionya beda, lihat
 
 Screen yang muncul saat correlation match ketemu ([Poin 6](#poin-6-duplicate-atau-correlation-handling)), sebelum user pilih mana yang mau di-reuse.
 
-**Catatan (2026-08-17):** tampilan visual screen ini (layout, styling per baris kandidat, dkk) **butuh UI designer** untuk finalisasi — kolom/data/behavior (sourcing, selection, badge match quality) sudah didefine lengkap di bawah, tinggal dieksekusi visualnya.
+**Catatan (2026-08-17):** tampilan visual screen ini (layout, styling per baris kandidat, dkk) **butuh UI designer** untuk finalisasi — kolom/data/behavior (sourcing, selection, pengelompokan 2 section) sudah didefine lengkap di bawah, tinggal dieksekusi visualnya.
 
-**Kolom per baris kandidat:**
+**Pengelompokan (2026-08-18, resolved):** kandidat ditampilkan dalam **2 section terpisah** (bukan 1 list digabung) — section **"Precise Match"** lalu section **"Broader Match"** di bawahnya — sesuai jalur search yang menemukan kandidat itu ([lihat fix di Poin 6](#poin-6-duplicate-atau-correlation-handling)). Layout persis 2 section ini (label, empty state per section) **butuh UI Designer**.
+
+**Resolved (2026-08-18) — search/filter dalam list, dan SAP MO Number tetap tampil setelah kandidat dipilih:**
+- **Search/filter** — di dalam kandidat yang sudah ketemu (hasil precise/broader-match), user bisa ketik sebagian **Order Number** atau **MO Number** untuk mempersempit tampilan list. Ini murni filter client-side atas hasil yang sudah di-fetch — **bukan** lookup baru ke luar hasil correlation yang sudah ada (beda dari escape hatch, yang memang untuk kasus di luar hasil search).
+- **Awareness setelah pilih** — begitu kandidat dipilih & user kembali ke layar "Defect Identified", **SAP MO Number kandidat itu (kalau ada) tetap ditampilkan** di section Order Type/Activity Type/Material (bukan cuma sempat kelihatan di List Suggestion lalu hilang) — supaya user (dan approver nanti di View Detail Order) tetap aware Order SAP mana persisnya yang di-reuse, walau field-nya read-only.
+- **Butuh UI Designer** untuk layout search box dan penempatan tampilan SAP MO Number di layar utama.
+
+**Kolom per baris kandidat (berlaku di kedua section):**
 
 | Kolom | Sumber | Catatan |
 |---|---|---|
-| Order Number | `PoolingMOItem.EMOLNumber` | Sama value dengan `MechanicOrderList.Number` (join key existing, lihat [order-emol-sap-sync.md](../../architecture/inspection-order/order-emol-sap-sync.md#52-bc-update-jika-ada-create-jika-tidak-ada--insert-ke-poolingmoitem)) — tidak perlu join balik ke `MechanicOrderList`. Kosong untuk kandidat case 3 (`MOOpen`-only, lihat di bawah) karena `MOOpen` tidak punya field ini — terkait gap [Poin 13](order-integration-checklist.md#fase-e--integrasi). |
+| Order Number | `PoolingMOItem.EMOLNumber` | Sama value dengan `MechanicOrderList.Number` (join key existing, lihat [order-emol-sap-sync.md](../../architecture/inspection-order/order-emol-sap-sync.md#52-bc-update-jika-ada-create-jika-tidak-ada--insert-ke-poolingmoitem)) — tidak perlu join balik ke `MechanicOrderList`. Kosong untuk kandidat di section Broader Match (`MOOpen`-only, lihat di bawah) karena `MOOpen` tidak punya field ini — terkait gap [Poin 13](order-integration-checklist.md#fase-e--integrasi). |
 | MO Number | `MOOpen.MONumber` (join by `MONo`) | Kosong/dash kalau belum sync ke SAP. |
 | Deskripsi Order | Lihat aturan sourcing Deskripsi di bawah | — |
 | Status Order | Lihat aturan sourcing Status di bawah | — |
-| Badge match quality **(baru, 2026-08-14)** | Ditentukan jalur search mana yang nemuin kandidat ini (lihat [fix di Poin 6](#poin-6-duplicate-atau-correlation-handling)) | **"Precise match"** (lolos filter Component/SubComponent/DamageCode) vs **"Broader match — Asset & Site only"** (kandidat `MOOpen`-only, cuma match by Asset Number + Site Code) — supaya user tahu tingkat kepercayaan match-nya sebelum pilih. |
 | — | Button **"View Detail Order"** | Isi/layout detail-nya belum dibahas. |
 
 **Selection:** single-select (radio) — user cuma bisa pilih **satu** Order untuk direuse. Kalau ketemu kandidat tapi tidak ada yang relevan/mau di-reuse — **tidak ada tombol eksplisit "buat baru"**, user cukup **skip/back** dari screen ini, lanjut ke section Order Type/Activity Type/Part manual/editable seperti cabang "tidak ketemu" (2026-08-14). **Resolved (2026-08-17):** skip/back ini **andalkan back/close navigation device/app** — bukan tombol eksplisit "None of these match" terpisah.
@@ -485,7 +556,7 @@ Berbeda dari mekanisme existing hari ini (Order Type diisi user langsung di scre
 
 **Kenapa harus skip `PoolingMOItem` untuk reuse — mencegah duplicate candidate di suggestion (2026-08-15):** kalau eMOL reuse ini ikut masuk `PoolingMOItem` lewat jalur normal, dia bakal punya Component/SubComponent/DamageCode **identik** dengan Order lama yang di-reuse — otomatis nongol lagi sebagai kandidat terpisah di [List Suggestion](#ui-view-detail--list-suggestion-order-lama-2026-08-14) untuk defect berikutnya, persis masalah duplicate yang [Poin 6](#poin-6-duplicate-atau-correlation-handling) coba hindari. Karena tidak pernah masuk `PoolingMOItem`, gap ini tertutup dengan sendirinya.
 
-**SAP MO Number manual — sekarang dipakai di titik `BacklogExecutionList`, bukan langsung dari Finding:** kalau `MONo` Order lama NULL + butuh material (mandatory field, sudah dibahas di atas), nilai manual ini disimpan di `TaskPersonalizedFinding` → propagate ke eMOL reuse → dipakai sebagai `MONumber` saat create `BacklogExecutionList` post-approval (karena kolom itu **not null**).
+**`ReuseSAPOrderNumber` (sebelumnya "SAP MO Number manual") — dipakai di titik `BacklogExecutionList`, bukan langsung dari Finding:** kalau `MONo` Order lama NULL + butuh material (mandatory field, sudah dibahas di atas), nilai manual ini disimpan di `TaskPersonalizedFinding` → propagate ke eMOL reuse → dipakai sebagai `MONumber` saat create `BacklogExecutionList` post-approval (karena kolom itu **not null**). Sourcing lengkap `MONumber` ini (kapan pakai `ReuseSAPOrderNumber` langsung vs lookup lewat `ReuseOrderNumber`) — [lihat Poin 6](#poin-6-duplicate-atau-correlation-handling).
 
 **Skema final kolom baru `MechanicOrderList` untuk Order Type/Activity Type (2026-08-15, resolved):** berlaku untuk **semua** eMOL Phase 2 (create baru maupun reuse-vehicle), bukan cuma reuse.
 
@@ -612,8 +683,8 @@ Konsolidasi semua field mapping yang sudah dibahas terpisah-pisah di atas, jadi 
 | `OrderTypeName` | 🆕 | `OrderTypeName` | 🆕 | — |
 | `ActivityTypeCode` | 🆕 | `ActivityTypeCode` | 🆕 | — |
 | `ActivityTypeName` | 🆕 | `ActivityTypeName` | 🆕 | — |
-| `ReuseOrderNumber` | 🆕 | `ReuseOrderNumber` | 🆕 | Marker vehicle-approval eMOL, [lihat mekanisme](#poin-5-data-flow-defect-dan-crack). |
-| `SAPMONumber` (manual) | 🆕 | — (tidak langsung) | — | Tidak propagate langsung ke `MechanicOrderList` — dipakai sebagai `BacklogExecutionList.MONumber` post-approval, **dan** update balik `PoolingMOItem`/`SAPMOSyncOrder` milik Order **lama** yang di-reuse ([lihat konsekuensi consumer](#poin-1-trigger-dan-ui-create-defect-atau-crack)). |
+| `ReuseOrderNumber` | 🆕 | `ReuseOrderNumber` | 🆕 | Reference ke `MechanicOrderList.Number` lokal — **cuma terisi kalau kandidatnya punya row lokal** (precise-match candidate). NULL untuk kandidat `MOOpen`-only atau escape hatch. Bareng `ReuseSAPOrderNumber`, salah satunya non-NULL = marker vehicle-approval eMOL — [lihat mekanisme lengkap di Poin 6](#poin-6-duplicate-atau-correlation-handling). |
+| `ReuseSAPOrderNumber` (sebelumnya `SAPMONumber`) | 🆕 | — (tidak langsung) | — | Nomor MO SAP — isinya beda sumber tergantung kondisi kandidat (manual/auto-derive, [lihat Poin 6](#poin-6-duplicate-atau-correlation-handling)). Tidak propagate langsung ke `MechanicOrderList` — dipakai sebagai `BacklogExecutionList.MONumber` post-approval, **dan** update balik `PoolingMOItem`/`SAPMOSyncOrder` milik Order **lama** yang di-reuse ([lihat konsekuensi consumer](#poin-1-trigger-dan-ui-create-defect-atau-crack)). |
 | `NoPartsRequired` | 🆕 | `NoPartsRequired` | ✅ | Companion existing column di Order side. |
 | `DeleteNotes` | ✅ | `DeleteReason` | ✅ | Nama kolom beda, soft-delete reason ([Poin 8](#poin-8-cancel-atau-delete-finding)). |
 | `IsActive` | ✅ | `IsActive` | ✅ | Soft-delete flag, cascade juga ke `MechanicOrderSummary` + semua child table ([Poin 8](#poin-8-cancel-atau-delete-finding)). |
@@ -692,11 +763,11 @@ Foundational untuk keputusan reuse-Order di [Crack Order Lifecycle](#poin-5-data
 
 **Gap ditemukan & fixed — kandidat `MOOpen`-only tidak pernah bisa lolos filter Component/SubComponent/DamageCode (2026-08-14):** mekanisme search di atas (filter by Component+SubComponent+DamageCode) secara teknis butuh join ke `PoolingMOItem` (satu-satunya sumber field-field itu) — akibatnya kandidat yang **cuma ada di `MOOpen`** (tidak ada `PoolingMOItem`-nya, mis. skenario MO Backlog re-entry SAP, [Poin 13](order-integration-checklist.md#fase-e--integrasi)) **tidak akan pernah lolos filter ini**, karena `MOOpen` (data murni dari SAP) tidak punya Component/SubComponent/DamageCode sama sekali. "Case 3" yang tercatat di description-sourcing [List Suggestion Order Lama](#ui-view-detail--list-suggestion-order-lama-2026-08-14) sebelumnya jadi **dead path** kalau tidak diperbaiki.
 
-**Fix — 2 jalur search terpisah, digabung tapi ditandai beda:**
+**Fix — 2 jalur search terpisah, ditampilkan sebagai 2 section terpisah:**
 1. **Jalur precise-match** (existing) — filter Asset+Component+SubComponent+DamageCode via join `PoolingMOItem`.
-2. **Jalur `MOOpen`-only** (baru) — filter by **Asset Number + Site Code** (sinyal jauh lebih lemah, karena `MOOpen` tidak punya data defect spesifik apapun untuk match lebih presisi).
+2. **Jalur broader-match** (baru) — filter cuma by **Asset Number + Site Code** (sinyal jauh lebih lemah, tidak coba match defect spesifik). **Dijalankan ke `PoolingMOItem` (`Equipment`+`SiteId`, filter longgar) DAN ke `MOOpen` (`AssetNumber`+`SiteCode`) sekaligus** — bukan cuma `MOOpen`. **Koreksi (2026-08-18):** `PoolingMOItem` punya kolom `Equipment`/`SiteId`, jadi kandidat yang **punya row lokal tapi tidak match presisi by defect** (Component/SubComponent/DamageCode beda dari defect yang lagi dicari) juga bisa muncul di section Broader Match, bukan eksklusif kandidat `MOOpen`-only. Hasil jalur ini **exclude kandidat yang sudah muncul di jalur precise-match** (supaya tidak dobel tampil di 2 section).
 
-Kedua jalur hasilnya **digabung ke 1 list yang sama** di [List Suggestion Order Lama](#ui-view-detail--list-suggestion-order-lama-2026-08-14), tapi kandidat dari jalur ke-2 **ditandai visual beda** (mis. badge "broader match"/"Asset only") — supaya user sadar ini bukan match presisi by defect, perlu divalidasi lebih hati-hati sebelum dipilih (konsisten prinsip "manusia yang validasi final", tapi dengan sinyal kepercayaan yang jujur ke user).
+**Resolved (2026-08-18) — presentasi 2 section, bukan 1 list digabung:** di [List Suggestion Order Lama](#ui-view-detail--list-suggestion-order-lama-2026-08-14), kandidat dari kedua jalur **dikelompokkan spasial jadi 2 section terpisah** (mis. section "Precise Match" lalu section "Broader Match" di bawahnya) — bukan 1 list ter-interleave dengan badge inline saja. Lebih jelas secara visual buat user langsung tahu tingkat kepercayaan tiap grup tanpa perlu baca badge satu-satu, tetap konsisten dengan prinsip "manusia yang validasi final". **Butuh UI Designer** untuk layout persis 2 section ini (termasuk badge/label per section, empty state kalau salah satu section kosong).
 
 **Yang berubah di Order lama kalau ketemu match (2026-08-13, final 2026-08-15 setelah beberapa kali revisi):** **tidak ada field `MechanicOrderList` LAMA yang diubah langsung.** Yang terjadi: eMOL **baru** dibentuk (snapshot data dari Order lama, jadi "vehicle" buat lewat Planner approval — safety net atas keputusan reuse), lalu **post-approval** trigger mekanisme "eksekusi MO Backlog" existing (create `BacklogExecutionList` di `maintenance-execution`, mengarah ke Order **lama**, TECO ke SAP jalan lewat pipeline yang sudah ada) — bukan sync SAP sebagai MO baru buat eMOL vehicle itu sendiri (supaya tidak duplicate). Detail lengkap ada di [Poin 1](#poin-1-trigger-dan-ui-create-defect-atau-crack) (Sub-kasus A) & [Poin 5](#poin-5-data-flow-defect-dan-crack).
 
@@ -743,6 +814,36 @@ MechanicOrderList (Finding/Order asal, + DamageCode dkk via MechanicOrderDetail)
 
 **Resolved (2026-08-17):** ya — `MechanicOrderList.IsActive=0` (soft-delete, [lihat Poin 8](#poin-8-cancel-atau-delete-finding)) adalah state yang harus dikecualikan dari "open" meski `MONo` masih NULL. Filter kandidat correlation/candidate-scope perlu tambahan syarat `IsActive=1`, bukan cuma soal `MONo` terisi/tidak.
 
+#### `ReuseOrderNumber` & `ReuseSAPOrderNumber` — Mekanisme Lengkap Lintas Semua Kondisi Kandidat (2026-08-18, resolved)
+
+Konsolidasi keputusan yang tersebar (Poin 1, di sini, dan diskusi List Suggestion) jadi 1 acuan — supaya konsisten dipakai developer terlepas kandidatnya ketemu lewat jalur mana.
+
+**⚠️ Koreksi penting (2026-08-18) — determinannya "`PoolingMOItem` ada atau tidak", BUKAN "section Precise Match vs Broader Match":** sempat disederhanakan seolah section (badge) yang menentukan sourcing data — **itu keliru**. `PoolingMOItem` punya kolom `Equipment`/`SiteId`, jadi query broader-match (Asset+Site saja) dijalankan ke **`PoolingMOItem` juga**, bukan cuma `MOOpen` ([lihat fix di atas](#poin-6-duplicate-atau-correlation-handling)). Konsekuensinya: kandidat yang tampil di section **Broader Match** bisa saja tetap **punya row `PoolingMOItem`** (cuma tidak match presisi by defect code) — beda dari kandidat yang genuinely `MOOpen`-only (tidak punya `PoolingMOItem` sama sekali). Section di UI itu soal **tingkat kepercayaan match** (buat user), sourcing data (`ReuseOrderNumber`, Material) soal **ada tidaknya `PoolingMOItem`** — 2 hal yang independen, jangan disamakan.
+
+**Prinsip dasar — 2 field, masing-masing 1 arti tetap, tidak pernah dobel makna:**
+
+| Field | Arti | Terisi kalau |
+|---|---|---|
+| `ReuseOrderNumber` | Reference ke `MechanicOrderList.Number` **lokal** Digiman+ | Kandidat yang dipilih **punya row `PoolingMOItem`** — terlepas ketemu lewat jalur precise-match atau broader-match. NULL kalau tidak ada row `PoolingMOItem`. |
+| `ReuseSAPOrderNumber` | Nomor MO **SAP** | Tergantung kondisi — lihat tabel per-kasus di bawah. |
+
+**Per kondisi kandidat (determinan: keberadaan `PoolingMOItem`, bukan section list):**
+
+| Kondisi | Bisa muncul di section | `ReuseOrderNumber` | `ReuseSAPOrderNumber` | Order Type/Activity Type/Material |
+|---|---|---|---|---|
+| `PoolingMOItem` ada, match presisi by defect code | Precise Match saja | `MechanicOrderList.Number` | Kosong kalau `MONo` sudah ada — **manual, mandatory** kalau `MONo` masih NULL **dan** butuh material (gap 2026-08-14 di atas), opsional kalau tidak butuh material. | Read-only, derived dari `MechanicOrderDetail`/`MechanicOrderMaterial` (normal). |
+| `PoolingMOItem` ada, TIDAK match presisi (cuma match Asset+Site) | Broader Match saja | `MechanicOrderList.Number` (**sama seperti baris di atas** — row lokal-nya tetap ada) | Sama seperti baris di atas — mandatory-nya tidak berubah karena posisi section. | Read-only, derived dari `MechanicOrderDetail`/`MechanicOrderMaterial` (**normal, sama seperti precise-match** — bukan `CheckPartOrder`). |
+| `PoolingMOItem` tidak ada sama sekali, `MOOpen` ada | Broader Match saja (satu-satunya cara ketemu) | **NULL** (tidak ada row lokal untuk direferensikan) | **Auto-derive dari `MOOpen.MONumber`** — tidak perlu input manual. | Order Type/Activity Type read-only dari `MOOpen`. Material coba dari `CheckPartOrder` (join `MONumber`) — read-only kalau ada row, **fallback manual/editable** kalau tidak ada ([detail di bawah](#poin-6-duplicate-atau-correlation-handling)). |
+| Keduanya tidak ada, tapi user tahu ada di SAP | — (escape hatch, bukan dari list) | **NULL** | **Manual oleh user** (mandatory saat checkbox dicentang, [lihat Poin 1](#poin-1-trigger-dan-ui-create-defect-atau-crack)). | Manual semua (tidak ada yang bisa di-derive). |
+| Keduanya tidak ada, genuinely Order baru | — (bukan kandidat) | NULL | NULL | Manual/editable (Order baru genuine). |
+
+**Consumer logic (post-approval):**
+- **Marker "ini eMOL reuse/vehicle-approval"**: `ReuseOrderNumber IS NOT NULL` **OR** `ReuseSAPOrderNumber IS NOT NULL` — bukan cek 1 field saja.
+- **Sourcing `BacklogExecutionList.MONumber`**: kalau `ReuseSAPOrderNumber` terisi → pakai itu langsung. Kalau tidak (berarti `ReuseOrderNumber` yang terisi, `MONo` Order lama sudah diketahui) → lookup `MechanicOrderList` via `ReuseOrderNumber` → ambil `SAPMOSyncOrder.MONo`-nya.
+- **Update balik ke Order lama** (isi `MONo` yang tadinya NULL) — cuma applicable kalau ada row `PoolingMOItem` untuk di-update (baris 1 & 2 di tabel atas). Tidak applicable untuk kandidat `MOOpen`-only maupun escape hatch (tidak ada row lokal yang perlu di-update).
+
+**Resolved (2026-08-18) — Order Type/Activity Type/Material untuk kandidat genuinely `MOOpen`-only (tidak punya `PoolingMOItem` sama sekali):** `MOOpen` punya `CostTypeCode` (Order Type) dan `MaintenanceCategoryCode`/`Name` (Activity Type) — 2 field itu **read-only-derived** dari `MOOpen`. Material coba di-derive dari tabel **`CheckPartOrder`** (`maintenance-order`, sync dari SAP sama seperti `MOOpen`, join by `MONumber`) — kalau ada row, tampil **read-only**. **Kalau `CheckPartOrder` tidak ada row untuk `MONumber` itu** (ambigu — genuinely tidak butuh material, atau cuma belum sempat sync) — Material section **fallback ke manual/editable** (sama seperti escape hatch/tidak-ketemu), user declare sendiri (`NoPartsRequired` dicentang, atau isi material manual). **Alasan (dari user):** tidak masalah secara UX kalau data memang tidak bisa di-derive — user tetap bisa lanjut submit lewat jalur declare manual, konsisten dengan [prinsip accepted-risk](#poin-1-trigger-dan-ui-create-defect-atau-crack) bahwa sistem tidak pernah block submit karena data tidak lengkap/mismatch — Order Approval jadi gate final. **Tidak berlaku** untuk kandidat Broader Match yang tetap punya `PoolingMOItem` (baris 2 tabel di atas) — itu tetap pakai derivasi normal dari `MechanicOrderMaterial`, tidak butuh `CheckPartOrder`.
+
 ### Poin 7: Editability Window Sebelum Approval
 
 **Resolved (2026-08-15):** ya, mechanic **bisa edit** Finding miliknya sendiri (mis. salah ketik Defect Notes) setelah submit, tapi sebelum diproses Planner. Entry-point-nya **sama** dengan [tampilan post-submit](#current-state--mobile-app-ui-v400) — tap icon kaca pembesar (model 3-state — merah/oranye solid sesuai warna Condition saat sudah submitted, [lihat detail](#current-state--mobile-app-ui-v400)) di row **Form Task** (bukan "Bank Task"/"Task" — [lihat koreksi terminologi](#current-state--mobile-app-ui-v400)), navigasi balik ke screen "Defect Identified" yang sudah terisi — **detail behavior begitu landing di-refine di bawah (2026-08-17)**, tidak selalu "langsung editable" seperti draft awal kalimat ini.
@@ -768,6 +869,8 @@ MechanicOrderList (Finding/Order asal, + DamageCode dkk via MechanicOrderDetail)
 **Catatan (2026-08-17) — butuh UI designer:** behavior & placement di atas sudah didefine lengkap, tampilan visual persis (styling badge/chip, layout Edit/Delete button, transisi view↔edit) **belum ada, perlu UI designer** untuk finalisasi — konsisten pola note lain di dokumen ini.
 
 **Resolved (2026-08-17) — edit BISA mengubah pilihan reuse Order lama, bukan cuma field non-Order:** confirmed — selama masih dalam window edit (belum lock, [lihat batas window di atas](#poin-7-editability-window-sebelum-approval)), user boleh re-run "Check Existing", ganti kandidat reuse yang sudah dipilih, batalkan reuse (jadi Order baru), atau sebaliknya (dari tidak-reuse jadi reuse) — **tidak dibatasi cuma field non-Order** seperti Defect Notes. Konsekuensi: setiap kali `ReuseOrderNumber` berubah lewat edit, berlaku validasi ulang yang sama dengan submit pertama kali (kandidat harus masih `IsActive=1` di titik submit-edit, [terkait langsung ke edge case validasi stale-candidate](#poin-6-duplicate-atau-correlation-handling)) — bukan cuma dicek sekali di awal.
+
+**Resolved (2026-08-18) — mekanisme ganti kandidat reuse ke `TaskPersonalizedFindingMaterial`: hard delete baris lama, insert ulang (bukan diff/update per-baris):** begitu user ganti kandidat reuse (atau batalkan reuse jadi manual, atau sebaliknya), seluruh row `TaskPersonalizedFindingMaterial` lama untuk Finding itu **dihapus (hard delete)**, lalu baris baru di-insert sesuai kandidat/isian yang baru. **Alasan:** Material 1-to-many dengan jumlah baris yang bisa beda-beda antar kandidat (mis. Order A 3 baris material, Order B 5 baris) — matching/diff per-baris antar kandidat lama vs baru tidak ada gunanya, baris lama cuma snapshot turunan dari kandidat yang sedang dipilih saat itu, bukan entitas yang perlu di-track individual. Konsisten dengan prinsip **simple-mechanism/full-overwrite** yang sudah dipegang di seluruh dokumen ini (mis. race condition last-write-wins tanpa merge/diff, [lihat Poin 5](#poin-5-data-flow-defect-dan-crack)) — **hard delete cukup**, tidak perlu soft-delete (`IsActive`/reason) untuk baris Material transisional ini, beda dari soft-delete Finding-level di [Poin 8](#poin-8-cancel-atau-delete-finding) yang memang butuh audit trail. **Berlaku simetris di consumer `maintenance-order`** saat event hasil edit di-consume — `MechanicOrderMaterial` lama untuk eMOL itu di-replace dengan pola yang sama (delete+reinsert), bukan diff per-baris.
 
 **Catatan — batasan scope vs Poin 10 (Reject/rework), bukan open item Poin 7 (2026-08-17):** Poin 7 di atas cuma cover mechanic **inisiatif sendiri** edit/delete Finding-nya (lewat Edit/Delete, [Poin 8](#poin-8-cancel-atau-delete-finding)) **sebelum** ada approver yang bertindak — sudah **fully resolved**, tidak ada open item tersisa untuk Poin 7 sendiri. **Poin 10 itu trigger yang beda sama sekali** — approver (Supervisor/Planner) **aktif menolak** Finding/Order saat review, bukan aksi mechanic — masih kosong total, open item-nya tercatat di **checklist item 10 sendiri**, bukan digantung di sini.
 
