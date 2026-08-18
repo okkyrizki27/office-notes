@@ -231,32 +231,69 @@ Aksinya: create `BacklogExecutionList` (`WorkOrderId` dari konteks Finding, `MON
 
 **Konsekuensi ke skema — field manual `ReuseSAPOrderNumber` cuma dibutuhkan untuk escape hatch:** untuk reuse dengan `PoolingMOItem`, field ini **tidak pernah** diisi manual — kalau `MONo` sudah diketahui, otomatis lengkap; kalau belum, submit di-block duluan (poin 2 di atas), jadi tidak ada state "submit lolos tapi field-nya kosong" yang perlu ditutup manual. Manual input **cuma** dibutuhkan untuk **escape hatch** (Order yang genuinely tidak pernah masuk Digiman+, tidak ada mekanisme sync/scheduler apa pun yang bisa diandalkan di situ).
 
-**Matriks lengkap skenario TECO — A/B1/B2/Escape hatch (2026-08-15, tabel final 2026-08-18, `Sync Create MO` & `TECO` dipisah jadi 2 kolom karena beda titik waktu):**
+**Alur keputusan (2026-08-18, versi final — tabel di bawah adalah enumerasi literal dari alur ini, tidak ada logic tersembunyi yang perlu diinterpretasi):**
 
-| # | Jalur | `PoolingMOItem`? | Butuh Material? | `MONo` | `IsImmediateExecutable` | Kapan Trigger **Sync Create MO ke SAP** | Mekanisme Trigger **TECO ke SAP** | Detail |
+```
+IsImmediateExecutable = No
+  → TECO: Tidak ada (berlaku utk SEMUA Jalur, apapun kondisi lain)
+
+IsImmediateExecutable = Yes DAN Jalur = Reuse DAN MONoKnown = Ya
+  → Sync Create MO: Tidak pernah
+  → TECO: Immediate, final Order Approval
+
+IsImmediateExecutable = Yes DAN PoolingMOItem = Ada DAN MONoKnown = Tidak DAN ButuhMaterial = Ya
+  → Submit: Blocked (satu-satunya baris yang di-block di seluruh matriks)
+
+IsImmediateExecutable = Yes DAN PoolingMOItem = Ada DAN MONoKnown = Tidak DAN ButuhMaterial = Tidak
+  → Sync Create MO: Tidak pernah
+  → TECO: Immediate, begitu MONo confirmed (event-driven, tidak block submit)
+
+IsImmediateExecutable = Yes DAN Jalur = OrderBaru DAN ButuhMaterial = Tidak
+  → Sync Create MO: Final Order Approval
+  → TECO: Immediate, begitu MONo confirmed dari create-response
+
+IsImmediateExecutable = Yes DAN Jalur = OrderBaru DAN ButuhMaterial = Ya
+  → Sync Create MO: Final Order Approval
+  → TECO: Scheduler, 2x/hari dekat shift-end (satu-satunya baris yang pakai Scheduler)
+
+IsImmediateExecutable = Yes DAN Jalur = EscapeHatch
+  → Sync Create MO: Tidak pernah
+  → TECO: Immediate, final Order Approval
+```
+
+**Tabel — 20 baris, tiap kolom selalu diisi nilai konkret (tidak ada "N/A"/"tidak relevan" untuk dimensi yang sebenarnya punya nilai):**
+
+| # | Jalur | `PoolingMOItem` | `MOOpen` | ButuhMaterial | MONoKnown | IsImmediateExecutable | Sync Create MO ke SAP | TECO ke SAP |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Reuse | Ada | Tidak | — | `Yes` | Tidak pernah (skip total, reuse Order lama) | **After Fully Approved** | Final Order Approval selesai |
-| 2 | Reuse | Ada | Tidak | — | `No` | Tidak pernah | — | Tidak ada — Order lama tetap open, jalan normal via siklusnya sendiri |
-| 3 | Reuse | Ada | Ya | Sudah diketahui | `Yes` | Tidak pernah | **After Fully Approved** | Final Order Approval selesai |
-| 4 | Reuse | Ada | Ya | Sudah diketahui | `No` | Tidak pernah | — | Tidak ada — Order lama tetap open |
-| 5 | Reuse | Ada | Ya | **NULL** | `Yes` | Tidak pernah | — | **Tidak applicable** — submit di-block sebelum sampai approval |
-| 6 | Reuse | Ada | Ya | NULL | `No` | Tidak pernah | — | Tidak ada — Order lama tetap open |
-| 7 | Reuse | Tidak ada (`MOOpen`-only) | Tidak relevan | Selalu ada | `Yes` | Tidak pernah | **After Fully Approved** | Final Order Approval selesai |
-| 8 | Reuse | Tidak ada | Tidak relevan | Selalu ada | `No` | Tidak pernah | — | Tidak ada — Order lama tetap open |
-| 9 | Order baru (B1) | N/A | Tidak | — | `Yes` | **Begitu Order Approval final** (create) | **After Fully Approved** | Sekaligus dengan create (close bareng) |
-| 10 | Order baru (B1) | N/A | Tidak | — | `No` | Begitu Order Approval final | — | Tidak ada — jadi backlog biasa, dieksekusi manual kapan pun via mekanisme existing |
-| 11 | Order baru (B2) | N/A | Ya | Belum ada | `Yes` | Begitu Order Approval final | **Scheduler** | Begitu `MONo` confirmed & shift-end check berikutnya |
-| 12 | Order baru (B2) | N/A | Ya | Belum ada | `No` | Begitu Order Approval final | — | Tidak ada — jadi backlog biasa, dieksekusi manual kapan pun via mekanisme existing |
-| 13 | Escape hatch | N/A | Declare tidak | Selalu ada (manual) | `Yes` | Tidak pernah | **After Fully Approved** | Final Order Approval selesai |
-| 14 | Escape hatch | N/A | Declare tidak | Selalu ada | `No` | Tidak pernah | — | Tidak ada — Order tetap open apa adanya |
-| 15 | Escape hatch | N/A | Declare ya | Selalu ada | `Yes` | Tidak pernah | **After Fully Approved** | Final Order Approval selesai (⚠️ **Accepted Risk**, declare `NoPartsRequired` tidak terverifikasi ke SAP) |
-| 16 | Escape hatch | N/A | Declare ya | Selalu ada | `No` | Tidak pernah | — | Tidak ada — Order tetap open apa adanya |
+| 1 | Reuse | Ada | Tidak ada | Tidak | Ya | Yes | Tidak pernah | Immediate — final Order Approval |
+| 2 | Reuse | Ada | Tidak ada | Tidak | Ya | No | Tidak pernah | Tidak ada |
+| 3 | Reuse | Ada | Tidak ada | Tidak | Tidak | Yes | Tidak pernah | Immediate — begitu MONo confirmed |
+| 4 | Reuse | Ada | Tidak ada | Tidak | Tidak | No | Tidak pernah | Tidak ada |
+| 5 | Reuse | Ada | Tidak ada | Ya | Ya | Yes | Tidak pernah | Immediate — final Order Approval |
+| 6 | Reuse | Ada | Tidak ada | Ya | Ya | No | Tidak pernah | Tidak ada |
+| 7 | Reuse | Ada | Tidak ada | Ya | Tidak | Yes | Tidak pernah | **Blocked di submit** |
+| 8 | Reuse | Ada | Tidak ada | Ya | Tidak | No | Tidak pernah | Tidak ada |
+| 9 | Reuse | Tidak ada | Ada | Tidak | Ya | Yes | Tidak pernah | Immediate — final Order Approval |
+| 10 | Reuse | Tidak ada | Ada | Tidak | Ya | No | Tidak pernah | Tidak ada |
+| 11 | Reuse | Tidak ada | Ada | Ya | Ya | Yes | Tidak pernah | Immediate — final Order Approval |
+| 12 | Reuse | Tidak ada | Ada | Ya | Ya | No | Tidak pernah | Tidak ada |
+| 13 | OrderBaru | Tidak ada | Tidak ada | Tidak | Tidak | Yes | Final Order Approval | Immediate — begitu MONo confirmed dari create-response |
+| 14 | OrderBaru | Tidak ada | Tidak ada | Tidak | Tidak | No | Final Order Approval | Tidak ada |
+| 15 | OrderBaru | Tidak ada | Tidak ada | Ya | Tidak | Yes | Final Order Approval | **Scheduler — 2x/hari dekat shift-end** |
+| 16 | OrderBaru | Tidak ada | Tidak ada | Ya | Tidak | No | Final Order Approval | Tidak ada |
+| 17 | EscapeHatch | Tidak ada | Tidak ada | Tidak | Ya | Yes | Tidak pernah | Immediate — final Order Approval |
+| 18 | EscapeHatch | Tidak ada | Tidak ada | Tidak | Ya | No | Tidak pernah | Tidak ada |
+| 19 | EscapeHatch | Tidak ada | Tidak ada | Ya | Ya | Yes | Tidak pernah | Immediate — final Order Approval ⚠ |
+| 20 | EscapeHatch | Tidak ada | Tidak ada | Ya | Ya | No | Tidak pernah | Tidak ada |
 
-**Poin kunci:**
-- "Sync Create MO ke SAP" **cuma pernah terjadi untuk Order baru genuine (baris 9–12)** — reuse & escape hatch tidak pernah membuat MO baru di SAP sama sekali (mencegah duplicate).
-- Mekanisme trigger **TECO ke SAP** hanya ada **dua jenis**: **After Fully Approved** (eager, langsung begitu final Order Approval selesai — baris 1, 3, 7, 9, 13, 15) atau **Scheduler** (baris 11 saja, karena `MONo` B2 belum tentu tersedia tepat saat approval final). Baris ber-`No` tidak trigger apa-apa (`—`).
-- Satu-satunya baris yang **submit-nya di-block** adalah **#5**.
-- Baris #10 & #12 (`No`) bukan mekanisme baru — itu backlog biasa yang sudah ada jalurnya (§9.2/9.3 existing).
+**Legend:**
+- `PoolingMOItem`/`MOOpen` = ada/tidaknya record di masing-masing tabel untuk kandidat Order ini. Untuk `Jalur=Reuse`, salah satu dari dua ini selalu `Ada` (sumber datanya harus dari salah satu). Untuk `OrderBaru` dan `EscapeHatch`, keduanya selalu `Tidak ada` (Order-nya belum tercatat di kedua tabel itu di titik ini).
+- `MONoKnown` = apakah SAP MO Number sudah confirmed di titik itu. Kalau `MOOpen=Ada` atau `Jalur=EscapeHatch`, selalu `Ya` (struktural, bukan variabel — MOOpen sumbernya data SAP yang sudah confirmed; escape hatch diisi manual oleh user). Kalau `Jalur=OrderBaru`, selalu `Tidak` (order-nya belum di-create). Kalau `PoolingMOItem=Ada`, genuinely bisa `Ya` atau `Tidak` (tergantung status sync SAP).
+- Baris 1–12 = disebut **Sub-kasus A** di bagian lain dokumen ini.
+- `OrderBaru` + `ButuhMaterial=Tidak` (baris 13–14) = disebut **B1**; `OrderBaru` + `ButuhMaterial=Ya` (baris 15–16) = disebut **B2**, di bagian lain dokumen ini.
+- ⚠ (baris 19) = **Accepted Risk** — declare `NoPartsRequired` tidak diverifikasi ke SAP.
+- `BacklogExecutionList.MONumber` NOT NULL → TECO tidak pernah terjadi sebelum `MONoKnown=Ya`. Baris 3, 13 ("Immediate — begitu MONo confirmed") menunggu event konfirmasi SAP dulu, baru trigger — bukan langsung di titik approval/create.
+- Scheduler (baris 15) mekanismenya: begitu `SAPMOSyncOrder.MONo` confirmed, insert row ke `BacklogExecutionList` (`MONumber` = `MONo` itu) → insert ini yang trigger TECO lewat §9.3 existing.
 
 **Resolved:**
 - ~~Scope kerja "sambungkan backend"~~ — **terjawab lengkap** lewat mekanisme di [Poin 5](#poin-5-data-flow-defect-dan-crack): menyimpan `TaskPersonalizedFinding`/`TaskPersonalizedFindingMaterial`/`CrackIdentified`, publish ke topic, DAN trigger create `MechanicOrderSummary`/`MechanicOrderList` (baik create-baru maupun reuse-vehicle) — bukan cuma menyimpan Finding saja. **Koreksi (2026-08-17):** klaim "lengkap" ini sebelumnya cuma benar untuk sisi `maintenance-execution` — `CrackIdentified` ternyata tidak punya tujuan di `maintenance-order` sama sekali (gap, [lihat detail di Poin 5](#poin-5-data-flow-defect-dan-crack)), baru resolved sekarang dengan tabel baru `MechanicOrderCrackIdentified`.

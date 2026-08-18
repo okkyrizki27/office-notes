@@ -10,42 +10,43 @@
 
   .eyebrow { font-size: 9.5pt; font-weight: 700; color: #2c5f8a; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 6px; }
   h1 { font-size: 17pt; color: #1f3a5f; border-bottom: 3px solid #1f3a5f; padding-bottom: 8px; margin: 0 0 4px; }
-  .subtitle { font-size: 10.2pt; color: #556; margin: 0 0 16px; line-height: 1.5; }
+  .subtitle { font-size: 10.2pt; color: #556; margin: 0 0 14px; line-height: 1.5; }
 
-  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 8.3pt; margin: 10px 0 18px; line-height: 1.38; }
+  .flow { background: #1f2937; color: #d1e0f0; font-family: Consolas, monospace; font-size: 8.4pt; line-height: 1.65; padding: 14px 18px; border-radius: 8px; margin: 0 0 16px; white-space: pre; }
+  .flow b { color: #7ec8f0; }
+
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9pt; margin: 0 0 16px; line-height: 1.4; }
   th { background: #1f3a5f; color: #fff; padding: 7px 6px; text-align: left; font-weight: 600; word-wrap: break-word; }
   td { padding: 6px 6px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
   tr { page-break-inside: avoid; }
   tr:nth-child(even) td { background: #f4f7fa; }
 
-  col.c-num { width: 3%; }
-  col.c-jalur { width: 11%; }
-  col.c-pool { width: 11%; }
-  col.c-mat { width: 9%; }
-  col.c-mono { width: 9%; }
-  col.c-imm { width: 8%; }
-  col.c-sync { width: 15%; }
-  col.c-mech { width: 10%; }
-  col.c-detail { width: 24%; }
+  col.c-num { width: 4%; }
+  col.c-jalur { width: 17%; }
+  col.c-mat { width: 12%; }
+  col.c-mono { width: 11%; }
+  col.c-imm { width: 12%; }
+  col.c-sync { width: 20%; }
+  col.c-teco { width: 24%; }
 
-  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 7.6pt; font-weight: 700; letter-spacing: 0.2px; }
-  .tag-afa { background: #eaf6ee; color: #1e8449; }
-  .tag-sched { background: #f7f0fa; color: #6c3483; }
-  .tag-none { color: #999; }
-  .tag-block { background: #fdecea; color: #c0392b; }
+  .v-yes { color: #1e8449; font-weight: 700; }
+  .v-no { color: #999; }
+  .tag-block { background: #fdecea; color: #c0392b; font-weight: 700; padding: 2px 8px; border-radius: 10px; font-size: 8.3pt; }
+  .tag-sched { background: #f7f0fa; color: #6c3483; font-weight: 700; padding: 2px 8px; border-radius: 10px; font-size: 8.3pt; }
+  .v-none { color: #999; }
 
-  .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 13px 16px; border-radius: 0 6px 6px 0; margin: 4px 0 0; line-height: 1.55; font-size: 9.3pt; }
-  .callout-label { font-weight: 700; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 7px; }
+  .callout { border-left: 5px solid #2c5f8a; background: #eef3f8; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 0 0 14px; line-height: 1.55; font-size: 9pt; }
+  .callout-label { font-weight: 700; font-size: 8.6pt; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5f8a; margin-bottom: 6px; }
   .callout ul { margin: 4px 0 0; padding-left: 18px; }
-  .callout li { margin: 5px 0; }
+  .callout li { margin: 4px 0; }
 
   code { background: #f0f2f5; color: #1a1a1a; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 8pt; }
 
-  .footer { margin-top: 16px; font-size: 8.3pt; color: #999; text-align: center; border-top: 1px solid #ddd; padding-top: 8px; }
+  .footer { margin-top: 10px; font-size: 8.3pt; color: #999; text-align: center; border-top: 1px solid #ddd; padding-top: 8px; }
 
   @media print {
     th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .tag, .callout { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .flow, .callout, .tag-block, .tag-sched { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
@@ -53,52 +54,82 @@
 
 <div class="eyebrow">Digiman+ &middot; Phase 2 Order Integration</div>
 <h1>Matriks Trigger Sync Create MO &amp; TECO ke SAP</h1>
-<p class="subtitle">Seluruh kombinasi jalur Reuse, Order Baru (B1/B2), dan Escape Hatch — menentukan kapan MO baru di-sync ke SAP dan kapan TECO ditrigger. Sumber: <code>order-integration.md</code>, Poin 1 (Trigger dan UI Create Defect atau Crack).</p>
+<p class="subtitle">20 kombinasi Jalur &times; ButuhMaterial &times; MONoKnown &times; IsImmediateExecutable. Tiap baris dibaca berdiri sendiri &mdash; tidak perlu logic tambahan. Sumber: <code>order-integration.md</code>, Poin 1.</p>
+
+<div class="flow"><b>IsImmediateExecutable = No</b>
+  &rarr; TECO: Tidak ada (berlaku utk SEMUA Jalur, apapun kondisi lain)
+
+<b>IsImmediateExecutable = Yes</b> DAN Jalur = Reuse DAN MONoKnown = Ya
+  &rarr; Sync Create MO: Tidak pernah
+  &rarr; TECO: Immediate, final Order Approval
+
+<b>IsImmediateExecutable = Yes</b> DAN Jalur = Reuse-PoolingMOItem DAN MONoKnown = Tidak DAN ButuhMaterial = Ya
+  &rarr; Submit: Blocked (satu-satunya baris yang di-block di seluruh matriks)
+
+<b>IsImmediateExecutable = Yes</b> DAN Jalur = Reuse-PoolingMOItem DAN MONoKnown = Tidak DAN ButuhMaterial = Tidak
+  &rarr; Sync Create MO: Tidak pernah
+  &rarr; TECO: Immediate, begitu MONo confirmed (event-driven, tidak block submit)
+
+<b>IsImmediateExecutable = Yes</b> DAN Jalur = OrderBaru DAN ButuhMaterial = Tidak
+  &rarr; Sync Create MO: Final Order Approval
+  &rarr; TECO: Immediate, begitu MONo confirmed dari create-response
+
+<b>IsImmediateExecutable = Yes</b> DAN Jalur = OrderBaru DAN ButuhMaterial = Ya
+  &rarr; Sync Create MO: Final Order Approval
+  &rarr; TECO: Scheduler, 2x/hari dekat shift-end (satu-satunya baris yang pakai Scheduler)
+
+<b>IsImmediateExecutable = Yes</b> DAN Jalur = EscapeHatch
+  &rarr; Sync Create MO: Tidak pernah
+  &rarr; TECO: Immediate, final Order Approval</div>
 
 <table>
 <colgroup>
-  <col class="c-num"><col class="c-jalur"><col class="c-pool"><col class="c-mat"><col class="c-mono"><col class="c-imm"><col class="c-sync"><col class="c-mech"><col class="c-detail">
+  <col class="c-num"><col class="c-jalur"><col class="c-mat"><col class="c-mono"><col class="c-imm"><col class="c-sync"><col class="c-teco">
 </colgroup>
 <thead>
 <tr>
   <th>#</th>
   <th>Jalur</th>
-  <th><code>PoolingMOItem</code>?</th>
-  <th>Butuh Material?</th>
-  <th><code>MONo</code></th>
+  <th>ButuhMaterial</th>
+  <th>MONoKnown</th>
   <th><code>IsImmediateExecutable</code></th>
-  <th>Kapan Trigger Sync Create MO ke SAP</th>
-  <th>Mekanisme Trigger TECO</th>
-  <th>Detail</th>
+  <th>Sync Create MO ke SAP</th>
+  <th>TECO ke SAP</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Reuse</td><td>Ada</td><td>Tidak</td><td>&mdash;</td><td><code>Yes</code></td><td>Tidak pernah (skip total, reuse Order lama)</td><td><span class="tag tag-afa">After Fully Approved</span></td><td>Final Order Approval selesai</td></tr>
-<tr><td>2</td><td>Reuse</td><td>Ada</td><td>Tidak</td><td>&mdash;</td><td><code>No</code></td><td>Tidak pernah</td><td class="tag-none">&mdash;</td><td>Tidak ada &mdash; Order lama tetap open, jalan normal via siklusnya sendiri</td></tr>
-<tr><td>3</td><td>Reuse</td><td>Ada</td><td>Ya</td><td>Sudah diketahui</td><td><code>Yes</code></td><td>Tidak pernah</td><td><span class="tag tag-afa">After Fully Approved</span></td><td>Final Order Approval selesai</td></tr>
-<tr><td>4</td><td>Reuse</td><td>Ada</td><td>Ya</td><td>Sudah diketahui</td><td><code>No</code></td><td>Tidak pernah</td><td class="tag-none">&mdash;</td><td>Tidak ada &mdash; Order lama tetap open</td></tr>
-<tr><td>5</td><td>Reuse</td><td>Ada</td><td>Ya</td><td><b>NULL</b></td><td><code>Yes</code></td><td>Tidak pernah</td><td><span class="tag tag-block">Blocked</span></td><td>Tidak applicable &mdash; submit di-block sebelum sampai approval</td></tr>
-<tr><td>6</td><td>Reuse</td><td>Ada</td><td>Ya</td><td>NULL</td><td><code>No</code></td><td>Tidak pernah</td><td class="tag-none">&mdash;</td><td>Tidak ada &mdash; Order lama tetap open</td></tr>
-<tr><td>7</td><td>Reuse</td><td>Tidak ada (<code>MOOpen</code>-only)</td><td>Tidak relevan</td><td>Selalu ada</td><td><code>Yes</code></td><td>Tidak pernah</td><td><span class="tag tag-afa">After Fully Approved</span></td><td>Final Order Approval selesai</td></tr>
-<tr><td>8</td><td>Reuse</td><td>Tidak ada</td><td>Tidak relevan</td><td>Selalu ada</td><td><code>No</code></td><td>Tidak pernah</td><td class="tag-none">&mdash;</td><td>Tidak ada &mdash; Order lama tetap open</td></tr>
-<tr><td>9</td><td>Order baru (B1)</td><td>N/A</td><td>Tidak</td><td>&mdash;</td><td><code>Yes</code></td><td>Begitu Order Approval final (create)</td><td><span class="tag tag-afa">After Fully Approved</span></td><td>Sekaligus dengan create (close bareng)</td></tr>
-<tr><td>10</td><td>Order baru (B1)</td><td>N/A</td><td>Tidak</td><td>&mdash;</td><td><code>No</code></td><td>Begitu Order Approval final</td><td class="tag-none">&mdash;</td><td>Tidak ada &mdash; jadi backlog biasa, dieksekusi manual kapan pun via mekanisme existing</td></tr>
-<tr><td>11</td><td>Order baru (B2)</td><td>N/A</td><td>Ya</td><td>Belum ada</td><td><code>Yes</code></td><td>Begitu Order Approval final</td><td><span class="tag tag-sched">Scheduler</span></td><td>Begitu <code>MONo</code> confirmed &amp; shift-end check berikutnya</td></tr>
-<tr><td>12</td><td>Order baru (B2)</td><td>N/A</td><td>Ya</td><td>Belum ada</td><td><code>No</code></td><td>Begitu Order Approval final</td><td class="tag-none">&mdash;</td><td>Tidak ada &mdash; jadi backlog biasa, dieksekusi manual kapan pun via mekanisme existing</td></tr>
-<tr><td>13</td><td>Escape hatch</td><td>N/A</td><td>Declare tidak</td><td>Selalu ada (manual)</td><td><code>Yes</code></td><td>Tidak pernah</td><td><span class="tag tag-afa">After Fully Approved</span></td><td>Final Order Approval selesai</td></tr>
-<tr><td>14</td><td>Escape hatch</td><td>N/A</td><td>Declare tidak</td><td>Selalu ada</td><td><code>No</code></td><td>Tidak pernah</td><td class="tag-none">&mdash;</td><td>Tidak ada &mdash; Order tetap open apa adanya</td></tr>
-<tr><td>15</td><td>Escape hatch</td><td>N/A</td><td>Declare ya</td><td>Selalu ada</td><td><code>Yes</code></td><td>Tidak pernah</td><td><span class="tag tag-afa">After Fully Approved</span></td><td>Final Order Approval selesai (&#9888; Accepted Risk, declare <code>NoPartsRequired</code> tidak terverifikasi ke SAP)</td></tr>
-<tr><td>16</td><td>Escape hatch</td><td>N/A</td><td>Declare ya</td><td>Selalu ada</td><td><code>No</code></td><td>Tidak pernah</td><td class="tag-none">&mdash;</td><td>Tidak ada &mdash; Order tetap open apa adanya</td></tr>
+<tr><td>1</td><td>Reuse-PoolingMOItem</td><td>Tidak</td><td>Ya</td><td class="v-yes">Yes</td><td>Tidak pernah</td><td>Immediate &mdash; final Order Approval</td></tr>
+<tr><td>2</td><td>Reuse-PoolingMOItem</td><td>Tidak</td><td>Ya</td><td class="v-no">No</td><td>Tidak pernah</td><td class="v-none">Tidak ada</td></tr>
+<tr><td>3</td><td>Reuse-PoolingMOItem</td><td>Tidak</td><td>Tidak</td><td class="v-yes">Yes</td><td>Tidak pernah</td><td>Immediate &mdash; begitu MONo confirmed</td></tr>
+<tr><td>4</td><td>Reuse-PoolingMOItem</td><td>Tidak</td><td>Tidak</td><td class="v-no">No</td><td>Tidak pernah</td><td class="v-none">Tidak ada</td></tr>
+<tr><td>5</td><td>Reuse-PoolingMOItem</td><td>Ya</td><td>Ya</td><td class="v-yes">Yes</td><td>Tidak pernah</td><td>Immediate &mdash; final Order Approval</td></tr>
+<tr><td>6</td><td>Reuse-PoolingMOItem</td><td>Ya</td><td>Ya</td><td class="v-no">No</td><td>Tidak pernah</td><td class="v-none">Tidak ada</td></tr>
+<tr><td>7</td><td>Reuse-PoolingMOItem</td><td>Ya</td><td>Tidak</td><td class="v-yes">Yes</td><td>Tidak pernah</td><td><span class="tag-block">Blocked di submit</span></td></tr>
+<tr><td>8</td><td>Reuse-PoolingMOItem</td><td>Ya</td><td>Tidak</td><td class="v-no">No</td><td>Tidak pernah</td><td class="v-none">Tidak ada</td></tr>
+<tr><td>9</td><td>Reuse-MOOpenOnly</td><td>Tidak</td><td>Ya</td><td class="v-yes">Yes</td><td>Tidak pernah</td><td>Immediate &mdash; final Order Approval</td></tr>
+<tr><td>10</td><td>Reuse-MOOpenOnly</td><td>Tidak</td><td>Ya</td><td class="v-no">No</td><td>Tidak pernah</td><td class="v-none">Tidak ada</td></tr>
+<tr><td>11</td><td>Reuse-MOOpenOnly</td><td>Ya</td><td>Ya</td><td class="v-yes">Yes</td><td>Tidak pernah</td><td>Immediate &mdash; final Order Approval</td></tr>
+<tr><td>12</td><td>Reuse-MOOpenOnly</td><td>Ya</td><td>Ya</td><td class="v-no">No</td><td>Tidak pernah</td><td class="v-none">Tidak ada</td></tr>
+<tr><td>13</td><td>OrderBaru</td><td>Tidak</td><td>Tidak</td><td class="v-yes">Yes</td><td>Final Order Approval</td><td>Immediate &mdash; begitu MONo confirmed dari create-response</td></tr>
+<tr><td>14</td><td>OrderBaru</td><td>Tidak</td><td>Tidak</td><td class="v-no">No</td><td>Final Order Approval</td><td class="v-none">Tidak ada</td></tr>
+<tr><td>15</td><td>OrderBaru</td><td>Ya</td><td>Tidak</td><td class="v-yes">Yes</td><td>Final Order Approval</td><td><span class="tag-sched">Scheduler &mdash; 2x/hari dekat shift-end</span></td></tr>
+<tr><td>16</td><td>OrderBaru</td><td>Ya</td><td>Tidak</td><td class="v-no">No</td><td>Final Order Approval</td><td class="v-none">Tidak ada</td></tr>
+<tr><td>17</td><td>EscapeHatch</td><td>Tidak</td><td>Ya</td><td class="v-yes">Yes</td><td>Tidak pernah</td><td>Immediate &mdash; final Order Approval</td></tr>
+<tr><td>18</td><td>EscapeHatch</td><td>Tidak</td><td>Ya</td><td class="v-no">No</td><td>Tidak pernah</td><td class="v-none">Tidak ada</td></tr>
+<tr><td>19</td><td>EscapeHatch</td><td>Ya</td><td>Ya</td><td class="v-yes">Yes</td><td>Tidak pernah</td><td>Immediate &mdash; final Order Approval &#9888;</td></tr>
+<tr><td>20</td><td>EscapeHatch</td><td>Ya</td><td>Ya</td><td class="v-no">No</td><td>Tidak pernah</td><td class="v-none">Tidak ada</td></tr>
 </tbody>
 </table>
 
 <div class="callout">
-  <div class="callout-label">Poin kunci</div>
+  <div class="callout-label">Legend</div>
   <ul>
-    <li><b>Sync Create MO ke SAP</b> cuma pernah terjadi untuk Order baru genuine (baris 9&ndash;12) &mdash; reuse &amp; escape hatch tidak pernah membuat MO baru di SAP sama sekali (mencegah duplicate).</li>
-    <li>Mekanisme trigger <b>TECO ke SAP</b> hanya ada dua jenis: <b>After Fully Approved</b> (eager, langsung begitu final Order Approval selesai &mdash; baris 1, 3, 7, 9, 13, 15) atau <b>Scheduler</b> (baris 11 saja, karena <code>MONo</code> B2 belum tentu tersedia tepat saat approval final). Baris ber-<code>No</code> tidak trigger apa-apa.</li>
-    <li>Satu-satunya baris yang <b>submit-nya di-block</b> adalah <b>#5</b>.</li>
-    <li>Baris #10 &amp; #12 (<code>No</code>) bukan mekanisme baru &mdash; itu backlog biasa yang sudah ada jalurnya (&sect;9.2/9.3 existing).</li>
+    <li><code>MONoKnown</code> = apakah SAP MO Number sudah confirmed di titik itu. <code>Reuse-MOOpenOnly</code> dan <code>EscapeHatch</code> selalu <b>Ya</b> (struktural &mdash; MOOpen sumbernya data SAP yang sudah confirmed; escape hatch diisi manual). <code>OrderBaru</code> selalu <b>Tidak</b> (order-nya belum di-create).</li>
+    <li><code>Reuse-PoolingMOItem</code> + <code>Reuse-MOOpenOnly</code> = disebut <b>Sub-kasus A</b> di bagian lain dokumen.</li>
+    <li><code>OrderBaru</code> + ButuhMaterial=Tidak = disebut <b>B1</b>; ButuhMaterial=Ya = disebut <b>B2</b>, di bagian lain dokumen.</li>
+    <li>&#9888; (baris 19) = <b>Accepted Risk</b> &mdash; declare <code>NoPartsRequired</code> tidak diverifikasi ke SAP.</li>
+    <li><code>BacklogExecutionList.MONumber</code> NOT NULL &rarr; TECO tidak pernah terjadi sebelum <code>MONoKnown=Ya</code>. Baris 3 &amp; 13 ("begitu MONo confirmed") menunggu event konfirmasi SAP dulu, baru trigger.</li>
+    <li>Scheduler (baris 15): begitu <code>SAPMOSyncOrder.MONo</code> confirmed, insert row ke <code>BacklogExecutionList</code> (<code>MONumber</code> = <code>MONo</code> itu) &mdash; insert ini yang trigger TECO lewat &sect;9.3 existing.</li>
   </ul>
 </div>
 
