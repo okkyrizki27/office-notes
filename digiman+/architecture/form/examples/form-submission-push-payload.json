@@ -1,0 +1,1510 @@
+{
+  "formSubmissionId": "4b604512-b409-4a19-ba79-9ac5ab68e16c",
+  "formCode": "FORM394",
+  "formVersion": 16,
+  "formName": "IIR-Grader",
+  "formSubGroup": "IIR",
+  "siteCode": "LAT",
+  "equipmentNumber": "HDCT73112",
+  "submittedBy": "Rian.suryadi@bukitmakmur.com",
+  "submittedAt": "2026-07-07T11:47:06.163933Z",
+  "syncAt": "2026-07-07T11:47:09.884210Z",
+  "tabs": [
+    {
+      "title": "General",
+      "sections": [
+        {
+          "title": "Personnel Information",
+          "answers": [
+            {
+              "taskCode": "a14d849b-7241-4aae-befb-62f6e8e2f12a",
+              "label": "Inspector Name",
+              "value": "2009OBH.supervisor01",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:45:50.000000Z",
+              "photos": []
+            },
+            {
+              "taskCode": "ae80c1fb-0b00-498b-9482-5a41b1ff9ea0",
+              "label": "Date of Inspection",
+              "value": "2026-07-07T18:45:30.339044",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:45:55.000000Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "Asset Information",
+          "answers": [
+            {
+              "taskCode": "23168af1-5c82-42b8-8f78-1d0b32c7430d",
+              "label": "Site",
+              "value": "LAT",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:46:00.000000Z",
+              "photos": []
+            },
+            {
+              "taskCode": "251fe409-e442-4eee-9779-47bcdea924d1",
+              "label": "Section",
+              "value": "OB HAULER",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:46:05.000000Z",
+              "photos": []
+            },
+            {
+              "taskCode": "cd2c9390-3e67-499f-86b3-e9bd6178b69e",
+              "label": "Kode Unit",
+              "value": "HDCT73112",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:46:10.000000Z",
+              "photos": []
+            },
+            {
+              "taskCode": "e203d20f-6743-4563-bcf4-4dd181dae4ca",
+              "label": "Current SMU",
+              "value": "57780",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:46:15.000000Z",
+              "photos": []
+            },
+            {
+              "taskCode": "cb0d3f5f-3591-4d3c-946d-d4638b19a73a",
+              "label": "Photo Machine SMU",
+              "value": null,
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:46:20.000000Z",
+              "photos": [
+                {
+                  "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/122362d1-5230-4d2a-9883-cdb57eb97820.jpg"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Asset Detail",
+          "answers": [
+            {
+              "taskCode": "247aebe5-63f9-4b7d-ad69-902bde941d3e",
+              "label": "Unit Serial Number",
+              "value": "KDP30204",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:46:30.000000Z",
+              "photos": []
+            },
+            {
+              "taskCode": "581f397c-e9d4-48de-b4c5-5e04e2d1663a",
+              "label": "Foto Kondisi Fisik Equipment",
+              "value": null,
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:46:40.000000Z",
+              "photos": [
+                {
+                  "label": "Foto Tampak Depan",
+                  "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/9f1c2e4a-0000-4a1b-8c2d-000000000001.jpg"
+                },
+                {
+                  "label": "Foto Tampak Samping Kanan",
+                  "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/9f1c2e4a-0000-4a1b-8c2d-000000000002.jpg"
+                },
+                {
+                  "label": "Foto Tampak Samping Kiri",
+                  "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/9f1c2e4a-0000-4a1b-8c2d-000000000003.jpg"
+                },
+                {
+                  "label": "Foto Tampak Belakang",
+                  "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/9f1c2e4a-0000-4a1b-8c2d-000000000004.jpg"
+                },
+                {
+                  "label": "Foto Serial Number",
+                  "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/9f1c2e4a-0000-4a1b-8c2d-000000000005.jpg"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Inspection",
+      "sections": [
+        {
+          "title": "PENAMPILAN UMUM (GENERAL APPEARANCE)",
+          "answers": [
+            {
+              "number": 1,
+              "taskCode": "Task1252",
+              "label": "Radiator Grill / Front Grill",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:47:08.677785Z",
+              "photos": []
+            },
+            {
+              "number": 2,
+              "taskCode": "Task1119",
+              "label": "Bumpers / Counter Weight / Guard",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:47:10.702449Z",
+              "photos": []
+            },
+            {
+              "number": 3,
+              "taskCode": "Task1174",
+              "label": "Fuel Tank / Cap / Breather",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:47:12.401449Z",
+              "photos": []
+            },
+            {
+              "number": 4,
+              "taskCode": "Task1100",
+              "label": "Battery Box / Cover",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:47:14.210168Z",
+              "photos": []
+            },
+            {
+              "number": 5,
+              "taskCode": "Task1215",
+              "label": "Main Frame / Car Body",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "ada kerusakan kali ya",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:55:10.257398Z",
+              "photos": []
+            },
+            {
+              "number": 6,
+              "taskCode": "Task1014",
+              "label": "Cat Walk",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "Ada beberapa",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:54:48.367543Z",
+              "photos": [
+                {
+                  "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/1ccac17f-f8aa-49fe-9c53-5cc4c30ae77d.jpg"
+                },
+                {
+                  "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/8ffc591c-8a6d-46e4-bfdb-d7a4d5590a47.jpg"
+                }
+              ]
+            },
+            {
+              "number": 7,
+              "taskCode": "Task1033",
+              "label": "Hand Grips & Rails",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:54:53.599349Z",
+              "photos": []
+            },
+            {
+              "number": 8,
+              "taskCode": "Task1072",
+              "label": "Steps / Ladders",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:55:16.971141Z",
+              "photos": []
+            },
+            {
+              "number": 9,
+              "taskCode": "Task1154",
+              "label": "Engine Hood / Doors / Covers",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:55:19.739419Z",
+              "photos": []
+            },
+            {
+              "number": 10,
+              "taskCode": "Task1178",
+              "label": "General Cleanliness ",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:55:27.056116Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "PRODUK KESELAMATAN (SAFETY ITEMS)",
+          "answers": [
+            {
+              "number": 11,
+              "taskCode": "Task1061",
+              "label": "Safety Decals In Place",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:55:28.859139Z",
+              "photos": []
+            },
+            {
+              "number": 12,
+              "taskCode": "Task1025",
+              "label": "Fire Suppression System",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:55:32.984873Z",
+              "photos": []
+            },
+            {
+              "number": 13,
+              "taskCode": "Task1035",
+              "label": "Horn",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:55:36.190169Z",
+              "photos": []
+            },
+            {
+              "number": 14,
+              "taskCode": "Task1259",
+              "label": "ROPS & Certification",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T11:55:37.978898Z",
+              "photos": []
+            },
+            {
+              "number": 15,
+              "taskCode": "Task1062",
+              "label": "Seat Belt",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:13.477453Z",
+              "photos": []
+            },
+            {
+              "number": 16,
+              "taskCode": "Task1007",
+              "label": "Back-Up Alarm",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:15.954163Z",
+              "photos": []
+            },
+            {
+              "number": 17,
+              "taskCode": "Task1031",
+              "label": "Glass / Mirrors",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:19.96387Z",
+              "photos": []
+            },
+            {
+              "number": 18,
+              "taskCode": "Task1101",
+              "label": "Beacon Lamp / Rotary Lamp",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:22.803123Z",
+              "photos": []
+            },
+            {
+              "number": 19,
+              "taskCode": "Task1150",
+              "label": "Emergency Stop",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:27.579177Z",
+              "photos": []
+            },
+            {
+              "number": 20,
+              "taskCode": "Task1090",
+              "label": "Access Step / Anti-Slip Plate",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:31.422633Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "KABIN, RUANG OPERATOR (CABIN, OPERATOR STATION)",
+          "answers": [
+            {
+              "number": 21,
+              "taskCode": "Task1017",
+              "label": "Dash Console",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:33.344796Z",
+              "photos": []
+            },
+            {
+              "number": 22,
+              "taskCode": "Task1177",
+              "label": "Gauges / Monitor Working ",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:35.711993Z",
+              "photos": []
+            },
+            {
+              "number": 23,
+              "taskCode": "Task1074",
+              "label": "Switches",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:42.346433Z",
+              "photos": []
+            },
+            {
+              "number": 24,
+              "taskCode": "Task1085",
+              "label": "Windshield Wipers",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:48.585617Z",
+              "photos": []
+            },
+            {
+              "number": 25,
+              "taskCode": "Task1093",
+              "label": "Air Conditioner / Blower",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:50.82357Z",
+              "photos": []
+            },
+            {
+              "number": 26,
+              "taskCode": "Task1039",
+              "label": "Interior Lights",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:52.799555Z",
+              "photos": []
+            },
+            {
+              "number": 27,
+              "taskCode": "Task1261",
+              "label": "Seat / Arm Rest / Adjustments",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:54.697981Z",
+              "photos": []
+            },
+            {
+              "number": 28,
+              "taskCode": "Task1026",
+              "label": "Floor Boards",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:56.405058Z",
+              "photos": []
+            },
+            {
+              "number": 29,
+              "taskCode": "Task1018",
+              "label": "Dashboard Panel / Warning",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:58.008114Z",
+              "photos": []
+            },
+            {
+              "number": 30,
+              "taskCode": "Task1020",
+              "label": "Door Latches",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:02:59.876855Z",
+              "photos": []
+            },
+            {
+              "number": 31,
+              "taskCode": "Task1287",
+              "label": "Steering Wheel / Hoist lever / Retarder",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:02.116091Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "KONDISI ENGINE (ENGINE CONDITION)",
+          "answers": [
+            {
+              "number": 32,
+              "taskCode": "Task1155",
+              "label": "Engine Oil Leaking",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:04.602519Z",
+              "photos": []
+            },
+            {
+              "number": 33,
+              "taskCode": "Task1327",
+              "label": "Water Pump / Cooling Leak",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:08.228735Z",
+              "photos": []
+            },
+            {
+              "number": 34,
+              "taskCode": "Task1251",
+              "label": "Pump & Fuel Injectors",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:10.718714Z",
+              "photos": []
+            },
+            {
+              "number": 35,
+              "taskCode": "Task1092",
+              "label": "Air Cleaners / Dust Indicator",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:16.580701Z",
+              "photos": []
+            },
+            {
+              "number": 36,
+              "taskCode": "Task1023",
+              "label": "Exhaust / Muffler",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:18.985635Z",
+              "photos": []
+            },
+            {
+              "number": 37,
+              "taskCode": "Task1010",
+              "label": "Belt / Pulleys",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:21.054483Z",
+              "photos": []
+            },
+            {
+              "number": 38,
+              "taskCode": "Task1022",
+              "label": "Engine Start",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:23.773388Z",
+              "photos": []
+            },
+            {
+              "number": 39,
+              "taskCode": "Task1053",
+              "label": "Radiator",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:28.187866Z",
+              "photos": []
+            },
+            {
+              "number": 40,
+              "taskCode": "Task1016",
+              "label": "Coolers",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:30.575844Z",
+              "photos": []
+            },
+            {
+              "number": 41,
+              "taskCode": "Task1158",
+              "label": "Fan & Pulley Bearing",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:32.423578Z",
+              "photos": []
+            },
+            {
+              "number": 42,
+              "taskCode": "Task1153",
+              "label": "Engine Damper",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:34.332371Z",
+              "photos": []
+            },
+            {
+              "number": 43,
+              "taskCode": "Task1319",
+              "label": "Turbo Charger",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:36.052024Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "SISTEM ELEKTRIK (ELECTRICAL SYSTEM)",
+          "answers": [
+            {
+              "number": 44,
+              "taskCode": "Task1067",
+              "label": "Starter Motor",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:38.020235Z",
+              "photos": []
+            },
+            {
+              "number": 45,
+              "taskCode": "Task1006",
+              "label": "Alternator",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:39.822768Z",
+              "photos": []
+            },
+            {
+              "number": 46,
+              "taskCode": "Task1008",
+              "label": "Batteries / Cables / Clamps",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:41.642941Z",
+              "photos": []
+            },
+            {
+              "number": 47,
+              "taskCode": "Task1256",
+              "label": "Rellay / Fuse ",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:43.362251Z",
+              "photos": []
+            },
+            {
+              "number": 48,
+              "taskCode": "Task1175",
+              "label": "Fuse",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:45.268181Z",
+              "photos": []
+            },
+            {
+              "number": 49,
+              "taskCode": "Task1335",
+              "label": "Wiring Harness ",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:46.8695Z",
+              "photos": []
+            },
+            {
+              "number": 50,
+              "taskCode": "Task1213",
+              "label": "Lotto Box / Battery Isolator",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:48.639497Z",
+              "photos": []
+            },
+            {
+              "number": 51,
+              "taskCode": "Task1338",
+              "label": "Work Lamp / Head Lamp / Rear Lamp",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:51.031536Z",
+              "photos": []
+            },
+            {
+              "number": 52,
+              "taskCode": "Task1262",
+              "label": "Sensor / Switch Connectors",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:52.965017Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "TRANSMISI (TRANSMISSION)",
+          "answers": [
+            {
+              "number": 53,
+              "taskCode": "Task1078",
+              "label": "Transmission",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:54.718582Z",
+              "photos": []
+            },
+            {
+              "number": 54,
+              "taskCode": "Task1077",
+              "label": "Torque Converter",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:56.540786Z",
+              "photos": []
+            },
+            {
+              "number": 55,
+              "taskCode": "Task1324",
+              "label": "Uni'S Drive Line",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:03:58.346363Z",
+              "photos": []
+            },
+            {
+              "number": 56,
+              "taskCode": "Task1057",
+              "label": "Retarder",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:00.114291Z",
+              "photos": []
+            },
+            {
+              "number": 57,
+              "taskCode": "Task1079",
+              "label": "Transmission Pump",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:03.687522Z",
+              "photos": []
+            },
+            {
+              "number": 58,
+              "taskCode": "Task1132",
+              "label": "Cooler & Lines",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:06.280672Z",
+              "photos": []
+            },
+            {
+              "number": 59,
+              "taskCode": "Task1339",
+              "label": "Abnormal Noise / Vibration",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:08.397116Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "STEERING",
+          "answers": [
+            {
+              "number": 60,
+              "taskCode": "Task1278",
+              "label": "Steering Cylinder RH",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:11.205645Z",
+              "photos": []
+            },
+            {
+              "number": 61,
+              "taskCode": "Task1277",
+              "label": "Steering Cylinder LH",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:12.755971Z",
+              "photos": []
+            },
+            {
+              "number": 62,
+              "taskCode": "Task1284",
+              "label": "Steering Pump",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:17.047614Z",
+              "photos": []
+            },
+            {
+              "number": 63,
+              "taskCode": "Task1195",
+              "label": "Hyd Motor Circle ",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:33.067773Z",
+              "photos": []
+            },
+            {
+              "number": 64,
+              "taskCode": "Task1129",
+              "label": "Circle Drive Box",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:35.10093Z",
+              "photos": []
+            },
+            {
+              "number": 65,
+              "taskCode": "Task1279",
+              "label": "Steering Function Test",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:37.389415Z",
+              "photos": []
+            },
+            {
+              "number": 66,
+              "taskCode": "Task1170",
+              "label": "Front Axle Group",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:04:50.123456Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "BRAKES",
+          "answers": [
+            {
+              "number": 67,
+              "taskCode": "Task1114",
+              "label": "Brake RH Centre",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:05:28.274711Z",
+              "photos": []
+            },
+            {
+              "number": 68,
+              "taskCode": "Task1111",
+              "label": "Brake LH Centre",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:05:30.100491Z",
+              "photos": []
+            },
+            {
+              "number": 69,
+              "taskCode": "Task1115",
+              "label": "Brake RH Rear",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:05:31.935961Z",
+              "photos": []
+            },
+            {
+              "number": 70,
+              "taskCode": "Task1112",
+              "label": "Brake LH Rear",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:05:36.041542Z",
+              "photos": []
+            },
+            {
+              "number": 71,
+              "taskCode": "Task1333",
+              "label": "Wheel Bearing RH Front",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:05:41.206446Z",
+              "photos": []
+            },
+            {
+              "number": 72,
+              "taskCode": "Task1331",
+              "label": "Wheel Bearing LH Front",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:05:43.808981Z",
+              "photos": []
+            },
+            {
+              "number": 73,
+              "taskCode": "Task1113",
+              "label": "Brake Lines / Hose Leak",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:05:46.715304Z",
+              "photos": []
+            },
+            {
+              "number": 74,
+              "taskCode": "Task1043",
+              "label": "Master Cylinder",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:06:11.200618Z",
+              "photos": []
+            },
+            {
+              "number": 75,
+              "taskCode": "Task1109",
+              "label": "Brake Chamber",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:06:13.526046Z",
+              "photos": []
+            },
+            {
+              "number": 76,
+              "taskCode": "Task1046",
+              "label": "Parking Brake",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:06:15.775845Z",
+              "photos": []
+            },
+            {
+              "number": 77,
+              "taskCode": "Task1064",
+              "label": "Service Brake",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:06:17.88399Z",
+              "photos": []
+            },
+            {
+              "number": 78,
+              "taskCode": "Task1116",
+              "label": "Brake Slack Adj",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:06:20.005777Z",
+              "photos": []
+            },
+            {
+              "number": 79,
+              "taskCode": "Task1149",
+              "label": "Emergency Brake",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:06:22.239732Z",
+              "photos": []
+            },
+            {
+              "number": 80,
+              "taskCode": "Task1117",
+              "label": "Brake Valve / Accumulator",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:06:25.980955Z",
+              "photos": []
+            },
+            {
+              "number": 81,
+              "taskCode": "Task1110",
+              "label": "Brake Function Test",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:06:27.868302Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "GARDA BELAKANG / REAR AXLE ",
+          "answers": [
+            {
+              "number": 82,
+              "taskCode": "Task1084",
+              "label": "Wheel Lugs, Rims & Nuts",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:07:17.562981Z",
+              "photos": []
+            },
+            {
+              "number": 83,
+              "taskCode": "Task1055",
+              "label": "Rear Axle",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:07:20.074534Z",
+              "photos": []
+            },
+            {
+              "number": 84,
+              "taskCode": "Task813",
+              "label": "Final Drive RH",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:07:21.60422Z",
+              "photos": []
+            },
+            {
+              "number": 85,
+              "taskCode": "Task814",
+              "label": "Final Drive LH",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:07:23.663871Z",
+              "photos": []
+            },
+            {
+              "number": 86,
+              "taskCode": "Task1019",
+              "label": "Differential",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:07:25.414492Z",
+              "photos": []
+            },
+            {
+              "number": 87,
+              "taskCode": "Task1088",
+              "label": "Abnormal Noise / Heat ",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:07:27.75604Z",
+              "photos": []
+            },
+            {
+              "number": 88,
+              "taskCode": "Task1340",
+              "label": "Pin & Bushing",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:07:29.90687Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "SISTEM HIDROLIK/GREASE (HYDRAULICS/GREASE SYST)",
+          "answers": [
+            {
+              "number": 89,
+              "taskCode": "Task1209",
+              "label": "Lift Cylinder RH",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:08:57.548959Z",
+              "photos": []
+            },
+            {
+              "number": 90,
+              "taskCode": "Task1208",
+              "label": "Lift Cylinder LH",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:08:59.155904Z",
+              "photos": []
+            },
+            {
+              "number": 91,
+              "taskCode": "Task1203",
+              "label": "Implement Pump",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:00.738687Z",
+              "photos": []
+            },
+            {
+              "number": 92,
+              "taskCode": "Task1199",
+              "label": "Hyd Tank ",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:02.397987Z",
+              "photos": []
+            },
+            {
+              "number": 93,
+              "taskCode": "Task1185",
+              "label": "Hose Line  Hyd",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:03.945192Z",
+              "photos": []
+            },
+            {
+              "number": 94,
+              "taskCode": "Task1188",
+              "label": "Hyd Cyl Artic Rh",
+              "value": "Not Ok",
+              "valueCode": "CONDITION_CHECK_NOTOK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:05.733681Z",
+              "photos": []
+            },
+            {
+              "number": 95,
+              "taskCode": "Task1187",
+              "label": "Hyd Cyl Artic Lh",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:07.285174Z",
+              "photos": []
+            },
+            {
+              "number": 96,
+              "taskCode": "Task1190",
+              "label": "Hyd Cyl Blade Lift Rh",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:08.922166Z",
+              "photos": []
+            },
+            {
+              "number": 97,
+              "taskCode": "Task1189",
+              "label": "Hyd Cyl Blade Lift Lh",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:10.608529Z",
+              "photos": []
+            },
+            {
+              "number": 98,
+              "taskCode": "Task1191",
+              "label": "Hyd Cyl Blade Tilt",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:12.450618Z",
+              "photos": []
+            },
+            {
+              "number": 99,
+              "taskCode": "Task1192",
+              "label": "Hyd Cyl Centreshift",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:14.351195Z",
+              "photos": []
+            },
+            {
+              "number": 100,
+              "taskCode": "Task1193",
+              "label": "Hyd Cyl Sideshift",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:16.023394Z",
+              "photos": []
+            },
+            {
+              "number": 101,
+              "taskCode": "Task1181",
+              "label": "Grease System (Auto/Man)",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:17.789871Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "TYRES",
+          "answers": [
+            {
+              "number": 102,
+              "taskCode": "Task1237",
+              "label": "Pos 1",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:19.515075Z",
+              "photos": []
+            },
+            {
+              "number": 103,
+              "taskCode": "Task1241",
+              "label": "Pos 2",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:22.383719Z",
+              "photos": []
+            },
+            {
+              "number": 104,
+              "taskCode": "Task1242",
+              "label": "Pos 3",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:44.264162Z",
+              "photos": []
+            },
+            {
+              "number": 105,
+              "taskCode": "Task1243",
+              "label": "Pos 4",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:47.586715Z",
+              "photos": []
+            },
+            {
+              "number": 106,
+              "taskCode": "Task1244",
+              "label": "Pos 5",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:49.92225Z",
+              "photos": []
+            },
+            {
+              "number": 107,
+              "taskCode": "Task1245",
+              "label": "Pos 6",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:09:56.834035Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "ATTACHMENT",
+          "answers": [
+            {
+              "number": 108,
+              "taskCode": "Task1103",
+              "label": "Blade",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:07.437506Z",
+              "photos": []
+            },
+            {
+              "number": 109,
+              "taskCode": "Task1133",
+              "label": "Cutting Edge",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:12.453256Z",
+              "photos": []
+            },
+            {
+              "number": 110,
+              "taskCode": "Task1257",
+              "label": "Ripper ",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:14.536913Z",
+              "photos": []
+            },
+            {
+              "number": 111,
+              "taskCode": "Task1236",
+              "label": "Point Ripper",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:16.676234Z",
+              "photos": []
+            },
+            {
+              "number": 112,
+              "taskCode": "Task1263",
+              "label": "Shank Ripper ",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:19.245225Z",
+              "photos": []
+            },
+            {
+              "number": 113,
+              "taskCode": "Task977",
+              "label": "Pin & Bushing dari Keausan (Pins & Bushing Worn Out)",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:21.119469Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "RESUME FINAL INSPECTION",
+          "answers": [
+            {
+              "number": 114,
+              "taskCode": "Task1463",
+              "label": "Apakah unit dapat start / running?",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:25.516287Z",
+              "photos": []
+            },
+            {
+              "number": 115,
+              "taskCode": "Task1464",
+              "label": "Apakah unit lengkap / utuh?",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:28.281936Z",
+              "photos": []
+            },
+            {
+              "number": 116,
+              "taskCode": "Task1465",
+              "label": "Apakah unit beroperasi sesuai kondisi?",
+              "value": "Ok",
+              "valueCode": "CONDITION_CHECK_OK",
+              "remark": "",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:31.907397Z",
+              "photos": []
+            },
+            {
+              "taskCode": "775cc72c-fde9-412d-a71a-43b655861a73",
+              "label": "SUMMARY",
+              "value": "cukup ok",
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:40.006458Z",
+              "photos": []
+            }
+          ]
+        },
+        {
+          "title": "Digital Signature by Inspector",
+          "answers": [
+            {
+              "taskCode": "7e409e09-a463-4f3d-9629-cdea111ad2f9",
+              "label": "Digital Signature by Inspector",
+              "value": null,
+              "lastUpdatedBy": "Rian.suryadi@bukitmakmur.com",
+              "lastUpdatedAt": "2026-07-07T12:10:52.747297Z",
+              "photos": [
+                {
+                  "label": "Take photo of digital sign",
+                  "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/b7e4a210-0000-4a1b-8c2d-000000000001.jpg"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

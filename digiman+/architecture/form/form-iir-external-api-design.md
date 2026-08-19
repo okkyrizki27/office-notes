@@ -1,12 +1,22 @@
 # Form Submission — External API Integration Design (awalnya "Form IIR")
 
-*Last updated: 2026-08-14*
+*Last updated: 2026-08-19*
 
 *Nama endpoint & dokumen digeneralisasi 2026-08-14 — awalnya khusus IIR (`/api/v1/iir-form-submissions`), sekarang lintas semua kategori `BusinessOperationalForm` (`/api/v1/form-submissions`), IIR jadi kasus pemakaian awal/pendorong desain. Lihat [Konteks](#konteks) dan Keputusan Desain #25.*
 
 *Status: Draft — proposal, belum diimplementasi*
 
 ---
+
+> ## 🔴 PERINGATAN — Dokumen ini sedang direstruktur (2026-08-19)
+>
+> **Arah integrasi dibalik: dari PULL (client polling endpoint kita) jadi PUSH (kita POST ke API client).** Diputuskan 2026-08-19: API ini ditempatkan di **service `external-integration`** (service baru, belum terdokumentasi di [system-architecture-overview.md](../system-architecture-overview.md)), dengan alur: **user submit form → publish ke topic (payload lengkap termasuk blob URL foto) → consumer di `external-integration` POST ke API client**. Digiman+ jadi pihak aktif, client jadi pasif.
+>
+> **Endpoint pull data tidak akan dikembangkan sama sekali** — sebagian besar isi dokumen di bawah (endpoint list/polling & single-fetch, filter date range cap 7 hari, pagination, `formSubGroup`/`siteCode` sebagai parameter request wajib, rate limiting per API Key untuk endpoint data, format error response) karenanya jadi **riwayat desain, bukan scope development**. Dipertahankan di dokumen sebagai konteks keputusan, bukan sebagai spesifikasi yang harus diimplementasi.
+>
+> **Yang tetap berlaku apa adanya** (tidak terpengaruh pembalikan arah): seluruh mekanisme foto ([Endpoint — Photo Download](#endpoint--photo-download) — blob URL + SAS token, arahnya tetap client→Digiman+), semua query SQL/Cosmos di [Sumber Data](#sumber-data--sql--cosmos) (tetap dipakai untuk menyusun payload, cuma dipanggil per-submission bukan per-date-range), [Skema Response](#skema-response) (jadi bentuk body yang di-POST), dan seluruh aturan mapping field/derivasi label.
+>
+> Restrukturisasi penuh menunggu keputusan beberapa hal yang belum ditentukan — lihat [Model Push](#model-push--arah-integrasi-dibalik-2026-08-19) di bawah.
 
 ## Konteks
 
@@ -24,6 +34,133 @@ Rencana expose data form submission ke sistem eksternal via pull endpoint. Endpo
 - Perhitungan worst-case rate limit foto (lihat [Endpoint — Photo Download](#endpoint--photo-download)) idealnya berbasis jumlah task **terbanyak di antara semua varian form**, tapi endpoint ini **sengaja tidak meng-enumerasi/melacak daftar formCode per kategori** (lihat [Keputusan #26](#keputusan-desain-sudah-dikonfirmasi) dan [Open Item #6](#6--resolved--join-key-ke-businessoperationalform-terkonfirmasi-dan-daftar-lengkap-formcode-per-varian-sengaja-tidak-di-enumerasi)) — basis rate limit tetap dari sample yang tersedia sebagai estimasi guard rail, bukan hasil enumerasi lengkap.
 
 Data source: Cosmos `MaintenanceExecution` → `FormSubmissionStructure`, hasil query di [form-submission.md](form-submission.md#contoh-query--ambil-jawaban-user-dari-formsubmissionstructure) (query tab spesifik + tab general), digabung dengan `formName` dari SQL `cst-iams-sqldb-maintenance-execution` (lihat [Sumber Data](#sumber-data--sql--cosmos) di bawah).
+
+## Model Push — Arah Integrasi Dibalik (2026-08-19)
+
+**✅ Diputuskan** — API ini ditempatkan di **service `external-integration`** (service baru, belum ada di [system-architecture-overview.md](../system-architecture-overview.md) — perlu ditambahkan ke peta service), dan arah integrasi dibalik dari pull jadi **push**:
+
+```
+1. User submit form
+2. Publish ke topic (Azure Service Bus) — payload = data form lengkap, TERMASUK blob URL foto
+3. Consumer di `external-integration` POST ke API client
+```
+
+Ini mengikuti pola async messaging yang sudah jadi standar di Digiman+ (outbox → `TopicPublishLog` → Service Bus → consumer, lihat [system-architecture-overview.md §3b](../system-architecture-overview.md)), bukan pola baru — **kecuali** soal dead letter, yang di integrasi ini sengaja tidak dipakai (lihat [poin #4](#-belum-ditentukan--perlu-diputuskan-sebelum-implementasi)).
+
+**✅ Target: near real-time.** Ini salah satu keuntungan utama model push dibanding pull: data sampai ke client segera setelah submission masuk, bukan menunggu siklus polling berikutnya (yang di desain lama bisa tertunda sampai berjam-jam tergantung frekuensi poll client). Dua implikasi ke implementasi: **(a)** penyusunan payload (query SQL + Cosmos + resolusi foto) ada di jalur panas — perlu cukup cepat agar tidak jadi bottleneck per submission; **(b)** memperkuat pentingnya titik trigger yang benar (lihat poin #1 di bawah) — "near real-time" diukur dari **kapan data sampai server**, bukan kapan user menekan submit di device, karena untuk submission offline dua waktu itu bisa berbeda jauh dan itu di luar kendali kita.
+
+### Pembagian Tanggung Jawab Antar Service
+
+**✅ Dikonfirmasi (2026-08-19):**
+
+| Service | Tanggung jawab |
+|---|---|
+| `maintenance-execution` *(asumsi — publisher)* | Menyusun payload form lengkap (jalankan semua query di [Sumber Data](#sumber-data--sql--cosmos), termasuk resolusi `photoGuid` → blob URL) lalu publish ke topic |
+| `external-integration` | (a) Consumer topic → POST ke API client; (b) host endpoint [`sas-token`](#endpoint--photo-download) |
+
+**Implikasi penting — `external-integration` tidak butuh akses ke DB `maintenance-execution`.** Payload dibawa **lengkap di message** (pola *event-carried state transfer*), termasuk `photos[].url` yang sudah ter-resolve jadi blob URL. Jadi seluruh query SQL/Cosmos di dokumen ini tetap tinggal di sisi publisher — `external-integration` cukup meneruskan apa yang dia terima, tidak perlu join ke `FormSubmission`/`Task`/`TaskPersonalizedEvidence` sama sekali. Ini batas service yang bersih, dan menghindari dua service query ke DB yang sama.
+
+> **🚩 Perlu konfirmasi:** siapa persisnya publisher-nya belum dinyatakan eksplisit. `maintenance-execution` adalah asumsi paling masuk akal (di situ data & event submit/sync-nya berada), tapi perlu dipastikan — kalau ternyata publisher-nya `external-integration` sendiri (mis. dia yang query lalu publish ke dirinya sendiri), pembagian di atas berubah total dan service ini jadi butuh akses DB.
+
+### 🔐 Otorisasi `sas-token` — Konsekuensi dari Penempatan di `external-integration`
+
+Karena `sas-token` sekarang tinggal di `external-integration` (yang tidak punya akses DB `maintenance-execution`), muncul pertanyaan yang belum terjawab: **bagaimana service ini memvalidasi bahwa blob URL yang diminta client memang berhak dia akses?**
+
+Ini bukan detail teknis kecil — tanpa validasi, endpoint ini menerbitkan SAS token untuk **blob path apapun** yang dikirim client di storage account itu. Karena container foto kemungkinan besar dipakai bersama lintas tenant/klien (dan otorisasi memang sengaja tidak granular per site — [Keputusan #19](#keputusan-desain-sudah-dikonfirmasi)), client bisa menebak/menyusun path lalu menarik foto milik klien lain. Field `error: "URL_NOT_RECOGNIZED"` di [contoh payload](#contoh-payload--sas-token) mengasumsikan validasi ini ada, tapi mekanismenya belum ditentukan.
+
+**✅ Diputuskan (2026-08-19) — otorisasi `sas-token` = API Key + IP whitelist**, tidak ada lapisan validasi per-URL tambahan.
+
+**⚠️ Risiko residual yang perlu disadari:** API Key + IP whitelist menjawab pertanyaan *"siapa yang memanggil"* (autentikasi), bukan *"blob mana yang boleh dia akses"* (otorisasi). Dengan keputusan ini, consumer yang sudah lolos autentikasi bisa meminta token untuk **blob path apapun yang dia kirim** — termasuk, secara teori, foto milik klien/tenant lain di storage account yang sama.
+
+Seberapa nyata risikonya bergantung pada satu hal yang **belum diverifikasi**: apakah path blob berbasis GUID acak. Kalau ya (pola `.../{guid}.jpg` seperti yang diasumsikan di [contoh payload](#contoh-payload--sas-token)), path praktis tidak bisa ditebak dan risikonya rendah. Kalau ternyata path-nya terstruktur/bisa diprediksi (mis. mengandung site/equipment/tanggal), lubangnya nyata dan enumerasi jadi mungkin. **Perlu dicek developer** saat melihat nilai `ContentAddress` sebenarnya — kalau ternyata predictable, keputusan ini layak ditinjau ulang.
+
+**Field `error: "URL_NOT_RECOGNIZED"` di [contoh payload](#contoh-payload--sas-token) tetap relevan** untuk kasus URL malformed/blob tidak ada — cuma bukan lagi sebagai kontrol keamanan.
+
+*(Rekomendasi sebelumnya — `external-integration` menyimpan daftar blob URL yang pernah dia push lalu memvalidasi terhadap daftar itu — tidak diambil. Catatan: penyimpanan payload tetap dianjurkan untuk keperluan lain, yaitu kirim ulang/replay, lihat [section berikutnya](#-endpoint-pull-tidak-dikembangkan--konsekuensinya-ke-recovery).)*
+
+### 🚩 Ukuran Message — Berisiko Menabrak Limit Service Bus
+
+Payload form lengkap + blob URL semua foto dibawa dalam **satu message**. Estimasi kasar worst-case: ~460 foto × ~200 byte per entry (`label` + blob URL panjang) ≈ **90 KB** hanya untuk array foto, ditambah ~116 baris jawaban × ~250 byte ≈ **30 KB**, plus struktur tab/section dan metadata → total bisa **130–150 KB**.
+
+Azure Service Bus **tier Standard membatasi message di 256 KB**. Angka di atas belum menabrak limit, tapi marginnya tipis — dan estimasi ini konservatif (belum menghitung remark panjang, label panjang, atau varian form yang lebih besar dari yang sudah di-sample; ingat [Keputusan #26](#keputusan-desain-sudah-dikonfirmasi) sengaja tidak meng-enumerasi semua varian form, jadi selalu ada kemungkinan varian yang lebih besar).
+
+**👨‍💻 Diserahkan ke developer (2026-08-19)** — pengecekan tier Service Bus yang dipakai dan pemilihan mitigasinya kalau ternyata Standard: naik ke Premium (limit 100 MB), atau pakai *claim-check pattern* (publish referensi ringan, consumer ambil payload lengkap terpisah — tapi ini mengembalikan kebutuhan akses data di `external-integration`, jadi trade-off-nya nyata). Dicatat di sini supaya tidak ditemukan sebagai kejutan saat submission besar pertama gagal publish.
+
+### Yang Berubah vs Yang Tetap
+
+| Komponen | Status |
+|---|---|
+| Endpoint list/polling (`GET /form-submissions`) + single-fetch by ID + date range 7 hari + pagination | ❌ **Tidak dikembangkan sama sekali** (diputuskan 2026-08-19) — spesifikasinya di dokumen ini jadi riwayat desain, bukan scope development. Lihat [konsekuensinya ke recovery](#-endpoint-pull-tidak-dikembangkan--konsekuensinya-ke-recovery) |
+| `formSubGroup`/`siteCode` sebagai **parameter request wajib** | ❌ Berubah bentuk — tidak ada request dari client lagi, jadi ini jadi **konfigurasi routing di sisi kita** (submission mana dikirim ke consumer mana). Perlu didesain, belum ada |
+| Rate limiting per API Key untuk endpoint data | ❌ Tidak berlaku — kita yang jadi *caller*, jadi yang relevan justru **rate limit / kapasitas milik client** dan throttling di sisi consumer kita |
+| [Format Error Response](#format-error-response) | ❌ Berbalik peran — kita jadi konsumen error mereka, bukan penerbit error. Kontrak error jadi milik API client |
+| Autentikasi API Key + IP whitelist | ⚠️ **Tetap ada tapi pindah rumah & menyusut cakupannya** — sekarang di-host `external-integration`, dan cuma melindungi endpoint `sas-token` (satu-satunya yang tetap arah client→kita). Untuk POST ke client, **kita** yang harus autentikasi ke sistem mereka — mekanismenya milik mereka, belum diketahui |
+| [Skema Response](#skema-response) | ✅ **Tetap** — jadi bentuk body yang di-POST ke client (kemungkinan tanpa wrapper `totalRecords`/`page`/`hasMore` yang khas pagination) |
+| Seluruh query SQL/Cosmos di [Sumber Data](#sumber-data--sql--cosmos) | ✅ **Tetap** — tetap dipakai untuk menyusun payload, cuma dipanggil **per-submission** (dipicu event) bukan per-date-range |
+| Seluruh mekanisme foto ([blob URL + SAS token](#endpoint--photo-download)) | ✅ **Tetap utuh** — arahnya tetap client→Digiman+, tidak terpengaruh pembalikan arah data |
+| Mapping field, derivasi label, aturan `value: null`, filter `IsActive` | ✅ **Tetap** — semuanya soal isi payload, bukan soal arah transport |
+
+### 🚩 Belum Ditentukan — Perlu Diputuskan Sebelum Implementasi
+
+**1. Titik trigger publish — ✅ diputuskan: saat form submitted**
+
+Event pemicunya adalah **form submitted**. Karena publish ke Service Bus terjadi di sisi server, secara praktis ini berarti **saat submission sampai di server** — untuk submission yang dibuat offline, itu terjadi ketika device berhasil sync, bukan saat user menekan tombol submit di lapangan. Konsekuensi yang perlu disadari developer & disampaikan ke BUMA:
+
+- **`submittedAt` bisa jauh lebih lama dari waktu pesan diterima** — submission yang dikerjakan offline hari Senin bisa baru ter-publish hari Rabu. BUMA tidak boleh mengasumsikan "waktu terima ≈ `submittedAt`".
+- **"Near real-time" diukur dari kapan data sampai server**, bukan dari aksi user di device. Jeda karena device offline di luar kendali integrasi ini.
+- `syncAt` (`LastSyncedModifiedAt`) tetap disertakan di payload dan merupakan penanda waktu yang paling dekat dengan momen publish.
+
+**Cakupan awal — ✅ fokus `SubGroup = 'IIR'` dulu.** Meski desain payload & mekanismenya generik lintas kategori `BusinessOperationalForm` ([Keputusan #25](#keputusan-desain-sudah-dikonfirmasi)), yang di-publish & dikirim ke BUMA untuk saat ini **dibatasi ke `SubGroup = 'IIR'`**. Kategori lain menyusul tanpa perlu perubahan desain — cukup perluasan konfigurasi routing.
+
+**2. Submission yang diubah setelah ter-publish**
+[Mapping field `lastUpdatedAt`](#mapping-field-raw-query-result--api-field) mengakui jawaban bisa berubah belakangan (remark/foto di-update setelah submit). Perlu diputuskan: apakah perubahan memicu publish ulang? Kalau ya, client harus memperlakukannya sebagai **upsert by `formSubmissionId`**, bukan insert baru. Perlu disepakati eksplisit dengan BUMA, karena kalau mereka insert-only, data akan terduplikasi.
+
+**3. Urutan pesan tidak dijamin**
+Service Bus tidak menjamin urutan global tanpa session. Kalau submission dibuat lalu cepat diubah, event update bisa tiba **sebelum** event create di sisi client. Mitigasi yang paling murah: sertakan `syncAt` di payload sebagai **watermark** — client menolak/mengabaikan pesan yang `syncAt`-nya lebih lama dari yang sudah mereka simpan untuk `formSubmissionId` yang sama. Perlu disepakati dengan BUMA.
+
+**4. Kegagalan & retry — ✅ sebagian diputuskan, tapi ada lubang yang perlu ditutup**
+
+**✅ Diputuskan (2026-08-19): tidak ada dead letter — retry unlimited kalau server client down.** Ini konsisten dengan keputusan tidak mengembangkan endpoint pull: karena tidak ada jalur recovery lain, consumer memang tidak boleh menyerah.
+
+**🚩 Tapi "retry unlimited" hanya benar untuk kegagalan *transient*.** Perlu dibedakan dua jenis kegagalan, karena memperlakukan keduanya sama akan menghasilkan infinite loop:
+
+| Jenis kegagalan | Contoh | Perlakuan yang benar |
+|---|---|---|
+| **Transient** — masalah di sisi ketersediaan | `5xx`, timeout, connection refused, DNS gagal | ✅ **Retry unlimited** (sesuai keputusan) — server client down memang akan pulih, tinggal tunggu |
+| **Permanent** — request-nya sendiri yang ditolak | `400` payload malformed/kebesaran, `401`/`403` kredensial salah, `422` validasi gagal di sisi client | ❌ **Retry unlimited tidak akan pernah berhasil** — payload yang sama akan ditolak selamanya. Ini butuh tempat parkir + alert, apapun namanya |
+
+Kalau satu submission punya data yang bikin API client selalu menolak (mis. karakter aneh di remark, payload melebihi batas mereka), retry unlimited membuat pesan itu **berputar selamanya tanpa ada yang tahu** — dan berpotensi menahan/mengaburkan pengiriman pesan lain. Ini persis masalah yang biasanya diselesaikan dead letter.
+
+**Rekomendasi:** tetap retry unlimited untuk transient (sesuai keputusan), tapi untuk kegagalan permanen sediakan **parkir + alert** — tidak harus disebut "dead letter", yang penting ada tempat pesan berhenti berputar **dan ada notifikasi ke tim**, bukan gagal diam-diam. Tanpa ini, satu payload bermasalah bisa tidak terdeteksi berhari-hari.
+
+**👨‍💻 Diserahkan ke developer (2026-08-19)** — penanganan kegagalan permanen di atas beserta seluruh detail teknis di bawah adalah **keputusan implementasi milik developer**, bukan menunggu keputusan produk. Dicatat di sini sebagai hal yang harus ditangani, bukan sebagai open item yang memblokir mulainya development:
+
+- **Pola backoff** — retry unlimited tanpa exponential backoff = menghantam server client yang sedang down. Perlu backoff dengan cap (mis. naik bertahap sampai maksimal 5–15 menit per percobaan), bukan retry ketat tiap detik.
+- **Batasan bawaan Azure Service Bus** yang bisa membatalkan niat "unlimited" tanpa disadari: `MaxDeliveryCount` (default 10 — pesan otomatis masuk DLQ setelah itu, jadi harus dinaikkan/di-handle di dalam consumer), `TimeToLive` pesan (pesan bisa kedaluwarsa saat outage panjang), dan **lock duration maksimal 5 menit** (retry lama di dalam consumer butuh lock renewal, atau pola abandon-and-redeliver).
+- **Perilaku saat client pulih** — kalau outage berjam-jam menumpuk ribuan pesan, apakah consumer akan membanjiri client begitu mereka up? Perlu throttling di sisi kita.
+
+**5. Kontrak API client — ✅ diputuskan: mengikuti payload yang kita kirim**
+
+Bentuk body yang diterima BUMA = [Skema Payload](#skema-payload) apa adanya, **satu submission per POST**. Tidak ada negosiasi skema/transformasi khusus di sisi kita.
+
+Yang tetap perlu didapat dari BUMA saat integrasi disiapkan (bersifat operasional, bukan blocker desain): URL endpoint mereka, kredensial/mekanisme auth yang mereka minta dari kita, dan timeout. **Definisi "sukses" default: HTTP `2xx`** — kalau BUMA punya syarat lain (mis. body tertentu), itu harus mereka sampaikan; kalau tidak, `2xx` yang dipakai.
+
+**6. Konfigurasi routing — 👨‍💻 diserahkan ke developer**
+
+Di model pull, client sendiri yang menentukan scope lewat `formSubGroup`+`siteCode` per request. Di model push, **kita** yang harus tahu consumer mana menerima apa. Bentuk konkretnya (tabel config, appsettings, filter di subscription Service Bus, dll) diserahkan ke developer. Yang sudah pasti dari sisi produk: **cakupan awal `SubGroup = 'IIR'`, seluruh site** (tidak ada pembatasan per site — konsisten dengan [Keputusan #19](#keputusan-desain-sudah-dikonfirmasi) yang memang tidak menerapkan otorisasi granular per site).
+
+### ❌ Endpoint Pull Tidak Dikembangkan — Konsekuensinya ke Recovery
+
+**✅ Diputuskan (2026-08-19)** — endpoint pull data (`GET /form-submissions` dan `GET /form-submissions/{formSubmissionId}`) **tidak akan dikembangkan sama sekali**. Push adalah satu-satunya jalur pengiriman data. Seluruh spesifikasi endpoint tersebut di dokumen ini (filter, pagination, rate limit, format error) jadi **riwayat desain**, bukan scope development.
+
+*(Catatan: ini soal endpoint **data**. Endpoint [`sas-token`](#endpoint--photo-download) tetap dikembangkan meski arahnya client→kita — foto memang tidak ikut di-push, cuma URL-nya.)*
+
+**Konsekuensi:** tanpa jalur pull, tidak ada mekanisme *self-healing* dari sisi client. Ini sebagian sudah ditutup oleh keputusan **retry unlimited** (lihat [poin #4](#-belum-ditentukan--perlu-diputuskan-sebelum-implementasi)) — untuk kasus client down, consumer akan terus mencoba sampai berhasil, jadi data tidak hilang. Tapi dua celah tetap terbuka:
+
+1. **Kegagalan permanen (`4xx`) tidak tertutup retry** — payload yang selalu ditolak client tidak akan pernah terkirim, berapa kali pun dicoba. Tanpa endpoint pull, client juga tidak bisa menariknya sendiri. Perlu jalur perbaikan eksplisit (parkir + alert + kemampuan kirim ulang setelah masalahnya diperbaiki).
+2. **Kegagalan di sisi client setelah `2xx`** — kalau BUMA membalas sukses tapi kemudian gagal memproses/menyimpan di internal mereka, dari sisi kita pengiriman dianggap selesai dan tidak akan diulang. Mereka tidak punya cara menarik ulang. **Perlu disepakati dengan BUMA**: apakah mereka butuh cara meminta kiriman ulang untuk `formSubmissionId` tertentu — kalau ya, itu berarti tetap butuh satu jalur permintaan dari sisi mereka (sekecil apapun bentuknya), yang saat ini tidak ada dalam scope.
+
+**Rekomendasi yang menopang keduanya:** `external-integration` **menyimpan payload yang pernah dia push**. Ini sudah direkomendasikan untuk otorisasi `sas-token` (lihat [section di atas](#-otorisasi-sas-token--konsekuensi-dari-penempatan-di-external-integration)), dan dengan hilangnya endpoint pull ia sekaligus jadi **satu-satunya fondasi kirim-ulang**. Tanpa penyimpanan ini, kirim ulang berarti memicu publish ulang dari publisher — yang belum tentu mudah/mungkin untuk submission lama. Perlu ditentukan juga **berapa lama payload disimpan** supaya masih bisa di-replay.
 
 ## HTTP Method & Endpoint
 
@@ -64,71 +201,109 @@ Kebijakan versioning yang direkomendasikan:
 
 ## Endpoint — Photo Download
 
-**✅ Dikonfirmasi (2026-08-04)** — proxy endpoint terpisah untuk serve konten foto, bukan expose blob path langsung maupun SAS token. *(Menggantikan Open Item #4 lama — lihat riwayat diskusi di situ.)*
+**🔁 Direvisi (2026-08-19) — proxy streaming endpoint diganti jadi blob URL langsung + endpoint `get-sas-token` terpisah.** Setelah diskusi dengan tim tech lead: proxy streaming binary tiap foto (worst-case ~460 foto/submission, lihat riwayat perhitungan lama di bawah) membebani compute/bandwidth Digiman+ secara signifikan. Ini membalik Keputusan Desain #20 (proxy dipilih, SAS token ditolak) — lihat [Kenapa Direvisi](#kenapa-direvisi-dari-proxy-ke-blob-url--sas-token-2026-08-19) untuk kenapa alasan penolakan SAS token yang lama sudah teratasi di desain baru ini, bukan cuma diabaikan.
 
-```
-GET /api/v1/form-submissions/photos/{photoGuid}
+**✅ Dikonfirmasi (2026-08-19)** — Blob Storage sekarang **mengizinkan akses publik selama request menyertakan SAS token yang valid**. Ini perubahan network/access policy di Azure Storage Account (bukan cuma keputusan aplikasi), menggantikan constraint lama "blob tidak bisa diakses langsung dari luar Digiman+" — lihat [Open Item #4](#4--dibuka-ulang-2026-08-19--aksesibilitas-blob-dari-luar-berubah-jadi-diizinkan-via-sas-token).
+
+### Alur (Desain Baru)
+
+1. **`photos[].url` di response data (list & single-fetch) sekarang berisi blob URL langsung** (`ContentAddress`/`MachineSMUAddress` hasil resolusi, lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto)) — **bukan lagi** link ke proxy endpoint Digiman+. Resolusi `photoGuid → blob URL` tetap lewat query SQL yang sama seperti sebelumnya (tidak ada tambahan round-trip) — yang berubah cuma hasilnya sekarang di-expose langsung ke response, bukan dipakai backend secara internal untuk stream.
+2. Client minta SAS token untuk blob URL yang mau diakses:
+   ```
+   POST /api/v1/form-submissions/photos/sas-token
+   X-Api-Key: <api_key>
+
+   { "urls": ["<blob-url-1>", "<blob-url-2>", "..."] }
+   ```
+   **✅ Dikonfirmasi (2026-08-19)** — endpoint ini menerima banyak URL sekaligus (batch, bisa lebih dari satu blob URL per call), konsisten dengan prinsip batch-bukan-N+1 yang dipakai di semua query backend lain di desain ini (1 submission bisa punya ratusan foto, client tidak ideal kalau harus 1 HTTP call per foto). Ini juga alasan method-nya `POST` bukan `GET` — beda dari 2 endpoint data yang aman pakai query string (Keputusan #16), daftar blob URL batch bisa jauh melebihi batas panjang URL yang lazim didukung browser/proxy/gateway.
+3. Response berisi token per URL — lihat [Contoh Payload](#contoh-payload--sas-token) di bawah.
+4. Client pakai `sasUrl` (URL + token sudah tergabung) untuk fetch **langsung ke Azure Blob Storage** — Digiman+ tidak lagi jadi perantara untuk isi file foto.
+
+### Contoh Payload — SAS Token
+
+**Request:**
+
+```http
+POST /api/v1/form-submissions/photos/sas-token
 X-Api-Key: <api_key>
+Content-Type: application/json
+
+{
+  "urls": [
+    "https://<storage-account>.blob.core.windows.net/<container>/evidence/a3f1c8e2-5b7d-4e91-8c2a-1f6b9d0e4a72.jpg",
+    "https://<storage-account>.blob.core.windows.net/<container>/evidence/b7d4e9f1-2c8a-4f63-9d15-3e8a7c2b5f90.jpg",
+    "https://<storage-account>.blob.core.windows.net/<container>/evidence/c9e2a145-8f31-4b7d-a026-5d1c4e8b3a67.jpg"
+  ]
+}
 ```
 
-Auth pakai API Key + IP whitelist yang sama dengan endpoint data (lihat [Autentikasi & Otorisasi](#autentikasi--otorisasi)) — tidak ada mekanisme auth kedua terpisah.
+**🚩 Format blob URL di atas ilustratif** — bentuk persisnya mengikuti nilai `ContentAddress`/`MachineSMUAddress` yang benar-benar tersimpan di DB (belum pernah dilihat sample realnya di dokumen ini). Yang pasti: client **mengirim balik apa adanya** nilai `photos[].url` yang dia terima dari response data, tidak perlu parsing/rekonstruksi sendiri.
 
-### Kenapa Proxy, Bukan SAS Token
-
-Blob penyimpanan foto **tidak bisa diakses langsung dari luar Digiman+** (dikonfirmasi user, 2026-08-04) — akses hanya lewat sistem Digiman+ sendiri (web/mobile), konsisten dengan pola gambar guideline yang di-host di Azure Blob Storage privat ([`form-builder.md`](form-builder.md#karakteristik)). Dua opsi dipertimbangkan:
-
-- **SAS token per-URL** — **ditolak**. Masalahnya soal timing: endpoint data didesain untuk polling async (Keputusan #1, bukan real-time), jadi sistem eksternal belum tentu langsung fetch foto begitu dapat response metadata (bisa jadi backfill/catch-up belakangan). SAS TTL pendek berisiko expired sebelum sempat dipakai; TTL panjang memperbesar window kebocoran kalau URL ter-log/screenshot di sisi eksternal.
-- **Proxy endpoint (dipilih)** — reuse API Key + IP whitelist yang sama dengan endpoint data (satu mekanisme auth, satu titik revoke), blob tetap fully private (tidak ada perubahan access policy Azure sama sekali), dan tidak terikat masalah timing SAS.
-
-### Response — Binary, Bukan Base64
-
-```
-200 OK
-Content-Type: image/jpeg   (sesuai tipe file asli)
-Content-Length: <ukuran file>
-Cache-Control: private, max-age=31536000, immutable
-
-<raw bytes>
-```
-
-Base64 sengaja tidak dipakai — base64 cuma masuk akal kalau foto harus nempel langsung di JSON response list/detail (menaikkan ukuran payload ~33%, bertentangan dengan alasan pagination endpoint list yang sudah ada di Keputusan #2). Karena ini endpoint terpisah, binary + `Content-Type` yang benar lebih efisien: bisa di-cache, mendukung `Range` request, dan langsung bisa dibuka/didownload tanpa decode di sisi eksternal.
-
-Backend **stream** dari Blob Storage ke response (bukan buffer seluruh file ke memory) — penting untuk foto berukuran besar supaya tidak membebani memory service per-request.
-
-`Cache-Control: private, max-age=31536000, immutable` (1 tahun) — foto evidence bersifat **immutable** (satu `photoGuid` = satu foto yang tidak pernah berubah isinya begitu dibuat), jadi aman TTL panjang tanpa perlu revalidasi (`ETag`). `private` karena response butuh auth — cache berlaku buat sistem eksternal itu sendiri, bukan shared cache/CDN publik.
-
-### Resolusi `photoGuid`
-
-Logic sama dengan yang sudah didokumentasikan di [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto) — backend coba resolve ke `TaskPersonalizedEvidence.ReferenceId` dulu, fallback ke `TaskPersonalized.ReferenceId`/`Task.ReferenceId` (Keputusan #5/#13, tergantung status rollout PM Shutdown Service Package Phase 1). Filter `IsActive = 1` tetap berlaku (Keputusan #14). Bedanya dari desain lama: hasil resolusi (`ContentAddress`) dipakai backend untuk fetch & stream isi file, **bukan** dikirim sebagai string ke response JSON endpoint data.
-
-### Error
+**Response `200 OK`:**
 
 ```json
-404 Not Found
-{ "error": { "code": "PHOTO_NOT_FOUND", "message": "...", "details": null } }
+{
+  "tokens": [
+    {
+      "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/a3f1c8e2-5b7d-4e91-8c2a-1f6b9d0e4a72.jpg",
+      "sasUrl": "https://<storage-account>.blob.core.windows.net/<container>/evidence/a3f1c8e2-5b7d-4e91-8c2a-1f6b9d0e4a72.jpg?sv=2024-11-04&sr=b&sp=r&se=2026-08-20T10%3A00%3A00Z&sig=<signature>",
+      "sasToken": "sv=2024-11-04&sr=b&sp=r&se=2026-08-20T10%3A00%3A00Z&sig=<signature>",
+      "expiresAt": "2026-08-20T10:00:00Z",
+      "error": null
+    },
+    {
+      "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/b7d4e9f1-2c8a-4f63-9d15-3e8a7c2b5f90.jpg",
+      "sasUrl": "https://<storage-account>.blob.core.windows.net/<container>/evidence/b7d4e9f1-2c8a-4f63-9d15-3e8a7c2b5f90.jpg?sv=2024-11-04&sr=b&sp=r&se=2026-08-20T10%3A00%3A00Z&sig=<signature>",
+      "sasToken": "sv=2024-11-04&sr=b&sp=r&se=2026-08-20T10%3A00%3A00Z&sig=<signature>",
+      "expiresAt": "2026-08-20T10:00:00Z",
+      "error": null
+    },
+    {
+      "url": "https://<storage-account>.blob.core.windows.net/<container>/evidence/c9e2a145-8f31-4b7d-a026-5d1c4e8b3a67.jpg",
+      "sasUrl": null,
+      "sasToken": null,
+      "expiresAt": null,
+      "error": "URL_NOT_RECOGNIZED"
+    }
+  ]
+}
 ```
 
-Tambahan baris di [Format Error Response](#format-error-response) — dipakai kalau `photoGuid` tidak match apapun di `TaskPersonalizedEvidence`/`TaskPersonalized`/`Task`. Beda dari fallback `url: null` di endpoint data (yang tetap `200`) — di endpoint proxy ini, foto yang benar-benar tidak ada memang harus `404` karena tidak ada isi untuk di-stream.
+**Keputusan bentuk payload:**
 
-### Rate Limit — Terpisah dari Endpoint Data
+| Aspek | Keputusan | Alasan |
+|---|---|---|
+| `sasUrl` **dan** `sasToken` dua-duanya dikirim | `sasUrl` = URL siap pakai (token sudah tergabung), `sasToken` = token mentah | Redundan secara data, tapi `sasUrl` menghilangkan kelas bug di sisi client (salah gabung `?` vs `&`, lupa URL-encode). `sasToken` tetap disediakan untuk client yang mau menyusun sendiri (mis. pakai SDK Azure) |
+| **Partial failure per-item**, bukan gagal seluruh batch | URL yang gagal tetap muncul di array dengan `sasUrl: null` + `error` terisi; URL lain di batch yang sama tetap dapat token | Konsisten dengan Keputusan #15 (`url: null` bukan di-drop dari array) — "jujur representasikan ketiadaan". Kalau 1 URL invalid membatalkan seluruh batch, client harus retry semua & sulit tahu mana yang bermasalah |
+| Urutan array response = urutan array request | Item ke-N di `tokens` selalu berkorespondensi dengan item ke-N di `urls` | Client bisa korelasi by index, tidak wajib string-matching `url` (walau `url` tetap di-echo untuk keamanan/kejelasan) |
+| `expiresAt` di-echo per item | Timestamp ISO-8601 UTC | Client bisa cache token & tahu kapan perlu minta ulang, tanpa hardcode asumsi TTL 24 jam di sisi mereka |
 
-**✅ Direvisi (2026-08-14) — 1.850 req/menit, 155.000 req/hari** (sliding window, algoritma sama dengan [Rate Limiting](#rate-limiting) endpoint data) — sengaja dibuat terpisah dari limit endpoint data (30/menit, 2.500/hari) karena karakteristik beban jauh beda: fetch foto adalah operasi ringan (resolve 1 `ReferenceId` + stream, bukan JOIN 4 tabel + aggregation), dan foto punya efek multiplier tinggi per submission — 1 request data bisa butuh puluhan-ratusan request foto susulan.
+**🚩 Belum ditentukan — batas maksimal jumlah URL per call.** Perlu ada cap supaya satu request tidak bisa minta token untuk ribuan URL sekaligus. Basis angka yang masuk akal: worst-case **460 foto/submission** (lihat [Riwayat Desain Lama](#riwayat-desain-lama-proxy-endpoint--sudah-tidak-dipakai)) — cap sebaiknya **di atas** angka itu (mis. 500) supaya client selalu bisa memproses 1 submission penuh dalam satu call, tapi angka finalnya perlu dikonfirmasi tim. Kalau melebihi cap → `400 INVALID_REQUEST` (atau kode baru khusus).
 
-**Perhitungan awal (worst-case-literal, dikonfirmasi user 2026-08-04) — basis lama, sudah stale:**
-- Tab spesifik "Inspection" form `FORM394` diasumsikan punya **113 form task** (`BANKTASK`, basis dari [`IIR-Grader.json`](examples/IIR-Grader.json) versi 6 — sample lama, sudah digantikan sample real terbaru).
-- Asumsi worst-case: semua task punya evidence, evidence maksimal 3 foto → 113 × 3 = 339 foto.
-- Ditambah 5 foto section `PHOTOLIST` (General tab) + 1 foto Machine SMU (`CAMERACAPTURE`) → total 345 foto/submission.
-- Basis per-menit: pageSize *default* (20) × 345 = 6.900 foto/halaman, target waktu hydrate ~5 menit → 1.380/menit → dibulatkan 1.400/menit.
-- Basis per-hari: rasio yang sama dengan endpoint data (2.500 ÷ 30 ≈ 83x) → 1.400 × 83 ≈ 116.200 → dibulatkan 120.000/hari.
+### Auth
 
-**✅ Dihitung ulang (2026-08-14) — basis 113 diganti angka real + buffer 30% untuk varian belum diketahui:**
-- Sample real menunjukkan `FORM394` versi 16 (varian "Grader") punya **116** `BANKTASK`/`TAKEPHOTO` — lebih tinggi dari `FORM385` (varian "General", **111**), jadi dipakai sebagai basis worst-case di antara 2 varian yang diketahui.
-- 116 × 3 foto = 348 foto, + 5 foto `PHOTOLIST` (General tab) + 1 foto Machine SMU + **1 foto signature** ("Digital Signature by Inspector", sebelumnya belum terhitung — lihat [Open Item #5](#5--resolved--flat-photolist-di-tab-inspection-signature-ditangani-sama-seperti-flat-elements-tab-general)) → **355 foto/submission** (worst-case-literal dari data yang diketahui).
-- **Buffer 30%** ditambahkan di atas 355 (355 × 1,3 ≈ 461,5) → dibulatkan ke **460 foto/submission** — bukan angka sembarangan, tujuannya nutup risiko dari [Keputusan #26](#keputusan-desain-sudah-dikonfirmasi)/[Open Item #6](#6--resolved--join-key-ke-businessoperationalform-terkonfirmasi-dan-daftar-lengkap-formcode-per-varian-sengaja-tidak-di-enumerasi): endpoint ini sengaja **tidak** meng-enumerasi semua formCode per `SubGroup`, jadi selalu ada kemungkinan varian lain (IIR yang belum di-sample, atau kategori `SubGroup` lain di masa depan) yang task-nya lebih banyak dari 116 — buffer lebih besar (30%, direvisi dari ~13% sebelumnya) dipilih supaya limit lebih longgar menghadapi varian baru yang cukup jauh lebih besar dari 116, bukan cuma sedikit lebih besar.
-- Basis per-menit: pageSize *default* (20) × 460 = 9.200 foto/halaman, target waktu hydrate ~5 menit → 1.840/menit → dibulatkan **1.850/menit**.
-- Basis per-hari: rasio yang sama (2.500 ÷ 30 ≈ 83x) → 1.850 × 83 ≈ 154.167 → dibulatkan **155.000/hari**.
+Sama dengan endpoint data — `X-Api-Key` + IP whitelist (lihat [Autentikasi & Otorisasi](#autentikasi--otorisasi)), tidak ada mekanisme auth kedua terpisah.
 
-**🚩 Catatan penting (tetap berlaku):** ini masih worst-case-literal + buffer, bukan angka dari volume real — kemungkinan besar volume real jauh lebih rendah (biasanya cuma item defect yang di-foto, item "OK" sering dilewat tanpa evidence). Limit ini fungsinya sebagai guard rail (konsisten dengan filosofi limit endpoint data di Keputusan #9), bukan target throughput yang harus selalu dikejar. **Perlu direvisit setelah ada data volume real pasca-launch.**
+### TTL SAS Token
+
+**✅ Dikonfirmasi (2026-08-19) — 24 jam.** Karena token digenerate on-demand (bukan dibakar ke response poll data seperti draft SAS token versi lama), TTL ini cukup longgar untuk pola pemakaian wajar. **Rekomendasi implementasi client**: minta SAS token sesaat sebelum render/download foto, bukan eager di awal saat baru menerima hasil poll — kalau ada jeda proses >24 jam di sisi client sebelum foto benar-benar di-fetch, token lama sudah expired dan perlu diminta ulang.
+
+### Kenapa Direvisi dari Proxy ke Blob URL + SAS Token (2026-08-19)
+
+Proxy dipilih sebelumnya (Keputusan #20) karena dua alasan: **(a)** blob storage saat itu tidak diizinkan diakses langsung dari luar, dan **(b)** SAS token per-URL ditolak akibat masalah *timing* — desain lama membakar SAS token ke response poll data, sedangkan endpoint didesain async/polling (client belum tentu langsung fetch foto begitu dapat metadata, bisa backfill/catch-up belakangan), jadi TTL pendek berisiko expired duluan, TTL panjang memperbesar window kebocoran kalau URL ter-log/screenshot di sisi eksternal.
+
+Kedua alasan itu tidak lagi berlaku di desain baru: **(a)** blob storage sekarang eksplisit diizinkan diakses via SAS (keputusan infra baru, dikonfirmasi user), dan **(b)** token di desain baru **digenerate terpisah, on-demand** lewat `get-sas-token` — bukan dibakar ke response poll — jadi client minta token pas benar-benar mau fetch, bukan di awal. Ini menghilangkan masalah timing yang jadi alasan penolakan SAS token dulu, bukan sekadar mengabaikannya.
+
+**Trade-off yang diterima (dikonfirmasi user, 2026-08-19):** revocation jadi tidak seketat proxy — API Key yang di-revoke tidak otomatis membatalkan SAS token yang sudah terlanjur terbit (tetap valid sampai TTL 24 jam habis). **Diputuskan: diabaikan**, tidak perlu mitigasi tambahan (mis. stored access policy Azure untuk revoke manual).
+
+### 🚩 Belum Ditentukan / Perlu Ditindaklanjuti
+
+- **Rate limit endpoint `get-sas-token`** — belum dihitung. Rate limit proxy lama (1.850/menit, 155.000/hari, lihat riwayat perhitungan di bawah) dihitung khusus untuk biaya byte-streaming per foto, sudah tidak relevan untuk endpoint token-generation yang jauh lebih ringan (apalagi kalau batch didukung — 1 call bisa cover banyak foto sekaligus). Perlu angka baru dari tim, bukan reuse angka lama.
+- Format error kalau `url` yang dikirim client tidak dikenali/tidak valid (mis. bukan blob URL yang pernah di-generate Digiman+) — belum didefinisikan, kemungkinan perlu kode error baru di [Format Error Response](#format-error-response).
+
+### Riwayat Desain Lama (Proxy Endpoint) — Sudah Tidak Dipakai
+
+Sebelum revisi 2026-08-19, foto diserve lewat `GET /api/v1/form-submissions/photos/{photoGuid}` (proxy, response binary langsung `Content-Type: image/jpeg`, `Cache-Control: private, max-age=31536000, immutable`, error `404 PHOTO_NOT_FOUND` kalau `photoGuid` tidak match). Rate limit-nya dihitung worst-case-literal dari **460 foto/submission** (116 `BANKTASK`/`TAKEPHOTO` varian terbanyak yang diketahui × 3 foto + 5 foto `PHOTOLIST` General tab + 1 foto Machine SMU + 1 foto signature, dibuffer 30% untuk varian belum di-sample) → **1.850 req/menit, 155.000 req/hari**. Detail perhitungan ini sudah tidak relevan untuk model biaya baru (token generation, bukan byte streaming) sehingga tidak dipertahankan penuh di sini — tapi angka **460 foto/submission (worst-case)** tetap berguna sebagai basis kalau nanti rate limit `get-sas-token` dihitung ulang.
 
 ## Sumber Data — SQL + Cosmos
 
@@ -143,11 +318,11 @@ Satu-satunya field yang **genuinely butuh SQL** adalah `formName` — Cosmos tid
 | `submittedAt` | SQL — `[dbo].[TaskPersonalized].ModifiedAt` (join `Task.Id → TaskPersonalized.TaskId`) | Waktu final submit di device — informational, **bukan** field filter (lihat `syncAt`) |
 | `syncAt` | SQL — `[dbo].[TaskPersonalized].LastSyncedModifiedAt` | Waktu record sync ke server — **ini field filter date-range**, karena Digiman+ offline-first (lihat Keputusan Desain #1) |
 | `tabs[].sections[].answers[]` (isi jawaban form) | Cosmos — `FormSubmissionStructure` | Hasil query di [form-submission.md](form-submission.md) |
-| `photos[].url` | Diisi URL ke [Endpoint — Photo Download](#endpoint--photo-download) (`.../photos/{photoGuid}`), **bukan** `ContentAddress` mentah. Resolusi `ContentAddress`/`MachineSMUAddress` tetap terjadi lewat query di bawah, tapi hasilnya dipakai backend untuk stream isi file di endpoint proxy — tidak pernah dikirim sebagai string ke response JSON | Lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto) di bawah dan [Endpoint — Photo Download](#endpoint--photo-download) |
+| `photos[].url` | **🔁 Direvisi (2026-08-19)** — diisi `ContentAddress`/`MachineSMUAddress` (blob URL) hasil resolusi **langsung**, bukan lagi link ke proxy endpoint. Client minta SAS token terpisah lewat `get-sas-token` sebelum fetch isi file dari blob | Lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto) di bawah dan [Endpoint — Photo Download](#endpoint--photo-download) |
 
 ### Resolusi Blob URL untuk Foto
 
-> ✅ **Resolved (2026-08-04)** — sebelumnya section ini flag risiko `ContentAddress` tidak bisa diakses langsung oleh sistem eksternal (dulu Open Item #4). Sudah diputuskan: nilai `ContentAddress`/`MachineSMUAddress` hasil query di bawah **tidak pernah dikirim langsung ke sistem eksternal** — dipakai backend secara internal untuk resolve & stream isi file lewat [Endpoint — Photo Download](#endpoint--photo-download) yang baru. Sistem eksternal cuma menerima URL ke endpoint proxy itu (berisi `photoGuid`), bukan path Blob Storage mentah.
+> 🔁 **Direvisi (2026-08-19)** — kesimpulan "Resolved (2026-08-04)" di bawah ini sudah **dibalik lagi**. Sempat diputuskan `ContentAddress`/`MachineSMUAddress` tidak pernah dikirim ke sistem eksternal (dipakai backend internal untuk stream lewat proxy). Setelah diskusi tech lead (2026-08-19, lihat [Endpoint — Photo Download](#endpoint--photo-download)), proxy dibuang karena membebani Digiman+ — nilai `ContentAddress`/`MachineSMUAddress` hasil query di bawah **sekarang dikirim langsung** sebagai `photos[].url` di response data. Sistem eksternal menerima blob URL asli, lalu minta SAS token terpisah lewat `get-sas-token` sebelum fetch isinya. Blob Storage sudah dikonfirmasi mengizinkan akses publik selama SAS token valid disertakan.
 
 `photoGuid` yang didapat dari Cosmos (dari `TAKEPHOTO`, `CAMERACAPTURE`, maupun `PHOTOLIST` — ketiganya dari field `value`, lihat koreksi di [Open Item #1](#1--belum-resolved-dibuka-ulang-2026-08-14--photolistvalue-di-data-real-masih-placeholder-bukan-guid)) **bukan URL langsung** — cuma GUID. Untuk resolve jadi blob URL, join ke SQL `[dbo].[TaskPersonalizedEvidence]` berdasarkan `ReferenceId = photoGuid`:
 
@@ -304,29 +479,27 @@ Hasil query Cosmos untuk tab **General** dan tab **Inspection/spesifik** punya s
 
 Kalau hasil query ini di-expose apa adanya ke sistem eksternal, konsumen API harus tahu detail internal Cosmos (dua struktur tab yang berbeda, bentuk `photoGuid` yang tidak konsisten) — rawan salah paham dan breaking change kalau struktur internal berubah. API contract sebaiknya **satu bentuk yang konsisten**, terlepas dari bagaimana data disimpan secara internal.
 
-## Skema Response
+## Skema Payload
 
-Contoh lengkap: [form-iir-external-api-response.json](examples/form-iir-external-api-response.json)
+**🔁 Direvisi (2026-08-19) — payload dikirim SATUAN per submission**, bukan lagi list ber-pagination. Konsekuensi langsung dari model push (satu event submit = satu POST ke API client): wrapper `dateFrom`/`dateTo`/`totalRecords`/`page`/`pageSize`/`hasMore`/`submissions[]` **dihapus seluruhnya** — isi array `submissions[]` yang dulu jadi objek root.
+
+**Contoh lengkap: [form-submission-push-payload.json](examples/form-submission-push-payload.json)** — data real dari sample UAT, foto sudah berupa blob URL, dropdown sudah menyertakan `valueCode`.
+
+*(File lama [form-iir-external-api-response.json](examples/form-iir-external-api-response.json) dipertahankan sebagai contoh bentuk response pull yang tidak jadi dikembangkan — jangan dipakai sebagai acuan implementasi.)*
 
 ```
 {
-  dateFrom, dateTo,          ← echo balik parameter request
-  totalRecords, page, pageSize, hasMore,
-  submissions: [
+  formSubmissionId, formCode, formVersion, formName, formSubGroup,
+  siteCode, equipmentNumber,
+  submittedBy, submittedAt, syncAt,
+  tabs: [
     {
-      formSubmissionId, formCode, formVersion, formName, formSubGroup,
-      siteCode, equipmentNumber,
-      submittedBy, submittedAt, syncAt,
-      tabs: [
+      title,
+      sections: [
         {
           title,
-          sections: [
-            {
-              title,
-              answers: [
-                { taskCode, label, value, lastUpdatedBy, lastUpdatedAt, photos: [{label, url}], number?, remark? }
-              ]
-            }
+          answers: [
+            { taskCode, label, value, valueCode?, lastUpdatedBy, lastUpdatedAt, photos: [{label, url}], number?, remark? }
           ]
         }
       ]
@@ -334,6 +507,42 @@ Contoh lengkap: [form-iir-external-api-response.json](examples/form-iir-external
   ]
 }
 ```
+
+### 🔍 Temuan dari Sample Real (2026-08-19) — Jawaban Checklist Ok / Not Ok
+
+Diverifikasi langsung dari [IIR-General-tab-inspection-sample.json](examples/IIR-General-tab-inspection-sample.json) (111 kemunculan) dan [IIR-Grader-tab-inspection-sample.json](examples/IIR-Grader-tab-inspection-sample.json) (116 kemunculan) — **seluruhnya konsisten, tanpa varian lain**:
+
+```json
+{
+  "elementCode": "DROPDOWN",
+  "label": "Condition",
+  "caption":   "['Ok','Not Ok']",
+  "itemValue": "['CONDITION_CHECK_OK','CONDITION_CHECK_NOTOK']",
+  "value":        "CONDITION_CHECK_OK",   ← yang tersimpan: KODE, bukan teks tampilan
+  "valueCaption": "Ok",                   ← teks tampilan, sudah ter-resolve per jawaban
+  "valueColor":   "#18AF4A"
+}
+```
+
+**Jadi jawaban checklist IIR adalah Ok / Not Ok — bukan Yes/No, dan bukan pula `CONDITION_CHECK_OK` sebagai teks yang dibaca manusia.** Dua hal penting yang sebelumnya tidak terdokumentasi:
+
+1. **`value` mentah berisi kode internal** (`CONDITION_CHECK_OK`/`CONDITION_CHECK_NOTOK`), sementara [Mapping Field](#mapping-field-raw-query-result--api-field) selama ini cuma bilang `taskValue` → `value` (pass-through) — yang kalau diikuti mentah-mentah akan mengirim kode internal Digiman+ ke BUMA. Contoh payload lama justru sudah memakai `"Ok"`, jadi dokumen dan contoh **saling bertentangan**. Sekarang diselaraskan.
+2. **`valueCaption` sudah berisi teks tampilan per jawaban** — tidak perlu index-mapping manual antara `caption` dan `itemValue`. (Catatan: `valueCaption` bermakna beda per elemen — untuk `PHOTOLIST` isinya justru device file path, bug [IAMS30-4485](https://bukittechnology.atlassian.net/browse/IAMS30-4485). Jadi aturan "pakai `valueCaption`" **hanya** berlaku untuk `DROPDOWN`, bukan blanket.)
+
+**✅ Diputuskan — kirim keduanya**, `value` (teks tampilan) **dan** `valueCode` (kode mentah):
+
+| Field | Isi | Kenapa perlu |
+|---|---|---|
+| `value` | `"Ok"` / `"Not Ok"` (dari `valueCaption`) | Yang dibaca manusia di laporan/UI BUMA |
+| `valueCode` | `"CONDITION_CHECK_OK"` / `"CONDITION_CHECK_NOTOK"` (dari `value` mentah) | Yang dipakai mesin untuk branching/agregasi. **Lebih stabil** — teks caption adalah konfigurasi template di Form Builder yang bisa diedit/diterjemahkan kapan saja, sedangkan kode jauh lebih jarang berubah. Kalau BUMA cuma dapat `"Ok"` lalu suatu hari caption diubah jadi `"OK"`/`"Baik"`, logic mereka diam-diam rusak |
+
+`valueCode` **hanya muncul untuk jawaban yang sumbernya `DROPDOWN` ber-`itemValue`** (checklist tab Inspection) — jawaban free-text tab General tidak punya kode, jadi field ini absen di situ (bukan `null`, tapi memang tidak ada — sesuai pola `number`/`remark` yang juga opsional per tab).
+
+**🚩 Catatan cakupan:** kesimpulan ini berbasis 4 sample dari kategori `SubGroup = 'IIR'`. Konsisten dengan [Keputusan #26](#keputusan-desain-sudah-dikonfirmasi) yang sengaja tidak meng-enumerasi semua varian form, **tidak dijamin** kategori/varian lain memakai pasangan kode yang sama — jadi implementasi harus membaca `valueCaption`/`value` apa adanya dari dokumen, **bukan** men-hardcode dua nilai `CONDITION_CHECK_*` di atas.
+
+**🐛 Temuan sampingan — ✅ dikonfirmasi user (2026-08-19): salah template.** [IIR-Grader-tab-inspection-sample.json](examples/IIR-Grader-tab-inspection-sample.json) memuat 1 elemen ber-`elementCode` `ASSESSMENTCHECK` (sample tertanggal 18 Agu 2026) — **ini template yang salah, seharusnya `CONDITION_CHECK`**. Sisa dari rename sementara untuk testing ([IAMS30-4203](https://bukittechnology.atlassian.net/browse/IAMS30-4203)) yang seharusnya sudah dikembalikan sebelum deploy PRD ([IAMS30-4207](https://bukittechnology.atlassian.net/browse/IAMS30-4207), sudah Closed) tapi ternyata masih tertinggal di template ini.
+
+**Dampak ke endpoint ini: kemungkinan besar tidak ada.** `CONDITION_CHECK`/`ASSESSMENTCHECK` adalah `elementCode` di level **container TaskKit**, sementara ekstraksi jawaban membaca elemen nested di dalamnya (`NUMBERINGTEXT`/`BANKTASK`/`DROPDOWN`/`INLINE`) dan tidak memfilter berdasarkan elementCode container — jadi jawaban tetap terbaca. **Tapi tetap perlu diperbaiki di sisi template**, dan perlu dicek apakah salah template ini cuma di UAT atau ikut ke PRD. Di luar scope endpoint ini, dicatat karena ditemukan saat audit sample.
 
 ### Mapping Field (raw query result → API field)
 
@@ -347,11 +556,12 @@ Contoh lengkap: [form-iir-external-api-response.json](examples/form-iir-external
 | SQL `TaskPersonalized.ModifiedAt` | `submittedAt` | Diganti dari sumber Cosmos ke SQL — lihat [Sumber Data](#sumber-data--sql--cosmos) |
 | SQL `TaskPersonalized.LastSyncedModifiedAt` | `syncAt` | **Field baru** — perlu verifikasi kolom ini benar ada di live schema (lihat catatan ⚠ di atas) |
 | `taskDesc` | `label` | Disamakan namanya lintas tab. **Untuk `PHOTOLIST`, `e.label` selalu `""`** (dikonfirmasi di semua kemunculan real: "Foto Kondisi Fisik Equipment" maupun "Digital Signature by Inspector") — lihat aturan derivasi label di Keputusan Desain #27, bukan dibiarkan kosong |
-| `taskValue` | `value` | Disamakan namanya lintas tab. **Untuk elemen yang isinya murni foto** (`CAMERACAPTURE` mis. "Photo Machine SMU", dan `PHOTOLIST` mis. "Foto Kondisi Fisik Equipment"), `value` selalu **`null`** — terlepas dari jumlah foto (lihat Keputusan Desain #12). GUID tetap bisa didapat dari `photos[].url`. **`TAKEPHOTO` yang nempel di row checklist** (tab spesifik) tidak kena aturan ini — `value`-nya tetap jawaban `DROPDOWN` (mis. "Ok"), foto cuma lampiran tambahan |
+| `taskValue` / `valueCaption` | `value` | Disamakan namanya lintas tab. **🔁 Direvisi (2026-08-19)** — untuk jawaban `DROPDOWN` (checklist tab Inspection), yang dikirim adalah **`valueCaption`** (teks tampilan, mis. `"Ok"`), **bukan** `value` mentah yang berisi kode internal `CONDITION_CHECK_OK` — lihat [Temuan dari Sample Real](#-temuan-dari-sample-real-2026-08-19--jawaban-checklist-ok--not-ok). Untuk elemen lain (free-text tab General dll), tetap pass-through nilai apa adanya. **Untuk elemen yang isinya murni foto** (`CAMERACAPTURE` mis. "Photo Machine SMU", dan `PHOTOLIST` mis. "Foto Kondisi Fisik Equipment"), `value` selalu **`null`** — terlepas dari jumlah foto (lihat Keputusan Desain #12). **`TAKEPHOTO` yang nempel di row checklist** (tab spesifik) tidak kena aturan ini — `value`-nya tetap jawaban `DROPDOWN`, foto cuma lampiran tambahan |
+| `value` (mentah, elemen `DROPDOWN`) | `valueCode` | **Field baru (2026-08-19)** — kode mentah pilihan dropdown (mis. `CONDITION_CHECK_OK`), dikirim berdampingan dengan `value` yang berisi teks tampilan. **Hanya ada untuk jawaban `DROPDOWN` ber-`itemValue`** — absen (bukan `null`) untuk jawaban free-text. Tujuannya memberi BUMA kunci yang stabil untuk branching, karena teks caption bisa diedit kapan saja di Form Builder — lihat [Temuan dari Sample Real](#-temuan-dari-sample-real-2026-08-19--jawaban-checklist-ok--not-ok) |
 | `taskCode` | `taskCode` | **Di-include untuk kedua tab** (direvisi 2026-08-14, lihat Keputusan Desain #7) — konsisten, tidak ada exception per tab. Semantiknya beda: tab spesifik = business code stabil (`Task1252`), tab General = GUID internal yang beda tiap submission (tidak berguna untuk korelasi lintas submission, tapi tidak masalah di-expose) |
 | `lastUpdatedByUserCode` | `lastUpdatedBy` | Email user yang terakhir mengubah jawaban (bukan display name `lastUpdatedBy` di raw). PII — disetujui di-share, lihat Keputusan Desain #6 |
 | `lastUpdatedDate` | `lastUpdatedAt` | Timestamp (ISO-8601 UTC) terakhir jawaban diubah. Diambil per-answer; kalau satu `taskCode` punya beberapa timestamp (mis. remark/foto di-update belakangan), pakai yang **paling akhir** (max) sebagai "kapan jawaban ini terakhir berubah" |
-| `photoGuid` (bentuk tidak konsisten — lihat tabel di atas) | `photos: [{label, url}]` | **Selalu array**, `url` diisi link ke [Endpoint — Photo Download](#endpoint--photo-download) (`.../photos/{photoGuid}`) — bukan `ContentAddress` mentah (lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto)) — konsumen API tidak perlu tahu/branch berdasarkan elementCode asal (`TAKEPHOTO`/`CAMERACAPTURE`/`PHOTOLIST`), cukup `GET` URL tersebut dengan API Key yang sama |
+| `photoGuid` (bentuk tidak konsisten — lihat tabel di atas) | `photos: [{label, url}]` | **Selalu array**. **🔁 Direvisi (2026-08-19)** — `url` sekarang berisi blob URL langsung (`ContentAddress`/`MachineSMUAddress`, lihat [Resolusi Blob URL untuk Foto](#resolusi-blob-url-untuk-foto)), bukan lagi link ke proxy endpoint. Konsumen API tetap tidak perlu tahu/branch berdasarkan elementCode asal (`TAKEPHOTO`/`CAMERACAPTURE`/`PHOTOLIST`) — tapi sebelum fetch isi file, perlu minta SAS token untuk `url` ini lewat [`get-sas-token`](#endpoint--photo-download) |
 | `sectionTitle: ""` | `title: null` | `null` lebih jujur merepresentasikan "tidak ada judul" dibanding string kosong |
 | `number` | `number` (nullable, hanya ada di tab spesifik) | Tidak dipaksakan ada di semua row |
 
@@ -378,11 +588,11 @@ Contoh lengkap: [form-iir-external-api-response.json](examples/form-iir-external
 | 17 | **Dua endpoint terpisah** — `GET /api/v1/form-submissions` (list/polling) dan `GET /api/v1/form-submissions/{formSubmissionId}` (single-fetch by ID) | Diminta eksplisit — dua endpoint ini beda peruntukan (polling berkala vs re-fetch/lookup granular), tidak digabung jadi satu. Lihat [HTTP Method & Endpoint](#http-method--endpoint) |
 | 18 | Versioning API pakai **URL path** (`/api/v1/...`) | Paling eksplisit untuk konsumen B2B eksternal, gampang didokumentasikan/dites tanpa header khusus. **🚩 Masih rekomendasi, perlu di-assess developer** sebelum dikunci — lihat [API Versioning](#api-versioning) |
 | 19 | **Tidak ada pembatasan otorisasi granular per site** — 1 API Key valid otomatis akses semua site | Diminta eksplisit. Filter `siteCode`/`equipmentNumber` di request murni narrowing hasil pencarian, bukan enforcement keamanan. Lihat [Scope Otorisasi](#scope-otorisasi) |
-| 20 | **Proxy endpoint** dipilih untuk serve foto (`GET /api/v1/form-submissions/photos/{photoGuid}`), **bukan** SAS token per-URL maupun expose `ContentAddress` mentah | Blob Storage tidak bisa diakses langsung dari luar Digiman+ (dikonfirmasi user). SAS token ditolak karena masalah timing TTL — endpoint ini didesain untuk polling async, sistem eksternal belum tentu langsung fetch foto begitu dapat response metadata. Proxy reuse auth API Key + IP whitelist yang sama (satu mekanisme, satu titik revoke), blob tetap fully private. Lihat [Endpoint — Photo Download](#endpoint--photo-download) |
-| 21 | Response endpoint foto pakai **binary langsung + `Content-Type`**, **bukan base64** | Base64 nge-bloat payload ~33%, cuma masuk akal kalau foto harus nempel di JSON list/detail (bertentangan dengan alasan pagination di Keputusan #2). Endpoint terpisah membuat binary lebih efisien: cache-able, mendukung `Range` request, langsung bisa dibuka tanpa decode. Lihat [Endpoint — Photo Download](#endpoint--photo-download) |
-| 22 | `Cache-Control: private, max-age=31536000, immutable` (1 tahun) untuk response foto | Foto evidence bersifat immutable per `photoGuid` — tidak perlu revalidasi (`ETag`) sama sekali. `private` karena response butuh auth, bukan buat shared cache/CDN publik |
-| 23 | **✅ Direvisi (2026-08-14)** — Rate limit endpoint foto **terpisah** dari endpoint data: **1.850 req/menit, 155.000 req/hari** (sebelumnya 1.400/120.000, basisnya salah — lihat kolom Alasan) | Karakteristik beban beda jauh (fetch foto ringan vs query data yang JOIN+aggregate), dan foto punya multiplier tinggi per submission. Basis lama (345 foto/submission = 113 form task × 3 foto + 5 foto General tab + 1 SMU) pakai angka "113" yang ternyata stale — real: **116** `BANKTASK` varian Grader (lebih tinggi dari 111 varian General), +1 foto signature yang dulu belum terhitung → worst-case-literal jadi **355** foto/submission. Ditambah **buffer 30%** (355 × 1,3 ≈ 461,5, dibulatkan ke **460**) untuk jaga-jaga varian form IIR lain/kategori `SubGroup` baru yang belum di-sample (konsisten dengan Keputusan #26 — daftar formCode sengaja tidak di-enumerasi). Limit final diturunkan dari 460 foto/submission dengan formula yang sama seperti sebelumnya (pageSize default × foto/submission ÷ target hydrate 5 menit, lalu rasio 2.500:30 untuk basis harian). **🚩 Tetap worst-case-literal + buffer dari sisi kebutuhan client — belum diverifikasi terhadap kapasitas backend/DevOps** (lihat [Open Item #9](#9--rate-limit-endpoint-foto-1850-reqmenit-155000-reqhari-belum-diverifikasi-terhadap-kapasitas-backend)). Lihat [Endpoint — Photo Download](#endpoint--photo-download) |
-| 24 | Naming endpoint: `GET /api/v1/form-submissions/photos/{photoGuid}` — **tidak** nested di bawah `{formSubmissionId}` | Tetap di namespace `form-submissions` untuk konsistensi/discoverability dengan 2 endpoint lain. `photoGuid` sudah cukup unik untuk resolve sendiri, tidak butuh `formSubmissionId` sebagai konteks — apalagi otorisasi juga tidak granular per-resource (Keputusan #19) |
+| 20 | **🔁 Direvisi (2026-08-19)** — **Blob URL langsung + SAS token via endpoint `get-sas-token` terpisah**, menggantikan proxy endpoint yang sebelumnya dipilih di sini | Proxy streaming binary tiap foto (worst-case ~460/submission) membebani compute/bandwidth Digiman+ — diputuskan setelah diskusi tech lead. Alasan penolakan SAS token yang lama (blob tidak bisa diakses langsung dari luar; timing TTL karena token dibakar ke response poll) sudah tidak berlaku: Blob Storage sekarang diizinkan diakses via SAS, dan token di desain baru digenerate on-demand (bukan di response poll). Lihat [Endpoint — Photo Download](#endpoint--photo-download) |
+| 21 | **🔁 Tidak berlaku lagi (2026-08-19)** — ~~Response endpoint foto pakai binary langsung + `Content-Type`, bukan base64~~ | Digiman+ tidak lagi serve isi file foto sama sekali (Keputusan #20 direvisi) — client fetch langsung dari Blob Storage pakai SAS token, format response jadi tanggung jawab Azure Blob, bukan Digiman+ |
+| 22 | **🔁 Tidak berlaku lagi (2026-08-19)** — ~~`Cache-Control: private, max-age=31536000, immutable` untuk response foto~~ | Sama seperti Keputusan #21 — Digiman+ tidak lagi jadi response server untuk isi foto, caching (kalau ada) jadi domain Azure Blob/client, bukan diatur Digiman+ |
+| 23 | **🔁 Tidak berlaku lagi (2026-08-19)** — ~~Rate limit endpoint foto 1.850 req/menit, 155.000 req/hari~~ | Angka ini dihitung khusus untuk biaya byte-streaming per foto (Keputusan #20 lama) — sudah tidak relevan untuk model biaya `get-sas-token` (token generation, jauh lebih ringan). Rate limit baru **belum dihitung** — lihat [Open Item terkait](#endpoint--photo-download) di Endpoint — Photo Download |
+| 24 | **🔁 Direvisi (2026-08-19)** — Naming endpoint jadi `POST /api/v1/form-submissions/photos/sas-token` (bukan lagi `GET .../photos/{photoGuid}`) | Method `POST` karena request butuh body berisi **batch** blob URL (✅ dikonfirmasi, bisa lebih dari satu) — bukan lagi 1 `photoGuid` di path. `GET` tidak dipakai di sini (beda dari 2 endpoint data, Keputusan #16) karena daftar URL batch bisa melebihi batas panjang URL yang aman untuk query string. Tetap di namespace `form-submissions` untuk konsistensi dengan 2 endpoint data. Lihat [Endpoint — Photo Download](#endpoint--photo-download) |
 | 25 | **✅ Diputuskan (2026-08-14)** — Endpoint (termasuk naming, `/api/v1/iir-form-submissions` → `/api/v1/form-submissions`, dan endpoint foto) **digeneralisasi lintas semua kategori `BusinessOperationalForm`**, bukan cuma IIR. Filter `bof.SubGroup = 'IIR'` yang tadinya hardcode diganti jadi parameter **wajib** `formSubGroup` di request (satu nilai, bukan list) — bukan opsional/default-ke-semua-kategori. `siteCode` juga direvisi jadi wajib di request yang sama (lihat Keputusan #11 revisi). `formSubGroup`/`siteCode`/`equipmentNumber` selalu di-include di response | Diminta eksplisit — supaya kalau ada kategori form baru ditambahkan ke `BusinessOperationalForm` di masa depan, sistem eksternal tinggal ganti nilai `formSubGroup=<kategori>` di request mereka tanpa perlu perubahan endpoint/kode di sisi Digiman+; wajib (bukan opsional) supaya tiap request eksplisit scope ke satu kategori, tidak ada request yang tanpa sadar menarik campuran banyak kategori sekaligus. Cakupan tetap terbatas ke form `FT_BusinessOperationalForm` (yang punya baris di `BusinessOperationalForm`) — form `FT_MaintenanceForm` (Inspection/PM Shutdown/BD Corrective) tetap di luar cakupan, generik atau tidak. Lihat [Konteks](#konteks), [HTTP Method & Endpoint](#http-method--endpoint), dan [Filter Tambahan](#filter-tambahan--site-equipment-number--form-subgroup) |
 | 26 | **✅ Diputuskan (2026-08-14)** — **Tidak ada filter per-`formCode`** di dalam satu `formSubGroup`. Response untuk satu `formSubGroup` (mis. `IIR`) selalu mengembalikan **semua** formCode yang tergabung di kategori itu tercampur (mis. `FORM385` + `FORM394` bareng dalam satu response) — tidak ada mode "cuma varian X". Konsekuensinya, daftar lengkap formCode per `SubGroup` **tidak perlu di-enumerasi/di-maintain** sebagai bagian dari desain endpoint ini | Diminta eksplisit. Grouping sudah cukup terjadi di level `SubGroup` (Keputusan #25) — filter tambahan per-formCode di bawahnya cuma menambah kompleksitas tanpa manfaat, karena tujuan endpoint memang expose semua submission dalam satu kategori bisnis, bukan micro-manage per varian form. Endpoint jadi benar-benar generik: tidak perlu tahu/track formCode apa saja yang termasuk kategori tertentu, cukup andalkan kolom `SubGroup` di database sebagai source of truth. Lihat [Open Item #6](#6--resolved--join-key-ke-businessoperationalform-terkonfirmasi-dan-daftar-lengkap-formcode-per-varian-sengaja-tidak-di-enumerasi) |
 | 27 | **✅ Diputuskan (2026-08-14)** — Untuk jawaban `PHOTOLIST` yang `e.label`-nya kosong (`""`, selalu begitu di data real), API **tidak membiarkan `label` kosong** — diisi dari konteks section: (a) kalau section punya elemen `CUSTOMCONTENT` sebelum `PHOTOLIST`-nya (mis. section "Asset Detail" → "Foto Kondisi Fisik Equipment", teks dari `<strong>FOTO KONDISI FISIK EQUIPMENT :</strong>` di-strip HTML & tanda baca penutup), pakai teks itu; (b) kalau section cuma berisi elemen `PHOTOLIST` itu sendiri tanpa `CUSTOMCONTENT` (mis. section "Digital Signature by Inspector"), pakai **`title` section itu sendiri** sebagai `label` | Diminta eksplisit — signature disamakan perlakuannya dengan "Foto Kondisi Fisik Equipment": sama-sama prinsip "ambil teks konteks terdekat", cuma sumbernya beda (sibling `CUSTOMCONTENT` vs `title` section) tergantung apa yang tersedia. Ini **beda** dari filosofi "honest null" yang dipakai untuk `title: null` section tanpa judul (Mapping Field) — di situ memang tidak ada teks apapun yang bisa diambil, sedangkan di sini source teksnya selalu ada (baik dari `CUSTOMCONTENT` maupun `title` section), jadi tidak ada alasan membiarkan `label` kosong. Per-foto tetap juga punya `label` sendiri dari `caption` (lihat [Skema Response](#skema-response)) — field ini di level jawaban cuma menjelaskan section-nya secara keseluruhan |
@@ -423,11 +633,15 @@ Kalau ternyata tidak reliable, filter ini berisiko exclude data yang seharusnya 
 
 Rekomendasi versioning (`/api/v1/...` di URL path, kebijakan breaking-change/deprecation) di [API Versioning](#api-versioning) dan Keputusan Desain #18 **masih proposal, belum final**. Perlu dinilai developer: konsistensi dengan konvensi API/endpoint lain yang sudah ada di Digiman+, kesiapan infrastruktur routing/gateway untuk path-based versioning, dan realistis-tidaknya komitmen masa deprecation dari sisi effort maintain multi-versi.
 
-### 4. ✅ Resolved — Aksesibilitas foto oleh sistem eksternal
+### 4. 🔁 Dibuka Ulang (2026-08-19) — Aksesibilitas blob dari luar berubah jadi diizinkan via SAS token
 
-**Dikonfirmasi user (2026-08-04):** blob penyimpanan foto **tidak bisa diakses langsung dari luar Digiman+** — akses hanya berlaku lewat sistem Digiman+ sendiri (web maupun mobile). Konsisten dengan pola gambar guideline yang di-host di Azure Blob Storage privat ([`form-builder.md`](form-builder.md#karakteristik)).
+**Kesimpulan lama (2026-08-04, sudah tidak berlaku):** blob penyimpanan foto tidak bisa diakses langsung dari luar Digiman+ — akses hanya lewat sistem Digiman+ sendiri (web/mobile), sehingga dipilih proxy endpoint (bukan SAS token).
 
-**Keputusan:** proxy endpoint (bukan SAS token) — lihat spec lengkap di [Endpoint — Photo Download](#endpoint--photo-download) dan Keputusan Desain #20–24. `photos[].url` sekarang mengarah ke endpoint proxy Digiman+ sendiri, bukan `ContentAddress` mentah.
+**✅ Dikonfirmasi ulang (2026-08-19), setelah diskusi tim tech lead:** Blob Storage **sekarang mengizinkan akses publik selama request menyertakan SAS token yang valid** — perubahan network/access policy di level Azure Storage Account. Konstraint lama "tidak bisa diakses langsung dari luar" sudah tidak berlaku untuk endpoint ini.
+
+**Keputusan baru:** blob URL langsung + endpoint `get-sas-token` terpisah (bukan proxy) — lihat spec lengkap di [Endpoint — Photo Download](#endpoint--photo-download) dan Keputusan Desain #20 (direvisi). `photos[].url` sekarang berisi `ContentAddress`/`MachineSMUAddress` mentah, bukan lagi link ke proxy Digiman+.
+
+**Catatan:** pola gambar guideline yang di-host di Azure Blob Storage privat ([`form-builder.md`](form-builder.md#karakteristik)) **tidak otomatis ikut berubah** oleh keputusan ini — perubahan access policy di sini spesifik untuk container/blob yang dipakai endpoint form submission foto, bukan blanket policy change untuk semua blob Digiman+. Perlu dipastikan ke tim infra bahwa perubahan ini scoped dengan benar, tidak tanpa sengaja membuka akses publik ke blob lain yang harusnya tetap privat.
 
 ### 5. ✅ Resolved — Flat `PHOTOLIST` di tab Inspection (signature) ditangani sama seperti flat elements tab General
 
@@ -465,18 +679,11 @@ Rekomendasi versioning (`/api/v1/...` di URL path, kebijakan breaking-change/dep
 
 **✅ Dikonfirmasi user — `FormCode` di `BusinessOperationalForm` selalu unique** (satu `FormCode` cuma pernah muncul di satu baris). Join `bof.FormCode = fs.FormCode` aman, tidak ada risiko fan-out/duplikat row. Tidak ada perubahan ke query — desain saat ini tetap valid apa adanya.
 
-### 9. 🚩 Rate limit endpoint foto (1.850 req/menit, 155.000 req/hari) belum diverifikasi terhadap kapasitas backend
+### 9. 🔁 Tidak berlaku lagi (2026-08-19) — Rate limit endpoint foto proxy digantikan open item baru untuk `get-sas-token`
 
-**Ditemukan (2026-08-14).** Angka rate limit endpoint foto di [Rate Limit — Terpisah dari Endpoint Data](#rate-limit--terpisah-dari-endpoint-data) dan Keputusan Desain #23 (**1.850 req/menit, 155.000 req/hari**, setelah revisi basis 116 BANKTASK + buffer 30%) murni diturunkan dari sudut pandang **"berapa request yang dibutuhkan client eksternal yang berperilaku wajar"** — sama sekali **belum dibandingkan dengan kapasitas riil backend** (throughput Blob Storage untuk serve foto, jumlah koneksi SQL concurrent ke `TaskPersonalizedEvidence`/`TaskPersonalized`, kapasitas service `maintenance-execution` secara umum).
+Open item ini awalnya soal verifikasi kapasitas backend untuk rate limit **proxy streaming** (1.850 req/menit, 155.000 req/hari). Proxy endpoint sudah dibuang (lihat [Endpoint — Photo Download](#endpoint--photo-download) dan Keputusan Desain #20 direvisi) — Digiman+ tidak lagi serve byte foto sama sekali, jadi pertanyaan "kapasitas backend untuk streaming" ini sudah tidak relevan.
 
-**Kenapa ini perlu diperhatikan:** buffer 30% yang ditambahkan (Keputusan #23) sengaja **menaikkan** ceiling limit supaya client legit tidak keblokir kalau ada varian form dengan lebih banyak foto — tapi menaikkan ceiling client-side otomatis berarti **potensi beban puncak ke backend juga naik**, tanpa ada verifikasi apakah backend sanggup menyerap beban itu. Kedua pertanyaan ini ("berapa yang dibutuhkan client" vs "berapa yang sanggup ditangani server") tidak sama, dan saat ini cuma yang pertama yang dihitung.
-
-**Perlu dikonfirmasi ke tim backend *dan* DevOps/infra** — dua sudut pandang yang beda:
-- **Backend**: kapasitas service `maintenance-execution` sendiri — koneksi SQL concurrent ke `TaskPersonalizedEvidence`/`TaskPersonalized`, efisiensi query resolusi foto di titik beban puncak.
-- **DevOps/infra**: kapasitas di luar kendali kode aplikasi — throughput/bandwidth Blob Storage, batas App Service Plan/container (CPU, memory, concurrent connection), rules di load balancer/API gateway/WAF (kalau ada rate limiting atau connection cap di layer itu juga), serta apakah autoscaling sudah dikonfigurasi untuk menyerap burst 1.850 req/menit (≈31 req/detik) di titik puncak.
-- Kalau kapasitas dari **salah satu pihak** (backend maupun infra) ternyata lebih rendah dari angka yang dihitung dari sisi client, **rate limit final harus ikut angka yang paling ketat** di antara keduanya — bukan angka kebutuhan client begitu saja.
-
-**Status:** angka 1.850/menit, 155.000/hari tetap dipakai sebagai estimasi sementara (belum final) sampai ada konfirmasi kapasitas dari backend **dan** DevOps/infra.
+**Open item pengganti:** rate limit untuk endpoint `get-sas-token` yang baru **belum dihitung sama sekali** (bukan cuma belum diverifikasi ke kapasitas — angkanya sendiri belum ada). Karakteristik bebannya beda total dari streaming (token generation jauh lebih ringan per-request, dan berpotensi batch), jadi tidak bisa reuse formula/angka lama. Lihat catatan di [Endpoint — Photo Download](#endpoint--photo-download).
 
 ---
 
