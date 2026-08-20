@@ -741,7 +741,7 @@ Konsolidasi semua field mapping yang sudah dibahas terpisah-pisah di atas, jadi 
 | `ReuseOrderNumber` | 🆕 | `ReuseOrderNumber` | 🆕 | Reference ke `MechanicOrderList.Number` lokal, **dibaca dari `PoolingMOItem.EMOLNumber`** (value-nya sama, tidak perlu join balik ke `MechanicOrderList`) — **cuma terisi kalau kandidatnya punya row lokal** (precise-match candidate). NULL untuk kandidat `MOOpen`-only atau escape hatch. Bareng `ReuseSAPOrderNumber`, salah satunya non-NULL = marker vehicle-approval eMOL — [lihat mekanisme lengkap di Poin 6](#poin-6-duplicate-atau-correlation-handling). |
 | `ReuseSAPOrderNumber` (sebelumnya `SAPMONumber`) | 🆕 | — (tidak langsung) | — | Nomor MO SAP — isinya beda sumber tergantung kondisi kandidat (manual/auto-derive, [lihat Poin 6](#poin-6-duplicate-atau-correlation-handling)). Tidak propagate langsung ke `MechanicOrderList` — dipakai sebagai `BacklogExecutionList.MONumber` post-approval, ~~**dan** update balik `PoolingMOItem`/`SAPMOSyncOrder` milik Order **lama** yang di-reuse~~ (**update balik tidak lagi punya pemicu, 2026-08-19** — [lihat catatan di Poin 1](#poin-1-trigger-dan-ui-create-defect-atau-crack)). |
 | `NoPartsRequired` | 🆕 | `NoPartsRequired` | ✅ | Companion existing column di Order side. |
-| `DeleteNotes` | ✅ | `DeleteReason` | ✅ | Nama kolom beda, soft-delete reason ([Poin 8](#poin-8-cancel-atau-delete-finding)). |
+| `DeleteNotes` | ✅ | `DeleteReason` | ✅ | Nama kolom beda, soft-delete reason ([Poin 8](#poin-8-cancel-atau-delete-finding)). **Opsional** — boleh NULL di kedua sisi kalau user tidak mengisi alasan saat delete. |
 | `IsActive` | ✅ | `IsActive` | ✅ | Soft-delete flag, cascade juga ke `MechanicOrderSummary` + semua child table ([Poin 8](#poin-8-cancel-atau-delete-finding)). |
 | — | — | `Type` | ✅ | Bukan propagate dari kolom manapun — di-**set** consumer jadi value baru `'Form'` saat create ([lihat penjelasan](#poin-5-data-flow-defect-dan-crack)). |
 | — | — | `Status` | ✅ | Bukan propagate — di-**set** consumer langsung `Complete` saat create (baik create-baru maupun reuse-vehicle). |
@@ -1004,7 +1004,7 @@ Memecah field jadi dua (fakta vs trigger) sengaja **tidak** diambil di Phase 2 �
 
 ### Poin 8: Cancel atau Delete Finding
 
-**Resolved (2026-08-17) — Delete (soft), bukan Cancel:** pembatalan total Finding (mechanic salah identifikasi/false positive) direalisasikan sebagai **soft-delete** — flip `IsActive=0` + isi `DeleteNotes` (`TaskPersonalizedFinding`) — **bukan** hard delete maupun status "Cancelled" terpisah. **Skema sudah ada, tidak perlu kolom baru** — dikonfirmasi real di kedua sisi: `TaskPersonalizedFinding.DeleteNotes`+`IsActive` ([maintenance-execution-schema.md](../../architecture/database/maintenance-execution-schema.md)), `MechanicOrderList.DeleteReason`+`IsActive` ([maintenance-order-schema.md](../../architecture/database/maintenance-order-schema.md)) — soft-delete via `IsActive` sudah jadi pola konsisten di hampir semua tabel di kedua service.
+**Resolved (2026-08-17) — Delete (soft), bukan Cancel:** pembatalan total Finding (mechanic salah identifikasi/false positive) direalisasikan sebagai **soft-delete** — flip `IsActive=0` + isi `DeleteNotes` (`TaskPersonalizedFinding`) — **`DeleteNotes` diketik user di confirmation dialog dan bersifat OPSIONAL (2026-08-19)**, jadi boleh NULL; detail kontrolnya di [confirmation dialog di bawah](#poin-8-cancel-atau-delete-finding) — **bukan** hard delete maupun status "Cancelled" terpisah. **Skema sudah ada, tidak perlu kolom baru** — dikonfirmasi real di kedua sisi: `TaskPersonalizedFinding.DeleteNotes`+`IsActive` ([maintenance-execution-schema.md](../../architecture/database/maintenance-execution-schema.md)), `MechanicOrderList.DeleteReason`+`IsActive` ([maintenance-order-schema.md](../../architecture/database/maintenance-order-schema.md)) — soft-delete via `IsActive` sudah jadi pola konsisten di hampir semua tabel di kedua service.
 
 **Resolved (2026-08-17) — permission, sama pola dengan Edit ([Poin 4](#poin-4-offline-behavior--draft-state-2026-08-15)):**
 - **`IAMS_Mobile_DefectCrack_Delete`** — hapus Finding milik sendiri (creator).
@@ -1025,7 +1025,7 @@ Memecah field jadi dua (fakta vs trigger) sengaja **tidak** diambil di Phase 2 �
 
 **Resolved (2026-08-17) — feedback setelah delete berhasil:** toast singkat *"Deleted"*, lalu **otomatis navigasi balik** ke Tab Finding list ([lihat filter+renumber](#current-state--mobile-app-ui-v400)) — Finding yang baru dihapus tidak lagi muncul di list itu.
 
-**Resolved (2026-08-17) — cascade ke `maintenance-order`:** delete **lewat topic/publish yang sama** dengan edit (bukan channel terpisah, [lihat Poin 5](#poin-5-data-flow-defect-dan-crack)) — consumer set `MechanicOrderList.IsActive=0`+`DeleteReason` (dari `DeleteNotes`). Karena grouping eMOL **1:1** per Finding — tidak ada `MechanicOrderList` lain yang gantung ke `MechanicOrderSummary` yang sama — **`MechanicOrderSummary.IsActive` ikut di-set `0` juga**, bukan cuma List-nya, karena Summary itu eksis semata-mata untuk Finding ini.
+**Resolved (2026-08-17) — cascade ke `maintenance-order`:** delete **lewat topic/publish yang sama** dengan edit (bukan channel terpisah, [lihat Poin 5](#poin-5-data-flow-defect-dan-crack)) — consumer set `MechanicOrderList.IsActive=0`+`DeleteReason` (dari `DeleteNotes`, **bisa NULL kalau user tidak mengisi alasan** — `IsActive=0` yang jadi sinyal delete-nya, bukan terisinya `DeleteReason`). Karena grouping eMOL **1:1** per Finding — tidak ada `MechanicOrderList` lain yang gantung ke `MechanicOrderSummary` yang sama — **`MechanicOrderSummary.IsActive` ikut di-set `0` juga**, bukan cuma List-nya, karena Summary itu eksis semata-mata untuk Finding ini.
 
 **Resolved (2026-08-17) — cascade ke child table eMOL, bukan cuma List+Summary:** `MechanicOrderDetail`/`MechanicOrderMaterial`/`MechanicOrderCrackIdentified`/`MechanicOrderEvidence` (semua child yang nempel ke `MechanicOrderList` yang di-delete) **ikut di-flip `IsActive=0` juga**, eksplisit — bukan cuma andalkan join ke status parent (`MechanicOrderList`). Alasan: lebih aman dari bug "lupa cek status parent" di query masa depan, dan cost-nya kecil (sudah dalam 1 transaction consumer yang sama dengan update List/Summary di atas).
 
@@ -1037,13 +1037,17 @@ Memecah field jadi dua (fakta vs trigger) sengaja **tidak** diambil di Phase 2 �
 
 **Resolved (2026-08-17) — konfirmasi sebelum delete, jadi mitigasi utama (bukan mekanisme restore):** karena tidak ada undelete/restore, delete **wajib lewat confirmation dialog** dulu sebelum action jalan — cukup sebagai mitigasi, **tidak perlu** bangun mekanisme restore terpisah (konsisten prinsip "manusia validasi di titik krusial" yang dipegang di seluruh dokumen ini). Copy beda tergantung konsekuensi cascade-nya (supaya user paham dampak sebenarnya, bukan pesan generik):
 
+**Resolved (2026-08-19) — alasan delete diketik user, tapi TIDAK mandatory:** dialog menyediakan satu field free text opsional; kalau dikosongkan, `DeleteNotes` (dan `DeleteReason` turunannya di `maintenance-order`) tetap NULL dan delete **tetap jalan**. Alasan tidak dimandatorikan: delete adalah aksi koreksi yang harus tetap ringan di lapangan — memaksa mengetik akan mendorong user mengisi asal-asalan, yang lebih buruk daripada kosong. Yang wajib tetap **konfirmasinya**, bukan alasannya. Beda dari `Approval Remark` saat reject ([Poin 10](#poin-10-rejectrework-flow)) yang **mandatory** — di sana approver membatalkan pekerjaan orang lain, jadi alasannya bagian dari akuntabilitas.
+
 - **Finding masih draft** (belum pernah submit, tidak ada eMOL terkait):
   - Title: *"Delete this draft?"*
   - Body: *"This draft will be permanently deleted. This can't be undone."*
+  - Input: **Reason — opsional**, free text. Label *"Reason (optional)"*, placeholder *"Why are you deleting this?"*
   - Buttons: **Cancel** / **Delete**
 - **Finding sudah submitted** (ada eMOL/Order terkait, [lihat cascade](#poin-8-cancel-atau-delete-finding)) — **revisi copy (2026-08-17)**, hindari istilah "order" (bukan mental model mechanic, [konsisten alasan penamaan tombol "Check Existing Defect"](#user-journey--defect-2026-08-13)):
   - Title: *"Delete this defect/crack?"*
   - Body: *"This defect has already been submitted and may be in the approval process. Deleting it will cancel it completely. This can't be undone."*
+  - Input: **Reason — opsional**, free text. Label *"Reason (optional)"*, placeholder *"Why are you deleting this?"*
   - Buttons: **Cancel** / **Delete**
 
 **Catatan (2026-08-17):** copy & struktur (title/body/button) di atas itu konten/wording-nya saja — **tampilan visual dialog ini mengikuti existing design system Digiman+** (komponen dialog/modal yang sudah ada), **butuh UI designer** untuk finalisasi layout/style-nya, bukan didesain dari nol di sini.
