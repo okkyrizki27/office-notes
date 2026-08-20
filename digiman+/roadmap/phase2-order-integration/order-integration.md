@@ -187,17 +187,33 @@ Teks checkbox saat ini cuma valid untuk Skenario 1. Untuk Skenario 2, Order teta
 
 Skenario 2 ternyata perlu dipecah lebih lanjut tergantung apakah ada Order lama yang bisa di-reuse:
 
-- **Sub-kasus A — Order lama sudah ada**, dari finding sebelumnya yang levelnya lebih rendah lalu eskalasi (pola sama dengan [Crack Order Lifecycle](#poin-5-data-flow-defect-dan-crack); mekanisme correlation-nya di [Poin 6](#poin-6-duplicate-atau-correlation-handling)). Eksekusi fisik **non-blocking** (mechanic tidak perlu nunggu approval untuk mulai kerja) — tapi **trigger `BacklogExecutionList`/TECO ke SAP menunggu approval SPV/Planner selesai** dulu, bukan langsung setelah mechanic submit (koreksi mekanisme 2026-08-15: bukan "close" field di `MechanicOrderList`, lihat [Poin 5](#poin-5-data-flow-defect-dan-crack)). Karena Order lama ini sudah pernah lolos approval saat pertama kali dibuat, tidak ada bypass approval yang dibutuhkan — functionally sama dengan backlog execution biasa, cuma dieksekusi lebih cepat dari jadwal aslinya. **Timing TECO pasti amannya tergantung `NoPartsRequired` Order lama** — lihat concern GI di bawah, cuma relevan kalau Order lama itu butuh material.
+- **Sub-kasus A — Order lama sudah ada**, dari finding sebelumnya yang levelnya lebih rendah lalu eskalasi (pola sama dengan [Crack Order Lifecycle](#poin-5-data-flow-defect-dan-crack); mekanisme correlation-nya di [Poin 6](#poin-6-duplicate-atau-correlation-handling)). Eksekusi fisik **non-blocking** (mechanic tidak perlu nunggu approval untuk mulai kerja) — tapi **trigger `BacklogExecutionList`/TECO ke SAP menunggu approval SPV/Planner selesai** dulu, bukan langsung setelah mechanic submit (koreksi mekanisme 2026-08-15: bukan "close" field di `MechanicOrderList`, lihat [Poin 5](#poin-5-data-flow-defect-dan-crack)). ~~Karena Order lama ini sudah pernah lolos approval saat pertama kali dibuat, tidak ada bypass approval yang dibutuhkan~~ — functionally sama dengan backlog execution biasa, cuma dieksekusi lebih cepat dari jadwal aslinya. **Resolved (2026-08-19) — Sub-kasus A dipecah jadi A1 / A2 / A-manual** (definisi lengkap di **Kondisi data** di bawah): kedua jenis kandidat sudah sah sebelum masuk ke sini — **A1** lewat Planner approval di Digiman+, **A2** lewat proses approval di SAP. Yang di-approve di eMOL vehicle ini bukan Order-nya, melainkan **keputusan reuse mechanic**.
 - **Sub-kasus B — tidak ada Order lama**, dipecah lagi berdasarkan kebutuhan material:
-  - **B1 (tidak butuh material)** — pola sama seperti Sub-kasus A: Order dibuat, mechanic eksekusi sekarang (non-blocking), masuk approval SPV/Planner post-hoc, begitu approved sistem create+close (TECO) ke SAP sekaligus. **Tetap aman** — concern GI di bawah **tidak relevan untuk B1** (tidak ada material yang perlu di-GI-kan). Tetap perlu konfirmasi ke BPO (Business Process Owner) client (2026-08-15) sebagai validasi rutin, bukan karena ada flaw yang diketahui.
+  - **B1 (tidak butuh material)** — pola sama seperti Sub-kasus A: Order dibuat, mechanic eksekusi sekarang (non-blocking), masuk approval SPV/Planner post-hoc, begitu approved sistem create+close (TECO) ke SAP sekaligus. **Tetap aman**. Tetap perlu konfirmasi ke BPO (Business Process Owner) client (2026-08-15) sebagai validasi rutin, bukan karena ada flaw yang diketahui.
   - **B2 (butuh material)** — **tidak bisa** pakai pola non-blocking di atas, karena keluarnya material dari logistic mensyaratkan Order/Reservasi SAP sudah ada & di-print duluan (proses fisik: Planner request ke logistic → print MO dari SAP → SPV/Foreman ambil material — proses ini **di luar sistem**). Arahnya: **tetap pakai flow Order → Approval → SAP standar** (tidak bikin jalur baru, supaya mudah dimaintain), cuma **dipercepat prioritasnya** (expedited) dibanding Order biasa. **Open item** — mekanisme percepatan/prioritas belum didesain, kemungkinan terkait visibility/sorting di [Fase F — Dashboard](#fase-f--dashboard). **Ini yang paling kena concern GI di bawah** (butuh material by definition).
     - **Alur yang sudah jelas (2026-08-15):** submit → sync ke `maintenance-order` → eMOL terbentuk → trigger approval workflow → approver bisa langsung approve sampai **fully approved** → data sync ke SAP membentuk MO. Follow-up setelah itu (approval fisik lain, print MO, ambil ke logistic, dst) **di luar sistem**, sudah dijelaskan di atas.
+
+**Resolved (2026-08-19) — Kondisi data (mengganti kolom `Jalur` di matrix):** kolom `Jalur` lama mencampur **cara menemukan** dengan **kondisi data**. Yang menentukan outcome hanya kondisi datanya.
+
+| Kode | Kondisi | `ReuseOrderNumber` | `ReuseSAPOrderNumber` | Provenance approval |
+|---|---|---|---|---|
+| **A1** | Ada row `PoolingMOItem` — **dengan atau tanpa** row `MOOpen` | Dari `PoolingMOItem` | Auto dari `SAPMOSyncOrder.MONo` (atau `MOOpen.MONumber` kalau row-nya sudah ada). **NULL selama `MONo` belum kembali** — inilah baris 3–4 di matrix di bawah | Planner approval Digiman+ |
+| **A2** | Ada row `MOOpen`, **tidak ada** row `PoolingMOItem` | NULL | Auto-derive `MOOpen.MONumber` | Proses approval di SAP |
+| **A-manual** | Auto-detection gagal total | NULL | **Manual** — diinput user | Tidak terverifikasi |
+| **B1** | Order baru, tidak butuh material | NULL | NULL | — (Order belum ada) |
+| **B2** | Order baru, butuh material | NULL | NULL | — (Order belum ada) |
+
+Pembeda A1 vs A2 adalah **asal-usul Order**, bukan ada-tidaknya row `MOOpen`: A1 lahir di Digiman+ (karena itu punya row `PoolingMOItem`), A2 dibuat langsung di ERP. A1 yang sudah sync akan punya row di **kedua** tabel — itu kondisi paling umum, bukan pengecualian.
+
+Hanya **B1/B2** yang menghasilkan row `PoolingMOItem` baru; seluruh jalur reuse (A1/A2/A-manual) tidak, karena Order-nya sudah ada di SAP.
+
+**Escape hatch tidak muncul di sumbu ini** — ia pintu masuk, bukan kondisi data. Sistem tetap coba lookup `MOOpen` + `CheckPartOrder` pakai MO Number yang diinput; ketemu → jatuh ke A1/A2, tidak ketemu → A-manual. Detail lookup & perilaku offline ada di [Poin 6](#poin-6-duplicate-atau-correlation-handling).
 
 **⚠️ Konteks SAP real (BUMA ID) — concern TECO cuma relevan kalau MO butuh material (2026-08-15, disempitkan & dikoreksi):** MO yang **butuh material** dari Digiman+ **tidak langsung siap dieksekusi/TECO** — statusnya awal **"belum release"**/**"waiting approval"** di SAP sendiri (proses approval SAP sendiri, terpisah dari approval Planner di Digiman+ — approver-nya **bukan** procurement/logistic). **Setelah** MO itu approved/release, **baru** lanjut ke proses di sisi **procurement/logistic** (durasinya tergantung ketersediaan material) — 2 tahap berurutan, bukan 1 tahap yang sama. Jadi dapat nomor MO balik dari sync **bukan berarti** MO itu siap di-TECO — bisa jadi masih belum release/approved, atau sudah release tapi proses procurement/logistic-nya masih berjalan. **MO tanpa material (`NoPartsRequired=1`) tidak kena concern ini** — tidak ada GI yang perlu ditunggu, aman TECO langsung.
 
 Sempat dipikirkan solusi "tunggu MO muncul di `MOOpen` dulu baru eksekusi lewat Backlog Execution existing" — **tapi ini juga bermasalah**: inbound sync SAP→`MOOpen` **tidak real-time**, jadi nunggu situ bisa lama/tidak reliable sebagai sinyal.
 
-**Pertanyaan sebenarnya yang perlu dikonfirmasi ke tim SAP (2026-08-15):** apakah validasi TECO di SAP **mensyaratkan GI (Goods Issue) sudah dibuat** atau tidak. Ini yang menentukan gate sebenarnya — bukan soal timing `MOOpen` sync. Kalau TECO memang butuh GI sudah posted, Digiman+ perlu cara untuk tahu status GI itu (belum ada visibility ke sana saat ini) sebelum aman men-trigger TECO. **Cuma relevan untuk kasus butuh material** — B2, dan Sub-kasus A kalau Order lama yang di-reuse punya `NoPartsRequired=0`. **Tidak relevan untuk B1** dan Sub-kasus A yang `NoPartsRequired=1` — keduanya aman TECO langsung, tidak ada GI yang perlu ditunggu.
+**Resolved (2026-08-19) — TECO tidak lagi digantungkan ke status GI:** TECO **selalu** dicoba di titik yang sama, SAP yang menolak kalau Order belum eligible, dan retry existing yang menyelesaikan konvergensinya.
 
 **Resolved (2026-08-18, final — supersede 3 draft sebelumnya) — determinan sebenarnya "apakah `MONo` sudah diketahui/predictable", bukan cuma "butuh material atau tidak":**
 
@@ -231,69 +247,40 @@ Aksinya: create `BacklogExecutionList` (`WorkOrderId` dari konteks Finding, `MON
 
 **Konsekuensi ke skema — field manual `ReuseSAPOrderNumber` cuma dibutuhkan untuk escape hatch:** untuk reuse dengan `PoolingMOItem`, field ini **tidak pernah** diisi manual — kalau `MONo` sudah diketahui, otomatis lengkap; kalau belum, submit di-block duluan (poin 2 di atas), jadi tidak ada state "submit lolos tapi field-nya kosong" yang perlu ditutup manual. Manual input **cuma** dibutuhkan untuk **escape hatch** (Order yang genuinely tidak pernah masuk Digiman+, tidak ada mekanisme sync/scheduler apa pun yang bisa diandalkan di situ).
 
-**Alur keputusan (2026-08-18, versi final — tabel di bawah adalah enumerasi literal dari alur ini, tidak ada logic tersembunyi yang perlu diinterpretasi):**
+**Resolved (2026-08-19) — matrix turun dari 20 baris jadi 10 baris, tanpa kehilangan satu kasus pun:**
 
-```
-IsImmediateExecutable = No
-  → TECO: Tidak ada (berlaku utk SEMUA Jalur, apapun kondisi lain)
+**Status SAP bukan lagi dimensi gate.** Yang tersisa hanya `MONo` — terisi atau NULL. Status REL/CRTD tidak diperiksa Digiman+ sama sekali; SAP yang menolak TECO kalau belum eligible, dan retry existing yang menyelesaikan begitu Order jadi REL. Status **terminal (TECO/CLSD) ditangani lebih awal** — Order seperti itu di-exclude dari candidate scope ([Poin 6](#poin-6-duplicate-atau-correlation-handling)), jadi tidak pernah sampai ke titik ini.
 
-IsImmediateExecutable = Yes DAN Jalur = Reuse DAN MONoKnown = Ya
-  → Sync Create MO: Tidak pernah
-  → TECO: Immediate, final Order Approval
+`MONo` NULL hanya mungkin di **A1 yang belum pernah sync** (`PoolingMOItem` ada, `MOOpen` belum ada). A2 selalu punya `MONumber` dari `MOOpen`; A-manual selalu punya dari input user (tidak terverifikasi — accepted risk).
 
-IsImmediateExecutable = Yes DAN PoolingMOItem = Ada DAN MONoKnown = Tidak DAN ButuhMaterial = Ya
-  → Submit: Blocked (satu-satunya baris yang di-block di seluruh matriks)
+`ButuhMaterial` **gugur sebagai dimensi outcome untuk reuse** — setelah GI resolved, material tidak lagi mengubah timing TECO di jalur reuse; ia hanya relevan sebagai validasi tulis ([Poin 7](#poin-7-editability-window-sebelum-approval)) dan sebagai pembeda B1/B2. Kolom `Submit` juga gugur: **tidak ada satu pun kondisi reuse yang di-block di sisi mechanic**.
 
-IsImmediateExecutable = Yes DAN PoolingMOItem = Ada DAN MONoKnown = Tidak DAN ButuhMaterial = Tidak
-  → Sync Create MO: Tidak pernah
-  → TECO: Immediate, begitu MONo confirmed (event-driven, tidak block submit)
+**Tabel — 10 baris, tiap kolom selalu diisi nilai konkret (tidak ada "N/A"/"tidak relevan" untuk dimensi yang sebenarnya punya nilai):**
 
-IsImmediateExecutable = Yes DAN Jalur = OrderBaru DAN ButuhMaterial = Tidak
-  → Sync Create MO: Final Order Approval
-  → TECO: Immediate, begitu MONo confirmed dari create-response
-
-IsImmediateExecutable = Yes DAN Jalur = OrderBaru DAN ButuhMaterial = Ya
-  → Sync Create MO: Final Order Approval
-  → TECO: Scheduler, 2x/hari dekat shift-end (satu-satunya baris yang pakai Scheduler)
-
-IsImmediateExecutable = Yes DAN Jalur = EscapeHatch
-  → Sync Create MO: Tidak pernah
-  → TECO: Immediate, final Order Approval
-```
-
-**Tabel — 20 baris, tiap kolom selalu diisi nilai konkret (tidak ada "N/A"/"tidak relevan" untuk dimensi yang sebenarnya punya nilai):**
-
-| # | Jalur | `PoolingMOItem` | `MOOpen` | ButuhMaterial | MONoKnown | IsImmediateExecutable | Sync Create MO ke SAP | TECO ke SAP |
-|---|---|---|---|---|---|---|---|---|
-| 1 | Reuse | Ada | Tidak ada | Tidak | Ya | Yes | Tidak pernah | Immediate — final Order Approval |
-| 2 | Reuse | Ada | Tidak ada | Tidak | Ya | No | Tidak pernah | Tidak ada |
-| 3 | Reuse | Ada | Tidak ada | Tidak | Tidak | Yes | Tidak pernah | Immediate — begitu MONo confirmed |
-| 4 | Reuse | Ada | Tidak ada | Tidak | Tidak | No | Tidak pernah | Tidak ada |
-| 5 | Reuse | Ada | Tidak ada | Ya | Ya | Yes | Tidak pernah | Immediate — final Order Approval |
-| 6 | Reuse | Ada | Tidak ada | Ya | Ya | No | Tidak pernah | Tidak ada |
-| 7 | Reuse | Ada | Tidak ada | Ya | Tidak | Yes | Tidak pernah | **Blocked di submit** |
-| 8 | Reuse | Ada | Tidak ada | Ya | Tidak | No | Tidak pernah | Tidak ada |
-| 9 | Reuse | Tidak ada | Ada | Tidak | Ya | Yes | Tidak pernah | Immediate — final Order Approval |
-| 10 | Reuse | Tidak ada | Ada | Tidak | Ya | No | Tidak pernah | Tidak ada |
-| 11 | Reuse | Tidak ada | Ada | Ya | Ya | Yes | Tidak pernah | Immediate — final Order Approval |
-| 12 | Reuse | Tidak ada | Ada | Ya | Ya | No | Tidak pernah | Tidak ada |
-| 13 | OrderBaru | Tidak ada | Tidak ada | Tidak | Tidak | Yes | Final Order Approval | Immediate — begitu MONo confirmed dari create-response |
-| 14 | OrderBaru | Tidak ada | Tidak ada | Tidak | Tidak | No | Final Order Approval | Tidak ada |
-| 15 | OrderBaru | Tidak ada | Tidak ada | Ya | Tidak | Yes | Final Order Approval | **Scheduler — 2x/hari dekat shift-end** |
-| 16 | OrderBaru | Tidak ada | Tidak ada | Ya | Tidak | No | Final Order Approval | Tidak ada |
-| 17 | EscapeHatch | Tidak ada | Tidak ada | Tidak | Ya | Yes | Tidak pernah | Immediate — final Order Approval |
-| 18 | EscapeHatch | Tidak ada | Tidak ada | Tidak | Ya | No | Tidak pernah | Tidak ada |
-| 19 | EscapeHatch | Tidak ada | Tidak ada | Ya | Ya | Yes | Tidak pernah | Immediate — final Order Approval ⚠ |
-| 20 | EscapeHatch | Tidak ada | Tidak ada | Ya | Ya | No | Tidak pernah | Tidak ada |
+| # | Kondisi | `MONo` | `IsImmediateExecutable` | Final Approval | Create `PoolingMOItem` → Sync SAP | TECO ke SAP |
+|---|---|---|---|---|---|---|
+| 1 | A1 / A2 | Terisi | Yes | Lolos | Tidak pernah | Immediate — final Order Approval |
+| 2 | A1 / A2 | Terisi | No | Lolos | Tidak pernah | Tidak ada |
+| 3 | A1 (belum sync) | NULL | Yes | **Blocked** — sampai `MONo` confirmed. Escape valve: turunkan ke `No` (pop-up warning) → jadi baris 4 | Tidak pernah | Immediate — begitu approval lolos |
+| 4 | A1 (belum sync) | NULL | No | Lolos | Tidak pernah | Tidak ada |
+| 5 | A-manual | Manual ⚠ | Yes | Lolos | Tidak pernah | Immediate — final Order Approval |
+| 6 | A-manual | Manual ⚠ | No | Lolos | Tidak pernah | Tidak ada |
+| 7 | B1 | — | Yes | Lolos | Final Order Approval | Immediate — begitu `MONo` confirmed dari create-response |
+| 8 | B1 | — | No | Lolos | Final Order Approval | Tidak ada |
+| 9 | B2 | — | Yes | Lolos | Final Order Approval | **Scheduler — 2x/hari dekat shift-end** |
+| 10 | B2 | — | No | Lolos | Final Order Approval | Tidak ada |
 
 **Legend:**
-- `PoolingMOItem`/`MOOpen` = ada/tidaknya record di masing-masing tabel untuk kandidat Order ini. Untuk `Jalur=Reuse`, salah satu dari dua ini selalu `Ada` (sumber datanya harus dari salah satu). Untuk `OrderBaru` dan `EscapeHatch`, keduanya selalu `Tidak ada` (Order-nya belum tercatat di kedua tabel itu di titik ini).
-- `MONoKnown` = apakah SAP MO Number sudah confirmed di titik itu. Kalau `MOOpen=Ada` atau `Jalur=EscapeHatch`, selalu `Ya` (struktural, bukan variabel — MOOpen sumbernya data SAP yang sudah confirmed; escape hatch diisi manual oleh user). Kalau `Jalur=OrderBaru`, selalu `Tidak` (order-nya belum di-create). Kalau `PoolingMOItem=Ada`, genuinely bisa `Ya` atau `Tidak` (tergantung status sync SAP).
-- Baris 1–12 = disebut **Sub-kasus A** di bagian lain dokumen ini.
-- `OrderBaru` + `ButuhMaterial=Tidak` (baris 13–14) = disebut **B1**; `OrderBaru` + `ButuhMaterial=Ya` (baris 15–16) = disebut **B2**, di bagian lain dokumen ini.
-- ⚠ (baris 19) = **Accepted Risk** — declare `NoPartsRequired` tidak diverifikasi ke SAP.
-- `BacklogExecutionList.MONumber` NOT NULL → TECO tidak pernah terjadi sebelum `MONoKnown=Ya`. Baris 3, 13 ("Immediate — begitu MONo confirmed") menunggu event konfirmasi SAP dulu, baru trigger — bukan langsung di titik approval/create.
-- Scheduler (baris 15) mekanismenya: begitu `SAPMOSyncOrder.MONo` confirmed, insert row ke `BacklogExecutionList` (`MONumber` = `MONo` itu) → insert ini yang trigger TECO lewat §9.3 existing.
+- Baris 1–6 = disebut **Sub-kasus A** di bagian lain dokumen ini (A1/A2/A-manual); baris 7–8 = **B1**, baris 9–10 = **B2**.
+- **Baris 3 = satu-satunya block di seluruh matrix, dan letaknya di sisi approver.** Sebabnya bukan kesiapan SAP, melainkan `BacklogExecutionList.MONumber` yang **NOT NULL** — tanpa `MONo`, insert-nya tidak bisa terjadi dan tidak ada apa pun yang bisa dikirim ke SAP untuk ditolak. **Remedy utama: menunggu `MONo` datang.** Approver tetap punya escape valve (turunkan ke `No`) supaya approval tidak pernah buntu total — tapi ada konsekuensi data, lihat [Poin 7](#poin-7-editability-window-sebelum-approval).
+- **Status REL tidak diperiksa di mana pun.** MO berstatus CRTD tetap muncul sebagai kandidat, tetap bisa disubmit, tetap bisa di-approve — TECO ditembak, SAP menolak, retry existing berhasil sendiri begitu Order jadi REL. Konsisten dengan keputusan GI yang sudah ada.
+- **Status terminal (TECO/CLSD) tidak pernah sampai ke matrix ini** — di-exclude di candidate scope ([Poin 6](#poin-6-duplicate-atau-correlation-handling)). Alasannya beda dari CRTD: Order terminal **tidak akan pernah** jadi REL, jadi retry akan gagal selamanya, sementara row `BacklogExecutionList` sudah terlanjur ter-insert dan tidak ada yang membersihkannya.
+- **Mechanic tidak pernah kena block terkait `MONo`.** Di sisi mechanic hanya ada peringatan non-blocking: *"Order ini belum confirmed ready — eksekusinya tetap tercatat, tapi penutupannya menunggu approval."* Alasan pemindahan ada di [Poin 7](#poin-7-editability-window-sebelum-approval).
+- **⚠ (baris 5–6) = Accepted Risk, status SAP A-manual tidak terverifikasi.** MO Number diinput manual dan tidak ketemu di `MOOpen`, jadi tidak bisa dicek apakah terminal. Ini satu-satunya jalan Order terminal bisa lolos ke TECO — dan itu diterima, karena SAP tetap menolak.
+- **Marker ⚠ material dihapus.** Ketiga arah risikonya sudah tertutup (lihat tangga **Sumber Material** di [User Journey — Defect](#user-journey--defect-2026-08-13)), jadi tidak ada baris yang perlu ditandai.
+- **Kolom Create/Sync = satu pipeline, dua langkah.** `PoolingMOItem` adalah **staging table** untuk sync SAP, bukan tujuan terpisah: Order Approval → insert `PoolingMOItem` → publish ke SAP → `MONo` terbentuk → balik ke `SAPMOSyncOrder`. Nilai `Final Order Approval` di kolom ini berarti **kedua langkah** dipicu di titik itu.
+- **"Tidak pernah" berarti tidak pernah untuk dua-duanya.** Jalur reuse (baris 1–6) tidak insert `PoolingMOItem` dan tidak publish ke SAP — Order-nya sudah ada di ERP (untuk A-manual: diklaim ada, tidak terverifikasi). Konsekuensi yang perlu disadari: **eMOL reuse tidak pernah menjadi kandidat baru** di kemudian hari, karena kandidat di-drive dari union `PoolingMOItem` ∪ `MOOpen` (lihat **Kondisi data** di atas dan [Poin 6](#poin-6-duplicate-atau-correlation-handling)) dan eMOL reuse tidak masuk keduanya. Yang tetap jadi kandidat adalah Order lama yang direuse — dan itu memang benar, kalau tidak akan muncul dua kandidat untuk satu MO yang sama.
+- **Baris 7 vs 9:** B1 menunggu event create-response, B2 pakai scheduler karena harus menunggu GI selesai — satu-satunya baris yang pakai scheduler di seluruh matrix.
 
 **Resolved:**
 - ~~Scope kerja "sambungkan backend"~~ — **terjawab lengkap** lewat mekanisme di [Poin 5](#poin-5-data-flow-defect-dan-crack): menyimpan `TaskPersonalizedFinding`/`TaskPersonalizedFindingMaterial`/`CrackIdentified`, publish ke topic, DAN trigger create `MechanicOrderSummary`/`MechanicOrderList` (baik create-baru maupun reuse-vehicle) — bukan cuma menyimpan Finding saja. **Koreksi (2026-08-17):** klaim "lengkap" ini sebelumnya cuma benar untuk sisi `maintenance-execution` — `CrackIdentified` ternyata tidak punya tujuan di `maintenance-order` sama sekali (gap, [lihat detail di Poin 5](#poin-5-data-flow-defect-dan-crack)), baru resolved sekarang dengan tabel baru `MechanicOrderCrackIdentified`.
@@ -381,7 +368,26 @@ Scope: **Defect saja** — Crack dibahas terpisah nanti (skenarionya beda, lihat
 
 **⚠️ Accepted Risk (2026-08-18, disempitkan setelah resolusi TECO/GI di atas) — declare `NoPartsRequired` di escape hatch ini murni self-declared, tidak terverifikasi ke SAP:** karena Order-nya dibuat di luar Digiman+, tidak ada cara sistem memvalidasi apakah declare user (termasuk `NoPartsRequired`) cocok dengan kondisi asli Order tersebut di SAP. **Konsekuensinya sekarang lebih ringan** dari draft awal — dengan resolusi TECO/GI ([lihat di atas](#poin-1-trigger-dan-ui-create-defect-atau-crack)), Digiman+ tidak lagi mencoba "menebak aman atau tidak" dari `NoPartsRequired` sebelum trigger TECO — TECO **selalu** dicoba di titik yang sama, SAP sendiri yang menolak kalau belum siap (GI belum ada), retry existing yang tangani. Jadi salah declare `NoPartsRequired` **tidak lagi** menyebabkan TECO premature ke SAP — paling jauh cuma bikin call itu gagal & retry sampai SAP benar-benar siap, bukan operasional yang salah.
 
-**Sisa risiko yang genuinely diterima:** cuma di sisi **UX/data entry** — Material section (tampil/tersembunyi, mandatory minimal 1 baris) mengikuti declare user yang mungkin salah, dan record `NoPartsRequired` di Digiman+ bisa tidak match kondisi asli di SAP untuk keperluan reporting/audit trail. **Keputusan (2026-08-18, prinsip umum, berlaku juga ke kasus lain yang serupa — mis. Material hasil derive dari `CheckPartOrder` untuk kandidat Broader Match):** sistem **tidak pernah block submit** berdasarkan mismatch antara declare user dan data lain (SAP atau sumber lain manapun) — **dua arah**, baik "user bilang tidak butuh material tapi ternyata di SAP ada" maupun sebaliknya. Alasan: blocking di lapangan lebih berbahaya daripada membiarkan mismatch tercatat — mechanic yang paling tahu kondisi fisik saat itu, dan **Order Approval (Planner) jadi gate final** untuk menangkap kesalahan sebelum benar-benar dieksekusi/di-push, bukan validasi sistem otomatis.
+**Resolved (2026-08-19) — Sumber Material, tangga 3 tingkat (menggantikan accepted risk material lama):** berurutan, berhenti di tingkat pertama yang menghasilkan data.
+
+1. **`CheckPartOrder`** (join `MONumber`) — otoritatif, SAP source of truth. Kalau ada row, Material dari sini dan **`NoPartsRequired=Yes` gugur**.
+2. **`MechanicOrderMaterial` milik Order lama** (service `maintenance-order`) — kalau `CheckPartOrder` kosong. Hanya tersedia untuk A1.
+3. **Declare `NoPartsRequired`** — kalau dua-duanya kosong.
+   - `NoPartsRequired=Yes` → **no issue**, sesuai ekspektasi, transaksi jalan.
+   - `NoPartsRequired=No` → **blocking**, user wajib input material manual.
+
+Alasan tangga ini: perubahan di SAP tidak terlihat dari sisi Digiman+, jadi `MechanicOrderMaterial` tidak boleh dipakai selama `CheckPartOrder` punya jawaban.
+
+**Accepted risk material lama dihapus, bukan ditulis ulang.** Rumusan "dua arah" sudah tidak akurat: arah *declare-tidak-butuh vs SAP-punya* selesai lewat tingkat 1 (`CheckPartOrder` menang, `NoPartsRequired=Yes` gugur), arah *declare-butuh vs tidak ada di mana pun* jadi **blocking** lewat tingkat 3.
+
+**Catatan beda jenis blocking** — perlu ditulis supaya tidak disamakan:
+
+| Blocking | Bisa diselesaikan user di tempat? |
+|---|---|
+| Material (tangga tingkat 3) | **Ya** — input material manual, submit lolos |
+| `MONo` NULL | **Tidak oleh mechanic** — hanya approver, lewat menunggu atau escape valve ber-warning ([Poin 9](#poin-9-approval-flow)) |
+
+**⚠️ Accepted Risk (2026-08-19) — status SAP A-manual tidak terverifikasi.** MO Number yang diinput manual dan tidak ketemu di `MOOpen` tidak bisa dicek statusnya. Yang penting di sini bukan CRTD (itu memang tidak di-block di mana pun), melainkan **status terminal**: kandidat A1/A2 yang sudah TECO/CLSD di-exclude di candidate scope ([Poin 6](#poin-6-duplicate-atau-correlation-handling)), sedangkan lewat A-manual Order terminal bisa lolos sampai TECO. Diterima — SAP tetap menolak, dan retry existing yang menangani.
 
 **Resolved (2026-08-15):** mekanisme consumer-nya **sama persis** dengan "eMOL vehicle approval" untuk Sub-kasus A ([Poin 5](#poin-5-data-flow-defect-dan-crack)) — consumer create eMOL baru (full snapshot, isinya dari input manual user karena Digiman+ tidak punya data lain), lewat Planner approval seperti biasa, post-approval **skip sync SAP normal** (supaya tidak create MO baru yang duplicate dengan yang sudah ada di SAP), trigger `BacklogExecutionList` — bedanya cuma `MONumber`-nya **selalu** dari input manual (bukan kondisional seperti Sub-kasus A yang bisa derive dari `MONo` existing).
 
