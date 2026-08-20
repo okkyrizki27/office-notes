@@ -957,6 +957,33 @@ Konsolidasi keputusan yang tersebar (Poin 1, di sini, dan diskusi List Suggestio
 
 **Resolved (2026-08-17) — edit BISA mengubah pilihan reuse Order lama, bukan cuma field non-Order:** confirmed — selama masih dalam window edit (belum lock, [lihat batas window di atas](#poin-7-editability-window-sebelum-approval)), user boleh re-run "Check Existing", ganti kandidat reuse yang sudah dipilih, batalkan reuse (jadi Order baru), atau sebaliknya (dari tidak-reuse jadi reuse) — **tidak dibatasi cuma field non-Order** seperti Defect Notes. Konsekuensi: setiap kali `ReuseOrderNumber` berubah lewat edit, berlaku validasi ulang yang sama dengan submit pertama kali (kandidat harus masih `IsActive=1` di titik submit-edit, [terkait langsung ke edge case validasi stale-candidate](#poin-6-duplicate-atau-correlation-handling)) — bukan cuma dicek sekali di awal.
 
+**Resolved (2026-08-19) — validasi reuse diperluas jadi 4 validasi, dan titiknya ditentukan oleh siapa yang bisa menindaklanjuti.** Yang tertulis di atas baru mencakup **satu** validasi (kandidat stale) dan cuma untuk jalur mechanic. Prinsipnya: **block hanya berguna di depan orang yang bisa menyelesaikannya** — block yang tidak actionable adalah obstruksi murni, karena user tidak punya informasi baru untuk diberikan.
+
+| Validasi | Resolvable oleh | Titik |
+|---|---|---|
+| Kandidat stale (`IsActive=1`, belum masuk `BacklogExecutionList`) | Mechanic — re-run Check Existing, pilih lain, atau lanjut Order baru | Submit pertama, submit edit mechanic, Save approver |
+| Material resolvable (lihat [tangga Sumber Data Order](#user-journey--defect-2026-08-13)) | Mechanic — input material manual | Submit pertama, submit edit mechanic, Save approver |
+| Konsistensi field reuse (`ReuseOrderNumber` ↔ `ReuseSAPOrderNumber` menunjuk Order sama) | Sistem | Semua titik tulis |
+| **`MONo` terisi** (kalau `IsImmediateExecutable=Yes`) | **Hanya approver** | **Final approval** |
+
+**Kenapa `MONo` pindah dari submit mechanic ke approver — dua alasan, dan soal sinyal bukan yang utama:**
+
+1. **Block di submit memaksa mechanic memalsukan catatan.** `IsImmediateExecutable` adalah **pernyataan fakta** (perbaikan sudah/sedang dikerjakan saat itu juga), bukan permintaan. Jalan keluar dari block-nya adalah "uncheck" — artinya menyuruh mechanic mencatat bahwa ia **tidak** mengerjakan pekerjaan yang sudah ia kerjakan. Tidak ada block lain di dokumen ini yang menuntut hal seperti itu.
+2. **Mechanic tidak bisa menyelesaikannya.** Tidak ada aksi apa pun di lapangan yang membuat `MONo` datang lebih cepat. Approver bisa menunggu lalu mencoba approve lagi, atau memakai escape valve secara sadar. Mechanic tidak punya dua opsi itu — begitu submit, eMOL sudah lepas dari tangannya.
+
+**Aturan turunan — dua peran `IsImmediateExecutable`.** Field ini memikul catatan fakta eksekusi **sekaligus** trigger TECO. Karena itu menurunkannya ke `No` punya dua arti yang berbeda, dan approver harus sadar sedang melakukan yang mana:
+
+| Alasan approver menurunkan `IsImmediateExecutable` | Boleh? | Akibat |
+|---|---|---|
+| Mechanic salah declare — ternyata tidak dikerjakan saat itu | **Ya**, ini koreksi fakta | Tidak ada; catatannya memang jadi benar |
+| `MONo` belum datang, approval tertahan | **Ya, sebagai escape valve** — supaya approval tidak pernah buntu total | Catatan fakta jadi tidak akurat, **dan** Order lama tetap open di SAP lalu muncul lagi sebagai outstanding backlog untuk pekerjaan yang fisiknya sudah selesai |
+
+Dari sisi UI dua aksi ini identik, jadi **wajib ada pop-up konfirmasi** yang menyebut konsekuensinya, bukan sekadar "Are you sure?". Usulan copy:
+
+> *"Turning this off will record the repair as not executed immediately. The Order will stay open and may reappear as outstanding backlog — even though the work is already done. Continue only if this is what you intend."*
+
+Memecah field jadi dua (fakta vs trigger) sengaja **tidak** diambil di Phase 2 — itu mengembalikan kebutuhan menahan TECO sampai `MONo` datang, lengkap dengan watcher, retry, dan eskalasi. Terlalu mahal untuk kasus sesempit ini. Di luar baris 3 matrix ([Poin 1](#poin-1-trigger-dan-ui-create-defect-atau-crack)) dual-role-nya tidak pernah aktif: A2 dan A-manual selalu punya `MONumber`, B1/B2 mendapatkannya dari create-response.
+
 **Resolved (2026-08-18) — mekanisme ganti kandidat reuse ke `TaskPersonalizedFindingMaterial`: hard delete baris lama, insert ulang (bukan diff/update per-baris):** begitu user ganti kandidat reuse (atau batalkan reuse jadi manual, atau sebaliknya), seluruh row `TaskPersonalizedFindingMaterial` lama untuk Finding itu **dihapus (hard delete)**, lalu baris baru di-insert sesuai kandidat/isian yang baru. **Alasan:** Material 1-to-many dengan jumlah baris yang bisa beda-beda antar kandidat (mis. Order A 3 baris material, Order B 5 baris) — matching/diff per-baris antar kandidat lama vs baru tidak ada gunanya, baris lama cuma snapshot turunan dari kandidat yang sedang dipilih saat itu, bukan entitas yang perlu di-track individual. Konsisten dengan prinsip **simple-mechanism/full-overwrite** yang sudah dipegang di seluruh dokumen ini (mis. race condition last-write-wins tanpa merge/diff, [lihat Poin 5](#poin-5-data-flow-defect-dan-crack)) — **hard delete cukup**, tidak perlu soft-delete (`IsActive`/reason) untuk baris Material transisional ini, beda dari soft-delete Finding-level di [Poin 8](#poin-8-cancel-atau-delete-finding) yang memang butuh audit trail. **Berlaku simetris di consumer `maintenance-order`** saat event hasil edit di-consume — `MechanicOrderMaterial` lama untuk eMOL itu di-replace dengan pola yang sama (delete+reinsert), bukan diff per-baris.
 
 **Catatan — batasan scope vs Poin 10 (Reject/rework), bukan open item Poin 7 (2026-08-17):** Poin 7 di atas cuma cover mechanic **inisiatif sendiri** edit/delete Finding-nya (lewat Edit/Delete, [Poin 8](#poin-8-cancel-atau-delete-finding)) **sebelum** ada approver yang bertindak — sudah **fully resolved**, tidak ada open item tersisa untuk Poin 7 sendiri. **Poin 10 itu trigger yang beda sama sekali** — approver (Supervisor/Planner) **aktif menolak** Finding/Order saat review, bukan aksi mechanic — masih kosong total, open item-nya tercatat di **checklist item 10 sendiri**, bukan digantung di sini.
